@@ -7,9 +7,9 @@ import {Subject} from 'rxjs';
 })
 export class LoginServiceService {
   headerOptions: any = null
+  token: string;
 
   _isLoggedIn: boolean = false
-
   authSub = new Subject<any>();
 
   constructor(private _http: HttpClient) {
@@ -22,15 +22,25 @@ export class LoginServiceService {
         'x-tfa': userObj.authcode
       });
     }
-    return this._http.post("http://localhost:3000/login", {
+    return this._http.post("http://localhost:8080/login", {
       name: userObj.uname,
       pass: userObj.upass
-    }, {observe: 'response', headers: this.headerOptions});
+    }, {observe: 'response', headers: this.headerOptions, responseType: 'text'});
   }
 
-  setupAuth() {
-    return this._http.post("http://localhost:3000/tfa/setup", {}, {observe: 'response'})
+  verifyLogin(userObj: any) {
+    if (userObj.authcode) {
+      console.log('Appending headers');
+      this.headerOptions = new HttpHeaders({
+        'x-tfa': userObj.authcode
+      });
+    }
+    return this._http.post("http://localhost:8080/login", {
+      name: userObj.uname,
+      pass: userObj.upass
+    }, {observe: 'response', headers: this.headerOptions, responseType: 'text'});
   }
+
 
   registerUser(userObj: any) {
     return this._http.post("http://localhost:8080/register", {
@@ -64,15 +74,11 @@ export class LoginServiceService {
     localStorage.setItem('isLoggedIn', "false")
   }
 
-  getAuth() {
-    return this._http.get("http://localhost:3000/tfa/setup", {observe: 'response'});
+  getToken() {
+    return this.token;
   }
 
-  deleteAuth() {
-    return this._http.delete("http://localhost:3000/tfa/setup", {observe: 'response'});
-  }
-
-  verifyAuth(setup2FA: any) {
-    return this._http.post("http://localhost:3000/tfa/verify", {token: setup2FA}, {observe: 'response'});
+  setToken(token: string) {
+    this.token = token;
   }
 }

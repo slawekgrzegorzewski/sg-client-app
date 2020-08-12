@@ -6,17 +6,17 @@
              [(ngModel)]="userObject.uname" placeholder="Username" title="Please enter the username" required autofocus>
       <input type="password" id="upass" class="form-control" name="upass" autocomplete="off" #upass="ngModel"
              [(ngModel)]="userObject.upass" placeholder="Password" title="Please enter the password" required>
-      <input type="text" id="authcode" class="form-control" *ngIf="this.tfaFlag" name="authcode" autocomplete="off"
+      <input type="text" id="authcode" class="form-control" name="authcode" autocomplete="off"
              #authcode="ngModel" [(ngModel)]="userObject.authcode" placeholder="Two-Factor Auth code"
              title="Please enter the code" required>
       <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit"
-              [disabled]="uname?.errors?.required || upass?.errors?.required || (this.tfaFlag && userObject.authcode?.errors?.required)">
+              [disabled]="uname?.errors?.required || upass?.errors?.required || authcode?.errors?.required">
         Sign
         in
       </button>
       <p style="text-align:center;">Want to reset login? <a [routerLink]="['/register']">Register
         here</a></p>
-      <p class="text-danger" style="text-align:center;" *ngIf="errorMessage">{{errorMessage}}</p>
+      <p class="text-danger" style="text-align:center;" *ngIf="message">{{message}}</p>
     </form>
   </div>
 </div>

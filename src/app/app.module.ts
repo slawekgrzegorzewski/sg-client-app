@@ -10,6 +10,7 @@ import {LoginServiceService} from "./services/login-service/login-service.servic
 import {AppRoutingModule} from "./app-routing.module";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HttpClientModule} from "@angular/common/http";
+import { httpInterceptorProviders } from "./interceptors";
 
 @NgModule({
   declarations: [
@@ -26,7 +27,7 @@ import {HttpClientModule} from "@angular/common/http";
     HttpClientModule,
     ReactiveFormsModule
   ],
-  providers: [LoginServiceService],
+  providers: [LoginServiceService, httpInterceptorProviders],
   bootstrap: [AppComponent]
 })
 export class AppModule {
