@@ -1,6 +1,6 @@
 <div class="container">
   <div class="card card-container">
-    <img id="profile-img" class="profile-img-card" src="assets/images/avatar_2x.png"/>
+    <img id="profile-img" class="profile-img-card" src="assets/images/avatar_2x.png" alt=""/>
     <form class="form-signin" *ngIf="qrUrl === null" (ngSubmit)="registerUser()" #registerForm="ngForm">
       <input type="text" id="uname" class="form-control" name="uname" #uname="ngModel" [(ngModel)]="userObject.uname"
              placeholder="Username" title="Please enter the username" autocomplete="off" required autofocus>
@@ -12,26 +12,21 @@
              required>
       <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit"
               [disabled]="(uname?.errors?.required || upass?.errors?.required || uconfirmpass?.errors?.required) || (upass.value !== uconfirmpass.value)">
-        Sign
-        up
+        Sign up
       </button>
-      <p style="text-align:center;">Remember credentials? <a [routerLink]="['/login']">Login
-        here</a></p>
-      <p class="text-success" style="text-align:center;" *ngIf="message">{{message}}</p>
     </form>
-    <form class="form-signin" *ngIf="qrUrl !== null" (ngSubmit)="confirmToken()" #confirmTokenForm="ngForm">
-      <img [src]="qrUrl"/>
-      <div>{{userObject.token}}</div>
+    <form class="form-signin" *ngIf="qrUrl !== null" (ngSubmit)="setup2FA()" #confirmTokenForm="ngForm">
+      <img class="qr-code-img" [src]="qrUrl" alt=""/>
       <input type="password" id="token" class="form-control" name="token"
              placeholder="Type code from authenticator"
-             title="Type code from authenticator" #token="ngModel" [(ngModel)]="userObject.token">
-      <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit" [disabled]="token?.errors?.required">
-        Sign
-        up
+             title="Type code from authenticator" #secretTo2FA="ngModel" [(ngModel)]="userObject.secretFor2FA">
+      <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit"
+              [disabled]="secretTo2FA?.errors?.required">
+        Enter token
       </button>
-      <p style="text-align:center;">Remember credentials? <a [routerLink]="['/login']">Login
-        here</a></p>
-      <p class="text-success" style="text-align:center;" *ngIf="message">{{message}}</p>
     </form>
+    <p style="text-align:center;">Already have an account? <a [routerLink]="['/login']">Login
+      here</a></p>
+    <p class="text-success" style="text-align:center;" *ngIf="message">{{message}}</p>
   </div>
 </div>

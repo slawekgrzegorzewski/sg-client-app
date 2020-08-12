@@ -23,8 +23,8 @@ export class LoginServiceService {
       });
     }
     return this._http.post("http://localhost:3000/login", {
-      uname: userObj.uname,
-      upass: userObj.upass
+      name: userObj.uname,
+      pass: userObj.upass
     }, {observe: 'response', headers: this.headerOptions});
   }
 
@@ -34,9 +34,16 @@ export class LoginServiceService {
 
   registerUser(userObj: any) {
     return this._http.post("http://localhost:8080/register", {
-      uname: userObj.uname,
-      upass: userObj.upass,
-      token: userObj.token
+      name: userObj.uname,
+      pass: userObj.upass
+    }, {observe: "response", responseType: "text"});
+  }
+
+  setup2FA(userObj: any) {
+    return this._http.post("http://localhost:8080/register/setup2FA", {
+      name: userObj.uname,
+      pass: userObj.upass,
+      secretFor2FA: userObj.secretFor2FA
     }, {observe: "response", responseType: "text"});
   }
 
@@ -65,7 +72,7 @@ export class LoginServiceService {
     return this._http.delete("http://localhost:3000/tfa/setup", {observe: 'response'});
   }
 
-  verifyAuth(token: any) {
-    return this._http.post("http://localhost:3000/tfa/verify", {token}, {observe: 'response'});
+  verifyAuth(setup2FA: any) {
+    return this._http.post("http://localhost:3000/tfa/verify", {token: setup2FA}, {observe: 'response'});
   }
 }

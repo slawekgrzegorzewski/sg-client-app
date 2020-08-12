@@ -10,14 +10,13 @@ import {Router} from '@angular/router';
 export class RegisterComponent implements OnInit {
   message: string = null
   qrUrl: string = null
+  confirmPass: string = ""
 
   userObject = {
     uname: "",
     upass: "",
-    token: ""
+    secretFor2FA: ""
   }
-
-  confirmPass: string = ""
 
   constructor(private _loginService: LoginServiceService, private _router: Router) {
   }
@@ -33,9 +32,9 @@ export class RegisterComponent implements OnInit {
     }
   }
 
-  confirmToken() {
-    if (this.userObject.token !== null) {
-      this._loginService.registerUser(this.userObject).subscribe(this.tokenValidationResult(this), this.error(this));
+  setup2FA() {
+    if (this.userObject.secretFor2FA !== null) {
+      this._loginService.setup2FA(this.userObject).subscribe(this.tokenValidationResult(this), this.error(this));
     } else {
       this.message = "Token is empty";
     }
