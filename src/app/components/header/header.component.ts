@@ -11,13 +11,11 @@ export class HeaderComponent implements OnInit {
   isLoggedIn: boolean = false
 
   constructor(private _loginService: LoginServiceService, private _router: Router) {
-    this._loginService.authSub.subscribe((data) => {
-      this.isLoggedIn = data
-    })
+    this._loginService.authSub.subscribe(data => this.isLoggedIn = data);
   }
 
   ngOnInit() {
-    this.isLoggedIn = this._loginService.getAuthStatus()
+    this.isLoggedIn = this._loginService.isLoggedIn();
   }
 
   toggleMenuBar() {

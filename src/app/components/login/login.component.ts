@@ -23,12 +23,15 @@ export class LoginComponent implements OnInit {
   }
 
   loginUser() {
-    this._loginService.loginAuth(this.userObject).subscribe((data) => {
-      this.message = data.body
-      if (data.status === 200) {
-        this._loginService.updateAuthStatus(true);
-      }
-    })
+    this._loginService.login(this.userObject).subscribe(
+      data => {
+        if (data.status !== 200) {
+          this.message = data.body;
+        }
+      },
+      error => {
+        this.message = error.error;
+      })
   }
 
 }

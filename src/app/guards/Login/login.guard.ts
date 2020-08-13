@@ -1,22 +1,17 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
-import { LoginServiceService } from 'src/app/services/login-service/login-service.service';
+import {Injectable} from '@angular/core';
+import {ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot} from '@angular/router';
+import {LoginServiceService} from 'src/app/services/login-service/login-service.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoginGuard implements CanActivate {
-  constructor(private _loginService: LoginServiceService, private _router: Router) {
+  constructor(private _loginService: LoginServiceService) {
   }
-  canActivate(
-    next: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot) {
-    if (!this._loginService.getAuthStatus()) {
-      return true;
-    }
 
-    this._router.navigate(['/home'])
-    return false;
+  canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+    return !this._loginService.isLoggedIn();
+
   }
 
 }

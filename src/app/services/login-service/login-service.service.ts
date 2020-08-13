@@ -1,84 +1,59 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Subject} from 'rxjs';
+import {environment} from "../../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoginServiceService {
-  headerOptions: any = null
-  token: string;
-
-  _isLoggedIn: boolean = false
   authSub = new Subject<any>();
+  serviceUrl: string;
 
   constructor(private _http: HttpClient) {
+    this.serviceUrl = environment.serviceUrl;
   }
 
-  loginAuth(userObj: any) {
-    if (userObj.authcode) {
-      console.log('Appending headers');
-      this.headerOptions = new HttpHeaders({
-        'x-tfa': userObj.authcode
-      });
-    }
-    return this._http.post("http://localhost:8080/login", {
+  login(userObj: any) {
+    var httpHeaders = new HttpHeaders({
+      'x-tfa': userObj.authcode
+    });
+    return this._http.post(this.serviceUrl + "/login", {
       name: userObj.uname,
       pass: userObj.upass
-    }, {observe: 'response', headers: this.headerOptions, responseType: 'text'});
+    }, {observe: 'response', headers: httpHeaders, responseType: 'text'});
   }
-
-  verifyLogin(userObj: any) {
-    if (userObj.authcode) {
-      console.log('Appending headers');
-      this.headerOptions = new HttpHeaders({
-        'x-tfa': userObj.authcode
-      });
-    }
-    return this._http.post("http://localhost:8080/login", {
-      name: userObj.uname,
-      pass: userObj.upass
-    }, {observe: 'response', headers: this.headerOptions, responseType: 'text'});
-  }
-
 
   registerUser(userObj: any) {
-    return this._http.post("http://localhost:8080/register", {
+    return this._http.post(this.serviceUrl + "/register", {
       name: userObj.uname,
       pass: userObj.upass
     }, {observe: "response", responseType: "text"});
   }
 
   setup2FA(userObj: any) {
-    return this._http.post("http://localhost:8080/register/setup2FA", {
+    return this._http.post(this.serviceUrl + "/register/setup2FA", {
       name: userObj.uname,
       pass: userObj.upass,
       secretFor2FA: userObj.secretFor2FA
     }, {observe: "response", responseType: "text"});
   }
 
-  updateAuthStatus(value: boolean) {
-    this._isLoggedIn = value
-    this.authSub.next(this._isLoggedIn);
-    localStorage.setItem('isLoggedIn', value ? "true" : "false");
-  }
-
-  getAuthStatus() {
-    this._isLoggedIn = localStorage.getItem('isLoggedIn') == "true";
-    return this._isLoggedIn
+  isLoggedIn(): boolean {
+    let token = this.getToken();
+    return token !== undefined && token !== null && token !== "";
   }
 
   logoutUser() {
-    this._isLoggedIn = false;
-    this.authSub.next(this._isLoggedIn);
-    localStorage.setItem('isLoggedIn', "false")
+    this.setToken("");
+    this.authSub.next(this.isLoggedIn());
   }
 
   getToken() {
-    return this.token;
+    return localStorage.getItem('token');
   }
 
   setToken(token: string) {
-    this.token = token;
+    localStorage.setItem('token', token)
   }
 }
