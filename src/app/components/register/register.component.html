@@ -1,0 +1,32 @@
+<div class="container">
+  <div class="card card-container">
+    <img id="profile-img" class="profile-img-card" src="assets/images/avatar_2x.png" alt=""/>
+    <form class="form-signin" *ngIf="qrUrl === null" (ngSubmit)="registerUser()" #registerForm="ngForm">
+      <input type="text" id="uname" class="form-control" name="uname" #uname="ngModel" [(ngModel)]="userObject.uname"
+             placeholder="Username" title="Please enter the username" autocomplete="off" required autofocus>
+      <input type="password" id="upass" class="form-control" name="upass" placeholder="Password"
+             title="Please enter the password" #upass="ngModel" autocomplete="off" [(ngModel)]="userObject.upass"
+             required>
+      <input type="password" id="confirmpass" class="form-control" name="confirmpass" placeholder="Confirm password"
+             title="Please re-enter the password" #uconfirmpass="ngModel" autocomplete="off" [(ngModel)]="confirmPass"
+             required>
+      <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit"
+              [disabled]="(uname?.errors?.required || upass?.errors?.required || uconfirmpass?.errors?.required) || (upass.value !== uconfirmpass.value)">
+        Sign up
+      </button>
+    </form>
+    <form class="form-signin" *ngIf="qrUrl !== null" (ngSubmit)="setup2FA()" #confirmTokenForm="ngForm">
+      <img class="qr-code-img" [src]="qrUrl" alt=""/>
+      <input type="password" id="token" class="form-control" name="token"
+             placeholder="Type code from authenticator"
+             title="Type code from authenticator" #secretTo2FA="ngModel" [(ngModel)]="userObject.secretFor2FA">
+      <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit"
+              [disabled]="secretTo2FA?.errors?.required">
+        Enter token
+      </button>
+    </form>
+    <p style="text-align:center;">Already have an account? <a [routerLink]="['/login']">Login
+      here</a></p>
+    <p class="text-success" style="text-align:center;" *ngIf="message">{{message}}</p>
+  </div>
+</div>
