@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-sm navbar-dark bg-dark" style="z-index: 99999;">
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark" style="z-index: 99998;">
   <a class="navbar-brand" [routerLink]="['/login']">Accountant</a>
   <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#collapsibleNavId"
           aria-controls="collapsibleNavId" aria-expanded="false" aria-label="Toggle navigation"
@@ -13,6 +13,12 @@
       <li class="nav-item" [routerLinkActive]="['active']" *ngIf="!isLoggedIn">
         <a class="nav-link" [routerLink]="['/register']">Register</a>
       </li>
+      <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
+        <a class="nav-link" [routerLink]="['/home']">Home</a>
+      </li>
+      <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
+        <a class="nav-link" [routerLink]="['/accounts']">Accounts</a>
+      </li>
     </ul>
     <ul class="navbar-nav ml-auto">
       <li class="nav-item" *ngIf="isLoggedIn">
@@ -21,3 +27,4 @@
     </ul>
   </div>
 </nav>
+<app-toasts aria-live="polite" aria-atomic="true" style="top: 60px !important;"></app-toasts>

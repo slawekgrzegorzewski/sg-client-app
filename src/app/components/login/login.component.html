@@ -11,8 +11,7 @@
              title="Please enter the code" required>
       <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit"
               [disabled]="uname?.errors?.required || upass?.errors?.required || authcode?.errors?.required">
-        Sign
-        in
+        Sign in
       </button>
       <p style="text-align:center;">Want to reset login? <a [routerLink]="['/register']">Register
         here</a></p>

@@ -1,0 +1,7 @@
+<div class="container" *ngIf="this.loggedIn()">
+  <div class="card card-container">
+    <p *ngFor="let account of data">{{account.name}} - {{account.currency}} </p>
+  </div>
+  <button type="button" class="btn btn-primary" (click)="fetchData()">Refresh data</button>
+  <button type="button" class="btn btn-primary" (click)="open()">Create new account</button>
+</div>

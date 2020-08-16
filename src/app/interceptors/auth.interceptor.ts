@@ -31,8 +31,7 @@ export class AuthInterceptor implements HttpInterceptor {
       map(evt => {
         if (evt instanceof HttpResponse) {
           if (evt.body && evt.status === 200 && evt.body.toString().startsWith("Authorization: Bearer ")) {
-            this._loginService.setToken(evt.body.replace("Authorization: Bearer ", ""));
-            setTimeout(() => this._router.navigate(["/home"]), 1000);
+            this._loginService.login(evt.body.replace("Authorization: Bearer ", ""));
             return evt.clone({
               body: "Login successfull"
             });
@@ -42,7 +41,7 @@ export class AuthInterceptor implements HttpInterceptor {
       }),
       catchError(err => {
         if (err instanceof HttpErrorResponse && err.status === 401) {
-          this._loginService.setToken("");
+          this._loginService.logout();
         }
         return throwError(err);
       })

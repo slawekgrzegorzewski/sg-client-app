@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Subject} from 'rxjs';
 import {environment} from "../../../environments/environment";
+import {Router} from "@angular/router";
 
 @Injectable({
   providedIn: 'root'
@@ -10,11 +11,11 @@ export class LoginServiceService {
   authSub = new Subject<any>();
   serviceUrl: string;
 
-  constructor(private _http: HttpClient) {
+  constructor(private _http: HttpClient, private _router: Router) {
     this.serviceUrl = environment.serviceUrl;
   }
 
-  login(userObj: any) {
+  authenticate(userObj: any) {
     var httpHeaders = new HttpHeaders({
       'x-tfa': userObj.authcode
     });
@@ -44,16 +45,25 @@ export class LoginServiceService {
     return token !== undefined && token !== null && token !== "";
   }
 
-  logoutUser() {
+  logout() {
     this.setToken("");
-    this.authSub.next(this.isLoggedIn());
+  }
+
+  login(token: string) {
+    this.setToken(token);
   }
 
   getToken() {
     return localStorage.getItem('token');
   }
 
-  setToken(token: string) {
-    localStorage.setItem('token', token)
+  private setToken(token: string) {
+    localStorage.setItem('token', token);
+    this.authSub.next(this.isLoggedIn());
+    if (this.isLoggedIn()) {
+      setTimeout(() => this._router.navigate(['/home']), 100)
+    } else {
+      setTimeout(() => this._router.navigate(['/login']), 100)
+    }
   }
 }
