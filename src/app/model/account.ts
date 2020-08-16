@@ -1,4 +1,4 @@
-export class Account {
+export class AccountData {
   public id: number;
   public name: string;
   public currency: string;

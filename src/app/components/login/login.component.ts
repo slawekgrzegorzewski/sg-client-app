@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {Router} from '@angular/router'
 import {LoginServiceService} from 'src/app/services/login-service/login-service.service';
 
 @Component({
@@ -16,14 +15,14 @@ export class LoginComponent implements OnInit {
   }
   message: string = null
 
-  constructor(private _loginService: LoginServiceService, private _router: Router) {
+  constructor(private _loginService: LoginServiceService) {
   }
 
   ngOnInit() {
   }
 
   loginUser() {
-    this._loginService.login(this.userObject).subscribe(
+    this._loginService.authenticate(this.userObject).subscribe(
       data => {
         if (data.status !== 200) {
           this.message = data.body;
