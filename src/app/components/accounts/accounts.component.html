@@ -2,7 +2,7 @@
 
   <div *ngIf="!othersAccounts || othersAccounts.length === 0">
     <hoverable-buttons [data]="userAccounts" [converter]="simpleAccountInfo"
-                       [buttons]="[{name: 'del', action:delete(this)}]"></hoverable-buttons>
+                       [buttons]="[{name: 'del', action:delete(this, deleteConfirmation)}]"></hoverable-buttons>
   </div>
   <div *ngIf="othersAccounts && othersAccounts.length > 0">
     <ul ngbNav #nav="ngbNav" class="nav-tabs">
@@ -10,7 +10,7 @@
         <a ngbNavLink>Your accounts</a>
         <ng-template ngbNavContent>
           <hoverable-buttons [data]="userAccounts" [converter]="simpleAccountInfo"
-                             [buttons]="[{name: 'del', action:delete(this,deleteConfirmation)}]"></hoverable-buttons>
+                             [buttons]="[{name: 'del', action:delete(this, deleteConfirmation)}]"></hoverable-buttons>
         </ng-template>
       </li>
       <li ngbNavItem>
