@@ -4,6 +4,7 @@ export class AccountData {
   public currency: string;
   public currentBalance: number;
   public balanceIndex: number;
+  public userName: string;
 
   constructor() {
   }

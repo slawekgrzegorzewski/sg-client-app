@@ -15,7 +15,8 @@ import {ToastService} from "../../services/toast/toast-service";
 export class AccountsComponent implements OnInit {
   private _isLoggedIn = false;
   message = ""
-  data: AccountData[]
+  userAccounts: AccountData[]
+  othersAccounts: AccountData[]
 
   constructor(private _loginService: LoginServiceService, private _http: HttpClient, private modalService: NgbModal, private _toastService: ToastService) {
     _loginService.authSub.subscribe(data => this._isLoggedIn = data);
@@ -32,15 +33,20 @@ export class AccountsComponent implements OnInit {
 
   fetchData() {
     if (!this.loggedIn()) {
-      this.data = [];
+      this.userAccounts = [];
+      this.othersAccounts = [];
       return;
     }
+
+    var userName = this._loginService.getUserName();
     this._http.get<AccountData[]>(environment.serviceUrl + "/accounts/all").subscribe(
       data => {
-        this.data = data;
+        this.userAccounts = data.filter(a => a.userName === userName);
+        this.othersAccounts = data.filter(a => a.userName !== userName);
       },
       err => {
-        this.data = [];
+        this.userAccounts = [];
+        this.othersAccounts = [];
         this._toastService.showWarning("Current data has been cleared out.", "Can not obtain data!");
       }
     )

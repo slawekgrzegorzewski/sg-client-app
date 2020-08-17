@@ -3,6 +3,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Subject} from 'rxjs';
 import {environment} from "../../../environments/environment";
 import {Router} from "@angular/router";
+import * as jwt_decode from "jwt-decode";
 
 @Injectable({
   providedIn: 'root'
@@ -64,6 +65,15 @@ export class LoginServiceService {
       setTimeout(() => this._router.navigate(['/home']), 100)
     } else {
       setTimeout(() => this._router.navigate(['/login']), 100)
+    }
+  }
+
+  getUserName(): any {
+    try{
+      return jwt_decode(this.getToken()).sub;
+    }
+    catch(Error){
+      return null;
     }
   }
 }
