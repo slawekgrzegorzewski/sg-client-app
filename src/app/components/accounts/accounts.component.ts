@@ -78,18 +78,18 @@ export class AccountsComponent implements OnInit {
   }
 
   simpleAccountInfo(a: Account) {
-    return a.name + '- ' + a.currency;
+    return a.name + ' - ' + a.currency;
   }
 
   othersUserAccountInfo(a: Account) {
-    return a.name + '- ' + a.currency + ' for user ' + a.userName;
+    return a.name + ' - ' + a.currency + ' for user ' + a.userName;
   }
 
   delete(that, deleteConfirmation: TemplateRef<any>) {
     return (a: Account) => {
 
       that.accountBeingDeletedDescription = that.othersUserAccountInfo(a)
-      var m: NgbModal = that.modalService;
+      const m: NgbModal = that.modalService;
       m.open(deleteConfirmation, {centered: true}).result.then(
         result => that.deleteAccount(a),
         reason => {
