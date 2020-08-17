@@ -1,7 +1,21 @@
 <div class="container" *ngIf="this.loggedIn()">
-  <div class="card card-container">
-    <p *ngFor="let account of data">{{account.name}} - {{account.currency}} </p>
+
+  <div *ngIf="!othersAccounts || othersAccounts.length === 0" class="card card-container">
+    <p *ngFor="let account of userAccounts">{{account.name}} - {{account.currency}} </p>
   </div>
+
+  <ngb-tabset *ngIf="othersAccounts && othersAccounts.length > 0" [destroyOnHide]="false">
+    <ngb-tab title="Your accounts">
+      <ng-template ngbTabContent>
+        <p *ngFor="let account of userAccounts">{{account.name}} - {{account.currency}} </p>
+      </ng-template>
+    </ngb-tab>
+    <ngb-tab title="Other user's accounts">
+      <ng-template ngbTabContent>
+        <p *ngFor="let account of othersAccounts">{{account.name}} - {{account.currency}} for user {{account.userName}}</p>
+      </ng-template>
+    </ngb-tab>
+  </ngb-tabset>
   <button type="button" class="btn btn-primary" (click)="fetchData()">Refresh data</button>
   <button type="button" class="btn btn-primary" (click)="open()">Create new account</button>
 </div>
