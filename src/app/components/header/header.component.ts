@@ -30,4 +30,12 @@ export class HeaderComponent implements OnInit {
     this._loginService.logout()
     this._router.navigate(['/login'])
   }
+
+  goAsAdmin() {
+    localStorage.setItem('token', localStorage.getItem('adminToken'));
+  }
+
+  goAsGuest() {
+    localStorage.setItem('token', localStorage.getItem('guestToken'));
+  }
 }

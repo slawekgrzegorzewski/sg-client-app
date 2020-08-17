@@ -10,10 +10,24 @@
     </div>
     <div class="form-group">
       <label for="accountCurrency">Currency</label>
-      <select class="form-control" id="accountCurrency" name="accountCurrency"
-              #accountCurrency="ngModel" [(ngModel)]="newAccount.currency" required>
-        <option *ngFor="let currency of currencies" [value]="currency.code">{{currency.code}} - {{currency.displayName}}</option>
-      </select>
+      <input
+        id="accountCurrency"
+        name="accountCurrency"
+        #accountCurrency="ngModel"
+        type="text"
+        class="form-control"
+        [(ngModel)]="currencyObject"
+        [ngbTypeahead]="search"
+        [resultTemplate]="currencyLabel"
+        (focus)="focus$.next($any($event).target.value)"
+        (click)="click$.next($any($event).target.value)"
+        [inputFormatter]="formatter"
+        #accountsTypeAhead="ngbTypeahead"
+        required
+      />
+      <ng-template #currencyLabel let-r="result" let-t="term">
+        <ngb-highlight [result]="r.description()" [term]="t"></ngb-highlight>
+      </ng-template>
     </div>
     <button type="button" class="btn btn-outline-dark" (click)="createAccount()"
             [disabled]="accountName?.errors?.required || accountCurrency?.errors?.required">Create</button>

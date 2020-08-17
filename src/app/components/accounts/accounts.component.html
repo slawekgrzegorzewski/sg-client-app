@@ -1,21 +1,44 @@
 <div class="container" *ngIf="this.loggedIn()">
 
-  <div *ngIf="!othersAccounts || othersAccounts.length === 0" class="card card-container">
-    <p *ngFor="let account of userAccounts">{{account.name}} - {{account.currency}} </p>
+  <div *ngIf="!othersAccounts || othersAccounts.length === 0">
+    <hoverable-buttons [data]="userAccounts" [converter]="simpleAccountInfo"
+                       [buttons]="[{name: 'del', action:delete(this)}]"></hoverable-buttons>
+  </div>
+  <div *ngIf="othersAccounts && othersAccounts.length > 0">
+    <ul ngbNav #nav="ngbNav" class="nav-tabs">
+      <li ngbNavItem>
+        <a ngbNavLink>Your accounts</a>
+        <ng-template ngbNavContent>
+          <hoverable-buttons [data]="userAccounts" [converter]="simpleAccountInfo"
+                             [buttons]="[{name: 'del', action:delete(this,deleteConfirmation)}]"></hoverable-buttons>
+        </ng-template>
+      </li>
+      <li ngbNavItem>
+        <a ngbNavLink>Other user's accounts</a>
+        <ng-template ngbNavContent>
+          <hoverable-buttons [data]="othersAccounts" [converter]="othersUserAccountInfo"></hoverable-buttons>
+        </ng-template>
+      </li>
+    </ul>
+    <div [ngbNavOutlet]="nav"></div>
   </div>
 
-  <ngb-tabset *ngIf="othersAccounts && othersAccounts.length > 0" [destroyOnHide]="false">
-    <ngb-tab title="Your accounts">
-      <ng-template ngbTabContent>
-        <p *ngFor="let account of userAccounts">{{account.name}} - {{account.currency}} </p>
-      </ng-template>
-    </ngb-tab>
-    <ngb-tab title="Other user's accounts">
-      <ng-template ngbTabContent>
-        <p *ngFor="let account of othersAccounts">{{account.name}} - {{account.currency}} for user {{account.userName}}</p>
-      </ng-template>
-    </ngb-tab>
-  </ngb-tabset>
   <button type="button" class="btn btn-primary" (click)="fetchData()">Refresh data</button>
   <button type="button" class="btn btn-primary" (click)="open()">Create new account</button>
 </div>
+
+<ng-template #deleteConfirmation let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Confirmation</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    Do you really want to delete the '{{ accountBeingDeletedDescription }}' account?
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="modal.close('OK click')">OK</button>
+    <button type="button" class="btn btn-outline-dark" (click)="modal.dismiss('Cancel click')">Cancel</button>
+  </div>
+</ng-template>

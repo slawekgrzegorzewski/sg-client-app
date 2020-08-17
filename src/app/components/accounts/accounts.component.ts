@@ -1,9 +1,9 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, TemplateRef} from '@angular/core';
 import {LoginServiceService} from 'src/app/services/login-service/login-service.service';
 import {HttpClient} from "@angular/common/http";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {environment} from "../../../environments/environment";
-import {AccountData} from "../../model/account";
+import {Account} from "../../model/account";
 import {CreateAccountComponent} from "./create-account.component";
 import {ToastService} from "../../services/toast/toast-service";
 
@@ -14,9 +14,9 @@ import {ToastService} from "../../services/toast/toast-service";
 })
 export class AccountsComponent implements OnInit {
   private _isLoggedIn = false;
-  message = ""
-  userAccounts: AccountData[]
-  othersAccounts: AccountData[]
+  userAccounts: Account[]
+  othersAccounts: Account[]
+  accountBeingDeletedDescription: string
 
   constructor(private _loginService: LoginServiceService, private _http: HttpClient, private modalService: NgbModal, private _toastService: ToastService) {
     _loginService.authSub.subscribe(data => this._isLoggedIn = data);
@@ -39,10 +39,11 @@ export class AccountsComponent implements OnInit {
     }
 
     var userName = this._loginService.getUserName();
-    this._http.get<AccountData[]>(environment.serviceUrl + "/accounts/all").subscribe(
+    this._http.get<Account[]>(environment.serviceUrl + "/accounts").subscribe(
       data => {
-        this.userAccounts = data.filter(a => a.userName === userName);
-        this.othersAccounts = data.filter(a => a.userName !== userName);
+        var accounts = data.map(d => new Account(d));
+        this.userAccounts = accounts.filter(a => a.userName === userName);
+        this.othersAccounts = accounts.filter(a => a.userName !== userName);
       },
       err => {
         this.userAccounts = [];
@@ -54,11 +55,8 @@ export class AccountsComponent implements OnInit {
 
   open() {
     let ngbModalRef = this.modalService.open(CreateAccountComponent, {centered: true});
-    ngbModalRef.componentInstance.closeSubject.subscribe(
-      this.onModalClose(ngbModalRef, this),
-      this.onModalClose(ngbModalRef, this),
-      this.onModalClose(ngbModalRef, this)
-    )
+    let closeHandler = this.onModalClose(ngbModalRef, this);
+    ngbModalRef.componentInstance.closeSubject.subscribe(closeHandler, closeHandler, closeHandler)
   }
 
   onModalClose(ngbModalRef, that) {
@@ -67,4 +65,38 @@ export class AccountsComponent implements OnInit {
       that.fetchData();
     }
   }
+
+  deleteAccount(a: Account) {
+    this._http.delete(environment.serviceUrl + "/accounts/" + a.id, {responseType: 'text'}).subscribe(
+      data => {
+        this.userAccounts = this.userAccounts.filter(acc => acc.id !== a.id);
+      },
+      err => {
+        this._toastService.showWarning("'" + this.simpleAccountInfo(a) + "' could not be deleted.", "Can not delete!");
+      }
+    )
+  }
+
+  simpleAccountInfo(a: Account) {
+    return a.name + '- ' + a.currency;
+  }
+
+  othersUserAccountInfo(a: Account) {
+    return a.name + '- ' + a.currency + ' for user ' + a.userName;
+  }
+
+  delete(that, deleteConfirmation: TemplateRef<any>) {
+    return (a: Account) => {
+
+      that.accountBeingDeletedDescription = that.othersUserAccountInfo(a)
+      var m: NgbModal = that.modalService;
+      m.open(deleteConfirmation, {centered: true}).result.then(
+        result => that.deleteAccount(a),
+        reason => {
+        }
+      )
+    }
+
+  }
+
 }

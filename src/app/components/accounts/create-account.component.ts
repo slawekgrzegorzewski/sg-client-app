@@ -1,10 +1,13 @@
-import {Component, Inject, LOCALE_ID, OnInit} from '@angular/core';
+import {Component, Inject, LOCALE_ID, OnInit, ViewChild} from '@angular/core';
 import {LoginServiceService} from 'src/app/services/login-service/login-service.service';
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../../environments/environment";
-import {Subject} from "rxjs";
+import {merge, Observable, Subject} from "rxjs";
 import {ToastService} from "../../services/toast/toast-service";
 import {Currency} from "../../model/currency";
+import {debounceTime, distinctUntilChanged, filter, map} from "rxjs/operators";
+import {NgbTypeahead} from "@ng-bootstrap/ng-bootstrap";
+import {Account} from "../../model/account";
 
 @Component({
   selector: 'account-creator',
@@ -20,6 +23,10 @@ export class CreateAccountComponent implements OnInit {
     currency: string
   }
 
+  set currencyObject(currency: Currency) {
+    this.newAccount.currency = currency.code;
+  }
+
   constructor(private _loginService: LoginServiceService,
               private _http: HttpClient,
               private _toastService: ToastService,
@@ -32,7 +39,7 @@ export class CreateAccountComponent implements OnInit {
   private loadCurrencies() {
     this._http.get<Currency[]>(environment.serviceUrl + "/currency/all/" + this.getUsersLocale()).subscribe(
       data => {
-        this.currencies = data.sort((a, b) => a.code.localeCompare(b.code));
+        this.currencies = data.map(d => Currency.fromData(d)).sort((a, b) => a.code.localeCompare(b.code));
       },
       err => {
         this.currencies = [];
@@ -55,10 +62,6 @@ export class CreateAccountComponent implements OnInit {
     this.newAccount = {name: '', currency: ''}
   }
 
-  private mapToTransferObject() {
-    return {name: this.newAccount.name, currency: this.newAccount.currency}
-  }
-
   ngOnInit() {
     this._isLoggedIn = this._loginService.isLoggedIn();
   }
@@ -68,9 +71,9 @@ export class CreateAccountComponent implements OnInit {
   }
 
   createAccount() {
-    var accountToCreate = this.mapToTransferObject();
+    let account = new Account(this.newAccount);
     this.clearNewAccount();
-    this._http.post(environment.serviceUrl + "/accounts/add", accountToCreate).subscribe(
+    this._http.put(environment.serviceUrl + "/accounts", account).subscribe(
       data => this.confirm(),
       error => {
         this.cancel();
@@ -86,4 +89,20 @@ export class CreateAccountComponent implements OnInit {
   cancel() {
     this.closeSubject.next("cancel");
   }
+
+  @ViewChild('accountsTypeAhead', {static: true}) accountsTypeAhead: NgbTypeahead;
+  focus$ = new Subject<string>();
+  click$ = new Subject<string>();
+
+  search = (text$: Observable<string>) => {
+    const debouncedText$ = text$.pipe(debounceTime(200), distinctUntilChanged());
+    const clicksWithClosedPopup$ = this.click$.pipe(filter(() => !this.accountsTypeAhead.isPopupOpen()));
+    const inputFocus$ = this.focus$;
+
+    return merge(debouncedText$, inputFocus$, clicksWithClosedPopup$).pipe(
+      map(term => (term === '' ? this.currencies
+        : this.currencies.filter(c => c.description().toLowerCase().indexOf(term.toLowerCase()) > -1)).slice(0, 10))
+    );
+  }
+  formatter = (currency: Currency) => currency === null ? '' : currency.description();
 }
