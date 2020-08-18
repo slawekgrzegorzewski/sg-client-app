@@ -15,7 +15,7 @@ import {ToastService} from "../../services/toast/toast-service";
 export class AccountsComponent implements OnInit {
   private _isLoggedIn = false;
   userAccounts: Account[]
-  othersAccounts: Account[]
+  othersAccounts: Map<string, Account[]>
   accountBeingDeletedDescription: string
 
   constructor(private _loginService: LoginServiceService, private _http: HttpClient, private modalService: NgbModal, private _toastService: ToastService) {
@@ -34,23 +34,30 @@ export class AccountsComponent implements OnInit {
   fetchData() {
     if (!this.loggedIn()) {
       this.userAccounts = [];
-      this.othersAccounts = [];
+      this.othersAccounts = new Map<string, Account[]>();
       return;
     }
 
-    var userName = this._loginService.getUserName();
+    var userName = this.loggedInUser();
     this._http.get<Account[]>(environment.serviceUrl + "/accounts").subscribe(
       data => {
         var accounts = data.map(d => new Account(d));
         this.userAccounts = accounts.filter(a => a.userName === userName);
-        this.othersAccounts = accounts.filter(a => a.userName !== userName);
+        this.othersAccounts = accounts.filter(a => a.userName !== userName).reduce(
+          (map, acc) => map.set(acc.userName, [...map.get(acc.userName) || [], acc]),
+          new Map<string, Account[]>()
+        );
       },
       err => {
         this.userAccounts = [];
-        this.othersAccounts = [];
+        this.othersAccounts = new Map<string, Account[]>();
         this._toastService.showWarning("Current data has been cleared out.", "Can not obtain data!");
       }
     )
+  }
+
+  loggedInUser() {
+    return this._loginService.getUserName();
   }
 
   open() {
@@ -81,14 +88,9 @@ export class AccountsComponent implements OnInit {
     return a.name + ' - ' + a.currency;
   }
 
-  othersUserAccountInfo(a: Account) {
-    return a.name + ' - ' + a.currency + ' for user ' + a.userName;
-  }
-
   delete(that, deleteConfirmation: TemplateRef<any>) {
     return (a: Account) => {
-
-      that.accountBeingDeletedDescription = that.othersUserAccountInfo(a)
+      that.accountBeingDeletedDescription = a.name + ' - ' + a.userName
       const m: NgbModal = that.modalService;
       m.open(deleteConfirmation, {centered: true}).result.then(
         result => that.deleteAccount(a),
@@ -96,7 +98,9 @@ export class AccountsComponent implements OnInit {
         }
       )
     }
-
   }
 
+  entries(map: Map<string, Account[]>) {
+    return Array.from(map.entries())
+  }
 }

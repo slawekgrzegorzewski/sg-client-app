@@ -1,0 +1,33 @@
+<div class="card" style="width: 400px;">
+  <div class="card-body">
+    <h5 *ngIf="showTitle" class="card-title">Accounts of user {{userName}}</h5>
+    <div>
+      <table *ngIf="totalBalancesPerCurrency.size > 0" class="card-subtitle mb-2 text-muted"
+             style="margin-left: auto; margin-right: 10px;">
+        <tr>
+          <td>Total balance:</td>
+          <td style="text-align: right">{{firstEntry()[1] | number:'1.2-2'}}</td>
+          <td style="text-align: left">{{firstEntry()[0]}}</td>
+        </tr>
+        <tr *ngFor="let entry of restOfEntries()">
+          <td></td>
+          <td style="text-align: right">{{entry[1] | number:'1.2-2'}}</td>
+          <td style="text-align: left">{{entry[0]}}</td>
+        </tr>
+      </table>
+    </div>
+    <table class="card-text" style="width: 100%">
+      <tr *ngFor="let account of accounts" (mouseenter)="a(account)" (mouseleave)="a(null)"
+          class="row">
+        <td>{{account.name}}</td>
+        <td style="text-align: right; width: 100px">{{account.currentBalance | number:'1.2-2'}}</td>
+        <td style="text-align: left; width: 50px">{{account.currency}}</td>
+        <td *ngIf="buttons && buttons.length > 0">
+          <div *ngIf="overElement === account">
+            <button *ngFor="let button of buttons" (click)="button.action(account)">{{button.name}}</button>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
