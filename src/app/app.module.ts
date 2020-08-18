@@ -17,6 +17,7 @@ import {CreateAccountComponent} from "./components/accounts/create-account.compo
 import {ToastService} from "./services/toast/toast-service";
 import {ToastsContainer} from "./components/toast/toast-container.component";
 import {HoverableButtonsComponent} from "./components/gui/hoverable-buttons.component";
+import {UserAccountsComponent} from "./components/accounts/user-accounts.component";
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import {HoverableButtonsComponent} from "./components/gui/hoverable-buttons.comp
     HomeComponent,
     CreateAccountComponent,
     ToastsContainer,
-    HoverableButtonsComponent
+    HoverableButtonsComponent,
+    UserAccountsComponent
   ],
   imports: [
     BrowserModule,
