@@ -33,9 +33,11 @@ export class HeaderComponent implements OnInit {
 
   goAsAdmin() {
     localStorage.setItem('token', localStorage.getItem('adminToken'));
+    window.location.reload();
   }
 
   goAsGuest() {
     localStorage.setItem('token', localStorage.getItem('guestToken'));
+    window.location.reload();
   }
 }

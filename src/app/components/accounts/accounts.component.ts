@@ -15,6 +15,7 @@ import {ToastService} from "../../services/toast/toast-service";
 export class AccountsComponent implements OnInit {
   private _isLoggedIn = false;
   userAccounts: Account[]
+  otherUsers: string[]
   othersAccounts: Map<string, Account[]>
   accountBeingDeletedDescription: string
 
@@ -47,6 +48,7 @@ export class AccountsComponent implements OnInit {
           (map, acc) => map.set(acc.userName, [...map.get(acc.userName) || [], acc]),
           new Map<string, Account[]>()
         );
+        this.otherUsers = Array.from(this.othersAccounts.keys())
       },
       err => {
         this.userAccounts = [];
