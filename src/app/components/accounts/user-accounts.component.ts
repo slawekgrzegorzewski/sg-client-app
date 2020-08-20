@@ -61,7 +61,6 @@ export class UserAccountsComponent implements OnInit {
 
   setOverAccount(value: Account, accountRow: HTMLTableRowElement) {
     this.overElement = value;
-    console.log(value ? value.id : 'leave')
     if (value) {
       var adjustment = (accountRow.offsetHeight - this.utilBox.nativeElement.offsetHeight) / 2;
       this.utilBoxTop = accountRow.getBoundingClientRect().top + adjustment;

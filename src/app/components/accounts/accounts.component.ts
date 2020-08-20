@@ -4,7 +4,7 @@ import {HttpClient} from "@angular/common/http";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {environment} from "../../../environments/environment";
 import {Account} from "../../model/account";
-import {CreateAccountComponent} from "./create-account.component";
+import {EditAccountComponent, Mode} from "./edit-account.component";
 import {ToastService} from "../../services/toast/toast-service";
 
 @Component({
@@ -62,10 +62,24 @@ export class AccountsComponent implements OnInit {
     return this._loginService.getUserName();
   }
 
-  open() {
-    let ngbModalRef = this.modalService.open(CreateAccountComponent, {centered: true});
+  openCreationDialog() {
+    let component = this.setupEditDialog();
+    component.mode = Mode.CREATE;
+    component.entity = null;
+  }
+
+  openEditDialog(account: Account) {
+    let component = this.setupEditDialog();
+    component.mode = Mode.EDIT;
+    component.entity = account;
+  }
+
+  private setupEditDialog() {
+    let ngbModalRef = this.modalService.open(EditAccountComponent, {centered: true});
+    let component = ngbModalRef.componentInstance as EditAccountComponent;
     let closeHandler = this.onModalClose(ngbModalRef, this);
-    ngbModalRef.componentInstance.closeSubject.subscribe(closeHandler, closeHandler, closeHandler)
+    component.closeSubject.subscribe(closeHandler, closeHandler)
+    return component;
   }
 
   onModalClose(ngbModalRef, that) {
@@ -99,6 +113,12 @@ export class AccountsComponent implements OnInit {
         reason => {
         }
       )
+    }
+  }
+
+  rename(that) {
+    return (a: Account) => {
+      that.openEditDialog(a)
     }
   }
 

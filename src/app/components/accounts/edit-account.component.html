@@ -1,0 +1,38 @@
+<div class="creating-account-main">
+  <h5>Enter new account details</h5>
+  <form #createAccountForm="ngForm">
+    <div class="form-group row">
+      <label for="accountName" class="col-sm-2 col-form-label">Name</label>
+      <div class="col-sm-10">
+        <input id="accountName" name="accountName" type="text" class="form-control" placeholder="Account name"
+               #accountName="ngModel" [(ngModel)]="newAccount.name" required autofocus>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="accountCurrency" class="col-sm-2 col-form-label">Currency</label>
+      <div class="col-sm-10">
+        <input id="accountCurrency" name="accountCurrency" type="text" class="form-control"
+               #accountCurrency="ngModel" #accountsTypeAhead="ngbTypeahead"
+               [(ngModel)]="currencyObject" [ngbTypeahead]="search" [resultTemplate]="currencyLabel"
+               [inputFormatter]="formatter"
+               (focus)="focus$.next($any($event).target.value)" (click)="click$.next($any($event).target.value)"
+               [readonly]="isEditMode() ? 'readonly' : null" [class.form-control-plaintext]="isEditMode()"
+               required/>
+      </div>
+    </div>
+    <div class="form-group row">
+      <div class="col-sm-10">
+        <button type="button" class="btn btn-outline-dark" *ngIf="!isEditMode()" (click)="createAccount()"
+                [disabled]="accountName?.errors?.required || accountCurrency?.errors?.required">Create
+        </button>
+        <button type="button" class="btn btn-outline-dark" *ngIf="isEditMode()" (click)="updateAccount()"
+                [disabled]="accountName?.errors?.required">Save
+        </button>
+        <button type="button" class="btn btn-outline-dark" (click)="cancel()">Cancel</button>
+      </div>
+    </div>
+  </form>
+</div>
+<ng-template #currencyLabel let-r="result" let-t="term">
+  <ngb-highlight [result]="r.description()" [term]="t"></ngb-highlight>
+</ng-template>
