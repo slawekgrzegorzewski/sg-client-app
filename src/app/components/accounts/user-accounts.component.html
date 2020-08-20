@@ -16,23 +16,24 @@
         </tr>
       </table>
     </div>
-    <table class="card-text" style="width: 100%">
-      <tr #row *ngFor="let account of accounts"
-          (mouseenter)="setOverAccount(account, row)"
-          class="account-row">
-        <td>{{account.name}}</td>
-        <td style="text-align: right">{{account.currentBalance | number:'1.2-2'}}</td>
-        <td style="text-align: left">{{account.currency}}</td>
-      </tr>
-    </table>
+    <div #div (mouseleave)="setOverAccount(null, null)">
+      <table #table class="card-text" style="width: 100%">
+        <tr #row *ngFor="let account of accounts"
+            (mouseenter)="setOverAccount(account, row)"
+            class="account-row">
+          <td>{{account.name}}</td>
+          <td style="text-align: right">{{account.currentBalance | number:'1.2-2'}}</td>
+          <td style="text-align: left">{{account.currency}}</td>
+        </tr>
+      </table>
+      <div #utilBox style="position: fixed;"
+           [ngStyle]="{'top.px': utilBoxTop, 'left.px': utilBoxLeft, 'visibility': utilBoxVisibility}">
+        <button *ngFor="let button of buttons" (click)="button.action(overElement)">
+          {{button.name}}
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
-<div #utilBox style="position: absolute;"
-     [ngStyle]="{'top.px': utilBoxTop, 'left.px': utilBoxLeft, 'visibility': utilBoxVisibility}">
-  <button *ngFor="let button of buttons"
-          (click)="button.action(overElement)"
-          (mouseleave)="setOverAccount(null, null)">
-    {{button.name}}
-  </button>
-</div>
+
