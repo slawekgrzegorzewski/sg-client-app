@@ -13,7 +13,7 @@ import {HttpClientModule} from "@angular/common/http";
 import {httpInterceptorProviders} from "./interceptors";
 import {HomeComponent} from "./components/home/home.component";
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {CreateAccountComponent} from "./components/accounts/create-account.component";
+import {EditAccountComponent} from "./components/accounts/edit-account.component";
 import {ToastService} from "./services/toast/toast-service";
 import {ToastsContainer} from "./components/toast/toast-container.component";
 import {HoverableButtonsComponent} from "./components/gui/hoverable-buttons.component";
@@ -27,7 +27,7 @@ import {UserAccountsComponent} from "./components/accounts/user-accounts.compone
     LoginComponent,
     RegisterComponent,
     HomeComponent,
-    CreateAccountComponent,
+    EditAccountComponent,
     ToastsContainer,
     HoverableButtonsComponent,
     UserAccountsComponent

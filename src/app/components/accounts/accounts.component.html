@@ -1,9 +1,8 @@
 <div class="container" *ngIf="this.loggedIn()">
-
   <div *ngIf="!othersAccounts || othersAccounts.size === 0">
     <user-accounts [userName]="loggedInUser()"
                    [accounts]="userAccounts"
-                   [buttons]="[{name: 'del', action:delete(this, deleteConfirmation)}]">
+                   [buttons]="[{name: 'del', action:delete(this, deleteConfirmation)}, {name: 'rename', action:rename(this)}]">
     </user-accounts>
   </div>
   <div *ngIf="othersAccounts && othersAccounts.size > 0">
@@ -13,7 +12,7 @@
         <ng-template ngbNavContent>
           <user-accounts [userName]="loggedInUser()"
                          [accounts]="userAccounts"
-                         [buttons]="[{name: 'del', action:delete(this, deleteConfirmation)}]">
+                         [buttons]="[{name: 'del', action:delete(this, deleteConfirmation)}, {name: 'rename', action:rename(this)}]">
           </user-accounts>
         </ng-template>
       </li>
@@ -33,7 +32,7 @@
   </div>
 
   <button type="button" class="btn btn-primary" (click)="fetchData()">Refresh data</button>
-  <button type="button" class="btn btn-primary" (click)="open()">Create new account</button>
+  <button type="button" class="btn btn-primary" (click)="openCreationDialog()">Create new account</button>
 </div>
 
 <ng-template #deleteConfirmation let-modal>
