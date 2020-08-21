@@ -70,4 +70,10 @@ export class UserAccountsComponent implements OnInit {
       this.utilBoxVisibility = 'hidden'
     }
   }
+
+  buttonClicked() {
+    let acc = this.overElement;
+    this.setOverAccount(null, null);
+    return acc;
+  }
 }
