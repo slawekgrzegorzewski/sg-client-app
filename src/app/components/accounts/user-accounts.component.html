@@ -28,7 +28,7 @@
       </table>
       <div #utilBox style="position: fixed;"
            [ngStyle]="{'top.px': utilBoxTop, 'left.px': utilBoxLeft, 'visibility': utilBoxVisibility}">
-        <button *ngFor="let button of buttons" (click)="button.action(overElement)">
+        <button *ngFor="let button of buttons" (click)="button.action(buttonClicked());">
           {{button.name}}
         </button>
       </div>
