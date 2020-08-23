@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {Account} from "../../model/account";
 import {Button} from "../gui/hoverable-buttons.component";
 
@@ -11,6 +11,8 @@ export class UserAccountsComponent implements OnInit {
   @Input() showTitle: boolean = true
   @Input() userName: string
   @Input() buttons: Button<Account>[];
+  @Input() selectedAccount: Account;
+  @Output() selectionChanged = new EventEmitter<Account>();
 
   private _accounts: Account[];
 

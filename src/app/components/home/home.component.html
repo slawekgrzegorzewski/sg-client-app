@@ -1,5 +1,28 @@
-<div class="container">
-  <div class="card card-container">
-    <span style="white-space:pre-wrap;" *ngIf="this.loggedIn()">{{this.message}}</span>
+<div style="display: flex">
+  <user-accounts [userName]="loginService.getUserName()"
+                 [accounts]="accounts"
+                 [selectedAccount]="selectedAccount"
+                 (selectionChanged)="selectedAccount = $event"
+  >
+  </user-accounts>
+  <div>
+    <table>
+      <tr>
+        <td>Date</td>
+        <td>Amount</td>
+        <td>Description</td>
+      </tr>
+      <tr *ngFor="let transaction of transactionsOfSelectedAccount">
+        <td style="padding: 2px; border: black solid">{{transaction.timeOfTransaction | localizedDate:'d MMMM y, H:mm:ss'}}</td>
+        <td style="padding: 2px; border: black solid">
+          <span
+            *ngIf="transaction.source.id === selectedAccount.id">-{{transaction.debit}} {{transaction.source.currency}}</span>
+          <span
+            *ngIf="transaction.destination.id === selectedAccount.id">{{transaction.credit}} {{transaction.destination.currency}}</span>
+        </td>
+        <td style="padding: 2px; border: black solid">{{transaction.description}}</td>
+      </tr>
+    </table>
+    <button (click)="openIncomeCreationDialog()">Income</button>
   </div>
 </div>

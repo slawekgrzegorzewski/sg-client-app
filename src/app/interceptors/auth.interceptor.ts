@@ -8,14 +8,14 @@ import {
   HttpResponse
 } from "@angular/common/http";
 import {Observable, throwError} from "rxjs";
-import {LoginServiceService} from "../services/login-service/login-service.service";
+import {LoginService} from "../services/login.service";
 import {Router} from "@angular/router";
 import {catchError, map} from "rxjs/operators";
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
-  constructor(private _loginService: LoginServiceService, private _router: Router) {
+  constructor(private _loginService: LoginService, private _router: Router) {
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {

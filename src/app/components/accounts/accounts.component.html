@@ -1,6 +1,6 @@
 <div class="container" *ngIf="this.loggedIn()">
   <div *ngIf="!othersAccounts || othersAccounts.size === 0">
-    <user-accounts [userName]="loggedInUser()"
+    <user-accounts [userName]="loginService.getUserName()"
                    [accounts]="userAccounts"
                    [buttons]="[{name: 'delete', action:delete(this, deleteConfirmation)}, {name: 'rename', action:rename(this)}]">
     </user-accounts>
@@ -10,7 +10,7 @@
       <li ngbNavItem>
         <a ngbNavLink>Your accounts</a>
         <ng-template ngbNavContent>
-          <user-accounts [userName]="loggedInUser()"
+          <user-accounts [userName]="loginService.getUserName()"
                          [accounts]="userAccounts"
                          [buttons]="[{name: 'delete', action:delete(this, deleteConfirmation)}, {name: 'rename', action:rename(this)}]">
           </user-accounts>

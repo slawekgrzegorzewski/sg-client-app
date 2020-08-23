@@ -1,12 +1,11 @@
-import {Component, Inject, Input, LOCALE_ID, OnInit, ViewChild} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
-import {environment} from "../../../environments/environment";
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {merge, Observable, Subject} from "rxjs";
-import {ToastService} from "../../services/toast/toast-service";
+import {ToastService} from "../../services/toast.service";
 import {Currency} from "../../model/currency";
 import {debounceTime, distinctUntilChanged, filter, map} from "rxjs/operators";
 import {NgbTypeahead} from "@ng-bootstrap/ng-bootstrap";
 import {Account} from "../../model/account";
+import {AccountsService} from "../../services/accounts.service";
 
 export enum Mode {EDIT, CREATE}
 
@@ -50,9 +49,7 @@ export class EditAccountComponent implements OnInit {
     return this._currencyObject;
   }
 
-  constructor(private _http: HttpClient,
-              private _toastService: ToastService,
-              @Inject(LOCALE_ID) private defaultLocale: string) {
+  constructor(private accountsService: AccountsService, private _toastService: ToastService) {
     this.entity = null;
   }
 
@@ -61,7 +58,7 @@ export class EditAccountComponent implements OnInit {
   }
 
   private loadCurrencies() {
-    this._http.get<Currency[]>(environment.serviceUrl + "/currency/all/" + this.getUsersLocale()).subscribe(
+    this.accountsService.possibleCurrencies().subscribe(
       data => {
         this.currencies = data.map(d => Currency.fromData(d)).sort((a, b) => a.code.localeCompare(b.code));
         this.setCurrencyObject();
@@ -73,19 +70,9 @@ export class EditAccountComponent implements OnInit {
     )
   }
 
-  private getUsersLocale(): string {
-    if (typeof window === 'undefined' || typeof window.navigator === 'undefined') {
-      return this.defaultLocale;
-    }
-    const wn = window.navigator as any;
-    let lang = wn.languages ? wn.languages[0] : this.defaultLocale;
-    lang = lang || wn.language || wn.browserLanguage || wn.userLanguage;
-    return lang;
-  }
-
   createAccount() {
     this.entity = new Account(this.newAccount);
-    this._http.put(environment.serviceUrl + "/accounts", this.entity).subscribe(
+    this.accountsService.create(this.entity).subscribe(
       data => {
         this.confirm();
         this.entity = null;
@@ -100,7 +87,7 @@ export class EditAccountComponent implements OnInit {
 
   updateAccount() {
     this.entity.name = this.newAccount.name;
-    this._http.patch(environment.serviceUrl + "/accounts", this.entity, {responseType: 'text'}).subscribe(
+    this.accountsService.update(this.entity).subscribe(
       data => {
         this.confirm();
         this.entity = null;
