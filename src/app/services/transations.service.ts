@@ -31,4 +31,12 @@ export class TransactionsService {
       {responseType: 'json'}
     );
   }
+
+  debit(account: Account, amount: number, descritption: string) {
+    return this.http.post<Transaction>(
+      environment.serviceUrl + "/transactions/debit/" + account.id + "/" + amount,
+      descritption,
+      {responseType: 'json'}
+    );
+  }
 }

@@ -17,7 +17,7 @@ export class UserAccountsComponent implements OnInit {
   private _accounts: Account[];
 
   @Input() set accounts(value: Account[]) {
-    this._accounts = value;
+    this._accounts = value.sort(Account.compareByCurrencyAndName);
     this.recalculateSubtotals();
   }
 

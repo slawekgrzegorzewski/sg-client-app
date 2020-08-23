@@ -80,7 +80,7 @@ export class HomeComponent implements OnInit {
 
   private fetchAccounts() {
     this.accountsService.currentUserAccounts().subscribe(
-      data => this.accounts = data,
+      data => this.accounts = data.map(a => new Account(a)).sort(Account.compareByCurrencyAndName),
       error => {
         this.toastService.showWarning("Could not obtain accounts information, retrying");
         this.accounts = [];
@@ -102,8 +102,14 @@ export class HomeComponent implements OnInit {
 
   openIncomeCreationDialog() {
     let component = this.setupEditDialog();
-    component.accounts = this.accounts;
+    component.account = this.selectedAccount;
     component.transactionType = TransactionType.CREDIT;
+  }
+
+  openOutcomeCreationDialog() {
+    let component = this.setupEditDialog();
+    component.account = this.selectedAccount;
+    component.transactionType = TransactionType.DEBIT;
   }
 
   private setupEditDialog(): CreateTransactionsComponent {
@@ -119,6 +125,7 @@ export class HomeComponent implements OnInit {
       ngbModalRef.close();
       if (input === "OK") {
         that.fetchAccounts();
+        this.fetchTransactions();
       }
     }
   }

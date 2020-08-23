@@ -48,14 +48,14 @@ export class AccountsComponent implements OnInit {
     accounts.subscribe(
       data => {
         var accounts = data.map(d => new Account(d));
-        this.userAccounts = accounts.filter(a => a.userName === userName).sort(this.compareByCurrencyAndName);
+        this.userAccounts = accounts.filter(a => a.userName === userName).sort(Account.compareByCurrencyAndName);
         this.othersAccounts = accounts.filter(a => a.userName !== userName).reduce(
           (map, acc) => map.set(acc.userName, [...map.get(acc.userName) || [], acc]),
           new Map<string, Account[]>()
         );
         this.otherUsers = Array.from(this.othersAccounts.keys())
         for (let user of this.otherUsers) {
-          this.otherUsers[user] = (this.otherUsers[user] || []).sort(this.compareByCurrencyAndName);
+          this.otherUsers[user] = (this.otherUsers[user] || []).sort(Account.compareByCurrencyAndName);
         }
       },
       err => {
@@ -64,15 +64,6 @@ export class AccountsComponent implements OnInit {
         this.toastService.showWarning("Current data has been cleared out.", "Can not obtain data!");
       }
     )
-  }
-
-  compareByCurrencyAndName(first: Account, second: Account) {
-    let currencyComparison = first.currency.localeCompare(second.currency);
-    if (currencyComparison !== 0) {
-      return currencyComparison;
-    } else {
-      return first.name.localeCompare(second.name);
-    }
   }
 
   openCreationDialog() {

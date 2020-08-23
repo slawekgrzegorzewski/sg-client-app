@@ -6,23 +6,19 @@
   >
   </user-accounts>
   <div>
-    <table>
-      <tr>
-        <td>Date</td>
-        <td>Amount</td>
-        <td>Description</td>
-      </tr>
+    <table class="table table-striped">
       <tr *ngFor="let transaction of transactionsOfSelectedAccount">
-        <td style="padding: 2px; border: black solid">{{transaction.timeOfTransaction | localizedDate:'d MMMM y, H:mm:ss'}}</td>
-        <td style="padding: 2px; border: black solid">
+        <td>{{transaction.timeOfTransaction | localizedDate:'y-MM-d'}}</td>
+        <td>
           <span
             *ngIf="transaction.source.id === selectedAccount.id">-{{transaction.debit}} {{transaction.source.currency}}</span>
           <span
             *ngIf="transaction.destination.id === selectedAccount.id">{{transaction.credit}} {{transaction.destination.currency}}</span>
         </td>
-        <td style="padding: 2px; border: black solid">{{transaction.description}}</td>
+        <td>{{transaction.description}}</td>
       </tr>
     </table>
     <button (click)="openIncomeCreationDialog()">Income</button>
+    <button (click)="openOutcomeCreationDialog()">Outcome</button>
   </div>
 </div>

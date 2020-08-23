@@ -10,10 +10,9 @@ import {TransactionsService} from "../../services/transations.service";
 })
 export class CreateTransactionsComponent implements OnInit {
 
-  @Input() accounts: Account[]
+  @Input() account: Account
   @Input() transactionType: TransactionType
   @Output() finishSubject = new EventEmitter<string>();
-  toAccount: Account;
   _amount: number;
   set amount(a: number) {
     this._amount = a;
@@ -24,10 +23,7 @@ export class CreateTransactionsComponent implements OnInit {
     return this._amount;
   }
 
-  set toAccountId(id: string) {
-    let idNumber = Number(id);
-    this.toAccount = this.accounts.find(a => a.id === idNumber)
-  }
+  description: string;
 
   constructor(private transactionService: TransactionsService) {
   }
@@ -36,7 +32,15 @@ export class CreateTransactionsComponent implements OnInit {
   }
 
   credit() {
-    this.transactionService.credit(this.toAccount, this.amount, 'O lol')
+    this.transactionService.credit(this.account, this.amount, this.description)
+      .subscribe(
+        data => this.finishSubject.emit("OK"),
+        error => this.finishSubject.emit("Error")
+      );
+  }
+
+  debit() {
+    this.transactionService.debit(this.account, this.amount, this.description)
       .subscribe(
         data => this.finishSubject.emit("OK"),
         error => this.finishSubject.emit("Error")
@@ -45,5 +49,31 @@ export class CreateTransactionsComponent implements OnInit {
 
   cancel() {
     this.finishSubject.emit("Cancelled");
+  }
+
+  public accountLabel(): string {
+    switch (this.transactionType) {
+      case TransactionType.CREDIT:
+        return "Credited account"
+      case TransactionType.DEBIT:
+        return "Debited account"
+      case TransactionType.TRANSFER:
+      default:
+        return "";
+    }
+  }
+
+  createTransaction() {
+    switch (this.transactionType) {
+      case TransactionType.CREDIT:
+        this.credit();
+        break;
+      case TransactionType.DEBIT:
+        this.debit();
+        break;
+      case TransactionType.TRANSFER:
+      default:
+        break;
+    }
   }
 }
