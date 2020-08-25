@@ -47,4 +47,12 @@ export class TransactionsService {
       {responseType: 'json'}
     );
   }
+
+  transferWithConversion(account: Account, targetAccount: Account, amount: number, targetAmount: number, description: string, rate: number) {
+    return this.http.post<Transaction>(
+      environment.serviceUrl + "/transactions/transfer_with_conversion/" + account.id + "/" + targetAccount.id + "/" + amount + "/" + targetAmount + "/" + rate,
+      description,
+      {responseType: 'json'}
+    );
+  }
 }

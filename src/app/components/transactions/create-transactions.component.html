@@ -7,7 +7,7 @@
         <input id="account" name="account" readonly class="form-control-plaintext" value="{{account.name}}">
       </div>
     </div>
-    <div class="form-group row" *ngIf="isTransfer()">
+    <div class="form-group row" *ngIf="isTransfer() || isTransferWithConversion()">
       <label for="destinationAccount" class="col-sm-2 col-form-label">To</label>
       <div class="col-sm-10">
         <select id="destinationAccount" name="destinationAccount" class="form-control"
@@ -18,12 +18,22 @@
     </div>
     <div class="form-group row">
       <label for="transferAmount" class="col-sm-2 col-form-label">Amount</label>
-      <div class="col-sm-7">
+      <div class="col-sm-5">
         <input id="transferAmount" name="accountCurrency" type="number" min=0
                class="form-control" #transferAmount="ngModel" [(ngModel)]="amount" required/>
       </div>
-      <div class="form-control col-sm-2">
-        {{account.currency}}
+      <div class="form-control col-sm-4">
+        <span *ngIf="!isTransferWithConversion()">{{account.currency}}</span>
+        <span *ngIf="isTransferWithConversion() && !targetAccount && !targetAmount">{{account.currency}} -> XXX ?</span>
+        <span *ngIf="isTransferWithConversion() && targetAccount && !targetAmount">{{account.currency}} -> XXX {{targetAccount.currency}}</span>
+        <span *ngIf="isTransferWithConversion() && targetAmount">{{account.currency}} -> {{targetAmount}} {{targetAccount.currency}}</span>
+      </div>
+    </div>
+    <div class="form-group row" *ngIf="isTransferWithConversion()">
+      <label for="currencyRate" class="col-sm-2 col-form-label">Rate</label>
+      <div class="col-sm-10">
+        <input id="currencyRate" name="currencyRate" type="number" min=0
+               class="form-control" #currencyRate="ngModel" [(ngModel)]="rate" required/>
       </div>
     </div>
     <div class="form-group row">
@@ -38,8 +48,10 @@
         <button type="button" class="btn btn-outline-dark" (click)="createTransaction()"
                 [disabled]="transferAmount?.errors?.required
                 || transferAmount?.value < 0
+                || !isIncome() && transferAmount?.value > account.currentBalance
                 || transferDescription?.errors?.required
-                || (isTransfer() && !targetAccount)">
+                || ((isTransfer()||isTransferWithConversion()) && !targetAccount)
+                ||(isTransferWithConversion() && !targetAmount)">
           Create
         </button>
         <button type="button" class="btn btn-outline-dark" (click)="cancel()">Cancel</button>

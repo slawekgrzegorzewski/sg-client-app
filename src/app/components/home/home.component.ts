@@ -102,21 +102,28 @@ export class HomeComponent implements OnInit {
 
   openIncomeCreationDialog() {
     let component = this.setupEditDialog();
-    component.account = this.selectedAccount;
     component.transactionType = TransactionType.CREDIT;
+    component.account = this.selectedAccount;
   }
 
   openOutcomeCreationDialog() {
     let component = this.setupEditDialog();
-    component.account = this.selectedAccount;
     component.transactionType = TransactionType.DEBIT;
+    component.account = this.selectedAccount;
   }
 
   openTransferCreationDialog() {
     let component = this.setupEditDialog();
+    component.transactionType = TransactionType.TRANSFER;
     component.account = this.selectedAccount;
     component.targetAccounts = this.accounts;
-    component.transactionType = TransactionType.TRANSFER;
+  }
+
+  openTransferWithConversionCreationDialog() {
+    let component = this.setupEditDialog();
+    component.transactionType = TransactionType.TRANSFER_WITH_CONVERSION;
+    component.account = this.selectedAccount;
+    component.targetAccounts = this.accounts;
   }
 
   private setupEditDialog(): CreateTransactionsComponent {
