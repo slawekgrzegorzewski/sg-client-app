@@ -24,18 +24,26 @@ export class TransactionsService {
     );
   }
 
-  credit(account: Account, amount: number, descritption: string): Observable<Transaction> {
+  credit(account: Account, amount: number, description: string): Observable<Transaction> {
     return this.http.post<Transaction>(
       environment.serviceUrl + "/transactions/credit/" + account.id + "/" + amount,
-      descritption,
+      description,
       {responseType: 'json'}
     );
   }
 
-  debit(account: Account, amount: number, descritption: string) {
+  debit(account: Account, amount: number, description: string) {
     return this.http.post<Transaction>(
       environment.serviceUrl + "/transactions/debit/" + account.id + "/" + amount,
-      descritption,
+      description,
+      {responseType: 'json'}
+    );
+  }
+
+  transfer(account: Account, targetAccount: Account, amount: number, description: string) {
+    return this.http.post<Transaction>(
+      environment.serviceUrl + "/transactions/transfer/" + account.id + "/" + targetAccount.id + "/" + amount,
+      description,
       {responseType: 'json'}
     );
   }

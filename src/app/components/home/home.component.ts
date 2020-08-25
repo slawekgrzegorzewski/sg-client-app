@@ -112,6 +112,13 @@ export class HomeComponent implements OnInit {
     component.transactionType = TransactionType.DEBIT;
   }
 
+  openTransferCreationDialog() {
+    let component = this.setupEditDialog();
+    component.account = this.selectedAccount;
+    component.targetAccounts = this.accounts;
+    component.transactionType = TransactionType.TRANSFER;
+  }
+
   private setupEditDialog(): CreateTransactionsComponent {
     let ngbModalRef: NgbModalRef = this.modalService.open(CreateTransactionsComponent, {centered: true});
     let component = ngbModalRef.componentInstance as CreateTransactionsComponent;

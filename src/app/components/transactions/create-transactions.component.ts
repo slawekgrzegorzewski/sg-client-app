@@ -10,8 +10,39 @@ import {TransactionsService} from "../../services/transations.service";
 })
 export class CreateTransactionsComponent implements OnInit {
 
-  @Input() account: Account
+  private _account: Account
+  get account(): Account {
+    return this._account;
+  }
+
+  @Input() set account(value: Account) {
+    this._account = value;
+    this.targetAccounts = this.filterTargetAccounts(this.targetAccounts);
+  }
+
+  private _targetAccounts: Account[]
+  get targetAccounts(): Account[] {
+    return this._targetAccounts;
+  }
+
+  @Input() set targetAccounts(value: Account[]) {
+    this._targetAccounts = this.filterTargetAccounts(value);
+  }
+
+  set targetAccountId(id: string) {
+    let idNumber = Number(id);
+    this.targetAccount = this.targetAccounts.find(a => a.id === idNumber)
+  }
+
+  targetAccount: Account;
+
+  private filterTargetAccounts(value: Account[]) {
+    return (value || []).filter(a => !this.account || a.id !== this.account.id)
+      .filter(a => !this.account || a.currency === this.account.currency);
+  }
+
   @Input() transactionType: TransactionType
+
   @Output() finishSubject = new EventEmitter<string>();
   _amount: number;
   set amount(a: number) {
@@ -47,8 +78,20 @@ export class CreateTransactionsComponent implements OnInit {
       );
   }
 
+  transfer() {
+    this.transactionService.transfer(this.account, this.targetAccount, this.amount, this.description)
+      .subscribe(
+        data => this.finishSubject.emit("OK"),
+        error => this.finishSubject.emit("Error")
+      );
+  }
+
   cancel() {
     this.finishSubject.emit("Cancelled");
+  }
+
+  public isTransfer(): boolean {
+    return this.transactionType === TransactionType.TRANSFER;
   }
 
   public accountLabel(): string {
@@ -58,6 +101,7 @@ export class CreateTransactionsComponent implements OnInit {
       case TransactionType.DEBIT:
         return "Debited account"
       case TransactionType.TRANSFER:
+        return "From";
       default:
         return "";
     }
@@ -72,6 +116,8 @@ export class CreateTransactionsComponent implements OnInit {
         this.debit();
         break;
       case TransactionType.TRANSFER:
+        this.transfer();
+        break;
       default:
         break;
     }
