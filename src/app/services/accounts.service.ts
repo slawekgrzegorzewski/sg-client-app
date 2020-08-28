@@ -5,7 +5,7 @@ import {Account} from "../model/account";
 import {Observable, of, throwError} from "rxjs";
 import {Currency} from "../model/currency";
 import {LoginService} from "./login.service";
-import {SettingsService} from "./settingss.service";
+import {SettingsService} from "./settings.service";
 
 @Injectable({
   providedIn: 'root'

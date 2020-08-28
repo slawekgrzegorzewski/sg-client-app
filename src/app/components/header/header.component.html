@@ -28,7 +28,7 @@
         <a class="nav-link" (click)="goAsGuest()">Go as Guest</a>
       </li>
       <li class="nav-item" *ngIf="isLoggedIn">
-        <a class="nav-link" (click)="logout()">Logout {{_loginService.getUserName()}}</a>
+        <a class="nav-link" (click)="logout()">Logout {{loginService.getUserName()}}</a>
       </li>
     </ul>
   </div>

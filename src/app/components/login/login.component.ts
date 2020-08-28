@@ -29,7 +29,7 @@ export class LoginComponent implements OnInit {
         }
       },
       error => {
-        this.message = error.error;
+        this.message = JSON.stringify(error.error);
       })
   }
 

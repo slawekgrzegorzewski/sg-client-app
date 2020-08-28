@@ -22,7 +22,7 @@ import {UserAccountsComponent} from "./components/accounts/user-accounts.compone
 import {CreateTransactionsComponent} from "./components/transactions/create-transactions.component";
 import {TransactionsService} from "./services/transations.service";
 import {LocalizedDatePipe} from "./pipe/localized-date-pipe";
-import {SettingsService} from "./services/settingss.service";
+import {SettingsService} from "./services/settings.service";
 import '@angular/common/locales/global/pl';
 
 @NgModule({

@@ -12,7 +12,10 @@ export class LoginService {
   authSub = new Subject<any>();
   serviceUrl: string;
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {
     this.serviceUrl = environment.serviceUrl;
   }
 
@@ -69,19 +72,17 @@ export class LoginService {
   }
 
   isAdmin(): boolean {
-    try{
+    try {
       return jwt_decode(this.getToken()).roles.includes("ADMIN");
-    }
-    catch(Error){
+    } catch (Error) {
       return false;
     }
   }
 
   getUserName(): string {
-    try{
+    try {
       return jwt_decode(this.getToken()).sub;
-    }
-    catch(Error){
+    } catch (Error) {
       return '';
     }
   }
