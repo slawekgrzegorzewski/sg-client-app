@@ -5,9 +5,10 @@
                  (selectionChanged)="selectedAccount = $event"
   >
   </user-accounts>
-  <div>
+  <div (mouseleave)="setOverTransaction(null, null)">
     <table class="table table-striped">
-      <tr *ngFor="let transaction of transactionsOfSelectedAccount">
+      <tr #row *ngFor="let transaction of transactionsOfSelectedAccount"
+          (mouseenter)="setOverTransaction(transaction, row)">
         <td>{{transaction.timeOfTransaction | localizedDate:'y-MM-d'}}</td>
         <td>
           <span
@@ -21,6 +22,11 @@
     <button (click)="openIncomeCreationDialog()">Income</button>
     <button (click)="openOutcomeCreationDialog()">Outcome</button>
     <button (click)="openTransferCreationDialog()">Transfer</button>
-    <button (click)="openTransferWithConversionCreationDialog()">Transfer with conversion</button>
+    <div #utilBox style="position: fixed;"
+         [ngStyle]="{'top.px': utilBoxTop, 'left.px': utilBoxLeft, 'visibility': utilBoxVisibility}">
+      <button (click)="openPredefinedTransferCreationDialog(buttonClicked())">
+        Transfer
+      </button>
+    </div>
   </div>
 </div>

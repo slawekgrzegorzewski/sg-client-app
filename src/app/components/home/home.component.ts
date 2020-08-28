@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {AccountsService} from "../../services/accounts.service";
 import {ToastService} from "../../services/toast.service";
 import {Account} from "../../model/account";
@@ -16,6 +16,12 @@ import {TransactionsService} from "../../services/transations.service";
 })
 export class HomeComponent implements OnInit {
   private _accounts: Account[]
+
+  @ViewChild('utilBox') utilBox: ElementRef;
+  private overTransaction: Transaction;
+  utilBoxTop: number;
+  utilBoxLeft: number;
+  utilBoxVisibility: string = 'hidden';
 
   get accounts(): Account[] {
     return this._accounts;
@@ -119,11 +125,13 @@ export class HomeComponent implements OnInit {
     component.targetAccounts = this.accounts;
   }
 
-  openTransferWithConversionCreationDialog() {
+  openPredefinedTransferCreationDialog(transaction: Transaction) {
     let component = this.setupEditDialog();
-    component.transactionType = TransactionType.TRANSFER_WITH_CONVERSION;
+    component.transactionType = TransactionType.TRANSFER_PREDEFINED;
     component.account = this.selectedAccount;
     component.targetAccounts = this.accounts;
+    component.amount = transaction.credit;
+    component.description = 'Transfer of \'' + transaction.description + "\'";
   }
 
   private setupEditDialog(): CreateTransactionsComponent {
@@ -142,5 +150,23 @@ export class HomeComponent implements OnInit {
         this.fetchTransactions();
       }
     }
+  }
+
+  setOverTransaction(value: Transaction, transactionRow: HTMLTableRowElement) {
+    this.overTransaction = value;
+    if (value && value.destination?.id === this.selectedAccount.id) {
+      var adjustment = (transactionRow.offsetHeight - this.utilBox.nativeElement.offsetHeight) / 2;
+      this.utilBoxTop = transactionRow.getBoundingClientRect().top + adjustment;
+      this.utilBoxLeft = transactionRow.getBoundingClientRect().left + transactionRow.clientWidth - this.utilBox.nativeElement.offsetWidth;
+      this.utilBoxVisibility = 'visible'
+    } else {
+      this.utilBoxVisibility = 'hidden'
+    }
+  }
+
+  buttonClicked(): Transaction {
+    let transaction = this.overTransaction;
+    this.setOverTransaction(null, null);
+    return transaction;
   }
 }

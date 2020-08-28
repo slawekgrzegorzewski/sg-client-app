@@ -3,6 +3,7 @@ import {TransactionType} from "../../model/transaction-type";
 import {Account} from "../../model/account";
 import {TransactionsService} from "../../services/transations.service";
 import {CurrencyCalculator} from "../../../utils/currency-calculator";
+import {NgModel} from "@angular/forms";
 
 @Component({
   selector: 'create-transaction',
@@ -79,8 +80,7 @@ export class CreateTransactionsComponent implements OnInit {
   }
 
   private filterTargetAccounts(value: Account[]) {
-    return (value || []).filter(a => !this.account || a.id !== this.account.id)
-      .filter(a => this.isTransferWithConversion() || !this.account || a.currency === this.account.currency);
+    return (value || []).filter(a => !this.account || a.id !== this.account.id);
   }
 
   credit() {
@@ -120,25 +120,25 @@ export class CreateTransactionsComponent implements OnInit {
   }
 
   public isIncome(): boolean {
-    return this._transactionType === TransactionType.CREDIT;
+    return this.transactionType === TransactionType.CREDIT;
   }
 
   public isTransfer(): boolean {
-    return this._transactionType === TransactionType.TRANSFER;
+    return this.transactionType === TransactionType.TRANSFER || this.transactionType === TransactionType.TRANSFER_PREDEFINED;
   }
 
   public isTransferWithConversion(): boolean {
-    return this._transactionType === TransactionType.TRANSFER_WITH_CONVERSION;
+    return this.targetAccount && this.targetAccount.currency !== this.account.currency;
   }
 
   public accountLabel(): string {
-    switch (this._transactionType) {
+    switch (this.transactionType) {
       case TransactionType.CREDIT:
         return "Credited account"
       case TransactionType.DEBIT:
         return "Debited account"
       case TransactionType.TRANSFER:
-      case TransactionType.TRANSFER_WITH_CONVERSION:
+      case TransactionType.TRANSFER_PREDEFINED:
         return "From";
       default:
         return "";
@@ -146,7 +146,7 @@ export class CreateTransactionsComponent implements OnInit {
   }
 
   public createTransaction() {
-    switch (this._transactionType) {
+    switch (this.transactionType) {
       case TransactionType.CREDIT:
         this.credit();
         break;
@@ -154,13 +154,25 @@ export class CreateTransactionsComponent implements OnInit {
         this.debit();
         break;
       case TransactionType.TRANSFER:
-        this.transfer();
-        break;
-      case TransactionType.TRANSFER_WITH_CONVERSION:
-        this.transferWithConversion();
+      case TransactionType.TRANSFER_PREDEFINED:
+        this.isTransferWithConversion() ? this.transferWithConversion() : this.transfer();
         break;
       default:
         break;
     }
+  }
+
+  isPredefined() {
+    return this.transactionType === TransactionType.TRANSFER_PREDEFINED;
+  }
+
+  isTransferNotAllowed(transferAmount: NgModel, transferDescription: NgModel) {
+    let req1 = transferAmount?.errors?.required;
+    let req2 = transferAmount?.value < 0;
+    let req3 = !this.isIncome() && transferAmount?.value > this.account.currentBalance;
+    let req4 = transferDescription?.errors?.required;
+    let req5 = (this.isTransfer() || this.isTransferWithConversion()) && !this.targetAccount;
+    let req6 = this.isTransferWithConversion() && !this.targetAmount;
+    return [req1, req2, req3, req4, req5, req6].some(b => b);
   }
 }
