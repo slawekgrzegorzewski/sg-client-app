@@ -28,7 +28,7 @@
         <span *ngIf="isTransferWithConversion() && !targetAccount && !targetAmount">{{account.currency}} -> XXX ?</span>
         <span *ngIf="isTransferWithConversion() && targetAccount && !targetAmount">{{account.currency}}
           -> XXX {{targetAccount.currency}}</span>
-        <span *ngIf="isTransferWithConversion() && targetAmount">{{account.currency}}
+        <span *ngIf="isTransferWithConversion() && targetAccount && targetAmount">{{account.currency}}
           -> {{targetAmount}} {{targetAccount.currency}}</span>
       </div>
     </div>

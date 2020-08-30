@@ -53,6 +53,7 @@ export class CreateTransactionsComponent implements OnInit {
   set amount(a: number) {
     this._amount = a;
     if (this._amount < 0) this._amount = 0;
+    this.calculateTargetAmount();
   }
 
   get amount() {
@@ -64,11 +65,22 @@ export class CreateTransactionsComponent implements OnInit {
   _rate: number;
   set rate(value: number) {
     this._rate = value;
-    this.targetAmount = CurrencyCalculator.round(this.amount * this._rate);
+    this.calculateTargetAmount();
   };
 
   get rate() {
     return this._rate;
+  }
+
+  private calculateTargetAmount() {
+    if (this.isTransferWithConversion()) {
+      if (this._rate) {
+        this.targetAmount = CurrencyCalculator.round(this.amount * this._rate);
+      }
+    } else {
+      this.targetAmount = this.amount;
+    }
+
   }
 
   targetAmount: number;
