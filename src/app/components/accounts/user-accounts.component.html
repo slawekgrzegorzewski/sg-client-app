@@ -16,11 +16,12 @@
         </tr>
       </table>
     </div>
-    <div #div (mouseleave)="setOverAccount(null, null)">
+    <div (mouseleave)="setOverAccount(null, null)">
       <table #table class="card-text" style="width: 100%">
         <tr #row *ngFor="let account of accounts"
             (mouseenter)="setOverAccount(account, row)"
-            class="account-row">
+            (click)="selectedAccount = account; selectionChanged.emit(account);"
+            class="account-row" [class.selected]="account === selectedAccount">
           <td>{{account.name}}</td>
           <td style="text-align: right">{{account.currentBalance | number:'1.2-2'}}</td>
           <td style="text-align: left">{{account.currency}}</td>

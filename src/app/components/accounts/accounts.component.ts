@@ -1,11 +1,11 @@
 import {Component, OnInit, TemplateRef} from '@angular/core';
-import {LoginServiceService} from 'src/app/services/login-service/login-service.service';
-import {HttpClient} from "@angular/common/http";
+import {LoginService} from 'src/app/services/login.service';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {environment} from "../../../environments/environment";
 import {Account} from "../../model/account";
 import {EditAccountComponent, Mode} from "./edit-account.component";
-import {ToastService} from "../../services/toast/toast-service";
+import {ToastService} from "../../services/toast.service";
+import {AccountsService} from "../../services/accounts.service";
+import {Observable} from "rxjs";
 
 @Component({
   selector: 'accounts',
@@ -19,12 +19,16 @@ export class AccountsComponent implements OnInit {
   othersAccounts: Map<string, Account[]>
   accountBeingDeletedDescription: string
 
-  constructor(private _loginService: LoginServiceService, private _http: HttpClient, private modalService: NgbModal, private _toastService: ToastService) {
-    _loginService.authSub.subscribe(data => this._isLoggedIn = data);
+  constructor(
+    private accountsService: AccountsService,
+    protected loginService: LoginService,
+    private modalService: NgbModal,
+    private toastService: ToastService) {
+    loginService.authSub.subscribe(data => this._isLoggedIn = data);
   }
 
   ngOnInit() {
-    this._isLoggedIn = this._loginService.isLoggedIn();
+    this._isLoggedIn = this.loginService.isLoggedIn();
     this.fetchData();
   }
 
@@ -39,39 +43,27 @@ export class AccountsComponent implements OnInit {
       return;
     }
 
-    var userName = this.loggedInUser();
-    this._http.get<Account[]>(environment.serviceUrl + "/accounts").subscribe(
+    var userName = this.loginService.getUserName();
+    let accounts: Observable<Account[]> = this.loginService.isAdmin() ? this.accountsService.allAccounts() : this.accountsService.currentUserAccounts();
+    accounts.subscribe(
       data => {
         var accounts = data.map(d => new Account(d));
-        this.userAccounts = accounts.filter(a => a.userName === userName).sort(this.compareByCurrencyAndName);
+        this.userAccounts = accounts.filter(a => a.userName === userName).sort(Account.compareByCurrencyAndName);
         this.othersAccounts = accounts.filter(a => a.userName !== userName).reduce(
           (map, acc) => map.set(acc.userName, [...map.get(acc.userName) || [], acc]),
           new Map<string, Account[]>()
         );
         this.otherUsers = Array.from(this.othersAccounts.keys())
         for (let user of this.otherUsers) {
-          this.otherUsers[user] = this.otherUsers[user].sort(this.compareByCurrencyAndName);
+          this.otherUsers[user] = (this.otherUsers[user] || []).sort(Account.compareByCurrencyAndName);
         }
       },
       err => {
         this.userAccounts = [];
         this.othersAccounts = new Map<string, Account[]>();
-        this._toastService.showWarning("Current data has been cleared out.", "Can not obtain data!");
+        this.toastService.showWarning("Current data has been cleared out.", "Can not obtain data!");
       }
     )
-  }
-
-  compareByCurrencyAndName(first: Account, second: Account) {
-    let currencyComparison = first.currency.localeCompare(second.currency);
-    if (currencyComparison !== 0) {
-      return currencyComparison;
-    } else {
-      return first.name.localeCompare(second.name);
-    }
-  }
-
-  loggedInUser() {
-    return this._loginService.getUserName();
   }
 
   openCreationDialog() {
@@ -102,12 +94,12 @@ export class AccountsComponent implements OnInit {
   }
 
   deleteAccount(a: Account) {
-    this._http.delete(environment.serviceUrl + "/accounts/" + a.id, {responseType: 'text'}).subscribe(
+    this.accountsService.delete(a).subscribe(
       data => {
         this.userAccounts = this.userAccounts.filter(acc => acc.id !== a.id);
       },
       err => {
-        this._toastService.showWarning("'" + this.simpleAccountInfo(a) + "' could not be deleted.", "Can not delete!");
+        this.toastService.showWarning("'" + this.simpleAccountInfo(a) + "' could not be deleted.", "Can not delete!");
       }
     )
   }

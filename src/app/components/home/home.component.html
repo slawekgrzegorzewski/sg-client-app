@@ -1,5 +1,12 @@
-<div class="container">
-  <div class="card card-container">
-    <span style="white-space:pre-wrap;" *ngIf="this.loggedIn()">{{this.message}}</span>
-  </div>
+<div style="display: flex">
+  <user-accounts [userName]="loginService.getUserName()"
+                 [accounts]="accounts"
+                 [selectedAccount]="selectedAccount"
+                 (selectionChanged)="selectedAccount = $event">
+  </user-accounts>
+
+  <app-transactions-list [account]="selectedAccount"
+                         [allAccounts]="accounts"
+                         (transactionAction)="fetchAccounts()">
+  </app-transactions-list>
 </div>

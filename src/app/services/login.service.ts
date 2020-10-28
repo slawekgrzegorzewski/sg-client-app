@@ -1,18 +1,21 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Subject} from 'rxjs';
-import {environment} from "../../../environments/environment";
+import {environment} from "../../environments/environment";
 import {Router} from "@angular/router";
 import * as jwt_decode from "jwt-decode";
 
 @Injectable({
   providedIn: 'root'
 })
-export class LoginServiceService {
+export class LoginService {
   authSub = new Subject<any>();
   serviceUrl: string;
 
-  constructor(private _http: HttpClient, private _router: Router) {
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {
     this.serviceUrl = environment.serviceUrl;
   }
 
@@ -20,21 +23,21 @@ export class LoginServiceService {
     var httpHeaders = new HttpHeaders({
       'x-tfa': userObj.authcode
     });
-    return this._http.post(this.serviceUrl + "/login", {
+    return this.http.post(this.serviceUrl + "/login", {
       name: userObj.uname,
       pass: userObj.upass
     }, {observe: 'response', headers: httpHeaders, responseType: 'text'});
   }
 
   registerUser(userObj: any) {
-    return this._http.post(this.serviceUrl + "/register", {
+    return this.http.post(this.serviceUrl + "/register", {
       name: userObj.uname,
       pass: userObj.upass
     }, {observe: "response", responseType: "text"});
   }
 
   setup2FA(userObj: any) {
-    return this._http.post(this.serviceUrl + "/register/setup2FA", {
+    return this.http.post(this.serviceUrl + "/register/setup2FA", {
       name: userObj.uname,
       pass: userObj.upass,
       secretFor2FA: userObj.secretFor2FA
@@ -62,18 +65,25 @@ export class LoginServiceService {
     localStorage.setItem('token', token);
     this.authSub.next(this.isLoggedIn());
     if (this.isLoggedIn()) {
-      setTimeout(() => this._router.navigate(['/home']), 100)
+      setTimeout(() => this.router.navigate(['/home']), 100)
     } else {
-      setTimeout(() => this._router.navigate(['/login']), 100)
+      setTimeout(() => this.router.navigate(['/login']), 100)
     }
   }
 
-  getUserName(): any {
-    try{
-      return jwt_decode(this.getToken()).sub;
+  isAdmin(): boolean {
+    try {
+      return jwt_decode(this.getToken()).roles.includes("ADMIN");
+    } catch (Error) {
+      return false;
     }
-    catch(Error){
-      return null;
+  }
+
+  getUserName(): string {
+    try {
+      return jwt_decode(this.getToken()).sub;
+    } catch (Error) {
+      return '';
     }
   }
 }

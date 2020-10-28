@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {Account} from "../../model/account";
 import {Button} from "../gui/hoverable-buttons.component";
 
@@ -11,11 +11,13 @@ export class UserAccountsComponent implements OnInit {
   @Input() showTitle: boolean = true
   @Input() userName: string
   @Input() buttons: Button<Account>[];
+  @Input() selectedAccount: Account;
+  @Output() selectionChanged = new EventEmitter<Account>();
 
   private _accounts: Account[];
 
   @Input() set accounts(value: Account[]) {
-    this._accounts = value;
+    this._accounts = (value || []).sort(Account.compareByCurrencyAndName);
     this.recalculateSubtotals();
   }
 
@@ -23,7 +25,7 @@ export class UserAccountsComponent implements OnInit {
     return this._accounts;
   }
 
-  totalBalancesPerCurrency: Map<string, number>
+  totalBalancesPerCurrency: Map<string, number> = new Map<string, number>()
 
   @ViewChild('utilBox') utilBox: ElementRef;
   overElement: Account;

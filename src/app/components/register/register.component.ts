@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {LoginServiceService} from 'src/app/services/login-service/login-service.service';
+import {LoginService} from 'src/app/services/login.service';
 import {Router} from '@angular/router';
 
 @Component({
@@ -18,7 +18,7 @@ export class RegisterComponent implements OnInit {
     secretFor2FA: ""
   }
 
-  constructor(private _loginService: LoginServiceService, private _router: Router) {
+  constructor(private _loginService: LoginService, private _router: Router) {
   }
 
   ngOnInit() {

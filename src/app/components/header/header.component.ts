@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {LoginServiceService} from 'src/app/services/login-service/login-service.service';
+import {LoginService} from 'src/app/services/login.service';
 import {Router} from '@angular/router';
 
 @Component({
@@ -10,12 +10,15 @@ import {Router} from '@angular/router';
 export class HeaderComponent implements OnInit {
   isLoggedIn: boolean = false
 
-  constructor(private _loginService: LoginServiceService, private _router: Router) {
-    this._loginService.authSub.subscribe(data => this.isLoggedIn = data);
+  constructor(
+    public loginService: LoginService,
+    private router: Router
+  ) {
+    this.loginService.authSub.subscribe(data => this.isLoggedIn = data);
   }
 
   ngOnInit() {
-    this.isLoggedIn = this._loginService.isLoggedIn();
+    this.isLoggedIn = this.loginService.isLoggedIn();
   }
 
   toggleMenuBar() {
@@ -27,8 +30,8 @@ export class HeaderComponent implements OnInit {
   }
 
   logout() {
-    this._loginService.logout()
-    this._router.navigate(['/login'])
+    this.loginService.logout()
+    this.router.navigate(['/login'])
   }
 
   goAsAdmin() {

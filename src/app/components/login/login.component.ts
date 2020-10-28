@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {LoginServiceService} from 'src/app/services/login-service/login-service.service';
+import {LoginService} from 'src/app/services/login.service';
 
 @Component({
   selector: 'app-login',
@@ -15,7 +15,7 @@ export class LoginComponent implements OnInit {
   }
   message: string = null
 
-  constructor(private _loginService: LoginServiceService) {
+  constructor(private _loginService: LoginService) {
   }
 
   ngOnInit() {
@@ -29,7 +29,7 @@ export class LoginComponent implements OnInit {
         }
       },
       error => {
-        this.message = error.error;
+        this.message = JSON.stringify(error.error);
       })
   }
 
