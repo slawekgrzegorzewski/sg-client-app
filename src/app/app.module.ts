@@ -24,6 +24,7 @@ import {TransactionsService} from "./services/transations.service";
 import {LocalizedDatePipe} from "./pipe/localized-date-pipe";
 import {SettingsService} from "./services/settings.service";
 import '@angular/common/locales/global/pl';
+import {TransactionsListComponent} from "./components/transactions/transactions-list.component";
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import '@angular/common/locales/global/pl';
     HoverableButtonsComponent,
     UserAccountsComponent,
     CreateTransactionsComponent,
-    LocalizedDatePipe
+    LocalizedDatePipe,
+    TransactionsListComponent
   ],
   imports: [
     BrowserModule,

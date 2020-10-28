@@ -2,31 +2,11 @@
   <user-accounts [userName]="loginService.getUserName()"
                  [accounts]="accounts"
                  [selectedAccount]="selectedAccount"
-                 (selectionChanged)="selectedAccount = $event"
-  >
+                 (selectionChanged)="selectedAccount = $event">
   </user-accounts>
-  <div (mouseleave)="setOverTransaction(null, null)">
-    <table class="table table-striped">
-      <tr #row *ngFor="let transaction of transactionsOfSelectedAccount"
-          (mouseenter)="setOverTransaction(transaction, row)">
-        <td>{{transaction.timeOfTransaction | localizedDate:'y-MM-d'}}</td>
-        <td>
-          <span
-            *ngIf="transaction.source.id === selectedAccount.id">-{{transaction.debit}} {{transaction.source.currency}}</span>
-          <span
-            *ngIf="transaction.destination.id === selectedAccount.id">{{transaction.credit}} {{transaction.destination.currency}}</span>
-        </td>
-        <td>{{transaction.description}}</td>
-      </tr>
-    </table>
-    <button (click)="openIncomeCreationDialog()">Income</button>
-    <button (click)="openOutcomeCreationDialog()">Outcome</button>
-    <button (click)="openTransferCreationDialog()">Transfer</button>
-    <div #utilBox style="position: fixed;"
-         [ngStyle]="{'top.px': utilBoxTop, 'left.px': utilBoxLeft, 'visibility': utilBoxVisibility}">
-      <button (click)="openPredefinedTransferCreationDialog(buttonClicked())">
-        Transfer
-      </button>
-    </div>
-  </div>
+
+  <app-transactions-list [account]="selectedAccount"
+                         [allAccounts]="accounts"
+                         (transactionAction)="fetchAccounts()">
+  </app-transactions-list>
 </div>
