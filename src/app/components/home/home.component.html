@@ -1,9 +1,8 @@
 <div style="display: flex">
-  <user-accounts [userName]="loginService.getUserName()"
+  <app-user-accounts [userName]="loginService.getUserName()"
                  [accounts]="accounts"
-                 [selectedAccount]="selectedAccount"
                  (selectionChanged)="selectedAccount = $event">
-  </user-accounts>
+  </app-user-accounts>
 
   <app-transactions-list [account]="selectedAccount"
                          [allAccounts]="accounts"

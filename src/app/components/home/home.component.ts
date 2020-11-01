@@ -11,17 +11,15 @@ import {LoginService} from '../../services/login.service';
 })
 export class HomeComponent implements OnInit {
 
+  private internalAccounts: Account[];
   selectedAccount: Account;
 
-  private interalAccounts: Account[];
-
   get accounts(): Account[] {
-    return this.interalAccounts;
+    return this.internalAccounts;
   }
 
   set accounts(value: Account[]) {
-    this.interalAccounts = value;
-    this.selectedAccount = (this.interalAccounts == null || this.interalAccounts.length === 0) ? null : this.interalAccounts[0];
+    this.internalAccounts = value;
   }
 
   constructor(private accountsService: AccountsService,

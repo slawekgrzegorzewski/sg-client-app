@@ -78,6 +78,9 @@ export class TransactionsListComponent {
   }
 
   private filterAccountsOtherThanSelectedOne(): Account[] {
+    if (!this.internalAllAccounts) {
+      return [];
+    }
     return this.internalAllAccounts.filter(account => this.internalAccount === undefined || account.id !== this.internalAccount.id);
   }
 
@@ -90,7 +93,7 @@ export class TransactionsListComponent {
     }
     return this.transactions
       .filter(t => this.isTransactionRelatedToSelectedAccount(t))
-      .sort((a, b) => a.timeOfTransaction.getTime() - b.timeOfTransaction.getTime())
+      .sort((a, b) => a.timeOfTransaction.getTime() - b.timeOfTransaction.getTime());
   }
 
   private isTransactionRelatedToSelectedAccount(t: Transaction): boolean {

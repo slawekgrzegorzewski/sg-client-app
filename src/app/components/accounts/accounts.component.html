@@ -1,29 +1,29 @@
 <div class="container" *ngIf="this.loggedIn()">
   <div *ngIf="!othersAccounts || othersAccounts.size === 0">
-    <user-accounts [userName]="loginService.getUserName()"
+    <app-user-accounts [userName]="loginService.getUserName()"
                    [accounts]="userAccounts"
                    [buttons]="[{name: 'delete', action:delete(this, deleteConfirmation)}, {name: 'rename', action:rename(this)}]">
-    </user-accounts>
+    </app-user-accounts>
   </div>
   <div *ngIf="othersAccounts && othersAccounts.size > 0">
     <ul ngbNav #nav="ngbNav" class="nav-tabs">
       <li ngbNavItem>
         <a ngbNavLink>Your accounts</a>
         <ng-template ngbNavContent>
-          <user-accounts [userName]="loginService.getUserName()"
+          <app-user-accounts [userName]="loginService.getUserName()"
                          [accounts]="userAccounts"
                          [buttons]="[{name: 'delete', action:delete(this, deleteConfirmation)}, {name: 'rename', action:rename(this)}]">
-          </user-accounts>
+          </app-user-accounts>
         </ng-template>
       </li>
       <li ngbNavItem>
         <a ngbNavLink>Other user's accounts</a>
         <ng-template ngbNavContent>
           <div style="display: flex">
-            <user-accounts *ngFor="let user of otherUsers"
+            <app-user-accounts *ngFor="let user of otherUsers"
                            [userName]="user"
                            [accounts]="othersAccounts.get(user)">
-            </user-accounts>
+            </app-user-accounts>
           </div>
         </ng-template>
       </li>

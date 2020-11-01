@@ -8,7 +8,7 @@ import {Router} from '@angular/router';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
-  isLoggedIn: boolean = false
+  isLoggedIn = false;
 
   constructor(
     public loginService: LoginService,
@@ -17,29 +17,29 @@ export class HeaderComponent implements OnInit {
     this.loginService.authSub.subscribe(data => this.isLoggedIn = data);
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.isLoggedIn = this.loginService.isLoggedIn();
   }
 
-  toggleMenuBar() {
-    if (document.getElementById("collapsibleNavId").style.display == "block") {
-      document.getElementById("collapsibleNavId").style.display = "none";
+  toggleMenuBar(): void {
+    if (document.getElementById('collapsibleNavId').style.display == 'block') {
+      document.getElementById('collapsibleNavId').style.display = 'none';
     } else {
-      document.getElementById("collapsibleNavId").style.display = "block";
+      document.getElementById('collapsibleNavId').style.display = 'block';
     }
   }
 
-  logout() {
+  logout(): void {
     this.loginService.logout()
     this.router.navigate(['/login'])
   }
 
-  goAsAdmin() {
+  goAsAdmin(): void {
     localStorage.setItem('token', localStorage.getItem('adminToken'));
     window.location.reload();
   }
 
-  goAsGuest() {
+  goAsGuest(): void {
     localStorage.setItem('token', localStorage.getItem('guestToken'));
     window.location.reload();
   }

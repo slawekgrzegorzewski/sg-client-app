@@ -56,7 +56,7 @@ export class CreateTransactionsComponent implements OnInit {
 
   set amount(a: number) {
     this.internalAmount = a;
-    if (this.internalAmount) {
+    if (this.internalAmount < 0) {
       this.internalAmount = 0;
     }
     this.calculateTargetAmount();

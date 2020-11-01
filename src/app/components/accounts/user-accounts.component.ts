@@ -1,80 +1,88 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {Account} from "../../model/account";
-import {Button} from "../gui/hoverable-buttons.component";
+import {Account} from '../../model/account';
+import {Button} from '../gui/hoverable-buttons.component';
 
 @Component({
-  selector: 'user-accounts',
+  selector: 'app-user-accounts',
   templateUrl: './user-accounts.component.html',
   styleUrls: ['./user-accounts.component.css']
 })
 export class UserAccountsComponent implements OnInit {
-  @Input() showTitle: boolean = true
-  @Input() userName: string
+  @Input() showTitle = true;
+  @Input() userName: string;
   @Input() buttons: Button<Account>[];
-  @Input() selectedAccount: Account;
   @Output() selectionChanged = new EventEmitter<Account>();
 
-  private _accounts: Account[];
+  private internalAccounts: Account[];
+  selectedAccount: Account;
 
   @Input() set accounts(value: Account[]) {
-    this._accounts = (value || []).sort(Account.compareByCurrencyAndName);
+    this.internalAccounts = (value || []).sort(Account.compareByCurrencyAndName);
+    this.selectAccount();
     this.recalculateSubtotals();
   }
 
   get accounts(): Account[] {
-    return this._accounts;
+    return this.internalAccounts;
   }
 
-  totalBalancesPerCurrency: Map<string, number> = new Map<string, number>()
+  totalBalancesPerCurrency: Map<string, number> = new Map<string, number>();
 
   @ViewChild('utilBox') utilBox: ElementRef;
   overElement: Account;
   utilBoxTop: number;
   utilBoxLeft: number;
-  utilBoxVisibility: string = 'hidden';
+  utilBoxVisibility = 'hidden';
 
   constructor() {
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
   }
 
-  simpleAccountInfo(a: Account) {
+  simpleAccountInfo(a: Account): string {
     return a.name + ' - ' + a.currentBalance + ' ' + a.currency;
   }
 
-  private recalculateSubtotals() {
+  private selectAccount(): void {
+    if (!this.accounts || this.accounts.length === 0 || !this.selectedAccount) {
+      this.selectedAccount = null;
+    }
+    if (this.selectedAccount) {
+      this.selectedAccount = this.accounts.find(a => a.id === this.selectedAccount.id);
+    }
+  }
+
+  private recalculateSubtotals(): void {
     this.totalBalancesPerCurrency = (this.accounts || [])
       .reduce(
         (map, acc) => map.set(acc.currency, (map.get(acc.currency) || 0) + acc.currentBalance),
         new Map<string, number>()
-      )
+      );
   }
 
-  firstEntry() {
-    let next = Array.from(this.totalBalancesPerCurrency.entries())[0];
-    return next;
+  firstEntry(): [string, number] {
+    return Array.from(this.totalBalancesPerCurrency.entries())[0];
   }
 
-  restOfEntries() {
-    let next = Array.from(this.totalBalancesPerCurrency.entries()).slice(1);
-    return next;
+  restOfEntries(): [string, number][] {
+    return Array.from(this.totalBalancesPerCurrency.entries()).slice(1);
   }
 
-  setOverAccount(value: Account, accountRow: HTMLTableRowElement) {
+  setOverAccount(value: Account, accountRow: HTMLTableRowElement): void {
     this.overElement = value;
     if (value) {
-      var adjustment = (accountRow.offsetHeight - this.utilBox.nativeElement.offsetHeight) / 2;
+      const adjustment = (accountRow.offsetHeight - this.utilBox.nativeElement.offsetHeight) / 2;
       this.utilBoxTop = accountRow.getBoundingClientRect().top + adjustment;
       this.utilBoxLeft = accountRow.getBoundingClientRect().left + accountRow.clientWidth - this.utilBox.nativeElement.offsetWidth;
-      this.utilBoxVisibility = 'visible'
+      this.utilBoxVisibility = 'visible';
     } else {
-      this.utilBoxVisibility = 'hidden'
+      this.utilBoxVisibility = 'hidden';
     }
   }
 
-  buttonClicked() {
-    let acc = this.overElement;
+  buttonClicked(): Account {
+    const acc = this.overElement;
     this.setOverAccount(null, null);
     return acc;
   }
