@@ -1,11 +1,15 @@
-<div style="display: flex">
-  <app-user-accounts [userName]="loginService.getUserName()"
-                 [accounts]="accounts"
-                 (selectionChanged)="selectedAccount = $event">
-  </app-user-accounts>
+<div style="display: flex; flex-direction: row">
+  <div style="display: flex; flex-direction: column">
+    <app-user-accounts [userName]="loginService.getUserName()"
+                       [accounts]="accounts"
+                       (selectionChanged)="selectedAccount = $event">
+    </app-user-accounts>
 
-  <app-transactions-list [account]="selectedAccount"
-                         [allAccounts]="accounts"
-                         (transactionAction)="fetchAccounts()">
-  </app-transactions-list>
+    <app-transactions-list [account]="selectedAccount"
+                           [allAccounts]="accounts"
+                           (transactionAction)="fetchAccounts()">
+    </app-transactions-list>
+  </div>
+
+  <app-billing-periods></app-billing-periods>
 </div>

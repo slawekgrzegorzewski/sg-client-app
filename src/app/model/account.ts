@@ -16,7 +16,7 @@ export class Account {
   }
 
   public static compareByCurrencyAndName(first: Account, second: Account): number {
-    let currencyComparison = first.currency.localeCompare(second.currency);
+    const currencyComparison = first.currency.localeCompare(second.currency);
     if (currencyComparison !== 0) {
       return currencyComparison;
     } else {

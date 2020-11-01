@@ -25,6 +25,9 @@ import {LocalizedDatePipe} from './pipe/localized-date-pipe';
 import {SettingsService} from './services/settings.service';
 import '@angular/common/locales/global/pl';
 import {TransactionsListComponent} from './components/transactions/transactions-list.component';
+import {BillingPeriodsComponent} from './components/billing-periods/billing-periods.component';
+import {BillingPeriodsService} from './services/billing-periods.service';
+import {DatePipe} from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -40,7 +43,8 @@ import {TransactionsListComponent} from './components/transactions/transactions-
     UserAccountsComponent,
     CreateTransactionsComponent,
     LocalizedDatePipe,
-    TransactionsListComponent
+    TransactionsListComponent,
+    BillingPeriodsComponent
   ],
   imports: [
     BrowserModule,
@@ -56,7 +60,9 @@ import {TransactionsListComponent} from './components/transactions/transactions-
     ToastService,
     AccountsService,
     TransactionsService,
-    SettingsService
+    SettingsService,
+    BillingPeriodsService,
+    DatePipe
   ],
   bootstrap: [AppComponent]
 })
