@@ -12,11 +12,16 @@
       <label for="accountCurrency" class="col-sm-2 col-form-label">Currency</label>
       <div class="col-sm-10">
         <input id="accountCurrency" name="accountCurrency" type="text" class="form-control"
-               #accountCurrency="ngModel" #accountsTypeAhead="ngbTypeahead"
-               [(ngModel)]="currencyObject" [ngbTypeahead]="search" [resultTemplate]="currencyLabel"
-               [inputFormatter]="formatter"
-               (focus)="focus$.next($any($event).target.value)" (click)="click$.next($any($event).target.value)"
+               appAppCurrencyAutocompletion
+               #accountCurrency="ngModel"
+               [(ngModel)]="currencyObject"
                [readonly]="isEditMode() ? 'readonly' : null" [class.form-control-plaintext]="isEditMode()"
+               #accountsTypeAhead="ngbTypeahead"
+               [ngbTypeahead]="search"
+               [resultTemplate]="currencyLabel"
+               [inputFormatter]="formatter"
+               (focus)="focus$.next($any($event).target.value)"
+               (click)="click$.next($any($event).target.value)"
                required/>
       </div>
     </div>

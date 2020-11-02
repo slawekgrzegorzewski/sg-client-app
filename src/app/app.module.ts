@@ -28,6 +28,9 @@ import {TransactionsListComponent} from './components/transactions/transactions-
 import {BillingPeriodsComponent} from './components/billing-periods/billing-periods.component';
 import {BillingPeriodsService} from './services/billing-periods.service';
 import {DatePipe} from '@angular/common';
+import {BillingElementsComponent} from './components/billing-periods/billing-elements.component';
+import {CreateBillingElementComponent} from './components/billing-periods/create-billing-element.component';
+import { AppCurrencyAutocompletionDirective } from './directives/app-currency-autocompletion.directive';
 
 @NgModule({
   declarations: [
@@ -44,7 +47,10 @@ import {DatePipe} from '@angular/common';
     CreateTransactionsComponent,
     LocalizedDatePipe,
     TransactionsListComponent,
-    BillingPeriodsComponent
+    BillingPeriodsComponent,
+    BillingElementsComponent,
+    CreateBillingElementComponent,
+    AppCurrencyAutocompletionDirective
   ],
   imports: [
     BrowserModule,

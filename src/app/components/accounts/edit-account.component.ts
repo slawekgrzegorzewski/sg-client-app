@@ -1,63 +1,69 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {merge, Observable, Subject} from "rxjs";
-import {ToastService} from "../../services/toast.service";
-import {Currency} from "../../model/currency";
-import {debounceTime, distinctUntilChanged, filter, map} from "rxjs/operators";
-import {NgbTypeahead} from "@ng-bootstrap/ng-bootstrap";
-import {Account} from "../../model/account";
-import {AccountsService} from "../../services/accounts.service";
+import {merge, Observable, Subject} from 'rxjs';
+import {ToastService} from '../../services/toast.service';
+import {Currency} from '../../model/currency';
+import {debounceTime, distinctUntilChanged, filter, map} from 'rxjs/operators';
+import {NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
+import {Account} from '../../model/account';
+import {AccountsService} from '../../services/accounts.service';
 
 export enum Mode {EDIT, CREATE}
 
 @Component({
-  selector: 'account-creator',
+  selector: 'app-account-creator',
   templateUrl: './edit-account.component.html',
   styleUrls: ['./edit-account.component.css']
 })
 export class EditAccountComponent implements OnInit {
   @Input() mode: Mode = Mode.CREATE;
 
-  _enitty: Account;
+  internalEntity: Account;
 
   @Input() set entity(account: Account) {
-    this._enitty = account;
-    this.newAccount = {name: '', currency: ''}
-    this.newAccount.name = account?.name || ''
-    this.newAccount.currency = account?.currency || ''
+    this.internalEntity = account;
+    this.newAccount = {name: '', currency: ''};
+    this.newAccount.name = account?.name || '';
+    this.newAccount.currency = account?.currency || '';
     this.setCurrencyObject();
   }
 
-  get entity() {
-    return this._enitty;
+  get entity(): Account {
+    return this.internalEntity;
   }
 
   closeSubject = new Subject<any>();
-  currencies: Currency[]
+  currencies: Currency[];
   newAccount: {
     name: string,
     currency: string
-  }
+  };
 
-  _currencyObject: Currency = null;
+  internalCurrencyObject: Currency = null;
+
   set currencyObject(currency: Currency) {
-    if (this.mode === Mode.CREATE)
+    if (this.mode === Mode.CREATE) {
       this.newAccount.currency = currency.code;
+    }
     this.setCurrencyObject();
   }
 
-  get currencyObject() {
-    return this._currencyObject;
+  get currencyObject(): Currency {
+    return this.internalCurrencyObject;
   }
 
-  constructor(private accountsService: AccountsService, private _toastService: ToastService) {
+  @ViewChild('accountsTypeAhead', {static: true}) accountsTypeAhead: NgbTypeahead;
+  focus$ = new Subject<string>();
+  click$ = new Subject<string>();
+
+  constructor(private accountsService: AccountsService, private toastService: ToastService) {
     this.entity = null;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadCurrencies();
   }
 
-  private loadCurrencies() {
+  private loadCurrencies(): void {
     this.accountsService.possibleCurrencies().subscribe(
       data => {
         this.currencies = data.map(d => Currency.fromData(d)).sort((a, b) => a.code.localeCompare(b.code));
@@ -65,12 +71,12 @@ export class EditAccountComponent implements OnInit {
       },
       err => {
         this.currencies = [];
-        this._toastService.showWarning("Creating new account is not possible.", "Can not obtain available currencies!");
+        this.toastService.showWarning('Creating new account is not possible.', 'Can not obtain available currencies!');
       }
-    )
+    );
   }
 
-  createAccount() {
+  createAccount(): void {
     this.entity = new Account(this.newAccount);
     this.accountsService.create(this.entity).subscribe(
       data => {
@@ -79,13 +85,13 @@ export class EditAccountComponent implements OnInit {
       },
       error => {
         this.cancel();
-        this._toastService.showWarning("Can not perform operation.");
+        this.toastService.showWarning('Can not perform operation.');
         this.entity = null;
       }
-    )
+    );
   }
 
-  updateAccount() {
+  updateAccount(): void {
     this.entity.name = this.newAccount.name;
     this.accountsService.update(this.entity).subscribe(
       data => {
@@ -94,35 +100,31 @@ export class EditAccountComponent implements OnInit {
       },
       error => {
         this.cancel();
-        this._toastService.showWarning("Can not perform operation.");
+        this.toastService.showWarning('Can not perform operation.');
         this.entity = null;
       }
-    )
+    );
   }
 
-  confirm() {
-    this.closeSubject.next("ok");
+  confirm(): void {
+    this.closeSubject.next('ok');
   }
 
-  cancel() {
-    this.closeSubject.next("cancel");
+  cancel(): void {
+    this.closeSubject.next('cancel');
   }
 
-  isEditMode() {
-    return this.mode === Mode.EDIT
+  isEditMode(): boolean {
+    return this.mode === Mode.EDIT;
   }
 
-  private setCurrencyObject() {
+  private setCurrencyObject(): void {
     if (this.newAccount?.currency) {
-      this._currencyObject = this.currencies.find(c => c.code === this.newAccount.currency)
+      this.internalCurrencyObject = this.currencies.find(c => c.code === this.newAccount.currency);
     } else {
-      this._currencyObject = null;
+      this.internalCurrencyObject = null;
     }
   }
-
-  @ViewChild('accountsTypeAhead', {static: true}) accountsTypeAhead: NgbTypeahead;
-  focus$ = new Subject<string>();
-  click$ = new Subject<string>();
 
   search = (text$: Observable<string>) => {
     const debouncedText$ = text$.pipe(debounceTime(200), distinctUntilChanged());
@@ -133,6 +135,7 @@ export class EditAccountComponent implements OnInit {
       map(term => (term === '' ? this.currencies
         : this.currencies.filter(c => c.description().toLowerCase().indexOf(term.toLowerCase()) > -1)).slice(0, 10))
     );
-  }
+  };
+
   formatter = (currency: Currency) => currency === null ? '' : currency.description();
 }

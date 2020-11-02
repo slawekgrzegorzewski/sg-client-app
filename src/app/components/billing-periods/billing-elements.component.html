@@ -1,0 +1,12 @@
+<div style="display: flex; flex-direction: column">
+  <h3>{{title}}</h3>
+  <div *ngIf="elements().length > 0">
+    <div *ngFor="let element of elements()">
+      {{element.amount | currency: element.currency}} - {{element.description}} ({{element.category.name}})
+    </div>
+  </div>
+  <div *ngIf="elements().length === 0">
+    No {{nameOfType()}} yet
+  </div>
+  <button (click)="add()">Add</button>
+</div>
