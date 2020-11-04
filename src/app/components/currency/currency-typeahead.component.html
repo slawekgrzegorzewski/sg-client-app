@@ -1,0 +1,16 @@
+<input type="text"
+       [class]="inputClass"
+       [(ngModel)]="value"
+       [readonly]="readonly"
+
+       #currenciesTypeAhead="ngbTypeahead"
+       [ngbTypeahead]="searchClosure(this)"
+       [resultTemplate]="currencyLabel"
+       [inputFormatter]="formatter"
+       (focus)="focus.next($any($event).target.value)"
+       (click)="click.next($any($event).target.value)"
+       (blur)="this.propagateTouch(value.code)"
+/>
+<ng-template #currencyLabel let-r="result" let-t="term">
+  <ngb-highlight [result]="r.description()" [term]="t"></ngb-highlight>
+</ng-template>

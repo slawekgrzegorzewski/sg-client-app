@@ -30,7 +30,7 @@ import {BillingPeriodsService} from './services/billing-periods.service';
 import {DatePipe} from '@angular/common';
 import {BillingElementsComponent} from './components/billing-periods/billing-elements.component';
 import {CreateBillingElementComponent} from './components/billing-periods/create-billing-element.component';
-import { AppCurrencyAutocompletionDirective } from './directives/app-currency-autocompletion.directive';
+import {CurrencyTypeaheadComponent} from './components/currency/currency-typeahead.component';
 
 @NgModule({
   declarations: [
@@ -50,7 +50,7 @@ import { AppCurrencyAutocompletionDirective } from './directives/app-currency-au
     BillingPeriodsComponent,
     BillingElementsComponent,
     CreateBillingElementComponent,
-    AppCurrencyAutocompletionDirective
+    CurrencyTypeaheadComponent
   ],
   imports: [
     BrowserModule,
