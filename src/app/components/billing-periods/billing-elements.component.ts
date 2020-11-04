@@ -2,6 +2,8 @@ import {Component, Input, OnInit} from '@angular/core';
 import {BillingPeriodsService} from '../../services/billing-periods.service';
 import {BillingPeriod} from '../../model/billings/billing-period';
 import {throwError} from 'rxjs';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {CreateBillingElementComponent} from './create-billing-element.component';
 
 export const INCOME = 'income';
 export const EXPENSE = 'expense';
@@ -30,7 +32,10 @@ export class BillingElementsComponent implements OnInit {
   @Input() public billingPeriod: BillingPeriod;
   @Input() title: string;
 
-  constructor(private billingsService: BillingPeriodsService) {
+  constructor(
+    private billingsService: BillingPeriodsService,
+    private modalService: NgbModal
+  ) {
   }
 
   ngOnInit(): void {
@@ -42,7 +47,19 @@ export class BillingElementsComponent implements OnInit {
   }
 
   add(): void {
+    const ngbModalRef = this.modalService.open(CreateBillingElementComponent, {centered: true});
+    const component = ngbModalRef.componentInstance as CreateBillingElementComponent;
+    const closeHandler = this.onModalClose(ngbModalRef, this);
+    component.closeSubject.subscribe(closeHandler, closeHandler);
+    component.display = this.display;
+    component.billingPeriod = this.billingPeriod;
+  }
 
+  onModalClose(ngbModalRef, that): (input) => void {
+    return input => {
+      ngbModalRef.close();
+      // that.fetchData();
+    };
   }
 
   nameOfType(): string {

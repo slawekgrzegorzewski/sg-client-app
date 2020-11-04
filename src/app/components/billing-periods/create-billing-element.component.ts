@@ -1,7 +1,9 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {BillingPeriodsService} from '../../services/billing-periods.service';
 import {BillingPeriod} from '../../model/billings/billing-period';
-import {throwError} from 'rxjs';
+import {Subject, throwError} from 'rxjs';
+import {Income} from '../../model/billings/income';
+import {Expense} from '../../model/billings/expense';
 
 export const INCOME = 'income';
 export const EXPENSE = 'expense';
@@ -14,6 +16,7 @@ export const EXPENSE = 'expense';
 export class CreateBillingElementComponent implements OnInit {
 
   private incomeDisplay: string;
+  closeSubject = new Subject<any>();
 
   get display(): string {
     return this.incomeDisplay;
@@ -30,10 +33,17 @@ export class CreateBillingElementComponent implements OnInit {
   @Input() public billingPeriod: BillingPeriod;
   @Input() title: string;
 
+  billingElement: Income | Expense;
+
   constructor(private billingsService: BillingPeriodsService) {
   }
 
   ngOnInit(): void {
+    if (this.display === INCOME) {
+      this.billingElement = new Income();
+    } else {
+      this.billingElement = new Expense();
+    }
   }
 
   public elements(): any[] {
@@ -47,5 +57,13 @@ export class CreateBillingElementComponent implements OnInit {
 
   nameOfType(): string {
     return this.display === INCOME ? 'incomes' : 'expenses';
+  }
+
+  confirm(): void {
+    this.closeSubject.next('ok');
+  }
+
+  cancel(): void {
+    this.closeSubject.next('cancel');
   }
 }
