@@ -8,6 +8,7 @@ import {AccountsService} from '../../services/accounts.service';
 import {ToastService} from '../../services/toast.service';
 import {Account} from '../../model/account';
 import {Category} from '../../model/billings/category';
+import {NgbCalendar, NgbDateStruct} from '@ng-bootstrap/ng-bootstrap';
 
 export const INCOME = 'income';
 export const EXPENSE = 'expense';
@@ -95,9 +96,12 @@ export class CreateBillingElementComponent implements OnInit {
     this.billingElement.category = this.categories.find(c => c.id === this.categoryId);
   }
 
+  elementDate: NgbDateStruct;
+
   constructor(private billingsService: BillingPeriodsService,
               private accountsService: AccountsService,
-              private toastService: ToastService) {
+              private toastService: ToastService,
+              private ngbCalendar: NgbCalendar) {
   }
 
   ngOnInit(): void {
@@ -117,6 +121,7 @@ export class CreateBillingElementComponent implements OnInit {
     } else {
       this.billingElement = new Expense();
     }
+    this.elementDate = this.ngbCalendar.getToday();
   }
 
   public elements(): any[] {
@@ -125,11 +130,24 @@ export class CreateBillingElementComponent implements OnInit {
   }
 
   add(): void {
+    if (this.billingElement instanceof Income) {
+      this.billingElement.incomeDate = this.convertToDate(this.elementDate);
+    } else {
+      this.billingElement.expenseDate = this.convertToDate(this.elementDate);
+    }
     this.billingsService.createBillingElement(this.billingPeriod, this.billingElement, this.selectedAccount.id)
       .subscribe(
         data => this.closeSubject.next(data),
         error => this.closeSubject.next(error)
       );
+  }
+
+  private convertToDate(date: NgbDateStruct): Date {
+    const result = new Date();
+    result.setFullYear(date.year);
+    result.setMonth(date.month);
+    result.setDate(date.day);
+    return result;
   }
 
   nameOfType(): string {

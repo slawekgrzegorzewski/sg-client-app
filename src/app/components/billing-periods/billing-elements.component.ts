@@ -6,6 +6,8 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {CreateBillingElementComponent} from './create-billing-element.component';
 import {NgEventBus} from 'ng-event-bus';
 import {Events} from '../../model/events';
+import {Income} from '../../model/billings/income';
+import {Expense} from '../../model/billings/expense';
 
 export const INCOME = 'income';
 export const EXPENSE = 'expense';
@@ -45,8 +47,27 @@ export class BillingElementsComponent implements OnInit {
   }
 
   public elements(): any[] {
-    const elements = this.incomeDisplay === INCOME ? this.billingPeriod.incomes : this.billingPeriod.expenses;
+    const elements = this.incomeDisplay === INCOME ? this.billingPeriod.incomes.sort((a, b) => this.sortIncomes(a, b)) :
+      this.billingPeriod.expenses.sort((a, b) => this.sortExpenses(a, b));
     return elements ? elements : [];
+  }
+
+  private sortIncomes(first: Income, second: Income): number {
+    return this.compareDates(first.incomeDate, second.incomeDate);
+  }
+
+  private sortExpenses(first: Expense, second: Expense): number {
+    return this.compareDates(first.expenseDate, second.expenseDate);
+  }
+
+  private compareDates(first: Date, second: Date): number {
+    if (first > second) {
+      return 1;
+    }
+    if (first === second) {
+      return 0;
+    }
+    return -1;
   }
 
   add(): void {
