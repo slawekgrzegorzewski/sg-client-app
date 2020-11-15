@@ -53,21 +53,21 @@ export class BillingElementsComponent implements OnInit {
   }
 
   private sortIncomes(first: Income, second: Income): number {
-    return this.compareDates(first.incomeDate, second.incomeDate);
+    return this.compareDates(first.incomeDate, first.description, second.incomeDate, second.description);
   }
 
   private sortExpenses(first: Expense, second: Expense): number {
-    return this.compareDates(first.expenseDate, second.expenseDate);
+    return this.compareDates(first.expenseDate, first.description, second.expenseDate, second.description);
   }
 
-  private compareDates(first: Date, second: Date): number {
+  private compareDates(first: Date, firstDescription: string, second: Date, secondDescription: string): number {
     if (first > second) {
       return 1;
     }
-    if (first === second) {
-      return 0;
+    if (first < second) {
+      return -1;
     }
-    return -1;
+    return firstDescription.localeCompare(secondDescription);
   }
 
   add(): void {

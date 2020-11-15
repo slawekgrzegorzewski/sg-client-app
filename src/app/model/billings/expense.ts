@@ -18,6 +18,6 @@ export class Expense {
   }
 
   dateString(): string {
-    return this.expenseDate.getFullYear() + '-' + this.expenseDate.getMonth() + '-' + this.expenseDate.getDate();
+    return this.expenseDate.getFullYear() + '-' + (this.expenseDate.getMonth() + 1) + '-' + this.expenseDate.getDate();
   }
 }

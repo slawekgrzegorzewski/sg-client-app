@@ -18,6 +18,6 @@ export class Income {
   }
 
   dateString(): string {
-    return this.incomeDate.getFullYear() + '-' + this.incomeDate.getMonth() + '-' + this.incomeDate.getDate();
+    return this.incomeDate.getFullYear() + '-' + (this.incomeDate.getMonth() + 1) + '-' + this.incomeDate.getDate();
   }
 }

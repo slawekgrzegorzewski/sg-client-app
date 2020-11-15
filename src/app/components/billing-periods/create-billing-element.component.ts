@@ -145,7 +145,7 @@ export class CreateBillingElementComponent implements OnInit {
   private convertToDate(date: NgbDateStruct): Date {
     const result = new Date();
     result.setFullYear(date.year);
-    result.setMonth(date.month);
+    result.setMonth(date.month - 1);
     result.setDate(date.day);
     return result;
   }
