@@ -4,8 +4,8 @@ import {environment} from '../../environments/environment';
 import {Account} from '../model/account';
 import {Observable, of, throwError} from 'rxjs';
 import {Currency} from '../model/currency';
-import {LoginService} from './login.service';
 import {SettingsService} from './settings.service';
+import {map} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +25,7 @@ export class AccountsService {
     this.http.get<Currency[]>(environment.serviceUrl + '/currency/all/' + this.settingsService.getUsersLocale())
       .subscribe(
         data => {
-          this.currencies = data;
+          this.currencies = data.map(d => Currency.fromData(d));
         },
         error => {
           this.currencies = null;
@@ -35,11 +35,13 @@ export class AccountsService {
   }
 
   allAccounts(): Observable<Account[]> {
-    return this.http.get<Account[]>(environment.serviceUrl + '/accounts');
+    return this.http.get<Account[]>(environment.serviceUrl + '/accounts')
+      .pipe(map(data => data.map(d => new Account(d))));
   }
 
   currentUserAccounts(): Observable<Account[]> {
-    return this.http.get<Account[]>(environment.serviceUrl + '/accounts/mine');
+    return this.http.get<Account[]>(environment.serviceUrl + '/accounts/mine')
+      .pipe(map(data => data.map(d => new Account(d))));
   }
 
   delete(a: Account): Observable<string> {
@@ -51,7 +53,8 @@ export class AccountsService {
   }
 
   create(account: Account): Observable<Account> {
-    return this.http.put<Account>(environment.serviceUrl + '/accounts', account);
+    return this.http.put<Account>(environment.serviceUrl + '/accounts', account)
+      .pipe(map(d => new Account(d)));
   }
 
   update(account: Account): Observable<string> {

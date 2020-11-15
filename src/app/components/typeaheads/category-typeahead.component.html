@@ -1,0 +1,16 @@
+<input type="text"
+       [class]="inputClass"
+       [(ngModel)]="value"
+       [readonly]="readonly"
+
+       #categoriesTypeAhead="ngbTypeahead"
+       [ngbTypeahead]="searchClosure(this)"
+       [resultTemplate]="categoryLabel"
+       [inputFormatter]="formatter"
+       (focus)="focus.next($any($event).target.value)"
+       (click)="click.next($any($event).target.value)"
+       (blur)="this.propagateTouch(value.id)"
+/>
+<ng-template #categoryLabel let-r="result" let-t="term">
+  <ngb-highlight [result]="r.fullName()" [term]="t"></ngb-highlight>
+</ng-template>

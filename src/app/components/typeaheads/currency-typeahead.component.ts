@@ -1,4 +1,4 @@
-import {Component, forwardRef, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, forwardRef, Input, OnInit, ViewChild} from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
 import {Currency} from '../../model/currency';
 import {AccountsService} from '../../services/accounts.service';
@@ -20,15 +20,30 @@ export class CurrencyTypeaheadComponent implements OnInit, ControlValueAccessor 
   private internalValue: string;
 
   get value(): Currency {
-    return this.currencies.find(c => c.code === this.internalValue);
+    return (this.currencies || []).find(c => c.code === this.internalValue);
   }
 
   set value(value: Currency) {
+    if (!(value instanceof Currency)) {
+      return;
+    }
     this.internalValue = value.code;
     this.propagateChange(value.code);
     this.propagateTouch(value.code);
   }
 
+  private availableCurrenciesInternal: string[] = [];
+
+  @Input() get availableCurrencies(): string[] {
+    return this.availableCurrenciesInternal;
+  }
+
+  set availableCurrencies(value: string[]) {
+    this.availableCurrenciesInternal = value;
+    this.filterCurrencies();
+  }
+
+  allCurrencies: Currency[];
   currencies: Currency[];
   @Input() readonly = false;
   @Input() inputClass: string;
@@ -61,12 +76,19 @@ export class CurrencyTypeaheadComponent implements OnInit, ControlValueAccessor 
   private loadCurrencies(): void {
     this.accountsService.possibleCurrencies().subscribe(
       data => {
-        this.currencies = data.map(d => Currency.fromData(d)).sort((a, b) => a.code.localeCompare(b.code));
+        this.allCurrencies = data.sort((a, b) => a.code.localeCompare(b.code));
+        this.filterCurrencies();
       },
       err => {
         this.currencies = [];
         this.toastService.showWarning('No currency available.', 'Can not obtain available currencies!');
       }
+    );
+  }
+
+  private filterCurrencies(): void {
+    this.currencies = (this.allCurrencies || []).filter(c =>
+      this.availableCurrencies.length === 0 ? true : this.availableCurrencies.includes(c.code)
     );
   }
 

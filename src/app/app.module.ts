@@ -3,7 +3,7 @@ import {NgModule} from '@angular/core';
 
 import {AppComponent} from './app.component';
 import {HeaderComponent} from './components/header/header.component';
-import {AccountsComponent} from './components/accounts/accounts.component';
+import {SettingsComponent} from './components/accounts/settings.component';
 import {LoginComponent} from './components/login/login.component';
 import {RegisterComponent} from './components/register/register.component';
 import {LoginService} from './services/login.service';
@@ -30,13 +30,16 @@ import {BillingPeriodsService} from './services/billing-periods.service';
 import {DatePipe} from '@angular/common';
 import {BillingElementsComponent} from './components/billing-periods/billing-elements.component';
 import {CreateBillingElementComponent} from './components/billing-periods/create-billing-element.component';
-import {CurrencyTypeaheadComponent} from './components/currency/currency-typeahead.component';
+import {CurrencyTypeaheadComponent} from './components/typeaheads/currency-typeahead.component';
+import {CategoriesComponent} from './components/billing-periods/categories.component';
+import {NgEventBus} from 'ng-event-bus';
+import {CategoryTypeaheadComponent} from './components/typeaheads/category-typeahead.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
-    AccountsComponent,
+    SettingsComponent,
     LoginComponent,
     RegisterComponent,
     HomeComponent,
@@ -50,7 +53,9 @@ import {CurrencyTypeaheadComponent} from './components/currency/currency-typeahe
     BillingPeriodsComponent,
     BillingElementsComponent,
     CreateBillingElementComponent,
-    CurrencyTypeaheadComponent
+    CurrencyTypeaheadComponent,
+    CategoriesComponent,
+    CategoryTypeaheadComponent
   ],
   imports: [
     BrowserModule,
@@ -68,7 +73,8 @@ import {CurrencyTypeaheadComponent} from './components/currency/currency-typeahe
     TransactionsService,
     SettingsService,
     BillingPeriodsService,
-    DatePipe
+    DatePipe,
+    NgEventBus
   ],
   bootstrap: [AppComponent]
 })

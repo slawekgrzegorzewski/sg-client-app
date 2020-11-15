@@ -8,4 +8,8 @@ export class Category {
     this.name = data && data.name || '';
     this.description = data && data.description || '';
   }
+
+  public fullName(): string {
+    return this.name + ' - ' + this.description;
+  }
 }

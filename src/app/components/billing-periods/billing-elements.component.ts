@@ -4,6 +4,8 @@ import {BillingPeriod} from '../../model/billings/billing-period';
 import {throwError} from 'rxjs';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {CreateBillingElementComponent} from './create-billing-element.component';
+import {NgEventBus} from 'ng-event-bus';
+import {Events} from '../../model/events';
 
 export const INCOME = 'income';
 export const EXPENSE = 'expense';
@@ -34,7 +36,8 @@ export class BillingElementsComponent implements OnInit {
 
   constructor(
     private billingsService: BillingPeriodsService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private eventBus: NgEventBus
   ) {
   }
 
@@ -58,7 +61,7 @@ export class BillingElementsComponent implements OnInit {
   onModalClose(ngbModalRef, that): (input) => void {
     return input => {
       ngbModalRef.close();
-      // that.fetchData();
+      this.eventBus.cast(Events.TRANSACTIONS_CHANGED);
     };
   }
 

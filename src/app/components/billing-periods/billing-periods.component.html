@@ -5,13 +5,13 @@
     <a (click)="next()">Next</a>
   </div>
   <div style="display: flex; flex-direction: row">
-    <app-billing-elements
+    <app-billing-elements style="padding-right: 10px"
       [title]="'Incomes'"
       [billingPeriod]="currentBilling"
       [display]="'income'">
 
     </app-billing-elements>
-    <app-billing-elements
+    <app-billing-elements style="padding-left: 10px"
       [title]="'Expenses'"
       [billingPeriod]="currentBilling"
       [display]="'expense'">

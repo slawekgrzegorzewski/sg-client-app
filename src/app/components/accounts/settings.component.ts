@@ -9,10 +9,10 @@ import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-accounts',
-  templateUrl: './accounts.component.html',
-  styleUrls: ['./accounts.component.css']
+  templateUrl: './settings.component.html',
+  styleUrls: ['./settings.component.css']
 })
-export class AccountsComponent implements OnInit {
+export class SettingsComponent implements OnInit {
   private isLoggedIn = false;
   userAccounts: Account[];
   otherUsers: string[];
@@ -49,8 +49,8 @@ export class AccountsComponent implements OnInit {
     accounts.subscribe(
       data => {
         const accountsFromData = data.map(d => new Account(d));
-        this.userAccounts = accountsFromData.filter(a => a.userName === userName).sort(Account.compareByCurrencyAndName);
-        this.othersAccounts = accountsFromData.filter(a => a.userName !== userName).reduce(
+        this.userAccounts = data.filter(a => a.userName === userName).sort(Account.compareByCurrencyAndName);
+        this.othersAccounts = data.filter(a => a.userName !== userName).reduce(
           (map, acc) => map.set(acc.userName, [...map.get(acc.userName) || [], acc]),
           new Map<string, Account[]>()
         );

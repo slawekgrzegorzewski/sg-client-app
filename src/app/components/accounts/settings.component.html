@@ -1,8 +1,8 @@
 <div class="container" *ngIf="this.loggedIn()">
   <div *ngIf="!othersAccounts || othersAccounts.size === 0">
     <app-user-accounts [userName]="loginService.getUserName()"
-                   [accounts]="userAccounts"
-                   [buttons]="[{name: 'delete', action:delete(this, deleteConfirmation)}, {name: 'rename', action:rename(this)}]">
+                       [accounts]="userAccounts"
+                       [buttons]="[{name: 'delete', action:delete(this, deleteConfirmation)}, {name: 'rename', action:rename(this)}]">
     </app-user-accounts>
   </div>
   <div *ngIf="othersAccounts && othersAccounts.size > 0">
@@ -11,9 +11,12 @@
         <a ngbNavLink>Your accounts</a>
         <ng-template ngbNavContent>
           <app-user-accounts [userName]="loginService.getUserName()"
-                         [accounts]="userAccounts"
-                         [buttons]="[{name: 'delete', action:delete(this, deleteConfirmation)}, {name: 'rename', action:rename(this)}]">
+                             [accounts]="userAccounts"
+                             [buttons]="[{name: 'delete', action:delete(this, deleteConfirmation)}, {name: 'rename', action:rename(this)}]">
           </app-user-accounts>
+
+          <button type="button" class="btn btn-primary" (click)="fetchData()">Refresh data</button>
+          <button type="button" class="btn btn-primary" (click)="openCreationDialog()">Create new account</button>
         </ng-template>
       </li>
       <li ngbNavItem>
@@ -21,18 +24,26 @@
         <ng-template ngbNavContent>
           <div style="display: flex">
             <app-user-accounts *ngFor="let user of otherUsers"
-                           [userName]="user"
-                           [accounts]="othersAccounts.get(user)">
+                               [userName]="user"
+                               [accounts]="othersAccounts.get(user)">
             </app-user-accounts>
+          </div>
+
+          <button type="button" class="btn btn-primary" (click)="fetchData()">Refresh data</button>
+          <button type="button" class="btn btn-primary" (click)="openCreationDialog()">Create new account</button>
+        </ng-template>
+      </li>
+      <li ngbNavItem>
+        <a ngbNavLink>Categories</a>
+        <ng-template ngbNavContent>
+          <div style="display: flex">
+            <app-categories></app-categories>
           </div>
         </ng-template>
       </li>
     </ul>
     <div [ngbNavOutlet]="nav"></div>
   </div>
-
-  <button type="button" class="btn btn-primary" (click)="fetchData()">Refresh data</button>
-  <button type="button" class="btn btn-primary" (click)="openCreationDialog()">Create new account</button>
 </div>
 
 <ng-template #deleteConfirmation let-modal>
