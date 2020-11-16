@@ -8,6 +8,7 @@ import {NgEventBus} from 'ng-event-bus';
 import {Events} from '../../model/events';
 import {Income} from '../../model/billings/income';
 import {Expense} from '../../model/billings/expense';
+import {Category} from '../../model/billings/category';
 
 export const INCOME = 'income';
 export const EXPENSE = 'expense';
@@ -19,6 +20,11 @@ export const EXPENSE = 'expense';
 })
 export class BillingElementsComponent implements OnInit {
 
+  readonly GENERAL_VIEW = 'general';
+  readonly DETAILED_VIEW = 'detailed';
+
+  mode: string = this.GENERAL_VIEW;
+
   private incomeDisplay: string;
 
   get display(): string {
@@ -28,12 +34,27 @@ export class BillingElementsComponent implements OnInit {
   @Input() set display(value: string) {
     if (value === INCOME || value === EXPENSE) {
       this.incomeDisplay = value;
+      this.selectElementsToShow();
     } else {
       throwError('incorrect value for display');
     }
   }
 
-  @Input() public billingPeriod: BillingPeriod;
+  public billingPeriodInternal: BillingPeriod;
+
+  @Input() get billingPeriod(): BillingPeriod {
+    return this.billingPeriodInternal;
+  }
+
+  set billingPeriod(value: BillingPeriod) {
+    this.billingPeriodInternal = value;
+    this.selectElementsToShow();
+  }
+
+  elements: Income[] | Expense[];
+  categoryBreakdown: Map<string, Map<string, number>> = new Map<string, Map<string, number>>();
+  summary: Map<string, number> = new Map<string, number>();
+
   @Input() title: string;
 
   constructor(
@@ -46,10 +67,21 @@ export class BillingElementsComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  public elements(): any[] {
+  private selectElementsToShow(): void {
     const elements = this.incomeDisplay === INCOME ? this.billingPeriod.incomes.sort((a, b) => this.sortIncomes(a, b)) :
       this.billingPeriod.expenses.sort((a, b) => this.sortExpenses(a, b));
-    return elements ? elements : [];
+    this.elements = elements || [];
+    this.categoryBreakdown.clear();
+    this.summary.clear();
+    this.elements.forEach(value => {
+      const sumPerCurrency = this.categoryBreakdown.get(value.category.name) || new Map<string, number>();
+      const sum = sumPerCurrency.get(value.currency) || 0;
+      sumPerCurrency.set(value.currency, sum + value.amount);
+      this.categoryBreakdown.set(value.category.name, sumPerCurrency);
+
+      const summary = this.summary.get(value.currency) || 0;
+      this.summary.set(value.currency, summary + value.amount);
+    });
   }
 
   private sortIncomes(first: Income, second: Income): number {
