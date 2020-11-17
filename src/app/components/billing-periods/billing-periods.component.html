@@ -1,0 +1,25 @@
+<div *ngIf="currentBilling" style="display: flex; flex-direction: column">
+  <div style="display: flex; flex-direction: row">
+    <a (click)="previous()">Previous</a>
+    &nbsp;&nbsp;&nbsp;Billing {{currentBilling.name}} for {{ currentBilling.period | date:'yyyy-MM' }}&nbsp;&nbsp;&nbsp;
+    <a (click)="next()">Next</a>
+  </div>
+  <div style="display: flex; flex-direction: row">
+    <app-billing-elements style="padding-right: 10px"
+      [title]="'Incomes'"
+      [billingPeriod]="currentBilling"
+      [display]="'income'">
+
+    </app-billing-elements>
+    <app-billing-elements style="padding-left: 10px"
+      [title]="'Expenses'"
+      [billingPeriod]="currentBilling"
+      [display]="'expense'">
+
+    </app-billing-elements>
+  </div>
+</div>
+
+<div *ngIf="!currentBilling">
+  No billing available for current month. <a (click)="create()">Create.</a>
+</div>

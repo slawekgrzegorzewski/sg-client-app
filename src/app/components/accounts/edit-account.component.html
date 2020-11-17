@@ -11,13 +11,15 @@
     <div class="form-group row">
       <label for="accountCurrency" class="col-sm-2 col-form-label">Currency</label>
       <div class="col-sm-10">
-        <input id="accountCurrency" name="accountCurrency" type="text" class="form-control"
-               #accountCurrency="ngModel" #accountsTypeAhead="ngbTypeahead"
-               [(ngModel)]="currencyObject" [ngbTypeahead]="search" [resultTemplate]="currencyLabel"
-               [inputFormatter]="formatter"
-               (focus)="focus$.next($any($event).target.value)" (click)="click$.next($any($event).target.value)"
-               [readonly]="isEditMode() ? 'readonly' : null" [class.form-control-plaintext]="isEditMode()"
-               required/>
+        <app-currency-typeahead
+          id="accountCurrency"
+          name="accountCurrency"
+          [inputClass]="'form-control'"
+          [readonly]="isEditMode() ? 'readonly' : null" [class.form-control-plaintext]="isEditMode()"
+          [(ngModel)]="newAccount.currency"
+          #accountCurrency="ngModel"
+          required>
+        </app-currency-typeahead>
       </div>
     </div>
     <div class="form-group row">
@@ -33,6 +35,3 @@
     </div>
   </form>
 </div>
-<ng-template #currencyLabel let-r="result" let-t="term">
-  <ngb-highlight [result]="r.description()" [term]="t"></ngb-highlight>
-</ng-template>

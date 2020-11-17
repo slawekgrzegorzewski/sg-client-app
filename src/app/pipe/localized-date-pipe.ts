@@ -1,6 +1,6 @@
 import {DatePipe} from '@angular/common';
 import {Pipe, PipeTransform} from '@angular/core';
-import {SettingsService} from "../services/settings.service";
+import {SettingsService} from '../services/settings.service';
 
 @Pipe({
   name: 'localizedDate',

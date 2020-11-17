@@ -1,9 +1,9 @@
 import {BrowserModule} from '@angular/platform-browser';
-import {NgModule} from '@angular/core';
+import {LOCALE_ID, NgModule} from '@angular/core';
 
 import {AppComponent} from './app.component';
 import {HeaderComponent} from './components/header/header.component';
-import {AccountsComponent} from './components/accounts/accounts.component';
+import {SettingsComponent} from './components/accounts/settings.component';
 import {LoginComponent} from './components/login/login.component';
 import {RegisterComponent} from './components/register/register.component';
 import {LoginService} from './services/login.service';
@@ -25,12 +25,21 @@ import {LocalizedDatePipe} from './pipe/localized-date-pipe';
 import {SettingsService} from './services/settings.service';
 import '@angular/common/locales/global/pl';
 import {TransactionsListComponent} from './components/transactions/transactions-list.component';
+import {BillingPeriodsComponent} from './components/billing-periods/billing-periods.component';
+import {BillingPeriodsService} from './services/billing-periods.service';
+import {DatePipe} from '@angular/common';
+import {BillingElementsComponent} from './components/billing-periods/billing-elements.component';
+import {CreateBillingElementComponent} from './components/billing-periods/create-billing-element.component';
+import {CurrencyTypeaheadComponent} from './components/typeaheads/currency-typeahead.component';
+import {CategoriesComponent} from './components/billing-periods/categories.component';
+import {NgEventBus} from 'ng-event-bus';
+import {CategoryTypeaheadComponent} from './components/typeaheads/category-typeahead.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
-    AccountsComponent,
+    SettingsComponent,
     LoginComponent,
     RegisterComponent,
     HomeComponent,
@@ -40,7 +49,13 @@ import {TransactionsListComponent} from './components/transactions/transactions-
     UserAccountsComponent,
     CreateTransactionsComponent,
     LocalizedDatePipe,
-    TransactionsListComponent
+    TransactionsListComponent,
+    BillingPeriodsComponent,
+    BillingElementsComponent,
+    CreateBillingElementComponent,
+    CurrencyTypeaheadComponent,
+    CategoriesComponent,
+    CategoryTypeaheadComponent
   ],
   imports: [
     BrowserModule,
@@ -56,7 +71,14 @@ import {TransactionsListComponent} from './components/transactions/transactions-
     ToastService,
     AccountsService,
     TransactionsService,
-    SettingsService
+    SettingsService,
+    BillingPeriodsService,
+    DatePipe,
+    NgEventBus,
+    {
+      provide: LOCALE_ID,
+      useValue: 'pl-PL'
+    }
   ],
   bootstrap: [AppComponent]
 })

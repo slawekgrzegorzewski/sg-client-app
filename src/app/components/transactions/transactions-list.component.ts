@@ -37,6 +37,7 @@ export class TransactionsListComponent {
   set allAccounts(value: Account[]) {
     this.internalAllAccounts = value;
     this.accountsToSelect = this.filterAccountsOtherThanSelectedOne();
+    this.fetchTransactions();
   }
 
   @Input()
@@ -47,7 +48,6 @@ export class TransactionsListComponent {
   set account(value: Account) {
     this.internalAccount = value;
     this.fetchTransactions();
-    this.transactionsOfSelectedAccount = this.filterTransactionsForSelectedAccount();
     this.accountsToSelect = this.filterAccountsOtherThanSelectedOne();
   }
 
@@ -68,11 +68,13 @@ export class TransactionsListComponent {
 
   private fetchTransactions(): void {
     this.transactionsService.allUsersTransactions().subscribe(
-      data => this.transactions = data.map(t => new Transaction(t)),
+      data => {
+        this.transactions = data;
+        this.transactionsOfSelectedAccount = this.filterTransactionsForSelectedAccount();
+      },
       error => {
-        this.toastService.showWarning('Could not obtain transactions information, retrying');
+        this.toastService.showWarning('Could not obtain transactions information.');
         this.transactions = [];
-        setTimeout(() => this.fetchTransactions(), 100);
       }
     );
   }

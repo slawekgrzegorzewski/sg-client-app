@@ -1,0 +1,42 @@
+<div style="display: flex; flex-direction: column">
+  <h3>{{title}}</h3>
+
+  <div style="display: flex; flex-direction: row">
+    <button (click)="mode = GENERAL_VIEW" style="width: 50%;">Overview</button>
+    <button (click)="mode = DETAILED_VIEW" style="width: 50%;">Detailed</button>
+  </div>
+  <div *ngIf="elements.length > 0 && mode === DETAILED_VIEW">
+    <div *ngFor="let element of elements" style="display: flex; flex-direction: row">
+      <div style="padding-right: 10px;width: 100px">{{element.dateString()}}</div>
+      <div style="padding-left: 10px;padding-right: 10px;width: 100px">
+        {{element.amount | currency: element.currency}}
+      </div>
+      <div style="padding-left: 10px;padding-right: 10px;width: 300px">
+        {{element.description}} ({{element.category.name}})
+      </div>
+    </div>
+  </div>
+  <div *ngIf="elements.length > 0 && mode === GENERAL_VIEW">
+    <div *ngFor="let perCategory of categoryBreakdown | keyvalue" style="display: flex; flex-direction: row">
+      <div style="padding-right: 10px;width: 200px">{{perCategory.key}}</div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end; padding-left: 10px;width: 100px">
+        <span *ngFor="let perCurrency of perCategory.value | keyvalue">
+          {{perCurrency.value | currency: perCurrency.key}}
+        </span>
+      </div>
+    </div>
+    -----------
+    <div style="display: flex; flex-direction: row;">
+      <div style="padding-right: 10px;width: 200px"></div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end; padding-left: 10px;width: 100px">
+        <span *ngFor="let perCurrency of summary | keyvalue">
+          {{perCurrency.value | currency: perCurrency.key}}
+        </span>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="elements.length === 0">
+    No {{nameOfType()}} yet
+  </div>
+  <button (click)="add()">Add</button>
+</div>
