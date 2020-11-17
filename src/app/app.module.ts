@@ -3,7 +3,7 @@ import {LOCALE_ID, NgModule} from '@angular/core';
 
 import {AppComponent} from './app.component';
 import {HeaderComponent} from './components/header/header.component';
-import {SettingsComponent} from './components/accounts/settings.component';
+import {SettingsComponent} from './components/settings.component';
 import {LoginComponent} from './components/login/login.component';
 import {RegisterComponent} from './components/register/register.component';
 import {LoginService} from './services/login.service';
@@ -34,6 +34,8 @@ import {CurrencyTypeaheadComponent} from './components/typeaheads/currency-typea
 import {CategoriesComponent} from './components/billing-periods/categories.component';
 import {NgEventBus} from 'ng-event-bus';
 import {CategoryTypeaheadComponent} from './components/typeaheads/category-typeahead.component';
+import {PiggyBanksService} from './services/piggy-banks.service';
+import {PiggyBanksComponent} from './components/piggy-banks/piggy-banks.component';
 
 @NgModule({
   declarations: [
@@ -55,7 +57,8 @@ import {CategoryTypeaheadComponent} from './components/typeaheads/category-typea
     CreateBillingElementComponent,
     CurrencyTypeaheadComponent,
     CategoriesComponent,
-    CategoryTypeaheadComponent
+    CategoryTypeaheadComponent,
+    PiggyBanksComponent
   ],
   imports: [
     BrowserModule,
@@ -73,6 +76,7 @@ import {CategoryTypeaheadComponent} from './components/typeaheads/category-typea
     TransactionsService,
     SettingsService,
     BillingPeriodsService,
+    PiggyBanksService,
     DatePipe,
     NgEventBus,
     {

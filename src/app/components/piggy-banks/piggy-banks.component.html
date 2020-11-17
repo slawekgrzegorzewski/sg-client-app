@@ -1,0 +1,71 @@
+<div (mouseleave)="setOverPiggyBank(null, null)" *ngIf="!editElement">
+  <div style="display: flex; flex-direction: column">
+    <div *ngFor="let piggyBank of piggyBanks" #row
+         (mouseenter)="setOverPiggyBank(piggyBank, row)">
+      {{piggyBank.name}} {{piggyBank.balance | currency: piggyBank.currency}} {{piggyBank.description}}
+    </div>
+  </div>
+  <div #utilBox style="position: fixed;"
+       [ngStyle]="{'top.px': utilBoxTop, 'left.px': utilBoxLeft, 'visibility': utilBoxVisibility}">
+    <button (click)="prepareToEdit()">
+      Edit
+    </button>
+  </div>
+</div>
+
+<button (click)="prepareToCreate()" *ngIf="!editElement">
+  Create
+</button>
+
+<div *ngIf="editElement">
+  <div class="form-group row">
+    <label for="name" class="col-sm-2 col-form-label">Name</label>
+    <div class="col-sm-10">
+      <input id="name" name="name" type="name" class="form-control"
+             #name="ngModel"
+             [(ngModel)]="editElement.name"
+             required/>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="description" class="col-sm-2 col-form-label">Description</label>
+    <div class="col-sm-10">
+      <textarea id="description" name="description" type="description" class="form-control"
+                #description="ngModel"
+                [(ngModel)]="editElement.description"
+                required>
+      </textarea>
+    </div>
+  </div>
+  <div class="form-group row" *ngIf="!editElement.id">
+    <label for="balance" class="col-sm-2 col-form-label">Balance</label>
+    <div class="col-sm-10">
+      <input id="balance" name="balance" type="number" min=0 class="form-control"
+             #balance="ngModel" [(ngModel)]="editElement.balance" required/>
+    </div>
+  </div>
+  <div class="form-group row" *ngIf="!editElement.id">
+    <label for="currency" class="col-sm-2 col-form-label">Currency</label>
+    <div class="col-sm-10">
+      <app-currency-typeahead
+        id="currency"
+        name="currency"
+        [inputClass]="'form-control'"
+        [readonly]="false"
+        [(ngModel)]="editElement.currency"
+        #currency="ngModel"
+        required>
+      </app-currency-typeahead>
+    </div>
+  </div>
+  <div class="form-group row" *ngIf="editElement.id">
+    {{editElement.balance | currency: editElement.currency}}
+  </div>
+  <button *ngIf="editElement.id" [disabled]="name?.errors?.required || description?.errors?.required"
+          (click)="update()">Update
+  </button>
+  <button *ngIf="!editElement.id" [disabled]="name?.errors?.required || description?.errors?.required"
+          (click)="create()">Create
+  </button>
+  <button (click)="reset()">Cancel</button>
+</div>
