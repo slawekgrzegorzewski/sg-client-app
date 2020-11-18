@@ -84,6 +84,10 @@
   </div>
 </div>
 
+<div class="form-group row" *ngIf="isTopUpEditMode() || isDebitEditMode()">
+  {{editElement.name}} - current balance: {{editElement.balance | currency: editElement.currency}}
+</div>
+
 <div class="form-group row" *ngIf="isTopUpEditMode()">
   <label for="topUp" class="col-sm-2 col-form-label">Amount</label>
   <div class="col-sm-10">
@@ -98,6 +102,14 @@
     <input id="debit" name="debit" type="number" max=0 class="form-control"
            [(ngModel)]="operationAmount" required/>
   </div>
+</div>
+
+<div class="form-group row" *ngIf="isTopUpEditMode()">
+  New balance: {{editElement.balance + operationAmount | currency: editElement.currency}}
+</div>
+
+<div class="form-group row" *ngIf="isDebitEditMode()">
+  New balance: {{editElement.balance - operationAmount | currency: editElement.currency}}
 </div>
 
 <button (click)="prepareToCreate()" *ngIf="isNonEditMode()">Create</button>
