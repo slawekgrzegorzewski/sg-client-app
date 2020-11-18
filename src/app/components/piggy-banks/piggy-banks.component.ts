@@ -5,6 +5,11 @@ import {PiggyBanksService} from '../../services/piggy-banks.service';
 
 export const INCOME = 'income';
 export const EXPENSE = 'expense';
+const GENERAL_EDIT_MODE = 'general';
+const CREATE_EDIT_MODE = 'create';
+const TOPUP_EDIT_MODE = 'topup';
+const DEBIT_EDIT_MODE = 'debit';
+const EMPTY_EDIT_MODE = '';
 
 @Component({
   selector: 'app-piggy-banks',
@@ -13,8 +18,41 @@ export const EXPENSE = 'expense';
 })
 export class PiggyBanksComponent implements OnInit {
 
+  get editElement(): PiggyBank {
+    return this.editElementInternal;
+  }
+
+  set editElement(value: PiggyBank) {
+    this.editElementInternal = value;
+    this.monthlyTopUpEnabled = this.editElementInternal?.monthlyTopUp > 0;
+  }
+
+  get monthlyTopUpEnabled(): boolean {
+    return this.monthlyTopUpEnabledInternal;
+  }
+
+  set monthlyTopUpEnabled(value: boolean) {
+    this.monthlyTopUpEnabledInternal = value;
+    if (!this.monthlyTopUpEnabledInternal) {
+      if (this.editElement) {
+        this.editElement.monthlyTopUp = 0;
+      }
+    }
+  }
+
+  constructor(
+    private piggyBanksService: PiggyBanksService,
+    private toastService: ToastService
+  ) {
+  }
+
   piggyBanks: PiggyBank[] = [];
-  editElement: PiggyBank;
+  editMode: string = EMPTY_EDIT_MODE;
+  private editElementInternal: PiggyBank;
+
+  private monthlyTopUpEnabledInternal = false;
+
+  operationAmount = 0;
 
   @ViewChild('utilBox') utilBox: ElementRef;
   overElement: PiggyBank;
@@ -22,10 +60,8 @@ export class PiggyBanksComponent implements OnInit {
   utilBoxLeft: number;
   utilBoxVisibility = 'hidden';
 
-  constructor(
-    private piggyBanksService: PiggyBanksService,
-    private toastService: ToastService
-  ) {
+  private static isEmptyString(value: string): boolean {
+    return value === undefined || value === null || value.length === 0;
   }
 
   ngOnInit(): void {
@@ -57,16 +93,32 @@ export class PiggyBanksComponent implements OnInit {
     return acc;
   }
 
-  prepareToEdit(): void {
-    this.editElement = this.overElement;
-  }
-
   prepareToCreate(): void {
-    this.editElement = new PiggyBank();
+    this.prepareToEdit(new PiggyBank(), CREATE_EDIT_MODE);
   }
 
-  reset(): void {
+  prepareToGeneralEdit(): void {
+    this.prepareToEdit(this.overElement, GENERAL_EDIT_MODE);
+  }
+
+  prepareToTopUp(): void {
+    this.prepareToEdit(this.overElement, TOPUP_EDIT_MODE);
+
+  }
+
+  prepareToDebit(): void {
+    this.prepareToEdit(this.overElement, DEBIT_EDIT_MODE);
+  }
+
+  prepareToEdit(editElement: PiggyBank, editMode): void {
+    this.editElement = editElement;
+    this.editMode = editMode;
+  }
+
+  resetEditForm(): void {
+    this.editMode = EMPTY_EDIT_MODE;
     this.editElement = null;
+    this.operationAmount = 0;
     this.setOverPiggyBank(null, null);
   }
 
@@ -74,24 +126,76 @@ export class PiggyBanksComponent implements OnInit {
     this.piggyBanksService.create(this.editElement).subscribe(
       data => {
         this.fetchData();
-        this.reset();
+        this.resetEditForm();
       },
       error => {
         this.toastService.showWarning('Can not create new piggy bank ' + error);
-        this.reset();
+        this.resetEditForm();
       }
     );
   }
 
   update(): void {
+    this.updateEditElement();
+  }
+
+  topUp(): void {
+    if (this.operationAmount > 0) {
+      this.editElement.balance += this.operationAmount;
+      this.updateEditElement();
+    } else {
+      this.resetEditForm();
+    }
+  }
+
+  debit(): void {
+    if (this.operationAmount > 0) {
+      this.editElement.balance -= this.operationAmount;
+      this.updateEditElement();
+    } else {
+      this.resetEditForm();
+    }
+  }
+
+  private updateEditElement(): void {
     this.piggyBanksService.update(this.editElement).subscribe(
       data => {
-        this.reset();
+        this.resetEditForm();
       },
       error => {
         this.toastService.showWarning('Can not update piggy bank ' + error);
-        this.reset();
+        this.resetEditForm();
       }
     );
+  }
+
+  isNonEditMode(): boolean {
+    return this.editMode === EMPTY_EDIT_MODE;
+  }
+
+  isGeneralEditMode(): boolean {
+    return this.editMode === GENERAL_EDIT_MODE;
+  }
+
+  isCreateEditMode(): boolean {
+    return this.editMode === CREATE_EDIT_MODE;
+  }
+
+  isTopUpEditMode(): boolean {
+    return this.editMode === TOPUP_EDIT_MODE;
+  }
+
+  isDebitEditMode(): boolean {
+    return this.editMode === DEBIT_EDIT_MODE;
+  }
+
+  canCreate(): boolean {
+    return this.isCreateEditMode()
+      && !PiggyBanksComponent.isEmptyString(this.editElement.name);
+  }
+
+  canEdit(): boolean {
+    return this.isGeneralEditMode()
+      && !PiggyBanksComponent.isEmptyString(this.editElement.name);
   }
 }
