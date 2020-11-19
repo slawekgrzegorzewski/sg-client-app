@@ -1,6 +1,6 @@
 <div *ngIf="account">
   <div (mouseleave)="setOverTransaction(null, null)">
-    <table class="table table-striped">
+    <table>
       <tr #row *ngFor="let transaction of transactionsOfSelectedAccount"
           (mouseenter)="setOverTransaction(transaction, row)">
         <td>{{transaction.timeOfTransaction | localizedDate:'y-MM-d'}}</td>
@@ -12,7 +12,7 @@
             {{transaction.credit}} {{transaction.destination.currency}}
           </span>
         </td>
-        <td>{{transaction.description}}</td>
+        <td [innerHTML]="transaction.description | htmlNewLine" style="max-width: 300px"></td>
       </tr>
     </table>
   </div>

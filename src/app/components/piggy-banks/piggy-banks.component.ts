@@ -1,7 +1,13 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {ToastService} from '../../services/toast.service';
 import {PiggyBank} from '../../model/piggy-bank';
 import {PiggyBanksService} from '../../services/piggy-banks.service';
+import {Observable} from 'rxjs';
+import {Currency} from '../../model/currency';
+import {map} from 'rxjs/operators';
+import {AccountsService} from '../../services/accounts.service';
+import {NgEventBus} from 'ng-event-bus';
+import {Events} from '../../model/events';
 
 export const INCOME = 'income';
 export const EXPENSE = 'expense';
@@ -17,6 +23,7 @@ const EMPTY_EDIT_MODE = '';
   styleUrls: ['./piggy-banks.component.css']
 })
 export class PiggyBanksComponent implements OnInit {
+  @Input() adminMode: boolean;
 
   get editElement(): PiggyBank {
     return this.editElementInternal;
@@ -41,7 +48,9 @@ export class PiggyBanksComponent implements OnInit {
   }
 
   constructor(
+    private accountsService: AccountsService,
     private piggyBanksService: PiggyBanksService,
+    private eventBus: NgEventBus,
     private toastService: ToastService
   ) {
   }
@@ -66,6 +75,7 @@ export class PiggyBanksComponent implements OnInit {
 
   ngOnInit(): void {
     this.fetchData();
+    this.eventBus.on(Events.PIGGY_BANK_CHANGED).subscribe((message) => this.fetchData());
   }
 
   private fetchData(): void {
@@ -75,7 +85,7 @@ export class PiggyBanksComponent implements OnInit {
     );
   }
 
-  setOverPiggyBank(piggyBank: PiggyBank, row: HTMLDivElement): void {
+  setOverPiggyBank(piggyBank: PiggyBank, row: HTMLTableRowElement): void {
     this.overElement = piggyBank;
     if (piggyBank) {
       const adjustment = (row.offsetHeight - this.utilBox.nativeElement.offsetHeight) / 2;
@@ -94,11 +104,15 @@ export class PiggyBanksComponent implements OnInit {
   }
 
   prepareToCreate(): void {
-    this.prepareToEdit(new PiggyBank(), CREATE_EDIT_MODE);
+    if (this.adminMode) {
+      this.prepareToEdit(new PiggyBank(), CREATE_EDIT_MODE);
+    }
   }
 
   prepareToGeneralEdit(): void {
-    this.prepareToEdit(this.overElement, GENERAL_EDIT_MODE);
+    if (this.adminMode) {
+      this.prepareToEdit(this.overElement, GENERAL_EDIT_MODE);
+    }
   }
 
   prepareToTopUp(): void {
@@ -197,5 +211,22 @@ export class PiggyBanksComponent implements OnInit {
   canEdit(): boolean {
     return this.isGeneralEditMode()
       && !PiggyBanksComponent.isEmptyString(this.editElement.name);
+  }
+
+  currenciesForTypeAhead(): () => Observable<Currency[]> {
+    const that = this;
+    return () => that.accountsService.possibleCurrencies()
+      .pipe(map(data => data.sort((a, b) => a.code.localeCompare(b.code))));
+  }
+
+  currencyIdExtractor(currency: Currency): string {
+    if (!currency) {
+      return null;
+    }
+    return currency.code;
+  }
+
+  currencyToString(currency: Currency): string {
+    return currency.description();
   }
 }

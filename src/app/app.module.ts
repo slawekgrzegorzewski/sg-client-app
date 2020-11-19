@@ -27,15 +27,15 @@ import '@angular/common/locales/global/pl';
 import {TransactionsListComponent} from './components/transactions/transactions-list.component';
 import {BillingPeriodsComponent} from './components/billing-periods/billing-periods.component';
 import {BillingPeriodsService} from './services/billing-periods.service';
-import {DatePipe} from '@angular/common';
+import {CurrencyPipe, DatePipe} from '@angular/common';
 import {BillingElementsComponent} from './components/billing-periods/billing-elements.component';
 import {CreateBillingElementComponent} from './components/billing-periods/create-billing-element.component';
-import {CurrencyTypeaheadComponent} from './components/typeaheads/currency-typeahead.component';
 import {CategoriesComponent} from './components/billing-periods/categories.component';
 import {NgEventBus} from 'ng-event-bus';
-import {CategoryTypeaheadComponent} from './components/typeaheads/category-typeahead.component';
 import {PiggyBanksService} from './services/piggy-banks.service';
 import {PiggyBanksComponent} from './components/piggy-banks/piggy-banks.component';
+import {HtmlNewLinePipe} from './pipe/html-new-line-pipe';
+import {GeneralTypeaheadComponent} from './components/typeaheads/general-typeahead.component';
 
 @NgModule({
   declarations: [
@@ -51,14 +51,14 @@ import {PiggyBanksComponent} from './components/piggy-banks/piggy-banks.componen
     UserAccountsComponent,
     CreateTransactionsComponent,
     LocalizedDatePipe,
+    HtmlNewLinePipe,
     TransactionsListComponent,
     BillingPeriodsComponent,
     BillingElementsComponent,
     CreateBillingElementComponent,
-    CurrencyTypeaheadComponent,
     CategoriesComponent,
-    CategoryTypeaheadComponent,
-    PiggyBanksComponent
+    PiggyBanksComponent,
+    GeneralTypeaheadComponent
   ],
   imports: [
     BrowserModule,
@@ -79,6 +79,7 @@ import {PiggyBanksComponent} from './components/piggy-banks/piggy-banks.componen
     PiggyBanksService,
     DatePipe,
     NgEventBus,
+    CurrencyPipe,
     {
       provide: LOCALE_ID,
       useValue: 'pl-PL'
