@@ -77,6 +77,7 @@
             [inputClass]="'form-control'"
             [readonly]="null"
             [(ngModel)]="piggyBankId"
+            [availableData]="piggyBanksForSelectedAccount"
             [dataProvider]="piggyBanksForTypeAhead()"
             [idExtractor]="piggyBankIdExtractor"
             [tToString]="piggyBankToString()"

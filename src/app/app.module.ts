@@ -36,6 +36,7 @@ import {PiggyBanksService} from './services/piggy-banks.service';
 import {PiggyBanksComponent} from './components/piggy-banks/piggy-banks.component';
 import {HtmlNewLinePipe} from './pipe/html-new-line-pipe';
 import {GeneralTypeaheadComponent} from './components/typeaheads/general-typeahead.component';
+import {CurrencyTotalsComponent} from './components/home/currency-totals.component';
 
 @NgModule({
   declarations: [
@@ -58,7 +59,8 @@ import {GeneralTypeaheadComponent} from './components/typeaheads/general-typeahe
     CreateBillingElementComponent,
     CategoriesComponent,
     PiggyBanksComponent,
-    GeneralTypeaheadComponent
+    GeneralTypeaheadComponent,
+    CurrencyTotalsComponent
   ],
   imports: [
     BrowserModule,

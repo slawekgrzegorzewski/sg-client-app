@@ -91,7 +91,7 @@ export class GeneralTypeaheadComponent<T, ID extends string | number> implements
 
   private filterData(): void {
     this.values = (this.allValues || []).filter(c =>
-      this.availableData.length === 0 ? true : this.availableData.includes(this.idExtractor(c))
+      this.availableData === null ? true : this.availableData.includes(this.idExtractor(c))
     );
   }
 

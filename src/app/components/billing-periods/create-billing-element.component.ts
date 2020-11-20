@@ -35,6 +35,8 @@ export class CreateBillingElementComponent implements OnInit {
     this.availableCurrencies = [...new Set(this.availableAccountsInternal.map(c => c.currency))];
   }
 
+  selectedAccountInternal: Account;
+
   get selectedAccount(): Account {
     return this.selectedAccountInternal || new Account();
   }
@@ -42,6 +44,7 @@ export class CreateBillingElementComponent implements OnInit {
   set selectedAccount(value: Account) {
     this.selectedAccountInternal = value;
     this.billingElement.currency = this.selectedAccount.currency;
+    this.filterPiggyBanks();
   }
 
   get forAccountId(): number {
@@ -114,8 +117,6 @@ export class CreateBillingElementComponent implements OnInit {
 
   private availableAccountsInternal: Account[];
 
-  selectedAccountInternal: Account;
-
   forAccountIdInternal: number;
 
   availableCurrenciesInternal: string[] = [];
@@ -132,11 +133,21 @@ export class CreateBillingElementComponent implements OnInit {
 
   private categoryIdInternal: number;
 
-  piggyBanks: PiggyBank[] = [];
+  piggyBanksInternal: PiggyBank[] = [];
+
+  get piggyBanks(): PiggyBank[] {
+    return this.piggyBanksInternal;
+  }
+
+  set piggyBanks(value: PiggyBank[]) {
+    this.piggyBanksInternal = value;
+    this.filterPiggyBanks();
+  }
 
   private piggyBankIdInternal: number;
 
   elementDate: NgbDateStruct;
+  piggyBanksForSelectedAccount: number[];
 
   ngOnInit(): void {
 
@@ -156,6 +167,14 @@ export class CreateBillingElementComponent implements OnInit {
       this.billingElement = new Expense();
     }
     this.elementDate = this.ngbCalendar.getToday();
+  }
+
+  private filterPiggyBanks(): void {
+    if (this.selectedAccount?.currency) {
+      this.piggyBanksForSelectedAccount = this.piggyBanks.filter(pg => pg.currency === this.selectedAccount.currency).map(pg => pg.id);
+    } else {
+      this.piggyBanksForSelectedAccount = null;
+    }
   }
 
   public elements(): any[] {
