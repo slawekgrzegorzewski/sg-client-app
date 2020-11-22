@@ -35,7 +35,7 @@ export class GeneralTypeaheadComponent<T, ID extends string | number> implements
     this.propagateTouch(id);
   }
 
-  private availableDataInternal: ID[] = [];
+  private availableDataInternal: ID[] = null;
 
   @Input() get availableData(): ID[] {
     return this.availableDataInternal;

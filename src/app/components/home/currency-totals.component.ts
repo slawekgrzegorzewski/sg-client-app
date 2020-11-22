@@ -87,7 +87,7 @@ export class CurrencyTotalsComponent<T> implements OnInit {
 
   private processValues(vals: T[], currencyExtractor: (t: T) => string, balanceExtractor: (t: T) => number): Map<string, number> {
     const result = new Map<string, number>();
-    for (const value of vals) {
+    for (const value of vals || []) {
       const currency = currencyExtractor(value);
       let total = result.get(currency) || 0;
       total += balanceExtractor(value);
