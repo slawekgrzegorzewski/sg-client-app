@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  serviceUrl: 'https://51.68.138.205:8443'
+  serviceUrl: 'https://grzegorzewski.org:8443'
 };

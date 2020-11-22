@@ -5,7 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "startProd": "ng serve --configuration=production",
-    "startProdHttps": "ng serve --host 0.0.0.0 --configuration=production --ssl true --ssl-cert /home/slag/sg-application/certs/sgapplication.crt --ssl-key /home/slag/sg-application/certs/sgapplication.key",
+    "startProdHttps": "ng serve --host grzegorzewski.org --port 443 --configuration=production --ssl true --ssl-cert /home/slag/sg-application/certs/sgapplication.crt --ssl-key /home/slag/sg-application/certs/sgapplication.key",
     "build": "ng build",
     "buildProd": "ng build --configuration=production",
     "test": "ng test",
