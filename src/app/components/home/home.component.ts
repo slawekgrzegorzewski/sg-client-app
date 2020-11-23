@@ -109,6 +109,6 @@ export class HomeComponent implements OnInit {
 
   selectAccount(account: Account): void {
     this.selectedAccount = account;
-    this.filterTransactionsForSelectedAccount();
+    this.transactionsOfSelectedAccount = this.filterTransactionsForSelectedAccount();
   }
 }
