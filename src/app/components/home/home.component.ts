@@ -111,4 +111,9 @@ export class HomeComponent implements OnInit {
     this.selectedAccount = account;
     this.transactionsOfSelectedAccount = this.filterTransactionsForSelectedAccount();
   }
+
+
+  updatePiggyBank(piggyBank: PiggyBank): void {
+    this.piggyBanksService.update(piggyBank).subscribe();
+  }
 }
