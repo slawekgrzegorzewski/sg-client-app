@@ -18,7 +18,7 @@ export class TransactionsService {
     this.serviceUrl = environment.serviceUrl;
   }
 
-  allUsersTransactions(): Observable<Transaction[]> {
+  userTransactions(): Observable<Transaction[]> {
     return this.http.get<Transaction[]>(
       environment.serviceUrl + '/transactions',
       {responseType: 'json'}

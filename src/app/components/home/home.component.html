@@ -1,16 +1,16 @@
 <div style="display: flex; flex-direction: row; justify-content: space-around">
   <div style="display: flex; flex-direction: column">
     <app-currency-totals style="margin-bottom: 10px"
-      [title]="'Accounts totals'"
-      [valuesLeft]="accounts"
-      [currencyExtractorLeft]="accountCurrencyExtractor"
-      [balanceExtractorLeft]="accountBalanceExtractor"
+                         [title]="'Accounts totals'"
+                         [valuesLeft]="accounts"
+                         [currencyExtractorLeft]="accountCurrencyExtractor"
+                         [balanceExtractorLeft]="accountBalanceExtractor"
     ></app-currency-totals>
     <app-currency-totals style="margin-bottom: 10px"
-      [title]="'Piggy Banks totals'"
-      [valuesLeft]="piggyBanks"
-      [currencyExtractorLeft]="piggyBankCurrencyExtractor"
-      [balanceExtractorLeft]="piggyBankBalanceExtractor"
+                         [title]="'Piggy Banks totals'"
+                         [valuesLeft]="piggyBanks"
+                         [currencyExtractorLeft]="piggyBankCurrencyExtractor"
+                         [balanceExtractorLeft]="piggyBankBalanceExtractor"
     ></app-currency-totals>
     <app-currency-totals
       [title]="'Balance'"
@@ -23,19 +23,24 @@
     ></app-currency-totals>
     <app-user-accounts [userName]="loginService.getUserName()"
                        [accounts]="accounts"
-                       (selectionChanged)="selectedAccount = $event">
+                       (selectionChanged)="selectAccount($event)">
     </app-user-accounts>
     <span (click)="showTransactions = !showTransactions" style="margin-bottom: 10px">
       <span *ngIf="showTransactions">Hide</span>
       <span *ngIf="!showTransactions">Show</span>
       transactions</span>
-    <app-transactions-list *ngIf="showTransactions" [account]="selectedAccount"
+    <app-transactions-list *ngIf="showTransactions"
                            [allAccounts]="accounts"
-                           (transactionAction)="fetchAccounts()">
+                           [account]="selectedAccount"
+                           [transactions]="transactionsOfSelectedAccount"
+                           (transactionAction)="refreshData()">
     </app-transactions-list>
   </div>
 
-  <app-piggy-banks [adminMode]="false" style="margin-left: 50px; margin-top: 50px;margin-right: 50px"></app-piggy-banks>
+  <app-piggy-banks
+    [adminMode]="false"
+    [piggyBanks]="piggyBanks"
+    style="margin-left: 50px; margin-top: 50px;margin-right: 50px"></app-piggy-banks>
 
   <app-billing-periods></app-billing-periods>
 

@@ -35,7 +35,14 @@
     <li ngbNavItem>
       <a ngbNavLink>Piggy Banks</a>
       <ng-template ngbNavContent>
-        <app-piggy-banks [adminMode]="true"></app-piggy-banks>
+        <app-piggy-banks
+          [adminMode]="true"
+          [piggyBanks]="piggyBanks"
+          [allCurrencies]="allCurrencies"
+          (createEvent)="createPiggyBank($event)"
+          (updateEvent)="updatePiggyBank($event)"
+
+        ></app-piggy-banks>
       </ng-template>
     </li>
   </ul>

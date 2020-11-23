@@ -1,7 +1,7 @@
-<div *ngIf="account">
+<div *ngIf="account && !transferCreationMode">
   <div (mouseleave)="setOverTransaction(null, null)">
     <table>
-      <tr #row *ngFor="let transaction of transactionsOfSelectedAccount"
+      <tr #row *ngFor="let transaction of transactions"
           (mouseenter)="setOverTransaction(transaction, row)">
         <td>{{transaction.timeOfTransaction | localizedDate:'y-MM-d'}}</td>
         <td>
@@ -15,16 +15,25 @@
         <td [innerHTML]="transaction.description | htmlNewLine" style="max-width: 300px"></td>
       </tr>
     </table>
+    <div #utilBox style="position: fixed;"
+         [ngStyle]="{'top.px': utilBoxTop, 'left.px': utilBoxLeft, 'visibility': utilBoxVisibility}">
+      <button (click)="openPredefinedTransferCreationDialog(buttonClicked())">
+        Transfer
+      </button>
+    </div>
   </div>
 
   <button (click)="openIncomeCreationDialog()">Income</button>
-  <button (click)="openOutcomeCreationDialog()">Outcome</button>
+  <button (click)="openExpenseCreationDialog()">Expense</button>
   <button (click)="openTransferCreationDialog()">Transfer</button>
-
-  <div #utilBox style="position: fixed;"
-       [ngStyle]="{'top.px': utilBoxTop, 'left.px': utilBoxLeft, 'visibility': utilBoxVisibility}">
-    <button (click)="openPredefinedTransferCreationDialog(buttonClicked())">
-      Transfer
-    </button>
-  </div>
+</div>
+<div *ngIf="account && transferCreationMode">
+  <app-create-transaction
+    [account]="account"
+    [targetAccounts]="accountsToSelect"
+    [transactionType]="creatingTransactionType"
+    [amount]="creatingTransactionAmount"
+    [description]="creatingTransactionFieldDescription"
+    (finishSubject)="editCompleted($event)">
+  </app-create-transaction>
 </div>

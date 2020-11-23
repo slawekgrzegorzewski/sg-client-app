@@ -1,13 +1,9 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {ToastService} from '../../services/toast.service';
 import {PiggyBank} from '../../model/piggy-bank';
-import {PiggyBanksService} from '../../services/piggy-banks.service';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {Currency} from '../../model/currency';
-import {map} from 'rxjs/operators';
-import {AccountsService} from '../../services/accounts.service';
 import {NgEventBus} from 'ng-event-bus';
-import {Events} from '../../model/events';
 
 export const INCOME = 'income';
 export const EXPENSE = 'expense';
@@ -24,6 +20,13 @@ const EMPTY_EDIT_MODE = '';
 })
 export class PiggyBanksComponent implements OnInit {
   @Input() adminMode: boolean;
+  @Input() piggyBanks: PiggyBank[] = [];
+  @Input() allCurrencies: Currency[];
+  @Output() updateEvent = new EventEmitter<PiggyBank>();
+  @Output() createEvent = new EventEmitter<PiggyBank>();
+  editMode: string = EMPTY_EDIT_MODE;
+
+  private editElementInternal: PiggyBank;
 
   get editElement(): PiggyBank {
     return this.editElementInternal;
@@ -33,6 +36,8 @@ export class PiggyBanksComponent implements OnInit {
     this.editElementInternal = value;
     this.monthlyTopUpEnabled = this.editElementInternal?.monthlyTopUp > 0;
   }
+
+  private monthlyTopUpEnabledInternal = false;
 
   get monthlyTopUpEnabled(): boolean {
     return this.monthlyTopUpEnabledInternal;
@@ -47,20 +52,6 @@ export class PiggyBanksComponent implements OnInit {
     }
   }
 
-  constructor(
-    private accountsService: AccountsService,
-    private piggyBanksService: PiggyBanksService,
-    private eventBus: NgEventBus,
-    private toastService: ToastService
-  ) {
-  }
-
-  piggyBanks: PiggyBank[] = [];
-  editMode: string = EMPTY_EDIT_MODE;
-  private editElementInternal: PiggyBank;
-
-  private monthlyTopUpEnabledInternal = false;
-
   operationAmount = 0;
 
   @ViewChild('utilBox') utilBox: ElementRef;
@@ -69,20 +60,17 @@ export class PiggyBanksComponent implements OnInit {
   utilBoxLeft: number;
   utilBoxVisibility = 'hidden';
 
+  constructor(
+    private eventBus: NgEventBus,
+    private toastService: ToastService
+  ) {
+  }
+
   private static isEmptyString(value: string): boolean {
     return value === undefined || value === null || value.length === 0;
   }
 
   ngOnInit(): void {
-    this.fetchData();
-    this.eventBus.on(Events.PIGGY_BANK_CHANGED).subscribe((message) => this.fetchData());
-  }
-
-  private fetchData(): void {
-    this.piggyBanksService.getAllPiggyBanks().subscribe(
-      data => this.piggyBanks = data,
-      error => this.toastService.showWarning('Could not obtain piggy banks ' + error)
-    );
   }
 
   setOverPiggyBank(piggyBank: PiggyBank, row: HTMLTableRowElement): void {
@@ -137,16 +125,8 @@ export class PiggyBanksComponent implements OnInit {
   }
 
   create(): void {
-    this.piggyBanksService.create(this.editElement).subscribe(
-      data => {
-        this.fetchData();
-        this.resetEditForm();
-      },
-      error => {
-        this.toastService.showWarning('Can not create new piggy bank ' + error);
-        this.resetEditForm();
-      }
-    );
+    this.createEvent.emit(this.editElement);
+    this.resetEditForm();
   }
 
   update(): void {
@@ -172,15 +152,8 @@ export class PiggyBanksComponent implements OnInit {
   }
 
   private updateEditElement(): void {
-    this.piggyBanksService.update(this.editElement).subscribe(
-      data => {
-        this.resetEditForm();
-      },
-      error => {
-        this.toastService.showWarning('Can not update piggy bank ' + error);
-        this.resetEditForm();
-      }
-    );
+    this.updateEvent.emit(this.editElement);
+    this.resetEditForm();
   }
 
   isNonEditMode(): boolean {
@@ -215,8 +188,7 @@ export class PiggyBanksComponent implements OnInit {
 
   currenciesForTypeAhead(): () => Observable<Currency[]> {
     const that = this;
-    return () => that.accountsService.possibleCurrencies()
-      .pipe(map(data => data.sort((a, b) => a.code.localeCompare(b.code))));
+    return () => of(that.allCurrencies);
   }
 
   currencyIdExtractor(currency: Currency): string {

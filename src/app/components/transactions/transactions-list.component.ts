@@ -4,8 +4,6 @@ import {Account} from '../../model/account';
 import {Transaction} from '../../model/transaction';
 import {CreateTransactionsComponent} from './create-transactions.component';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {TransactionsService} from '../../services/transations.service';
-import {ToastService} from '../../services/toast.service';
 
 @Component({
   selector: 'app-transactions-list',
@@ -14,19 +12,20 @@ import {ToastService} from '../../services/toast.service';
 })
 export class TransactionsListComponent {
 
-  constructor(private transactionsService: TransactionsService,
-              private modalService: NgbModal,
-              private toastService: ToastService) {
-  }
+  transferCreationMode = false;
+  creatingTransactionType: TransactionType;
+  creatingTransactionAmount: number;
+  creatingTransactionFieldDescription: string;
 
   @ViewChild('utilBox') utilBox: ElementRef;
   utilBoxTop: number;
   utilBoxLeft: number;
   utilBoxVisibility = 'hidden';
 
+
+  @Input() transactions: Transaction[];
   private overTransaction: Transaction;
 
-  private internalAccount: Account;
   internalAllAccounts: Account[];
   accountsToSelect: Account[];
 
@@ -37,8 +36,9 @@ export class TransactionsListComponent {
   set allAccounts(value: Account[]) {
     this.internalAllAccounts = value;
     this.accountsToSelect = this.filterAccountsOtherThanSelectedOne();
-    this.fetchTransactions();
   }
+
+  private internalAccount: Account;
 
   @Input()
   get account(): Account {
@@ -47,36 +47,12 @@ export class TransactionsListComponent {
 
   set account(value: Account) {
     this.internalAccount = value;
-    this.fetchTransactions();
     this.accountsToSelect = this.filterAccountsOtherThanSelectedOne();
   }
 
-  private internalTransactions: Transaction[];
-
-  get transactions(): Transaction[] {
-    return this.internalTransactions;
-  }
-
-  set transactions(t: Transaction[]) {
-    this.internalTransactions = t;
-    this.transactionsOfSelectedAccount = this.filterTransactionsForSelectedAccount();
-  }
-
-  public transactionsOfSelectedAccount: Transaction[];
-
   @Output() transactionAction = new EventEmitter<any>();
 
-  private fetchTransactions(): void {
-    this.transactionsService.allUsersTransactions().subscribe(
-      data => {
-        this.transactions = data;
-        this.transactionsOfSelectedAccount = this.filterTransactionsForSelectedAccount();
-      },
-      error => {
-        this.toastService.showWarning('Could not obtain transactions information.');
-        this.transactions = [];
-      }
-    );
+  constructor(private modalService: NgbModal) {
   }
 
   private filterAccountsOtherThanSelectedOne(): Account[] {
@@ -84,29 +60,6 @@ export class TransactionsListComponent {
       return [];
     }
     return this.internalAllAccounts.filter(account => this.internalAccount === undefined || account.id !== this.internalAccount.id);
-  }
-
-  private filterTransactionsForSelectedAccount(): Transaction[] {
-    if (!this.account) {
-      return [];
-    }
-    if (!this.transactions) {
-      return [];
-    }
-    return this.transactions
-      .filter(t => this.isTransactionRelatedToSelectedAccount(t))
-      .sort((a, b) => a.timeOfTransaction.getTime() - b.timeOfTransaction.getTime());
-  }
-
-  private isTransactionRelatedToSelectedAccount(t: Transaction): boolean {
-    return this.areAccountsEqual(t.source, this.account) || this.areAccountsEqual(t.destination, this.account);
-  }
-
-  private areAccountsEqual(a: Account, b: Account): boolean {
-    if (!a || !b) {
-      return false;
-    }
-    return a.id === b.id;
   }
 
   setOverTransaction(value: Transaction, transactionRow: HTMLTableRowElement): void {
@@ -121,55 +74,44 @@ export class TransactionsListComponent {
     }
   }
 
-  openPredefinedTransferCreationDialog(transaction: Transaction): void {
-    const component = this.setupEditDialog();
-    component.transactionType = TransactionType.TRANSFER_PREDEFINED;
-    component.account = this.account;
-    component.targetAccounts = this.accountsToSelect;
-    component.amount = transaction.credit;
-    component.description = 'Transfer of \'' + transaction.description + '\'';
-  }
-
   buttonClicked(): Transaction {
     const transaction = this.overTransaction;
     this.setOverTransaction(null, null);
     return transaction;
   }
 
-  openIncomeCreationDialog(): void {
-    const component = this.setupEditDialog();
-    component.transactionType = TransactionType.CREDIT;
-    component.account = this.account;
+  openPredefinedTransferCreationDialog(transaction: Transaction): void {
+    this.creatingTransactionType = TransactionType.TRANSFER_PREDEFINED;
+    this.creatingTransactionAmount = transaction.credit;
+    this.creatingTransactionFieldDescription = 'Transfer of \'' + transaction.description + '\'';
+    this.transferCreationMode = true;
   }
 
-  openOutcomeCreationDialog(): void {
-    const component = this.setupEditDialog();
-    component.transactionType = TransactionType.DEBIT;
-    component.account = this.account;
+  openIncomeCreationDialog(): void {
+    this.creatingTransactionType  = TransactionType.CREDIT;
+    this.creatingTransactionAmount = null;
+    this.creatingTransactionFieldDescription = '';
+    this.transferCreationMode = true;
+  }
+
+  openExpenseCreationDialog(): void {
+    this.creatingTransactionType  = TransactionType.DEBIT;
+    this.creatingTransactionAmount = null;
+    this.creatingTransactionFieldDescription = '';
+    this.transferCreationMode = true;
   }
 
   openTransferCreationDialog(): void {
-    const component = this.setupEditDialog();
-    component.transactionType = TransactionType.TRANSFER;
-    component.account = this.account;
-    component.targetAccounts = this.accountsToSelect;
+    this.creatingTransactionType  = TransactionType.TRANSFER;
+    this.creatingTransactionAmount = null;
+    this.creatingTransactionFieldDescription = '';
+    this.transferCreationMode = true;
   }
 
-  private setupEditDialog(): CreateTransactionsComponent {
-    const ngbModalRef: NgbModalRef = this.modalService.open(CreateTransactionsComponent, {centered: true});
-    const component = ngbModalRef.componentInstance as CreateTransactionsComponent;
-    const closeHandler = this.onModalClose(ngbModalRef, this);
-    component.finishSubject.subscribe(closeHandler, closeHandler);
-    return component;
-  }
-
-  onModalClose(ngbModalRef: NgbModalRef, that: TransactionsListComponent): (input: any) => void {
-    return input => {
-      ngbModalRef.close();
-      if (input === 'OK') {
-        that.transactionAction.emit();
-        // this.fetchTransactions();
-      }
-    };
+  editCompleted(input: any): void {
+    this.transferCreationMode = false;
+    if (input === 'OK') {
+      this.transactionAction.emit();
+    }
   }
 }
