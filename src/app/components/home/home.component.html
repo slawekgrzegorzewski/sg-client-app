@@ -42,7 +42,22 @@
     [piggyBanks]="piggyBanks"
     (updateEvent)="updatePiggyBank($event)"
     style="margin-left: 50px; margin-top: 50px;margin-right: 50px"></app-piggy-banks>
+  <div style="display: flex; flex-direction: column">
+    <div style="display: flex; flex-direction: row">
+      <a (click)="previous()">Previous</a>
+      &nbsp;&nbsp;&nbsp;<span *ngIf="currentBilling">
+         Billing {{currentBilling.name}} for {{ currentBilling.period | date:'yyyy-MM' }}
+       </span>
+      <span *ngIf="!currentBilling">
+         No billing for {{displayingPeriod | date:'yyyy-MM' }}
+       </span>
+      <a (click)="next()">Next</a>
+    </div>
+    <app-billing-periods
+      [billing]="currentBilling"
+      (createEvent)="createBillingForCurrentDate()">
 
-  <app-billing-periods></app-billing-periods>
+    </app-billing-periods>
+  </div>
 
 </div>
