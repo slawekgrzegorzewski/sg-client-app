@@ -1,5 +1,5 @@
-<div style="display: flex; flex-direction: row; justify-content: space-around">
-  <div style="display: flex; flex-direction: column">
+<div class="row">
+  <div class="col-md">
     <app-currency-totals style="margin-bottom: 10px"
                          [title]="'Accounts totals'"
                          [valuesLeft]="accounts"
@@ -36,13 +36,16 @@
                            (transactionAction)="refreshData()">
     </app-transactions-list>
   </div>
+  <div class="col-md">
+    <app-piggy-banks
+      [adminMode]="false"
+      [piggyBanks]="piggyBanks"
+      (updateEvent)="updatePiggyBank($event)"
+      style="margin-left: 50px; margin-top: 50px;margin-right: 50px">
 
-  <app-piggy-banks
-    [adminMode]="false"
-    [piggyBanks]="piggyBanks"
-    (updateEvent)="updatePiggyBank($event)"
-    style="margin-left: 50px; margin-top: 50px;margin-right: 50px"></app-piggy-banks>
-  <div style="display: flex; flex-direction: column">
+    </app-piggy-banks>
+  </div>
+  <div class="col-md">
     <div style="display: flex; flex-direction: row">
       <a (click)="previous()">Previous</a>
       &nbsp;&nbsp;&nbsp;<span *ngIf="currentBilling">
