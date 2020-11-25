@@ -49,13 +49,7 @@ export class HomeComponent implements OnInit {
     this.refreshData();
     this.accountsService.possibleCurrencies()
       .pipe(map(data => data.sort((a, b) => a.code.localeCompare(b.code))));
-    this.billingsService.getAllCategories()
-      .subscribe(data => this.categories = data);
-    // this.eventBus.on(Events.TRANSACTIONS_CHANGED).subscribe((message) => {
-    //   this.fetchAccounts();
-    //   this.fetchBillingPeriod();
-    // });
-    // this.eventBus.on(Events.PIGGY_BANK_CHANGED).subscribe((message) => this.fetchPiggyBanks());
+    this.billingsService.getAllCategories().subscribe(data => this.categories = data);
   }
 
   refreshData(): void {
