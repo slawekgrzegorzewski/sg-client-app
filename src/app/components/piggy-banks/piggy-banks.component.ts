@@ -1,9 +1,7 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {ToastService} from '../../services/toast.service';
 import {PiggyBank} from '../../model/piggy-bank';
 import {Observable, of} from 'rxjs';
 import {Currency} from '../../model/currency';
-import {NgEventBus} from 'ng-event-bus';
 
 export const INCOME = 'income';
 export const EXPENSE = 'expense';
@@ -60,10 +58,7 @@ export class PiggyBanksComponent implements OnInit {
   utilBoxLeft: number;
   utilBoxVisibility = 'hidden';
 
-  constructor(
-    private eventBus: NgEventBus,
-    private toastService: ToastService
-  ) {
+  constructor() {
   }
 
   private static isEmptyString(value: string): boolean {

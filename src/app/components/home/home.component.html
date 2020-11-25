@@ -53,11 +53,37 @@
        </span>
       <a (click)="next()">Next</a>
     </div>
-    <app-billing-periods
-      [billing]="currentBilling"
-      (createEvent)="createBillingForCurrentDate()">
 
-    </app-billing-periods>
+    <div *ngIf="currentBilling" style="display: flex; flex-direction: column">
+      <div style="display: flex; flex-direction: row">
+        <app-billing-elements style="padding-right: 10px"
+                              [title]="'Incomes'"
+                              [billingPeriod]="currentBilling"
+                              [elementType]="'income'"
+                              [userAccounts]="accounts"
+                              [categories]="categories"
+                              [piggyBanks]="piggyBanks"
+                              (createElementEvent)="createElement($event[0], $event[1])"
+                              (updatePiggyBankEvent)="updatePiggyBank($event)">
+
+        </app-billing-elements>
+        <app-billing-elements style="padding-left: 10px"
+                              [title]="'Expenses'"
+                              [billingPeriod]="currentBilling"
+                              [elementType]="'expense'"
+                              [userAccounts]="accounts"
+                              [categories]="categories"
+                              (createElementEvent)="createElement($event[0], $event[1])"
+                              (updatePiggyBankEvent)="updatePiggyBank($event)">
+
+        </app-billing-elements>
+      </div>
+    </div>
+
+    <div *ngIf="!currentBilling">
+      <button (click)="createBillingForCurrentDate()">Create</button>
+    </div>
+
   </div>
 
 </div>

@@ -1,4 +1,4 @@
-<div style="display: flex; flex-direction: column">
+<div *ngIf="mode !== EDIT_VIEW" style="display: flex; flex-direction: column">
   <h3>{{title}}</h3>
 
   <div style="display: flex; flex-direction: row">
@@ -40,3 +40,13 @@
   </div>
   <button (click)="add()">Add</button>
 </div>
+<app-create-billing-element *ngIf="mode === EDIT_VIEW" style="display: flex; flex-direction: column"
+                            [elementType]="elementType"
+                            [categories]="categories"
+                            [userAccounts]="userAccounts"
+                            [billingPeriod]="billingPeriod"
+                            [piggyBanks]="piggyBanks"
+                            (editEvent)="createElement($event[0], $event[1], $event[2])"
+>
+
+</app-create-billing-element>

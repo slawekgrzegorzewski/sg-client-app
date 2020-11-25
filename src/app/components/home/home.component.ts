@@ -3,8 +3,6 @@ import {AccountsService} from '../../services/accounts.service';
 import {ToastService} from '../../services/toast.service';
 import {Account} from '../../model/account';
 import {LoginService} from '../../services/login.service';
-import {NgEventBus} from 'ng-event-bus';
-import {Events} from '../../model/events';
 import {PiggyBanksService} from '../../services/piggy-banks.service';
 import {PiggyBank} from '../../model/piggy-bank';
 import {TransactionsService} from '../../services/transations.service';
@@ -12,6 +10,9 @@ import {Transaction} from '../../model/transaction';
 import {map} from 'rxjs/operators';
 import {BillingPeriodsService} from '../../services/billing-periods.service';
 import {BillingPeriod} from '../../model/billings/billing-period';
+import {Category} from '../../model/billings/category';
+import {Income} from '../../model/billings/income';
+import {Expense} from '../../model/billings/expense';
 
 @Component({
   selector: 'app-accounts',
@@ -28,6 +29,7 @@ export class HomeComponent implements OnInit {
   piggyBanks: PiggyBank[];
   displayingPeriod = new Date();
   currentBilling: BillingPeriod;
+  categories: Category[];
 
   accountCurrencyExtractor = (acc: Account) => acc.currency;
   accountBalanceExtractor = (acc: Account) => acc.currentBalance;
@@ -39,8 +41,7 @@ export class HomeComponent implements OnInit {
               private piggyBanksService: PiggyBanksService,
               private billingsService: BillingPeriodsService,
               private toastService: ToastService,
-              public loginService: LoginService,
-              private eventBus: NgEventBus) {
+              public loginService: LoginService) {
   }
 
 
@@ -48,11 +49,13 @@ export class HomeComponent implements OnInit {
     this.refreshData();
     this.accountsService.possibleCurrencies()
       .pipe(map(data => data.sort((a, b) => a.code.localeCompare(b.code))));
-    this.eventBus.on(Events.TRANSACTIONS_CHANGED).subscribe((message) => {
-      this.fetchAccounts();
-      this.fetchBillingPeriod();
-    });
-    this.eventBus.on(Events.PIGGY_BANK_CHANGED).subscribe((message) => this.fetchPiggyBanks());
+    this.billingsService.getAllCategories()
+      .subscribe(data => this.categories = data);
+    // this.eventBus.on(Events.TRANSACTIONS_CHANGED).subscribe((message) => {
+    //   this.fetchAccounts();
+    //   this.fetchBillingPeriod();
+    // });
+    // this.eventBus.on(Events.PIGGY_BANK_CHANGED).subscribe((message) => this.fetchPiggyBanks());
   }
 
   refreshData(): void {
@@ -63,12 +66,9 @@ export class HomeComponent implements OnInit {
   }
 
   fetchAccounts(): void {
-    this.accounts = [];
-    this.selectAccount(null);
     this.accountsService.currentUserAccounts().subscribe(
-      data => {
-        this.accounts = data.sort(Account.compareByCurrencyAndName);
-      }
+      data => this.accounts = data.sort(Account.compareByCurrencyAndName),
+      error => this.accounts = []
     );
   }
 
@@ -127,9 +127,20 @@ export class HomeComponent implements OnInit {
     this.transactionsOfSelectedAccount = this.filterTransactionsForSelectedAccount();
   }
 
+  createElement(element: Income | Expense, accountId: number): void {
+    this.billingsService.createBillingElement(this.currentBilling, element, accountId)
+      .subscribe(
+        success => this.refreshData(),
+        error => this.refreshData()
+      );
+  }
 
   updatePiggyBank(piggyBank: PiggyBank): void {
-    this.piggyBanksService.update(piggyBank).subscribe();
+    this.piggyBanksService.update(piggyBank)
+      .subscribe(
+        success => this.refreshData(),
+        error => this.refreshData()
+      );
   }
 
   createBillingForCurrentDate(): void {

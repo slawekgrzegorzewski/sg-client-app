@@ -51,8 +51,10 @@ export class UserAccountsComponent implements OnInit {
       } else {
         this.selectedAccount = this.accounts[0];
       }
-      this.selectionChanged.emit(this.selectedAccount);
+    } else {
+      this.selectedAccount = null;
     }
+    this.selectionChanged.emit(this.selectedAccount);
   }
 
   private recalculateSubtotals(): void {
