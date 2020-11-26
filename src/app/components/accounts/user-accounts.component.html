@@ -1,20 +1,13 @@
 <div class="card" style="width: 400px;">
   <div class="card-body">
     <h5 *ngIf="showTitle" class="card-title">Accounts of user {{userName}}</h5>
-    <div>
-      <table *ngIf="totalBalancesPerCurrency.size > 0" class="card-subtitle mb-2 text-muted"
-             style="margin-left: auto; margin-right: 10px">
-        <tr>
-          <td>Total balance:</td>
-          <td style="text-align: right">{{firstEntry()[1] | number:'1.2-2'}}</td>
-          <td style="text-align: left">{{firstEntry()[0]}}</td>
-        </tr>
-        <tr *ngFor="let entry of restOfEntries()">
-          <td></td>
-          <td style="text-align: right">{{entry[1] | number:'1.2-2'}}</td>
-          <td style="text-align: left">{{entry[0]}}</td>
-        </tr>
-      </table>
+    <div style="margin-left: auto; margin-right: 10px; width: 65%">
+      <app-multi-currency-total
+        class="card-subtitle mb-2 text-muted"
+        [title]="'Total balance:'"
+        [values]="totalBalancesPerCurrency">
+
+      </app-multi-currency-total>
     </div>
     <div (mouseleave)="setOverAccount(null, null)">
       <table #table class="card-text" style="width: 100%">

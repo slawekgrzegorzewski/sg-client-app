@@ -1,5 +1,5 @@
-<div class="row">
-  <div class="col-md">
+<div style="display: flex; flex-direction: row; flex-wrap: wrap">
+  <div style="margin-right: 20px;">
     <app-currency-totals style="margin-bottom: 10px"
                          [title]="'Accounts totals'"
                          [valuesLeft]="accounts"
@@ -21,6 +21,12 @@
       [currencyExtractorRight]="piggyBankCurrencyExtractor"
       [balanceExtractorRight]="piggyBankBalanceExtractor"
     ></app-currency-totals>
+    <app-multi-currency-total
+      [title]="'Savings'"
+      [values]="savingsTotal"
+    >
+
+    </app-multi-currency-total>
     <app-user-accounts [userName]="loginService.getUserName()"
                        [accounts]="accounts"
                        (selectionChanged)="selectAccount($event)">
@@ -36,7 +42,7 @@
                            (transactionAction)="refreshData()">
     </app-transactions-list>
   </div>
-  <div class="col-md">
+  <div style="margin-left: 20px;">
     <app-piggy-banks
       [adminMode]="false"
       [piggyBanks]="piggyBanks"
@@ -45,7 +51,7 @@
 
     </app-piggy-banks>
   </div>
-  <div class="col-md">
+  <div>
     <div style="display: flex; flex-direction: row">
       <a (click)="previous()">Previous</a>
       &nbsp;&nbsp;&nbsp;<span *ngIf="currentBilling">

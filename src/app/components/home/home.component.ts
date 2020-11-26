@@ -27,6 +27,7 @@ export class HomeComponent implements OnInit {
   allTransactions: Transaction[];
   transactionsOfSelectedAccount: Transaction[];
   piggyBanks: PiggyBank[];
+  savingsTotal = new Map<string, number>();
   displayingPeriod = new Date();
   currentBilling: BillingPeriod;
   categories: Category[];
@@ -113,6 +114,14 @@ export class HomeComponent implements OnInit {
   private fetchPiggyBanks(): void {
     this.piggyBanksService.getAllPiggyBanks().subscribe(data => {
       this.piggyBanks = data.sort((a, b) => a.name.localeCompare(b.name));
+      this.savingsTotal.clear();
+      this.piggyBanks.filter(pg => pg.savings).forEach(
+        value => {
+          let totalForCurrency = this.savingsTotal.get(value.currency) || 0;
+          totalForCurrency += value.balance;
+          this.savingsTotal.set(value.currency, totalForCurrency);
+        }
+      );
     });
   }
 
