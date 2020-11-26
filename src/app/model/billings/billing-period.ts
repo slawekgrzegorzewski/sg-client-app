@@ -1,6 +1,16 @@
 import {Income} from './income';
 import {Expense} from './expense';
 
+export class BillingPeriodInfo {
+  public result: BillingPeriod;
+  public unfinishedPeriods: BillingPeriod[];
+
+  constructor(data?: any) {
+    this.result = data && new BillingPeriod(data.result) || null;
+    this.unfinishedPeriods = data && data.unfinishedPeriods.map(up => new BillingPeriod(up)) || [];
+  }
+}
+
 export class BillingPeriod {
   public id: number;
   public name: string;

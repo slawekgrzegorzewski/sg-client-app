@@ -30,6 +30,7 @@ export class HomeComponent implements OnInit {
   savingsTotal = new Map<string, number>();
   displayingPeriod = new Date();
   currentBilling: BillingPeriod;
+  unfinishedBillings: BillingPeriod[];
   categories: Category[];
 
   accountCurrencyExtractor = (acc: Account) => acc.currency;
@@ -106,8 +107,14 @@ export class HomeComponent implements OnInit {
 
   private fetchBillingPeriod(): void {
     this.billingsService.billingPeriodFor(this.displayingPeriod).subscribe(
-      data => this.currentBilling = data,
-      error => this.currentBilling = null
+      data => {
+        this.currentBilling = data.result;
+        this.unfinishedBillings = data.unfinishedPeriods;
+      },
+      error => {
+        this.currentBilling = null;
+        this.unfinishedBillings = [];
+      }
     );
   }
 
@@ -149,7 +156,10 @@ export class HomeComponent implements OnInit {
   createBillingForCurrentDate(): void {
     if (!this.currentBilling) {
       this.billingsService.createBillingPeriodFor(this.displayingPeriod).subscribe(
-        data => this.currentBilling = data
+        data => {
+          this.currentBilling = data.result;
+          this.unfinishedBillings = data.unfinishedPeriods;
+        }
       );
     }
   }

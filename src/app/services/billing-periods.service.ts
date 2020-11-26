@@ -3,7 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import {Observable} from 'rxjs';
 import {SettingsService} from './settings.service';
-import {BillingPeriod} from '../model/billings/billing-period';
+import {BillingPeriod, BillingPeriodInfo} from '../model/billings/billing-period';
 import {DatePipe} from '@angular/common';
 import {Category} from '../model/billings/category';
 import {map} from 'rxjs/operators';
@@ -23,24 +23,24 @@ export class BillingPeriodsService {
     this.serviceUrl = environment.serviceUrl;
   }
 
-  currentBillingPeriod(): Observable<BillingPeriod> {
-    return this.http.get<BillingPeriod>(environment.serviceUrl + '/billing-periods')
-      .pipe(map(d => new BillingPeriod(d)));
+  currentBillingPeriod(): Observable<BillingPeriodInfo> {
+    return this.http.get<BillingPeriodInfo>(environment.serviceUrl + '/billing-periods')
+      .pipe(map(d => new BillingPeriodInfo(d)));
   }
 
-  billingPeriodFor(date: Date): Observable<BillingPeriod> {
-    return this.http.get<BillingPeriod>(environment.serviceUrl + '/billing-periods/' + this.datePipe.transform(date, 'yyyy-MM'))
-      .pipe(map(d => new BillingPeriod(d)));
+  billingPeriodFor(date: Date): Observable<BillingPeriodInfo> {
+    return this.http.get<BillingPeriodInfo>(environment.serviceUrl + '/billing-periods/' + this.datePipe.transform(date, 'yyyy-MM'))
+      .pipe(map(d => new BillingPeriodInfo(d)));
   }
 
-  createCurrentBillingPeriod(): Observable<BillingPeriod> {
-    return this.http.put<BillingPeriod>(environment.serviceUrl + '/billing-periods', null)
-      .pipe(map(d => new BillingPeriod(d)));
+  createCurrentBillingPeriod(): Observable<BillingPeriodInfo> {
+    return this.http.put<BillingPeriodInfo>(environment.serviceUrl + '/billing-periods', null)
+      .pipe(map(d => new BillingPeriodInfo(d)));
   }
 
-  createBillingPeriodFor(date: Date): Observable<BillingPeriod> {
-    return this.http.put<BillingPeriod>(environment.serviceUrl + '/billing-periods/' + this.datePipe.transform(date, 'yyyy-MM'), null)
-      .pipe(map(d => new BillingPeriod(d)));
+  createBillingPeriodFor(date: Date): Observable<BillingPeriodInfo> {
+    return this.http.put<BillingPeriodInfo>(environment.serviceUrl + '/billing-periods/' + this.datePipe.transform(date, 'yyyy-MM'), null)
+      .pipe(map(d => new BillingPeriodInfo(d)));
   }
 
   getAllCategories(): Observable<Category[]> {
