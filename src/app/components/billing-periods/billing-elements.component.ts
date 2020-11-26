@@ -1,14 +1,10 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {BillingPeriodsService} from '../../services/billing-periods.service';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {BillingPeriod} from '../../model/billings/billing-period';
 import {throwError} from 'rxjs';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {CreateBillingElementComponent} from './create-billing-element.component';
-import {NgEventBus} from 'ng-event-bus';
-import {Events} from '../../model/events';
 import {Income} from '../../model/billings/income';
 import {Expense} from '../../model/billings/expense';
 import {Category} from '../../model/billings/category';
+import {PiggyBank} from '../../model/piggy-bank';
 
 export const INCOME = 'income';
 export const EXPENSE = 'expense';
@@ -22,18 +18,20 @@ export class BillingElementsComponent implements OnInit {
 
   readonly GENERAL_VIEW = 'general';
   readonly DETAILED_VIEW = 'detailed';
+  readonly EDIT_VIEW = 'edit';
 
   mode: string = this.GENERAL_VIEW;
+  private previousMode: string;
 
-  private incomeDisplay: string;
+  private elementTypeInternal: string;
 
-  get display(): string {
-    return this.incomeDisplay;
+  get elementType(): string {
+    return this.elementTypeInternal;
   }
 
-  @Input() set display(value: string) {
+  @Input() set elementType(value: string) {
     if (value === INCOME || value === EXPENSE) {
-      this.incomeDisplay = value;
+      this.elementTypeInternal = value;
       this.selectElementsToShow();
     } else {
       throwError('incorrect value for display');
@@ -57,18 +55,20 @@ export class BillingElementsComponent implements OnInit {
 
   @Input() title: string;
 
-  constructor(
-    private billingsService: BillingPeriodsService,
-    private modalService: NgbModal,
-    private eventBus: NgEventBus
-  ) {
+  @Input() userAccounts: Account[];
+  @Input() categories: Category[];
+  @Input() piggyBanks: PiggyBank[];
+  @Output() createElementEvent = new EventEmitter<[Income | Expense, number]>();
+  @Output() updatePiggyBankEvent = new EventEmitter<PiggyBank>();
+
+  constructor() {
   }
 
   ngOnInit(): void {
   }
 
   private selectElementsToShow(): void {
-    const elements = this.incomeDisplay === INCOME ? this.billingPeriod.incomes.sort((a, b) => this.sortIncomes(a, b)) :
+    const elements = this.elementTypeInternal === INCOME ? this.billingPeriod.incomes.sort((a, b) => this.sortIncomes(a, b)) :
       this.billingPeriod.expenses.sort((a, b) => this.sortExpenses(a, b));
     this.elements = elements || [];
     this.categoryBreakdown.clear();
@@ -103,22 +103,22 @@ export class BillingElementsComponent implements OnInit {
   }
 
   add(): void {
-    const ngbModalRef = this.modalService.open(CreateBillingElementComponent, {centered: true});
-    const component = ngbModalRef.componentInstance as CreateBillingElementComponent;
-    const closeHandler = this.onModalClose(ngbModalRef, this);
-    component.closeSubject.subscribe(closeHandler, closeHandler);
-    component.display = this.display;
-    component.billingPeriod = this.billingPeriod;
+    this.previousMode = this.mode || this.GENERAL_VIEW;
+    this.mode = this.EDIT_VIEW;
   }
 
-  onModalClose(ngbModalRef, that): (input) => void {
-    return input => {
-      ngbModalRef.close();
-      this.eventBus.cast(Events.TRANSACTIONS_CHANGED);
-    };
+  createElement(elementToCreate: Income | Expense, accountIdForElement: number, piggyBankToUpdate: PiggyBank): void {
+    if (elementToCreate && accountIdForElement) {
+      this.createElementEvent.emit([elementToCreate, accountIdForElement]);
+      if (piggyBankToUpdate) {
+        this.updatePiggyBankEvent.emit(piggyBankToUpdate);
+      }
+    }
+    this.mode = this.previousMode || this.GENERAL_VIEW;
+    this.previousMode = null;
   }
 
   nameOfType(): string {
-    return this.display === INCOME ? 'incomes' : 'expenses';
+    return this.elementType === INCOME ? 'incomes' : 'expenses';
   }
 }

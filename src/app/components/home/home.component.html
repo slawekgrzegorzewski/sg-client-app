@@ -1,15 +1,99 @@
-<div style="display: flex; flex-direction: row">
-  <div style="display: flex; flex-direction: column">
+<div style="display: flex; flex-direction: row; flex-wrap: wrap">
+  <div style="margin-right: 20px;">
+    <app-currency-totals style="margin-bottom: 10px"
+                         [title]="'Accounts totals'"
+                         [valuesLeft]="accounts"
+                         [currencyExtractorLeft]="accountCurrencyExtractor"
+                         [balanceExtractorLeft]="accountBalanceExtractor"
+    ></app-currency-totals>
+    <app-currency-totals style="margin-bottom: 10px"
+                         [title]="'Piggy Banks totals'"
+                         [valuesLeft]="piggyBanks"
+                         [currencyExtractorLeft]="piggyBankCurrencyExtractor"
+                         [balanceExtractorLeft]="piggyBankBalanceExtractor"
+    ></app-currency-totals>
+    <app-currency-totals
+      [title]="'Balance'"
+      [valuesLeft]="accounts"
+      [currencyExtractorLeft]="accountCurrencyExtractor"
+      [balanceExtractorLeft]="accountBalanceExtractor"
+      [valuesRight]="piggyBanks"
+      [currencyExtractorRight]="piggyBankCurrencyExtractor"
+      [balanceExtractorRight]="piggyBankBalanceExtractor"
+    ></app-currency-totals>
+    <app-multi-currency-total
+      [title]="'Savings'"
+      [values]="savingsTotal"
+    >
+
+    </app-multi-currency-total>
     <app-user-accounts [userName]="loginService.getUserName()"
                        [accounts]="accounts"
-                       (selectionChanged)="selectedAccount = $event">
+                       (selectionChanged)="selectAccount($event)">
     </app-user-accounts>
-
-    <app-transactions-list [account]="selectedAccount"
+    <span (click)="showTransactions = !showTransactions" style="margin-bottom: 10px">
+      <span *ngIf="showTransactions">Hide</span>
+      <span *ngIf="!showTransactions">Show</span>
+      transactions</span>
+    <app-transactions-list *ngIf="showTransactions"
                            [allAccounts]="accounts"
-                           (transactionAction)="fetchAccounts()">
+                           [account]="selectedAccount"
+                           [transactions]="transactionsOfSelectedAccount"
+                           (transactionAction)="refreshData()">
     </app-transactions-list>
   </div>
+  <div style="margin-left: 20px;">
+    <app-piggy-banks
+      [adminMode]="false"
+      [piggyBanks]="piggyBanks"
+      (updateEvent)="updatePiggyBank($event)"
+      style="margin-left: 50px; margin-top: 50px;margin-right: 50px">
 
-  <app-billing-periods></app-billing-periods>
+    </app-piggy-banks>
+  </div>
+  <div>
+    <div style="display: flex; flex-direction: row">
+      <a (click)="previous()">Previous</a>
+      &nbsp;&nbsp;&nbsp;<span *ngIf="currentBilling">
+         Billing {{currentBilling.name}} for {{ currentBilling.period | date:'yyyy-MM' }}
+       </span>
+      <span *ngIf="!currentBilling">
+         No billing for {{displayingPeriod | date:'yyyy-MM' }}
+       </span>
+      <a (click)="next()">Next</a>
+    </div>
+
+    <div *ngIf="currentBilling" style="display: flex; flex-direction: column">
+      <div style="display: flex; flex-direction: row">
+        <app-billing-elements style="padding-right: 10px"
+                              [title]="'Incomes'"
+                              [billingPeriod]="currentBilling"
+                              [elementType]="'income'"
+                              [userAccounts]="accounts"
+                              [categories]="categories"
+                              [piggyBanks]="piggyBanks"
+                              (createElementEvent)="createElement($event[0], $event[1])"
+                              (updatePiggyBankEvent)="updatePiggyBank($event)">
+
+        </app-billing-elements>
+        <app-billing-elements style="padding-left: 10px"
+                              [title]="'Expenses'"
+                              [billingPeriod]="currentBilling"
+                              [elementType]="'expense'"
+                              [userAccounts]="accounts"
+                              [categories]="categories"
+                              [piggyBanks]="piggyBanks"
+                              (createElementEvent)="createElement($event[0], $event[1])"
+                              (updatePiggyBankEvent)="updatePiggyBank($event)">
+
+        </app-billing-elements>
+      </div>
+    </div>
+
+    <div *ngIf="!currentBilling">
+      <button (click)="createBillingForCurrentDate()">Create</button>
+    </div>
+
+  </div>
+
 </div>

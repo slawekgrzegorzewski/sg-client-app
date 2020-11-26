@@ -18,20 +18,15 @@ export class AccountsService {
               private settingsService: SettingsService,
               @Inject(LOCALE_ID) private defaultLocale: string) {
     this.serviceUrl = environment.serviceUrl;
-    this.fetchCurrencies();
   }
 
-  private fetchCurrencies(): void {
-    this.http.get<Currency[]>(environment.serviceUrl + '/currency/all/' + this.settingsService.getUsersLocale())
-      .subscribe(
-        data => {
-          this.currencies = data.map(d => Currency.fromData(d));
-        },
-        error => {
-          this.currencies = null;
-          setTimeout(() => this.fetchCurrencies(), 100);
-        }
-      );
+  private fetchCurrencies(): Observable<Currency[]> {
+    return this.http.get<Currency[]>(environment.serviceUrl + '/currency/all/' + this.settingsService.getUsersLocale())
+      .pipe(map(data => data.map(d => Currency.fromData(d))))
+      .pipe(map(data => {
+        this.currencies = data;
+        return data;
+      }));
   }
 
   allAccounts(): Observable<Account[]> {
@@ -49,7 +44,9 @@ export class AccountsService {
   }
 
   possibleCurrencies(): Observable<Currency[]> {
-    return this.currencies === null ? throwError('Error during fetching currencies.') : of(this.currencies);
+    return this.currencies === null ?
+      throwError('Error during fetching currencies.') :
+      (this.currencies.length === 0 ? this.fetchCurrencies() : of(this.currencies));
   }
 
   create(account: Account): Observable<Account> {

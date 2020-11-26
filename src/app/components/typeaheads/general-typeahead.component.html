@@ -3,14 +3,14 @@
        [(ngModel)]="value"
        [readonly]="readonly"
 
-       #categoriesTypeAhead="ngbTypeahead"
+       #tTypeAhead="ngbTypeahead"
        [ngbTypeahead]="searchClosure(this)"
        [resultTemplate]="categoryLabel"
-       [inputFormatter]="formatter"
+       [inputFormatter]="formatter()"
        (focus)="focus.next($any($event).target.value)"
        (click)="click.next($any($event).target.value)"
-       (blur)="this.propagateTouch(value.id)"
+       (blur)="propagateTouch(idExtractor(value))"
 />
 <ng-template #categoryLabel let-r="result" let-t="term">
-  <ngb-highlight [result]="r.fullName()" [term]="t"></ngb-highlight>
+  <ngb-highlight [result]="formatter()(r)" [term]="t"></ngb-highlight>
 </ng-template>

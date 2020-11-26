@@ -1,14 +1,13 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {BillingPeriodsService} from '../../services/billing-periods.service';
+import {Component, Input, OnInit, Output} from '@angular/core';
 import {BillingPeriod} from '../../model/billings/billing-period';
-import {Subject, throwError} from 'rxjs';
+import {Observable, of, Subject, throwError} from 'rxjs';
 import {Income} from '../../model/billings/income';
 import {Expense} from '../../model/billings/expense';
-import {AccountsService} from '../../services/accounts.service';
-import {ToastService} from '../../services/toast.service';
 import {Account} from '../../model/account';
 import {Category} from '../../model/billings/category';
 import {NgbCalendar, NgbDateStruct} from '@ng-bootstrap/ng-bootstrap';
+import {PiggyBank} from '../../model/piggy-bank';
+import {CurrencyPipe} from '@angular/common';
 
 export const INCOME = 'income';
 export const EXPENSE = 'expense';
@@ -20,16 +19,36 @@ export const EXPENSE = 'expense';
 })
 export class CreateBillingElementComponent implements OnInit {
 
-  private availableAccountsInternal: Account[];
+  @Input() billingPeriod: BillingPeriod;
 
-  get availableAccounts(): Account[] {
-    return this.availableAccountsInternal || [];
+  @Input() categories: Category[] = [];
+
+  private elementTypeInternal: string;
+
+  get elementType(): string {
+    return this.elementTypeInternal;
   }
 
-  set availableAccounts(value: Account[]) {
-    this.availableAccountsInternal = value;
-    this.availableCurrencies = [...new Set(this.availableAccountsInternal.map(c => c.currency))];
+  @Input() set elementType(value: string) {
+    if (value === INCOME || value === EXPENSE) {
+      this.elementTypeInternal = value;
+    } else {
+      throwError('incorrect value for display');
+    }
   }
+
+  private userAccountsInternal: Account[];
+
+  get userAccounts(): Account[] {
+    return this.userAccountsInternal || [];
+  }
+
+  @Input() set userAccounts(value: Account[]) {
+    this.userAccountsInternal = value;
+    this.availableCurrencies = [...new Set(this.userAccountsInternal.map(c => c.currency))];
+  }
+
+  @Output() editEvent = new Subject<[Income | Expense, number, PiggyBank]>();
 
   selectedAccountInternal: Account;
 
@@ -40,6 +59,7 @@ export class CreateBillingElementComponent implements OnInit {
   set selectedAccount(value: Account) {
     this.selectedAccountInternal = value;
     this.billingElement.currency = this.selectedAccount.currency;
+    this.filterPiggyBanks();
   }
 
   forAccountIdInternal: number;
@@ -50,7 +70,8 @@ export class CreateBillingElementComponent implements OnInit {
 
   set forAccountId(value: number) {
     this.forAccountIdInternal = value;
-    this.selectedAccount = this.availableAccounts.find(account => account.id === (this.forAccountId || -1));
+
+    this.selectedAccount = this.userAccounts.find(account => account.id === (this.forAccountId || -1));
   }
 
   availableCurrenciesInternal: string[] = [];
@@ -63,28 +84,6 @@ export class CreateBillingElementComponent implements OnInit {
     this.availableCurrenciesInternal = value;
   }
 
-  private incomeDisplay: string;
-  closeSubject = new Subject<any>();
-
-  get display(): string {
-    return this.incomeDisplay;
-  }
-
-  @Input() set display(value: string) {
-    if (value === INCOME || value === EXPENSE) {
-      this.incomeDisplay = value;
-    } else {
-      throwError('incorrect value for display');
-    }
-  }
-
-  @Input() public billingPeriod: BillingPeriod;
-  @Input() title: string;
-
-  billingElement: Income | Expense;
-
-  categories: Category[] = [];
-
   private categoryIdInternal: number;
 
   get categoryId(): number {
@@ -96,27 +95,37 @@ export class CreateBillingElementComponent implements OnInit {
     this.billingElement.category = this.categories.find(c => c.id === this.categoryId);
   }
 
+  private piggyBankIdInternal: number;
+
+  get piggyBankId(): number {
+    return Number(this.piggyBankIdInternal);
+  }
+
+  set piggyBankId(value: number) {
+    this.piggyBankIdInternal = value;
+  }
+
+  piggyBanksInternal: PiggyBank[] = [];
+
+  @Input() get piggyBanks(): PiggyBank[] {
+    return this.piggyBanksInternal;
+  }
+
+  set piggyBanks(value: PiggyBank[]) {
+    this.piggyBanksInternal = value;
+    this.filterPiggyBanks();
+  }
+
+  billingElement: Income | Expense;
+  piggyBanksForSelectedAccount: number[];
   elementDate: NgbDateStruct;
 
-  constructor(private billingsService: BillingPeriodsService,
-              private accountsService: AccountsService,
-              private toastService: ToastService,
+  constructor(private currencyPipe: CurrencyPipe,
               private ngbCalendar: NgbCalendar) {
   }
 
   ngOnInit(): void {
-
-    this.accountsService.currentUserAccounts().subscribe(
-      data => this.availableAccounts = data,
-      err => this.toastService.showWarning('Could not obtain accounts ' + err)
-    );
-
-    this.billingsService.getAllCategories().subscribe(
-      data => this.categories = data,
-      err => this.toastService.showWarning('Could not obtain categories ' + err)
-    );
-
-    if (this.display === INCOME) {
+    if (this.elementType === INCOME) {
       this.billingElement = new Income();
     } else {
       this.billingElement = new Expense();
@@ -124,22 +133,43 @@ export class CreateBillingElementComponent implements OnInit {
     this.elementDate = this.ngbCalendar.getToday();
   }
 
+  piggyBankAction(): string {
+    return this.elementType === INCOME ? 'Credit' : 'Debit';
+  }
+
+  piggyBankToFinance(): PiggyBank {
+    let piggyBank: PiggyBank = null;
+    if (this.piggyBankIdInternal) {
+      piggyBank = this.piggyBanks.find(pg => pg.id === this.piggyBankId);
+    }
+    return piggyBank;
+  }
+
+  private filterPiggyBanks(): void {
+    if (this.selectedAccount?.currency) {
+      this.piggyBanksForSelectedAccount = this.piggyBanks.filter(pg => pg.currency === this.selectedAccount.currency).map(pg => pg.id);
+    } else {
+      this.piggyBanksForSelectedAccount = null;
+    }
+  }
+
   public elements(): any[] {
-    const elements = this.incomeDisplay === INCOME ? this.billingPeriod.incomes : this.billingPeriod.expenses;
-    return elements ? elements : [];
+    return (this.elementType === INCOME ? this.billingPeriod.incomes : this.billingPeriod.expenses) || [];
   }
 
   add(): void {
+    let amount = this.billingElement.amount;
     if (this.billingElement instanceof Income) {
       this.billingElement.incomeDate = this.convertToDate(this.elementDate);
     } else {
       this.billingElement.expenseDate = this.convertToDate(this.elementDate);
+      amount = -amount;
     }
-    this.billingsService.createBillingElement(this.billingPeriod, this.billingElement, this.selectedAccount.id)
-      .subscribe(
-        data => this.closeSubject.next(data),
-        error => this.closeSubject.next(error)
-      );
+    const piggyBank = this.piggyBankToFinance();
+    if (piggyBank) {
+      piggyBank.balance += amount;
+    }
+    this.editEvent.next([this.billingElement, this.selectedAccount.id, piggyBank]);
   }
 
   private convertToDate(date: NgbDateStruct): Date {
@@ -150,27 +180,52 @@ export class CreateBillingElementComponent implements OnInit {
     return result;
   }
 
-  nameOfType(): string {
-    return this.isIncome() ? 'incomes' : 'expenses';
-  }
-
-  confirm(): void {
-    this.closeSubject.next('ok');
-  }
-
   cancel(): void {
-    this.closeSubject.next('cancel');
-  }
-
-  isExpense(): boolean {
-    return this.display === EXPENSE;
+    this.editEvent.next([null, null, null]);
   }
 
   isIncome(): boolean {
-    return this.display === INCOME;
+    return this.elementType === INCOME;
   }
 
   isAllowed(): boolean {
     return this.isIncome() || this.billingElement.amount <= this.selectedAccount.currentBalance;
+  }
+
+  categoriesForTypeAhead(): () => Observable<Category[]> {
+    const that = this;
+    return () => of(that.categories.sort((a, b) => a.name.localeCompare(b.name)));
+  }
+
+  categoryIdExtractor(category: Category): number {
+    if (!category) {
+      return null;
+    }
+    return category.id;
+  }
+
+  categoryToString(category: Category): string {
+    return category.fullName();
+  }
+
+  piggyBanksForTypeAhead(): () => Observable<PiggyBank[]> {
+    const that = this;
+    return () => of(
+      that.piggyBanks
+        .filter(pb => that.selectedAccount && pb.currency === this.selectedAccount.currency)
+        .sort((a, b) => a.name.localeCompare(b.name))
+    );
+  }
+
+  piggyBankIdExtractor(piggyBank: PiggyBank): number {
+    if (!piggyBank) {
+      return null;
+    }
+    return piggyBank.id;
+  }
+
+  piggyBankToString(): (PiggyBank) => string {
+    const that = this;
+    return piggyBank => piggyBank.name + ' ' + that.currencyPipe.transform(piggyBank.balance, piggyBank.currency);
   }
 }

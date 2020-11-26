@@ -1,5 +1,5 @@
 <div class="creating-billing-element-main">
-  <h5>Enter {{display}} details</h5>
+  <h5>Enter {{elementType}} details</h5>
   <form #createBillingElementForm="ngForm" class="needs-validation">
 
     <div class="form-group row">
@@ -7,7 +7,7 @@
       <div class="col-sm-10">
         <select id="forAccount" name="forAccount" class="form-control"
                 #forAccount="ngModel" [(ngModel)]="forAccountId" required ngbAutofocus>
-          <option *ngFor="let account of availableAccounts" [value]="account.id">{{account.name}}
+          <option *ngFor="let account of userAccounts" [value]="account.id">{{account.name}}
             ({{account.currentBalance}} {{account.currency}})
           </option>
         </select>
@@ -31,15 +31,18 @@
       <div class="form-group row">
         <label for="amount" class="col-sm-2 col-form-label">Category</label>
         <div class="col-sm-7">
-          <app-category-typeahead
+          <app-general-typeahead
             id="category"
             name="category"
             [inputClass]="'form-control'"
             [readonly]="null"
             [(ngModel)]="categoryId"
+            [dataProvider]="categoriesForTypeAhead()"
+            [idExtractor]="categoryIdExtractor"
+            [tToString]="categoryToString"
             #category="ngModel"
             required>
-          </app-category-typeahead>
+          </app-general-typeahead>
         </div>
         <div class="form-control col-sm-2">
           <span>{{billingElement.currency}}</span>
@@ -64,15 +67,34 @@
         </textarea>
         </div>
       </div>
+
       <div class="form-group row">
-        <div class="col-sm-10">
-          <button type="button" class="btn btn-outline-dark"
-                  [disabled]="amount?.errors?.required || !isAllowed()"
-                  (click)="add()">
-            Create
-          </button>
-          <button type="button" class="btn btn-outline-dark" (click)="cancel()">Cancel</button>
+        <label for="piggybank" class="col-sm-4 col-form-label">{{piggyBankAction()}} piggy bank</label>
+        <div class="col-sm-8">
+          <app-general-typeahead
+            id="piggybank"
+            name="piggybank"
+            [inputClass]="'form-control'"
+            [readonly]="null"
+            [(ngModel)]="piggyBankId"
+            [availableData]="piggyBanksForSelectedAccount"
+            [dataProvider]="piggyBanksForTypeAhead()"
+            [idExtractor]="piggyBankIdExtractor"
+            [tToString]="piggyBankToString()"
+            #piggybank="ngModel"
+            required>
+          </app-general-typeahead>
         </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <div class="col-sm-10">
+        <button type="button" class="btn btn-outline-dark" *ngIf="forAccountId"
+                [disabled]="amount?.errors?.required || !isAllowed()"
+                (click)="add()">
+          Create
+        </button>
+        <button type="button" class="btn btn-outline-dark" (click)="cancel()">Cancel</button>
       </div>
     </div>
   </form>

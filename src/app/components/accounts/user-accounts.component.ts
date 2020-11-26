@@ -45,16 +45,16 @@ export class UserAccountsComponent implements OnInit {
   }
 
   private selectAccount(): void {
-    if (!this.accounts || this.accounts.length === 0 || !this.selectedAccount) {
+    if (this.accounts && this.accounts.length > 0) {
+      if (this.selectedAccount) {
+        this.selectedAccount = this.accounts.find(a => a.id === this.selectedAccount.id);
+      } else {
+        this.selectedAccount = this.accounts[0];
+      }
+    } else {
       this.selectedAccount = null;
     }
-    if (this.selectedAccount) {
-      this.selectedAccount = this.accounts.find(a => a.id === this.selectedAccount.id);
-    }
-    if (!this.selectedAccount && this.accounts && this.accounts.length > 0) {
-      this.selectedAccount = this.accounts[0];
-      this.selectionChanged.emit(this.selectedAccount);
-    }
+    this.selectionChanged.emit(this.selectedAccount);
   }
 
   private recalculateSubtotals(): void {

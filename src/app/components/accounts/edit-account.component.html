@@ -11,15 +11,20 @@
     <div class="form-group row">
       <label for="accountCurrency" class="col-sm-2 col-form-label">Currency</label>
       <div class="col-sm-10">
-        <app-currency-typeahead
+        <app-general-typeahead
           id="accountCurrency"
           name="accountCurrency"
           [inputClass]="'form-control'"
           [readonly]="isEditMode() ? 'readonly' : null" [class.form-control-plaintext]="isEditMode()"
           [(ngModel)]="newAccount.currency"
+
+          [dataProvider]="currenciesForTypeAhead()"
+          [idExtractor]="currencyIdExtractor"
+          [tToString]="currencyToString"
+
           #accountCurrency="ngModel"
           required>
-        </app-currency-typeahead>
+        </app-general-typeahead>
       </div>
     </div>
     <div class="form-group row">

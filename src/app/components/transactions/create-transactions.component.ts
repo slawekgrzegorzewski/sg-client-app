@@ -62,11 +62,11 @@ export class CreateTransactionsComponent implements OnInit {
     this.calculateTargetAmount();
   }
 
-  get amount(): number {
+  @Input() get amount(): number {
     return this.internalAmount;
   }
 
-  description: string;
+  @Input() description: string;
 
   internalRate: number;
 

@@ -1,11 +1,14 @@
 import {Component, OnInit, TemplateRef} from '@angular/core';
 import {LoginService} from 'src/app/services/login.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {Account} from '../../model/account';
-import {EditAccountComponent, Mode} from './edit-account.component';
-import {ToastService} from '../../services/toast.service';
-import {AccountsService} from '../../services/accounts.service';
+import {Account} from '../model/account';
+import {EditAccountComponent, Mode} from './accounts/edit-account.component';
+import {ToastService} from '../services/toast.service';
+import {AccountsService} from '../services/accounts.service';
 import {Observable} from 'rxjs';
+import {PiggyBank} from '../model/piggy-bank';
+import {PiggyBanksService} from '../services/piggy-banks.service';
+import {Currency} from '../model/currency';
 
 @Component({
   selector: 'app-accounts',
@@ -18,9 +21,12 @@ export class SettingsComponent implements OnInit {
   otherUsers: string[];
   othersAccounts: Map<string, Account[]>;
   accountBeingDeletedDescription: string;
+  piggyBanks: PiggyBank[];
+  allCurrencies: Currency[];
 
   constructor(
     private accountsService: AccountsService,
+    private piggyBanksService: PiggyBanksService,
     private loginService: LoginService,
     private modalService: NgbModal,
     private toastService: ToastService) {
@@ -43,6 +49,12 @@ export class SettingsComponent implements OnInit {
       return;
     }
 
+    this.fetchAccounts();
+    this.fetchPiggyBanks();
+    this.fetchCurrencies();
+  }
+
+  private fetchAccounts(): void {
     const userName = this.loginService.getUserName();
     const accounts: Observable<Account[]> = this.loginService.isAdmin() ?
       this.accountsService.allAccounts() : this.accountsService.currentUserAccounts();
@@ -65,6 +77,18 @@ export class SettingsComponent implements OnInit {
         this.toastService.showWarning('Current data has been cleared out.', 'Can not obtain data!');
       }
     );
+  }
+
+  private fetchPiggyBanks(): void {
+    this.piggyBanksService.getAllPiggyBanks().subscribe(data => {
+      this.piggyBanks = data.sort((a, b) => a.name.localeCompare(b.name));
+    });
+  }
+
+  private fetchCurrencies(): void {
+    this.accountsService.possibleCurrencies().subscribe(data => {
+      this.allCurrencies = data.sort((a, b) => a.code.localeCompare(b.code));
+    });
   }
 
   openCreationDialog(): void {
@@ -129,5 +153,15 @@ export class SettingsComponent implements OnInit {
 
   entries(map: Map<string, Account[]>): [string, Account[]][] {
     return Array.from(map.entries());
+  }
+
+  createPiggyBank(piggyBank: PiggyBank): void {
+    this.piggyBanksService.create(piggyBank).subscribe(
+      data => this.fetchPiggyBanks()
+    );
+  }
+
+  updatePiggyBank(piggyBank: PiggyBank): void {
+    this.piggyBanksService.update(piggyBank).subscribe();
   }
 }

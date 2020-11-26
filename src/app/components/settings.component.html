@@ -29,9 +29,20 @@
     <li ngbNavItem>
       <a ngbNavLink>Categories</a>
       <ng-template ngbNavContent>
-        <div style="display: flex">
-          <app-categories></app-categories>
-        </div>
+        <app-categories></app-categories>
+      </ng-template>
+    </li>
+    <li ngbNavItem>
+      <a ngbNavLink>Piggy Banks</a>
+      <ng-template ngbNavContent>
+        <app-piggy-banks
+          [adminMode]="true"
+          [piggyBanks]="piggyBanks"
+          [allCurrencies]="allCurrencies"
+          (createEvent)="createPiggyBank($event)"
+          (updateEvent)="updatePiggyBank($event)"
+
+        ></app-piggy-banks>
       </ng-template>
     </li>
   </ul>
