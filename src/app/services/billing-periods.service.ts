@@ -43,6 +43,11 @@ export class BillingPeriodsService {
       .pipe(map(d => new BillingPeriodInfo(d)));
   }
 
+  finishBillingPeriod(period: BillingPeriod): Observable<BillingPeriodInfo> {
+    return this.http.get<BillingPeriodInfo>(environment.serviceUrl + '/billing-periods/' + this.datePipe.transform(period.period, 'yyyy-MM') + '/finish')
+      .pipe(map(d => new BillingPeriodInfo(d)));
+  }
+
   getAllCategories(): Observable<Category[]> {
     return this.http.get<Category[]>(environment.serviceUrl + '/billing-periods/categories')
       .pipe(map(data => (data.map(d => new Category(d)))));
@@ -67,5 +72,9 @@ export class BillingPeriodsService {
     } else {
       return this.http.put<string>(environment.serviceUrl + '/billing-periods/' + period.id + '/expense/' + accountId, element);
     }
+  }
+
+  getHistoricalSavings(noOfMonths: number): Observable<Map<Date, Map<string, number>>> {
+    return this.http.get<Map<Date, Map<string, number>>>(environment.serviceUrl + '/month-summaries/savings/' + noOfMonths);
   }
 }

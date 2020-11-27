@@ -21,11 +21,17 @@
       [currencyExtractorRight]="piggyBankCurrencyExtractor"
       [balanceExtractorRight]="piggyBankBalanceExtractor"
     ></app-currency-totals>
+    <div *ngFor="let month of historicalSavings | keyvalue">
+      <app-multi-currency-total
+        [title]="month.key"
+        [values]="month.value"
+      >
+      </app-multi-currency-total>
+    </div>
     <app-multi-currency-total
       [title]="'Savings'"
       [values]="savingsTotal"
     >
-
     </app-multi-currency-total>
     <app-user-accounts [userName]="loginService.getUserName()"
                        [accounts]="accounts"
@@ -52,15 +58,22 @@
     </app-piggy-banks>
   </div>
   <div>
-    <div style="display: flex; flex-direction: row">
-      <a (click)="previous()">Previous</a>
-      &nbsp;&nbsp;&nbsp;<span *ngIf="currentBilling">
-         Billing {{currentBilling.name}} for {{ currentBilling.period | date:'yyyy-MM' }}
-       </span>
-      <span *ngIf="!currentBilling">
-         No billing for {{displayingPeriod | date:'yyyy-MM' }}
-       </span>
-      <a (click)="next()">Next</a>
+    <div style="display: flex; flex-direction: row; justify-content: space-between">
+      <div>
+        <a (click)="previous()">Previous</a>
+      </div>
+      <div>
+        <div *ngIf="currentBilling" style="display: flex; flex-direction: column;">
+          Billing {{currentBilling.name}} for {{ currentBilling.period | date:'yyyy-MM' }}
+          <button *ngIf="!isCurrentBillingFinished" (click)="finish(currentBilling)">Finish</button>
+        </div>
+        <span *ngIf="!currentBilling">
+          No billing for {{displayingPeriod | date:'yyyy-MM' }}
+        </span>
+      </div>
+      <div>
+        <a (click)="next()">Next</a>
+      </div>
     </div>
 
     <div *ngIf="currentBilling" style="display: flex; flex-direction: column">
@@ -91,7 +104,13 @@
     </div>
 
     <div *ngIf="!currentBilling">
-      <button (click)="createBillingForCurrentDate()">Create</button>
+      <button (click)="createBillingForCurrentDate()" *ngIf="unfinishedBillingPeriods.length == 0">Create</button>
+      <div *ngIf="unfinishedBillingPeriods.length > 0">
+        Can not create a billing period because following periods are not finished:
+        <div *ngFor="let pb of unfinishedBillingPeriods">
+          {{pb.name}}
+        </div>
+      </div>
     </div>
 
   </div>

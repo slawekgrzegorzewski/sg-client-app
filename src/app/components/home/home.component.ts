@@ -9,7 +9,7 @@ import {TransactionsService} from '../../services/transations.service';
 import {Transaction} from '../../model/transaction';
 import {map} from 'rxjs/operators';
 import {BillingPeriodsService} from '../../services/billing-periods.service';
-import {BillingPeriod} from '../../model/billings/billing-period';
+import {BillingPeriod, BillingPeriodInfo} from '../../model/billings/billing-period';
 import {Category} from '../../model/billings/category';
 import {Income} from '../../model/billings/income';
 import {Expense} from '../../model/billings/expense';
@@ -30,8 +30,10 @@ export class HomeComponent implements OnInit {
   savingsTotal = new Map<string, number>();
   displayingPeriod = new Date();
   currentBilling: BillingPeriod;
-  unfinishedBillings: BillingPeriod[];
+  isCurrentBillingFinished: boolean;
+  unfinishedBillingPeriods: BillingPeriod[];
   categories: Category[];
+  historicalSavings: Map<Date, Map<string, number>>;
 
   accountCurrencyExtractor = (acc: Account) => acc.currency;
   accountBalanceExtractor = (acc: Account) => acc.currentBalance;
@@ -59,6 +61,7 @@ export class HomeComponent implements OnInit {
     this.fetchTransactions();
     this.fetchPiggyBanks();
     this.fetchBillingPeriod();
+    this.fetchHistoricalSavings();
   }
 
   fetchAccounts(): void {
@@ -107,15 +110,21 @@ export class HomeComponent implements OnInit {
 
   private fetchBillingPeriod(): void {
     this.billingsService.billingPeriodFor(this.displayingPeriod).subscribe(
-      data => {
-        this.currentBilling = data.result;
-        this.unfinishedBillings = data.unfinishedPeriods;
-      },
-      error => {
-        this.currentBilling = null;
-        this.unfinishedBillings = [];
-      }
+      data => this.setBillingPeriodRelatedData(data),
+      error => this.clearBillingPeriodRelatedData()
     );
+  }
+
+  private clearBillingPeriodRelatedData(): void {
+    this.currentBilling = null;
+    this.unfinishedBillingPeriods = [];
+    this.isCurrentBillingFinished = false;
+  }
+
+  private setBillingPeriodRelatedData(data: BillingPeriodInfo): void {
+    this.currentBilling = data.result;
+    this.unfinishedBillingPeriods = data.unfinishedBillingPeriods;
+    this.isCurrentBillingFinished = !this.unfinishedBillingPeriods.some(bp => this.currentBilling && bp.id === this.currentBilling.id);
   }
 
   private fetchPiggyBanks(): void {
@@ -130,6 +139,12 @@ export class HomeComponent implements OnInit {
         }
       );
     });
+  }
+
+  private fetchHistoricalSavings(): void {
+    this.billingsService.getHistoricalSavings(12).subscribe(
+      data => this.historicalSavings = data
+    );
   }
 
   selectAccount(account: Account): void {
@@ -158,7 +173,7 @@ export class HomeComponent implements OnInit {
       this.billingsService.createBillingPeriodFor(this.displayingPeriod).subscribe(
         data => {
           this.currentBilling = data.result;
-          this.unfinishedBillings = data.unfinishedPeriods;
+          this.unfinishedBillingPeriods = data.unfinishedBillingPeriods;
         }
       );
     }
@@ -172,5 +187,12 @@ export class HomeComponent implements OnInit {
   next(): void {
     this.displayingPeriod.setMonth(this.displayingPeriod.getMonth() + 1);
     this.fetchBillingPeriod();
+  }
+
+  finish(currentBilling: BillingPeriod): void {
+    this.billingsService.finishBillingPeriod(currentBilling).subscribe(
+      data => this.setBillingPeriodRelatedData(data),
+      error => this.clearBillingPeriodRelatedData()
+    );
   }
 }

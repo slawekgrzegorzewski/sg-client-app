@@ -3,11 +3,11 @@ import {Expense} from './expense';
 
 export class BillingPeriodInfo {
   public result: BillingPeriod;
-  public unfinishedPeriods: BillingPeriod[];
+  public unfinishedBillingPeriods: BillingPeriod[];
 
   constructor(data?: any) {
-    this.result = data && new BillingPeriod(data.result) || null;
-    this.unfinishedPeriods = data && data.unfinishedPeriods.map(up => new BillingPeriod(up)) || [];
+    this.result = data && data.result && new BillingPeriod(data.result) || null;
+    this.unfinishedBillingPeriods = data && data.unfinishedBillingPeriods && data.unfinishedBillingPeriods.map(up => new BillingPeriod(up)) || [];
   }
 }
 
