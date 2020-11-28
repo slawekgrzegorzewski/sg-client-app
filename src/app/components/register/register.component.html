@@ -1,7 +1,7 @@
 <div class="container">
   <div class="card card-container">
     <img id="profile-img" class="profile-img-card" src="assets/images/avatar_2x.png" alt=""/>
-    <form class="form-signin" *ngIf="qrUrl === null" (ngSubmit)="registerUser()" #registerForm="ngForm">
+    <form class="form-signin" *ngIf="isRegister() && qrUrl === null" (ngSubmit)="registerUser()" #registerForm="ngForm">
       <input type="text" id="uname" class="form-control" name="uname" #uname="ngModel" [(ngModel)]="userObject.uname"
              placeholder="Username" title="Please enter the username" autocomplete="off" required autofocus>
       <input type="password" id="upass" class="form-control" name="upass" placeholder="Password"
@@ -15,7 +15,10 @@
         Sign up
       </button>
     </form>
-    <form class="form-signin" *ngIf="qrUrl !== null" (ngSubmit)="setup2FA()" #confirmTokenForm="ngForm">
+    <p *ngIf="isRegister() && qrUrl === null" style="text-align:center;">Already have an account?
+      <a [routerLink]="['/login']">Login here</a>
+    </p>
+    <form class="form-signin" *ngIf="isRegister() && qrUrl !== null" (ngSubmit)="setup2FA()" #confirmTokenForm="ngForm">
       <img class="qr-code-img" [src]="qrUrl" alt=""/>
       <input type="password" id="token" class="form-control" name="token"
              placeholder="Type code from authenticator"
@@ -25,8 +28,31 @@
         Enter token
       </button>
     </form>
-    <p style="text-align:center;">Already have an account? <a [routerLink]="['/login']">Login
-      here</a></p>
+    <form class="form-signin" *ngIf="isChangePassword()" (ngSubmit)="changePassword()" #changePasswordForm="ngForm">
+      <input type="text" id="unameToChange" class="form-control" name="uname" #uname="ngModel"
+             [(ngModel)]="changePasswordObject.uname"
+             placeholder="Username" title="Please enter the username" autocomplete="off" required autofocus>
+      <input type="password" id="oldUpass" class="form-control" name="upass" placeholder="Current password"
+             title="Please enter the password" #upass="ngModel" autocomplete="off"
+             [(ngModel)]="changePasswordObject.oldpass"
+             required>
+      <input type="text" id="authcode" class="form-control" name="authcode" autocomplete="off"
+             #authcode="ngModel" [(ngModel)]="changePasswordObject.authcode" placeholder="Two-Factor Auth code"
+             title="Please enter the code" required>
+      <input type="password" id="newUpass" class="form-control" name="newpass" placeholder="New password"
+             title="Please enter a new password" #newpass="ngModel" autocomplete="off"
+             [(ngModel)]="changePasswordObject.newpass"
+             required>
+      <input type="password" id="newUpassConfirmation" class="form-control" name="confirmnewpass"
+             placeholder="Confirm a new password"
+             title="Please re-enter a new password" #uconfirmnewpass="ngModel" autocomplete="off"
+             [(ngModel)]="confirmNewPass"
+             required>
+      <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit"
+              [disabled]="uname?.errors?.required || upass?.errors?.required  || newpass?.errors?.required || uconfirmnewpass?.errors?.required || authcode?.errors?.required || newpass.value !== uconfirmnewpass.value">
+        Change password
+      </button>
+    </form>
     <p class="text-success" style="text-align:center;" *ngIf="message">{{message}}</p>
   </div>
 </div>

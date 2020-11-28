@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {LoginService} from 'src/app/services/login.service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -8,62 +8,107 @@ import {Router} from '@angular/router';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
-  message: string = null
-  qrUrl: string = null
-  confirmPass: string = ""
+  message: string = null;
+  qrUrl: string = null;
+  confirmPass = '';
+  confirmNewPass = '';
 
   userObject = {
-    uname: "",
-    upass: "",
-    secretFor2FA: ""
+    uname: '',
+    upass: '',
+    secretFor2FA: ''
+  };
+
+  changePasswordObject = {
+    uname: '',
+    oldpass: '',
+    authcode: '',
+    newpass: ''
+  };
+  private type: string;
+
+  constructor(private loginService: LoginService, private router: Router, private route: ActivatedRoute) {
   }
 
-  constructor(private _loginService: LoginService, private _router: Router) {
+  ngOnInit(): void {
+    this.route.paramMap.subscribe(value => {
+      this.type = value.get('type');
+    });
   }
 
-  ngOnInit() {
-  }
-
-  registerUser() {
-    if (this.userObject.uname.trim() !== "" && this.userObject.upass.trim() !== "" && (this.userObject.upass.trim() === this.confirmPass)) {
-      this._loginService.registerUser(this.userObject).subscribe(this.registrationResult(this), this.error(this));
+  registerUser(): void {
+    if (this.userObject.uname.trim() !== '' && this.userObject.upass.trim() !== '' && (this.userObject.upass.trim() === this.confirmPass)) {
+      this.loginService.registerUser(this.userObject).subscribe(this.registrationResult(this), this.error(this));
     } else {
-      this.message = "Typed password does not match"
+      this.message = 'Typed password does not match';
     }
   }
 
-  setup2FA() {
+  setup2FA(): void {
     if (this.userObject.secretFor2FA !== null) {
-      this._loginService.setup2FA(this.userObject).subscribe(this.tokenValidationResult(this), this.error(this));
+      this.loginService.setup2FA(this.userObject).subscribe(this.tokenValidationResult(this), this.error(this));
     } else {
-      this.message = "Token is empty";
+      this.message = 'Token is empty';
     }
   }
 
-  private registrationResult(that) {
+  changePassword(): void {
+    if (this.changePasswordObject.uname.trim() !== '' && this.changePasswordObject.oldpass.trim() !== ''
+      && this.changePasswordObject.newpass.trim() !== '' && this.changePasswordObject.newpass.trim() === this.confirmNewPass) {
+      this.loginService.changePassword(this.changePasswordObject).subscribe(this.changePasswordResult(this), this.error(this));
+    } else {
+      this.message = 'Can not change the password';
+    }
+  }
+
+  private registrationResult(that): (data: any) => void {
     return data => {
       if (data.status === 200) {
-        that.qrUrl = data.body
+        that.qrUrl = data.body;
       } else {
-        that.message = data.body
+        that.message = data.body;
       }
-    }
+    };
   }
 
-  private tokenValidationResult(that) {
+  private tokenValidationResult(that): (data: any) => void {
     return data => {
       if (data.status === 200) {
-        that.message = data.body
+        that.message = data.body;
         setTimeout(() => {
           that._router.navigate(['/login']);
         }, 2000);
       } else {
-        that.message = data.body
+        that.message = data.body;
       }
-    }
+    };
   }
 
-  private error(that) {
-    return error => that.message = error.error
+  private changePasswordResult(that): (data: any) => void {
+    return data => {
+      if (data.status === 200) {
+        if (that.loginService.isLoggedIn()) {
+          that.loginService.logout();
+        }
+        that.message = data.body;
+        setTimeout(() => {
+          that._router.navigate(['/login']);
+        }, 2000);
+      } else {
+        that.message = data.body;
+      }
+    };
+  }
+
+  private error(that): (error: any) => void {
+    return error => that.message = error.error;
+  }
+
+  isRegister(): boolean {
+    return this.type === 'register';
+  }
+
+  isChangePassword(): boolean {
+    return this.type === 'change-password';
   }
 }

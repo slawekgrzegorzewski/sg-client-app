@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Subject} from 'rxjs';
-import {environment} from "../../environments/environment";
-import {Router} from "@angular/router";
-import * as jwt_decode from "jwt-decode";
+import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
+import {Observable, Subject} from 'rxjs';
+import {environment} from '../../environments/environment';
+import {Router} from '@angular/router';
+import * as jwt_decode from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root'
@@ -19,61 +19,70 @@ export class LoginService {
     this.serviceUrl = environment.serviceUrl;
   }
 
-  authenticate(userObj: any) {
-    var httpHeaders = new HttpHeaders({
+  authenticate(userObj: any): Observable<HttpResponse<string>> {
+    const httpHeaders = new HttpHeaders({
       'x-tfa': userObj.authcode
     });
-    return this.http.post(this.serviceUrl + "/login", {
+    return this.http.post(this.serviceUrl + '/login', {
       name: userObj.uname,
       pass: userObj.upass
     }, {observe: 'response', headers: httpHeaders, responseType: 'text'});
   }
 
-  registerUser(userObj: any) {
-    return this.http.post(this.serviceUrl + "/register", {
+  registerUser(userObj: any): Observable<HttpResponse<string>> {
+    return this.http.post(this.serviceUrl + '/register', {
       name: userObj.uname,
       pass: userObj.upass
-    }, {observe: "response", responseType: "text"});
+    }, {observe: 'response', responseType: 'text'});
   }
 
-  setup2FA(userObj: any) {
-    return this.http.post(this.serviceUrl + "/register/setup2FA", {
+  setup2FA(userObj: any): Observable<HttpResponse<string>> {
+    return this.http.post(this.serviceUrl + '/register/setup2FA', {
       name: userObj.uname,
       pass: userObj.upass,
       secretFor2FA: userObj.secretFor2FA
-    }, {observe: "response", responseType: "text"});
+    }, {observe: 'response', responseType: 'text'});
+  }
+
+  changePassword(changePasswordObject: { uname: string; oldpass: string; authcode: string; newpass: string }): Observable<HttpResponse<string>> {
+    return this.http.post(this.serviceUrl + '/register/change-password', {
+      name: changePasswordObject.uname,
+      oldpass: changePasswordObject.oldpass,
+      authcode: changePasswordObject.authcode,
+      newpass: changePasswordObject.newpass
+    }, {observe: 'response', responseType: 'text'});
   }
 
   isLoggedIn(): boolean {
-    let token = this.getToken();
-    return token !== undefined && token !== null && token !== "";
+    const token = this.getToken();
+    return token !== undefined && token !== null && token !== '';
   }
 
-  logout() {
-    this.setToken("");
+  logout(): void {
+    this.setToken('');
   }
 
-  login(token: string) {
+  login(token: string): void {
     this.setToken(token);
   }
 
-  getToken() {
+  getToken(): string {
     return localStorage.getItem('token');
   }
 
-  private setToken(token: string) {
+  private setToken(token: string): void {
     localStorage.setItem('token', token);
     this.authSub.next(this.isLoggedIn());
     if (this.isLoggedIn()) {
-      setTimeout(() => this.router.navigate(['/home']), 100)
+      setTimeout(() => this.router.navigate(['/home']), 100);
     } else {
-      setTimeout(() => this.router.navigate(['/login']), 100)
+      setTimeout(() => this.router.navigate(['/login']), 100);
     }
   }
 
   isAdmin(): boolean {
     try {
-      return jwt_decode(this.getToken()).roles.includes("ADMIN");
+      return jwt_decode(this.getToken()).roles.includes('ADMIN');
     } catch (Error) {
       return false;
     }

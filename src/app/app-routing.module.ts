@@ -12,7 +12,8 @@ const routes: Routes = [
   {path: 'login', component: LoginComponent, canActivate: [LoginGuard]},
   {path: 'settings', component: SettingsComponent, canActivate: [AuthGuardGuard]},
   {path: 'home', component: HomeComponent, canActivate: [AuthGuardGuard]},
-  {path: 'register', component: RegisterComponent, canActivate: [LoginGuard]},
+  {path: 'register/:type', component: RegisterComponent, canActivate: [LoginGuard]},
+  {path: 'change-password/:type', component: RegisterComponent},
   {path: '**', redirectTo: '/login', pathMatch: 'full', canActivate: [LoginGuard]}
 ];
 
