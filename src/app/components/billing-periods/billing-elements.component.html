@@ -1,9 +1,9 @@
 <div *ngIf="mode !== EDIT_VIEW" style="display: flex; flex-direction: column">
-  <h3>{{title}}</h3>
+  <h5 style="text-align: center">{{title}}</h5>
 
   <div style="display: flex; flex-direction: row">
-    <button (click)="mode = GENERAL_VIEW" style="width: 50%;">Overview</button>
-    <button (click)="mode = DETAILED_VIEW" style="width: 50%;">Detailed</button>
+    <button (click)="mode = GENERAL_VIEW" style="width: 50%;" class="btn btn-link btn-small">Widok skrócony</button>
+    <button (click)="mode = DETAILED_VIEW" style="width: 50%;" class="btn btn-link btn-small">Szczegóły</button>
   </div>
   <div *ngIf="elements.length > 0 && mode === DETAILED_VIEW">
     <div *ngFor="let element of elements" style="display: flex; flex-direction: row">
@@ -36,9 +36,9 @@
     </div>
   </div>
   <div *ngIf="elements.length === 0">
-    No {{nameOfType()}} yet
+    Brak danych
   </div>
-  <button (click)="add()">Add</button>
+  <button (click)="add()" class="btn btn-outline-primary">Wprowadź</button>
 </div>
 <app-create-billing-element *ngIf="mode === EDIT_VIEW" style="display: flex; flex-direction: column"
                             [elementType]="elementType"

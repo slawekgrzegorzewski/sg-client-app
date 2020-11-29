@@ -18,8 +18,8 @@ import {Currency} from '../model/currency';
 export class SettingsComponent implements OnInit {
   private isLoggedIn = false;
   userAccounts: Account[];
-  otherUsers: string[];
-  othersAccounts: Map<string, Account[]>;
+  otherUsers: number[];
+  othersAccounts: Map<number, Account[]>;
   accountBeingDeletedDescription: string;
   piggyBanks: PiggyBank[];
   allCurrencies: Currency[];
@@ -42,10 +42,14 @@ export class SettingsComponent implements OnInit {
     return this.isLoggedIn;
   }
 
+  isAdmin(): boolean {
+    return this.loginService.isAdmin();
+  }
+
   fetchData(): void {
     if (!this.loggedIn()) {
       this.userAccounts = [];
-      this.othersAccounts = new Map<string, Account[]>();
+      this.othersAccounts = new Map<number, Account[]>();
       return;
     }
 
@@ -55,25 +59,25 @@ export class SettingsComponent implements OnInit {
   }
 
   private fetchAccounts(): void {
-    const userName = this.loginService.getUserName();
+    const userId = this.loginService.getUserId();
     const accounts: Observable<Account[]> = this.loginService.isAdmin() ?
       this.accountsService.allAccounts() : this.accountsService.currentUserAccounts();
     accounts.subscribe(
       data => {
         const accountsFromData = data.map(d => new Account(d));
-        this.userAccounts = data.filter(a => a.userName === userName).sort(Account.compareByCurrencyAndName);
-        this.othersAccounts = data.filter(a => a.userName !== userName).reduce(
-          (map, acc) => map.set(acc.userName, [...map.get(acc.userName) || [], acc]),
-          new Map<string, Account[]>()
+        this.userAccounts = data.filter(a => a.userId === userId).sort(Account.compareByCurrencyAndName);
+        this.othersAccounts = data.filter(a => a.userId !== userId).reduce(
+          (map, acc) => map.set(acc.userId, [...map.get(acc.userId) || [], acc]),
+          new Map<number, Account[]>()
         );
         this.otherUsers = Array.from(this.othersAccounts.keys());
         for (const user of this.otherUsers) {
-          this.otherUsers[user] = (this.otherUsers[user] || []).sort(Account.compareByCurrencyAndName);
+          this.othersAccounts[user] = (this.othersAccounts[user] || []).sort(Account.compareByCurrencyAndName);
         }
       },
       err => {
         this.userAccounts = [];
-        this.othersAccounts = new Map<string, Account[]>();
+        this.othersAccounts = new Map<number, Account[]>();
         this.toastService.showWarning('Current data has been cleared out.', 'Can not obtain data!');
       }
     );
@@ -135,7 +139,7 @@ export class SettingsComponent implements OnInit {
 
   delete(that, deleteConfirmation: TemplateRef<any>): (a: Account) => void {
     return (a: Account) => {
-      that.accountBeingDeletedDescription = a.name + ' - ' + a.userName;
+      that.accountBeingDeletedDescription = a.name + ' - ' + a.userId;
       const m: NgbModal = that.modalService;
       m.open(deleteConfirmation, {centered: true}).result.then(
         result => that.deleteAccount(a),

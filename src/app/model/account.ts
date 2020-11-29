@@ -4,7 +4,7 @@ export class Account {
   public currency: string;
   public currentBalance: number;
   public balanceIndex: number;
-  public userName: string;
+  public userId: number;
 
   constructor(data?: any) {
     this.id = data && data.id;
@@ -12,7 +12,7 @@ export class Account {
     this.currency = data && data.currency || '';
     this.currentBalance = data && data.currentBalance || 0;
     this.balanceIndex = data && data.balanceIndex || 0;
-    this.userName = data && data.userName || '';
+    this.userId = data && data.userId || 0;
   }
 
   public static compareByCurrencyAndName(first: Account, second: Account): number {

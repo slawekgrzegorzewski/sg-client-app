@@ -1,0 +1,102 @@
+<div style="display: flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap">
+  <div class="savings">
+    <div style="display:flex; flex-direction: column;justify-content: stretch;">
+      <app-currency-totals style="margin-bottom: 10px"
+                           [title]="'Zgromadzone środki'"
+                           [valuesLeft]="accounts"
+                           [currencyExtractorLeft]="accountCurrencyExtractor"
+                           [balanceExtractorLeft]="accountBalanceExtractor"
+      ></app-currency-totals>
+      <app-currency-totals style="margin-bottom: 10px"
+                           [title]="'Środki rozlokowane w skarbonkach'"
+                           [valuesLeft]="piggyBanks"
+                           [currencyExtractorLeft]="piggyBankCurrencyExtractor"
+                           [balanceExtractorLeft]="piggyBankBalanceExtractor"
+      ></app-currency-totals>
+      <app-currency-totals
+        [title]="'Różnica'"
+        [valuesLeft]="accounts"
+        [currencyExtractorLeft]="accountCurrencyExtractor"
+        [balanceExtractorLeft]="accountBalanceExtractor"
+        [valuesRight]="piggyBanks"
+        [currencyExtractorRight]="piggyBankCurrencyExtractor"
+        [balanceExtractorRight]="piggyBankBalanceExtractor"
+      ></app-currency-totals>
+      <div *ngFor="let month of historicalSavings | keyvalue">
+        <app-multi-currency-total
+          [title]="month.key"
+          [values]="month.value">
+        </app-multi-currency-total>
+      </div>
+      <app-multi-currency-total
+        [title]="'Oszczędności'"
+        [values]="savingsTotal"
+      >
+      </app-multi-currency-total>
+    </div>
+    <app-user-accounts [userName]="loginService.getUserName()"
+                       [accounts]="accounts"
+                       [selectable]="false">
+    </app-user-accounts>
+  </div>
+  <div class="billing">
+    <div style="display: flex; flex-direction: row; justify-content: space-between">
+      <div>
+        <button class="btn btn-link btn-small" (click)="previous()">Wcześniej</button>
+      </div>
+      <div>
+        <h4><span>{{monthYearString(displayingPeriod)}}</span></h4>
+      </div>
+      <div style="display: flex; flex-direction: column;">
+        <button class="btn btn-link btn-small" (click)="next()">Później</button>
+        <button *ngIf="currentBilling && !isCurrentBillingFinished"
+                (click)="finish(currentBilling)"
+                class="btn btn-link btn-small">
+          Zakończ okres
+        </button>
+      </div>
+    </div>
+    <div *ngIf="currentBilling" style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center">
+      <app-billing-elements style="margin:10px; max-width: 300px"
+                            [title]="'Dochody'"
+                            [billingPeriod]="currentBilling"
+                            [elementType]="'income'"
+                            [userAccounts]="accounts"
+                            [categories]="categories"
+                            [piggyBanks]="piggyBanks"
+                            (createElementEvent)="createElement($event[0], $event[1])"
+                            (updatePiggyBankEvent)="updatePiggyBank($event)">
+
+      </app-billing-elements>
+      <app-billing-elements style="margin:10px; max-width: 300px"
+                            [title]="'Wydatki'"
+                            [billingPeriod]="currentBilling"
+                            [elementType]="'expense'"
+                            [userAccounts]="accounts"
+                            [categories]="categories"
+                            [piggyBanks]="piggyBanks"
+                            (createElementEvent)="createElement($event[0], $event[1])"
+                            (updatePiggyBankEvent)="updatePiggyBank($event)">
+
+      </app-billing-elements>
+    </div>
+    <div *ngIf="!currentBilling">
+      <button (click)="createBillingForCurrentDate()" *ngIf="unfinishedBillingPeriods.length == 0">Create</button>
+      <div *ngIf="unfinishedBillingPeriods.length > 0">
+        Nie można rozpocząć kolejnego okresu ponieważ następujące okresy nie zostały jeszcze zakończone:
+        <div *ngFor="let pb of unfinishedBillingPeriods">
+          {{monthYearString(pb.period)}}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="piggy-banks">
+    <app-piggy-banks
+      [adminMode]="false"
+      [piggyBanks]="piggyBanks"
+      (updateEvent)="updatePiggyBank($event)"
+      style="margin-left: 50px; margin-top: 50px;margin-right: 50px">
+
+    </app-piggy-banks>
+  </div>
+</div>

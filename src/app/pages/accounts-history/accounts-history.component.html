@@ -1,0 +1,12 @@
+<div style="display: flex; flex-direction: row; justify-content:space-between; flex-wrap: wrap">
+  <app-user-accounts [userName]="loginService.getUserName()"
+                     [accounts]="accounts"
+                     (selectionChanged)="selectAccount($event)">
+  </app-user-accounts>
+  <app-transactions-list [allAccounts]="accounts"
+                         [account]="selectedAccount"
+                         [transactions]="transactionsOfSelectedAccount"
+                         (transactionAction)="refreshData()"
+                         style="flex-grow: 1; margin-left: 50px">
+  </app-transactions-list>
+</div>

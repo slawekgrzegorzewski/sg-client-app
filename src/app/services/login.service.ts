@@ -88,9 +88,20 @@ export class LoginService {
     }
   }
 
+  getUserId(): number {
+    try {
+      const sub = jwt_decode(this.getToken()).sub;
+      return Number(sub.split(':')[0]);
+    } catch (Error) {
+      return Number.NaN;
+    }
+  }
+
   getUserName(): string {
     try {
-      return jwt_decode(this.getToken()).sub;
+      const sub = jwt_decode(this.getToken()).sub;
+      const split = sub.split(':');
+      return sub.replace(split[0] + ':', '');
     } catch (Error) {
       return '';
     }

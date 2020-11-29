@@ -1,39 +1,41 @@
 <div class="container" *ngIf="this.loggedIn()">
   <ul ngbNav #nav="ngbNav" class="nav-tabs">
     <li ngbNavItem>
-      <a ngbNavLink>Your accounts</a>
+      <a ngbNavLink>Twoje konta</a>
       <ng-template ngbNavContent>
         <app-user-accounts [userName]="loginService.getUserName()"
                            [accounts]="userAccounts"
                            [buttons]="[{name: 'delete', action:delete(this, deleteConfirmation)}, {name: 'rename', action:rename(this)}]">
         </app-user-accounts>
 
-        <button type="button" class="btn btn-primary" (click)="fetchData()">Refresh data</button>
-        <button type="button" class="btn btn-primary" (click)="openCreationDialog()">Create new account</button>
+        <button type="button" class="btn btn-primary" (click)="fetchData()">Odśwież</button>
+        <button type="button" class="btn btn-primary" (click)="openCreationDialog()">Nowe konto</button>
       </ng-template>
     </li>
-    <li ngbNavItem *ngIf="othersAccounts && othersAccounts.size > 0">
-      <a ngbNavLink>Other user's accounts</a>
+    <li ngbNavItem *ngIf="isAdmin() && othersAccounts">
+      <a ngbNavLink>Konta innych użytkowników</a>
       <ng-template ngbNavContent>
-        <div style="display: flex">
+        <div style="display: flex" *ngIf="othersAccounts.size > 0">
           <app-user-accounts *ngFor="let user of otherUsers"
                              [userName]="user"
                              [accounts]="othersAccounts.get(user)">
           </app-user-accounts>
         </div>
-
-        <button type="button" class="btn btn-primary" (click)="fetchData()">Refresh data</button>
-        <button type="button" class="btn btn-primary" (click)="openCreationDialog()">Create new account</button>
+        <div style="display: flex" *ngIf="othersAccounts.size === 0">
+          Brak kont
+        </div>
+        <button type="button" class="btn btn-primary" (click)="fetchData()">Odśwież</button>
+        <button type="button" class="btn btn-primary" (click)="openCreationDialog()">Nowe konto</button>
       </ng-template>
     </li>
     <li ngbNavItem>
-      <a ngbNavLink>Categories</a>
+      <a ngbNavLink>Kategorie</a>
       <ng-template ngbNavContent>
         <app-categories></app-categories>
       </ng-template>
     </li>
     <li ngbNavItem>
-      <a ngbNavLink>Piggy Banks</a>
+      <a ngbNavLink>Skarbonki</a>
       <ng-template ngbNavContent>
         <app-piggy-banks
           [adminMode]="true"

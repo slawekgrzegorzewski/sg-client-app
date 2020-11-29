@@ -6,10 +6,10 @@
         <td>{{transaction.timeOfTransaction | localizedDate:'y-MM-d'}}</td>
         <td>
           <span *ngIf="transaction.source.id === account.id">
-            -{{transaction.debit}} {{transaction.source.currency}}
+            -{{transaction.debit | currency: transaction.source.currency}}
           </span>
           <span *ngIf="transaction.destination.id === account.id">
-            {{transaction.credit}} {{transaction.destination.currency}}
+            {{transaction.credit | currency: transaction.destination.currency}}
           </span>
         </td>
         <td [innerHTML]="transaction.description | htmlNewLine" style="max-width: 300px"></td>
@@ -17,15 +17,15 @@
     </table>
     <div #utilBox style="position: fixed;"
          [ngStyle]="{'top.px': utilBoxTop, 'left.px': utilBoxLeft, 'visibility': utilBoxVisibility}">
-      <button (click)="openPredefinedTransferCreationDialog(buttonClicked())">
-        Transfer
+      <button (click)="openPredefinedTransferCreationDialog(buttonClicked())" class="btn btn-primary">
+        Transfer wewnętrzny
       </button>
     </div>
   </div>
 
-  <button (click)="openIncomeCreationDialog()">Income</button>
-  <button (click)="openExpenseCreationDialog()">Expense</button>
-  <button (click)="openTransferCreationDialog()">Transfer</button>
+  <button (click)="openIncomeCreationDialog()" class="btn btn-primary">Uznanie</button>
+  <button (click)="openExpenseCreationDialog()" class="btn btn-primary">Obciążenie</button>
+  <button (click)="openTransferCreationDialog()" class="btn btn-primary">Transfer wewnętrzny</button>
 </div>
 <div *ngIf="account && transferCreationMode">
   <app-create-transaction

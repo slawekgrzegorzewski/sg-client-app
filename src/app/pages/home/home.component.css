@@ -1,0 +1,50 @@
+.savings {
+  order: 1;
+  max-width: 320px;
+  width: 320px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.billing {
+  order: 2;
+  width: 640px;
+  max-width: 640px;
+  min-width: 320px;
+}
+
+.piggy-banks {
+  order: 3;
+  max-width: 320px;
+  width: 320px;
+}
+
+@media (min-width: 960px) and (max-width: 1280px) {
+  .savings {
+  }
+
+  .billing {
+    width: 961px;
+    max-width: 961px;
+  }
+
+  .piggy-banks {
+    order: 3;
+  }
+}
+
+@media (max-width: 1280px) {
+  .savings {
+    order: 2;
+  }
+
+  .billing {
+    order: 1;
+  }
+
+  .piggy-banks {
+    order: 3;
+  }
+}

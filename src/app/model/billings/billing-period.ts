@@ -17,7 +17,7 @@ export class BillingPeriod {
   public period: Date;
   public incomes: Income[];
   public expenses: Expense[];
-  public userName: string;
+  public userId: number;
 
   constructor(data?: any) {
     this.id = data && data.id;
@@ -25,6 +25,6 @@ export class BillingPeriod {
     this.period = data && new Date(data.period) || null;
     this.incomes = data && data.incomes && data.incomes.map(income => new Income(income)) || [];
     this.expenses = data && data.expenses && data.expenses.map(income => new Expense(income)) || [];
-    this.userName = data && data.userName || '';
+    this.userId = data && data.userId || 0;
   }
 }

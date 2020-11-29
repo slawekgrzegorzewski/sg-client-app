@@ -1,6 +1,6 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {Account} from '../../model/account';
-import {Button} from '../gui/hoverable-buttons.component';
+import {Button} from '../general/hoverable-buttons.component';
 
 @Component({
   selector: 'app-user-accounts',
@@ -11,6 +11,7 @@ export class UserAccountsComponent implements OnInit {
   @Input() showTitle = true;
   @Input() userName: string;
   @Input() buttons: Button<Account>[];
+  @Input() selectable = true;
   @Output() selectionChanged = new EventEmitter<Account>();
 
   private internalAccounts: Account[];
@@ -40,11 +41,22 @@ export class UserAccountsComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  private recalculateSubtotals(): void {
+    this.totalBalancesPerCurrency = (this.accounts || [])
+      .reduce(
+        (map, acc) => map.set(acc.currency, (map.get(acc.currency) || 0) + acc.currentBalance),
+        new Map<string, number>()
+      );
+  }
+
   simpleAccountInfo(a: Account): string {
     return a.name + ' - ' + a.currentBalance + ' ' + a.currency;
   }
 
   private selectAccount(): void {
+    if (!this.selectable) {
+      return;
+    }
     if (this.accounts && this.accounts.length > 0) {
       if (this.selectedAccount) {
         this.selectedAccount = this.accounts.find(a => a.id === this.selectedAccount.id);
@@ -57,32 +69,24 @@ export class UserAccountsComponent implements OnInit {
     this.selectionChanged.emit(this.selectedAccount);
   }
 
-  private recalculateSubtotals(): void {
-    this.totalBalancesPerCurrency = (this.accounts || [])
-      .reduce(
-        (map, acc) => map.set(acc.currency, (map.get(acc.currency) || 0) + acc.currentBalance),
-        new Map<string, number>()
-      );
-  }
-
-  firstEntry(): [string, number] {
-    return Array.from(this.totalBalancesPerCurrency.entries())[0];
-  }
-
-  restOfEntries(): [string, number][] {
-    return Array.from(this.totalBalancesPerCurrency.entries()).slice(1);
-  }
-
   setOverAccount(value: Account, accountRow: HTMLTableRowElement): void {
     this.overElement = value;
     if (value) {
       const adjustment = (accountRow.offsetHeight - this.utilBox.nativeElement.offsetHeight) / 2;
       this.utilBoxTop = accountRow.getBoundingClientRect().top + adjustment;
-      this.utilBoxLeft = accountRow.getBoundingClientRect().left + accountRow.clientWidth - this.utilBox.nativeElement.offsetWidth;
+      this.utilBoxLeft = accountRow.getBoundingClientRect().left + accountRow.clientWidth;
       this.utilBoxVisibility = 'visible';
     } else {
       this.utilBoxVisibility = 'hidden';
     }
+  }
+
+  select(account: Account): void {
+    if (!this.selectable) {
+      return;
+    }
+    this.selectedAccount = account;
+    this.selectionChanged.emit(account);
   }
 
   buttonClicked(): Account {

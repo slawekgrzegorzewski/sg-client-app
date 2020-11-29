@@ -1,31 +1,28 @@
-<div class="card" style="width: 400px;">
-  <div class="card-body">
-    <h5 *ngIf="showTitle" class="card-title">Accounts of user {{userName}}</h5>
-    <div style="margin-left: auto; margin-right: 10px; width: 65%">
-      <app-multi-currency-total
-        class="card-subtitle mb-2 text-muted"
-        [title]="'Total balance:'"
-        [values]="totalBalancesPerCurrency">
+<div style="padding:10px; width: 320px;display: flex; flex-direction: column">
+  <h5 *ngIf="showTitle" style="text-align: center">Konta użytkownika {{userName}}</h5>
+  <div style="margin-left: auto; margin-right: 10px; width: 65%">
+    <app-multi-currency-total
+      class="mb-2 text-muted"
+      [title]="'Suma:'"
+      [values]="totalBalancesPerCurrency">
 
-      </app-multi-currency-total>
-    </div>
-    <div (mouseleave)="setOverAccount(null, null)">
-      <table #table class="card-text" style="width: 100%">
-        <tr #row *ngFor="let account of accounts"
-            (mouseenter)="setOverAccount(account, row)"
-            (click)="selectedAccount = account; selectionChanged.emit(account);"
-            class="account-row" [class.selected]="account === selectedAccount">
-          <td>{{account.name}}</td>
-          <td style="text-align: right">{{account.currentBalance | number:'1.2-2'}}</td>
-          <td style="text-align: left">{{account.currency}}</td>
-        </tr>
-      </table>
-      <div #utilBox style="position: fixed;"
-           [ngStyle]="{'top.px': utilBoxTop, 'left.px': utilBoxLeft, 'visibility': utilBoxVisibility}">
-        <button *ngFor="let button of buttons" (click)="button.action(buttonClicked());">
-          {{button.name}}
-        </button>
-      </div>
+    </app-multi-currency-total>
+  </div>
+  <div (mouseleave)="setOverAccount(null, null)">
+    <table #table style="width: 100%">
+      <tr #row *ngFor="let account of accounts"
+          (mouseenter)="setOverAccount(account, row)"
+          (click)="select(account);"
+          class="account-row" [class.selected]="account === selectedAccount">
+        <td>{{account.name}}</td>
+        <td style="text-align: right">{{account.currentBalance | currency: account.currency :undefined:'1.2-2' }}</td>
+      </tr>
+    </table>
+    <div #utilBox style="position: fixed;"
+         [ngStyle]="{'top.px': utilBoxTop, 'left.px': utilBoxLeft, 'visibility': utilBoxVisibility}">
+      <button class="btn btn-primary btn-sm" *ngFor="let button of buttons" (click)="button.action(buttonClicked());">
+        {{button.name}}
+      </button>
     </div>
   </div>
 </div>

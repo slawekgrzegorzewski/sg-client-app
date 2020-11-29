@@ -2,6 +2,7 @@ import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} f
 import {PiggyBank} from '../../model/piggy-bank';
 import {Observable, of} from 'rxjs';
 import {Currency} from '../../model/currency';
+import {getCurrencySymbol} from '@angular/common';
 
 export const INCOME = 'income';
 export const EXPENSE = 'expense';
@@ -73,7 +74,7 @@ export class PiggyBanksComponent implements OnInit {
     if (piggyBank) {
       const adjustment = (row.offsetHeight - this.utilBox.nativeElement.offsetHeight) / 2;
       this.utilBoxTop = row.getBoundingClientRect().top + adjustment;
-      this.utilBoxLeft = row.getBoundingClientRect().left + row.clientWidth - this.utilBox.nativeElement.offsetWidth;
+      this.utilBoxLeft = row.getBoundingClientRect().left + row.clientWidth - (this.utilBox.nativeElement.offsetWidth / 2);
       this.utilBoxVisibility = 'visible';
     } else {
       this.utilBoxVisibility = 'hidden';
@@ -195,5 +196,9 @@ export class PiggyBanksComponent implements OnInit {
 
   currencyToString(currency: Currency): string {
     return currency.description();
+  }
+
+  getCurrencySymbol(currency: string): string {
+    return getCurrencySymbol(currency, 'narrow');
   }
 }

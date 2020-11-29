@@ -10,21 +10,21 @@
   </table>
   <div #utilBox style="position: fixed;"
        [ngStyle]="{'top.px': utilBoxTop, 'left.px': utilBoxLeft, 'visibility': utilBoxVisibility}">
-    <button (click)="prepareToTopUp()">
-      Top up
+    <button (click)="prepareToTopUp()" class="btn btn-primary btn-sm" >
+      Uznaj
     </button>
-    <button (click)="prepareToDebit()">
-      Debit
+    <button (click)="prepareToDebit()" class="btn btn-primary btn-sm" >
+      Obciąż
     </button>
-    <button (click)="prepareToGeneralEdit()" *ngIf="this.adminMode">
-      Edit
+    <button (click)="prepareToGeneralEdit()" *ngIf="this.adminMode" class="btn btn-primary btn-sm" >
+      Edytuj
     </button>
   </div>
 </div>
 
 <div *ngIf="isGeneralEditMode() || isCreateEditMode()">
   <div class="form-group row">
-    <label for="name" class="col-sm-2 col-form-label">Name</label>
+    <label for="name" class="col-sm-2 col-form-label">Nazwa</label>
     <div class="col-sm-10">
       <input id="name" name="name" type="name" class="form-control"
              #name="ngModel"
@@ -33,7 +33,7 @@
     </div>
   </div>
   <div class="form-group row">
-    <label for="description" class="col-sm-2 col-form-label">Description</label>
+    <label for="description" class="col-sm-2 col-form-label">Opis</label>
     <div class="col-sm-10">
       <textarea id="description" name="description" type="description" class="form-control"
                 #description="ngModel"
@@ -43,14 +43,14 @@
     </div>
   </div>
   <div class="form-group row" *ngIf="isCreateEditMode()">
-    <label for="balance" class="col-sm-2 col-form-label">Balance</label>
+    <label for="balance" class="col-sm-2 col-form-label">Wartość</label>
     <div class="col-sm-10">
       <input id="balance" name="balance" type="number" min=0 class="form-control"
              #balance="ngModel" [(ngModel)]="editElement.balance" required/>
     </div>
   </div>
   <div class="form-group row" *ngIf="isCreateEditMode()">
-    <label for="currency" class="col-sm-2 col-form-label">Currency</label>
+    <label for="currency" class="col-sm-2 col-form-label">Waluta</label>
     <div class="col-sm-10">
       <app-general-typeahead
         id="currency"
@@ -69,33 +69,38 @@
   <div class="form-group row">
     <div class="custom-control custom-switch">
       <input id="savings" type="checkbox" class="custom-control-input" [(ngModel)]="editElement.savings">
-      <label class="col-sm-2 custom-control-label" for="savings">Savings</label>
+      <label class="col-sm-2 custom-control-label" for="savings">Oczędnościowa</label>
     </div>
   </div>
   <div class="form-group row" style="align-items: center">
     <div class="custom-control custom-switch col-sm-2">
       <input type="checkbox" class="custom-control-input" id="monthlyTopUpEnabled" [(ngModel)]="monthlyTopUpEnabled">
-      <label class="custom-control-label" for="monthlyTopUpEnabled">Monthly top up</label>
+      <label class="custom-control-label" for="monthlyTopUpEnabled">Comiesięczne uznania</label>
     </div>
     <div class="col-sm-9">
       <input class="form-control" id="monthlyTopUp" name="monthlyTopUpEnabled" type="number" min=0
              *ngIf="monthlyTopUpEnabled" [(ngModel)]="editElement.monthlyTopUp" required/>
     </div>
     <div class="col-sm-1">
-      <span *ngIf="monthlyTopUpEnabled">{{editElement.currency}}</span>
+      <span *ngIf="monthlyTopUpEnabled">{{getCurrencySymbol(editElement.currency)}}</span>
     </div>
   </div>
   <div class="form-group row" *ngIf="isGeneralEditMode()">
-    {{editElement.balance | currency: editElement.currency}}
+    <div class="custom-control custom-switch col-sm-2">
+      Wartość
+    </div>
+    <div class="col-sm-9">
+      {{editElement.balance | currency: editElement.currency}}
+    </div>
   </div>
 </div>
 
 <div class="form-group row" *ngIf="isTopUpEditMode() || isDebitEditMode()">
-  {{editElement.name}} - current balance: {{editElement.balance | currency: editElement.currency}}
+  {{editElement.name}} - aktualnie: {{editElement.balance | currency: editElement.currency}}
 </div>
 
 <div class="form-group row" *ngIf="isTopUpEditMode()">
-  <label for="topUp" class="col-sm-2 col-form-label">Amount</label>
+  <label for="topUp" class="col-sm-2 col-form-label">Kwota</label>
   <div class="col-sm-10">
     <input id="topUp" name="topUp" type="number" min=0 class="form-control"
            [(ngModel)]="operationAmount" required/>
@@ -103,7 +108,7 @@
 </div>
 
 <div class="form-group row" *ngIf="isDebitEditMode()">
-  <label for="debit" class="col-sm-2 col-form-label">Amount</label>
+  <label for="debit" class="col-sm-2 col-form-label">Kwota</label>
   <div class="col-sm-10">
     <input id="debit" name="debit" type="number" max=0 class="form-control"
            [(ngModel)]="operationAmount" required/>
@@ -111,20 +116,20 @@
 </div>
 
 <div class="form-group row" *ngIf="isTopUpEditMode()">
-  New balance: {{editElement.balance + operationAmount | currency: editElement.currency}}
+  Wartość po operacji: {{editElement.balance + operationAmount | currency: editElement.currency}}
 </div>
 
 <div class="form-group row" *ngIf="isDebitEditMode()">
-  New balance: {{editElement.balance - operationAmount | currency: editElement.currency}}
+  Wartość po operacji: {{editElement.balance - operationAmount | currency: editElement.currency}}
 </div>
 
-<button (click)="prepareToCreate()" *ngIf="this.adminMode && isNonEditMode()">Create</button>
-<button (click)="topUp()" *ngIf="isTopUpEditMode()">Top up</button>
-<button (click)="debit()" *ngIf="isDebitEditMode()">Debit</button>
+<button (click)="prepareToCreate()" *ngIf="this.adminMode && isNonEditMode()" class="btn btn-primary" >Stwórz</button>
+<button (click)="topUp()" *ngIf="isTopUpEditMode()" class="btn btn-primary" >Uznaj</button>
+<button (click)="debit()" *ngIf="isDebitEditMode()" class="btn btn-primary" >Obciąż</button>
 <button *ngIf="isGeneralEditMode()" [disabled]="!canEdit()"
-        (click)="update()">Update
+        (click)="update()" class="btn btn-primary" >Zapisz
 </button>
 <button *ngIf="this.adminMode && isCreateEditMode()" [disabled]="!canCreate()"
-        (click)="create()">Create
+        (click)="create()" class="btn btn-primary" >Stwórz
 </button>
-<button (click)="resetEditForm()" *ngIf="!isNonEditMode()">Cancel</button>
+<button (click)="resetEditForm()" *ngIf="!isNonEditMode()" class="btn btn-primary" >Anuluj</button>

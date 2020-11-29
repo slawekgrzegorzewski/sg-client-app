@@ -1,14 +1,14 @@
 <div class="creating-billing-element-main">
-  <h5>Enter {{elementType}} details</h5>
+  <h5>Wprowadź szczegóły</h5>
   <form #createBillingElementForm="ngForm" class="needs-validation">
 
     <div class="form-group row">
-      <label for="forAccount" class="col-sm-2 col-form-label">Account</label>
+      <label for="forAccount" class="col-sm-2 col-form-label">Konto</label>
       <div class="col-sm-10">
         <select id="forAccount" name="forAccount" class="form-control"
                 #forAccount="ngModel" [(ngModel)]="forAccountId" required ngbAutofocus>
           <option *ngFor="let account of userAccounts" [value]="account.id">{{account.name}}
-            ({{account.currentBalance}} {{account.currency}})
+            ({{account.currentBalance | currency:account.currency}})
           </option>
         </select>
       </div>
@@ -16,21 +16,21 @@
 
     <div *ngIf="forAccountId">
       <div class="form-group row">
-        <label for="amount" class="col-sm-2 col-form-label">Amount</label>
-        <div class="col-sm-7">
+        <label for="amount" class="col-sm-2 col-form-label">Kwota</label>
+        <div class="col-sm-8">
           <input id="amount" name="amount" type="number" class="form-control"
                  #amount="ngModel"
                  [(ngModel)]="billingElement.amount"
                  min=0 required/>
         </div>
-        <div class="form-control col-sm-2">
-          <span>{{billingElement.currency}}</span>
+        <div class="form-control col-sm-1">
+          <span>{{getCurrencySymbol(billingElement.currency)}}</span>
         </div>
       </div>
 
       <div class="form-group row">
-        <label for="amount" class="col-sm-2 col-form-label">Category</label>
-        <div class="col-sm-7">
+        <label for="amount" class="col-sm-2 col-form-label">Kategoria</label>
+        <div class="col-sm-10">
           <app-general-typeahead
             id="category"
             name="category"
@@ -44,13 +44,10 @@
             required>
           </app-general-typeahead>
         </div>
-        <div class="form-control col-sm-2">
-          <span>{{billingElement.currency}}</span>
-        </div>
       </div>
 
       <div class="form-group row">
-        <label for="dateOfElement" class="col-sm-2 col-form-label">Date</label>
+        <label for="dateOfElement" class="col-sm-2 col-form-label">Data</label>
         <div class="col-sm-10">
           <input class="form-control" id="dateOfElement" name="dateOfElement" [(ngModel)]="elementDate"
                  #d="ngbDatepicker" (click)="d.toggle()" ngbDatepicker>
@@ -58,7 +55,7 @@
       </div>
 
       <div class="form-group row">
-        <label for="description" class="col-sm-2 col-form-label">Description</label>
+        <label for="description" class="col-sm-2 col-form-label">Opis</label>
         <div class="col-sm-10">
         <textarea id="description" name="description" class="form-control"
                   #description="ngModel"
@@ -69,7 +66,7 @@
       </div>
 
       <div class="form-group row">
-        <label for="piggybank" class="col-sm-4 col-form-label">{{piggyBankAction()}} piggy bank</label>
+        <label for="piggybank" class="col-sm-4 col-form-label">{{piggyBankAction()}}</label>
         <div class="col-sm-8">
           <app-general-typeahead
             id="piggybank"
@@ -87,15 +84,13 @@
         </div>
       </div>
     </div>
-    <div class="form-group row">
-      <div class="col-sm-10">
-        <button type="button" class="btn btn-outline-dark" *ngIf="forAccountId"
-                [disabled]="amount?.errors?.required || !isAllowed()"
-                (click)="add()">
-          Create
-        </button>
-        <button type="button" class="btn btn-outline-dark" (click)="cancel()">Cancel</button>
-      </div>
-    </div>
   </form>
+  <div style="display: flex; flex-direction: row;align-items: stretch">
+    <button type="button" class="btn btn-outline-primary" *ngIf="forAccountId"
+            [disabled]="amount?.errors?.required || !isAllowed()"
+            (click)="add()">
+      Stwórz
+    </button>
+    <button type="button" class="btn btn-outline-primary" (click)="cancel()">Anuluj</button>
+  </div>
 </div>

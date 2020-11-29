@@ -7,7 +7,7 @@ import {Account} from '../../model/account';
 import {Category} from '../../model/billings/category';
 import {NgbCalendar, NgbDateStruct} from '@ng-bootstrap/ng-bootstrap';
 import {PiggyBank} from '../../model/piggy-bank';
-import {CurrencyPipe} from '@angular/common';
+import {CurrencyPipe, getCurrencySymbol} from '@angular/common';
 
 export const INCOME = 'income';
 export const EXPENSE = 'expense';
@@ -134,7 +134,7 @@ export class CreateBillingElementComponent implements OnInit {
   }
 
   piggyBankAction(): string {
-    return this.elementType === INCOME ? 'Credit' : 'Debit';
+    return 'Skarbonka do ' + (this.elementType === INCOME ? 'uznania' : 'obciążenia');
   }
 
   piggyBankToFinance(): PiggyBank {
@@ -227,5 +227,9 @@ export class CreateBillingElementComponent implements OnInit {
   piggyBankToString(): (PiggyBank) => string {
     const that = this;
     return piggyBank => piggyBank.name + ' ' + that.currencyPipe.transform(piggyBank.balance, piggyBank.currency);
+  }
+
+  getCurrencySymbol(currency: string): string {
+    return getCurrencySymbol(currency, 'narrow');
   }
 }

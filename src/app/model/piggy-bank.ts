@@ -6,7 +6,7 @@ export class PiggyBank {
   public currency: string;
   public savings: boolean;
   public monthlyTopUp: number;
-  public userName: string;
+  public userId: number;
 
   constructor(data?: any) {
     this.id = data && data.id;
@@ -16,6 +16,6 @@ export class PiggyBank {
     this.currency = data && data.currency || '';
     this.savings = data && data.savings || false;
     this.monthlyTopUp = data && data.monthlyTopUp || 0;
-    this.userName = data && data.userName || '';
+    this.userId = data && data.userId || 0;
   }
 }
