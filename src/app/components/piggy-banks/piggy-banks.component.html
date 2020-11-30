@@ -1,22 +1,35 @@
 <div (mouseleave)="setOverPiggyBank(null, null)" *ngIf="isNonEditMode()">
   <table>
-    <tr *ngFor="let piggyBank of piggyBanks" #row (mouseenter)="setOverPiggyBank(piggyBank, row)">
+    <thead>
+    <tr>
+      <td>Nazwa</td>
+      <td>Saldo</td>
+      <td *ngIf="adminMode">Oszędnościowe</td>
+      <td *ngIf="adminMode">Miesięczne uznanie</td>
+      <td *ngIf="adminMode">Opis</td>
+    </tr>
+    </thead>
+    <tr *ngFor="let piggyBank of piggyBanks" #row (mouseenter)="setOverPiggyBank(piggyBank, row)"
+        style="border-top: black dashed thin">
       <td>{{piggyBank.name}}</td>
-      <td>{{piggyBank.balance | currency: piggyBank.currency}}</td>
-      <td *ngIf="adminMode">{{piggyBank.savings}}</td>
-      <td *ngIf="adminMode">{{piggyBank.monthlyTopUp}}</td>
+      <td style="text-align:right">{{piggyBank.balance | currency: piggyBank.currency}}</td>
+      <td *ngIf="adminMode" style="text-align:center">
+        <input type="checkbox" [ngModel]="piggyBank.savings">
+      </td>
+      <td *ngIf="adminMode && piggyBank.monthlyTopUp" style="text-align:right">{{piggyBank.monthlyTopUp | currency: piggyBank.currency}}</td>
+      <td *ngIf="adminMode && !piggyBank.monthlyTopUp"></td>
       <td *ngIf="adminMode">{{piggyBank.description}}</td>
     </tr>
   </table>
   <div #utilBox style="position: fixed;"
        [ngStyle]="{'top.px': utilBoxTop, 'left.px': utilBoxLeft, 'visibility': utilBoxVisibility}">
-    <button (click)="prepareToTopUp()" class="btn btn-primary btn-sm" >
+    <button (click)="prepareToTopUp()" class="btn btn-primary btn-sm">
       Uznaj
     </button>
-    <button (click)="prepareToDebit()" class="btn btn-primary btn-sm" >
+    <button (click)="prepareToDebit()" class="btn btn-primary btn-sm">
       Obciąż
     </button>
-    <button (click)="prepareToGeneralEdit()" *ngIf="this.adminMode" class="btn btn-primary btn-sm" >
+    <button (click)="prepareToGeneralEdit()" *ngIf="this.adminMode" class="btn btn-primary btn-sm">
       Edytuj
     </button>
   </div>
@@ -123,13 +136,13 @@
   Wartość po operacji: {{editElement.balance - operationAmount | currency: editElement.currency}}
 </div>
 
-<button (click)="prepareToCreate()" *ngIf="this.adminMode && isNonEditMode()" class="btn btn-primary" >Stwórz</button>
-<button (click)="topUp()" *ngIf="isTopUpEditMode()" class="btn btn-primary" >Uznaj</button>
-<button (click)="debit()" *ngIf="isDebitEditMode()" class="btn btn-primary" >Obciąż</button>
+<button (click)="prepareToCreate()" *ngIf="this.adminMode && isNonEditMode()" class="btn btn-primary">Stwórz</button>
+<button (click)="topUp()" *ngIf="isTopUpEditMode()" class="btn btn-primary">Uznaj</button>
+<button (click)="debit()" *ngIf="isDebitEditMode()" class="btn btn-primary">Obciąż</button>
 <button *ngIf="isGeneralEditMode()" [disabled]="!canEdit()"
-        (click)="update()" class="btn btn-primary" >Zapisz
+        (click)="update()" class="btn btn-primary">Zapisz
 </button>
 <button *ngIf="this.adminMode && isCreateEditMode()" [disabled]="!canCreate()"
-        (click)="create()" class="btn btn-primary" >Stwórz
+        (click)="create()" class="btn btn-primary">Stwórz
 </button>
-<button (click)="resetEditForm()" *ngIf="!isNonEditMode()" class="btn btn-primary" >Anuluj</button>
+<button (click)="resetEditForm()" *ngIf="!isNonEditMode()" class="btn btn-primary">Anuluj</button>
