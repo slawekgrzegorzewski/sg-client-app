@@ -2,10 +2,6 @@
   order: 1;
   max-width: 320px;
   width: 320px;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  flex-wrap: wrap;
 }
 
 .billing {

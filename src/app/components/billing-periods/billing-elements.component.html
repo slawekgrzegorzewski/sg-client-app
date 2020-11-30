@@ -1,12 +1,12 @@
-<div *ngIf="mode !== EDIT_VIEW" style="display: flex; flex-direction: column">
+<div *ngIf="mode !== EDIT_VIEW" class="sg-flex-column">
   <h5 style="text-align: center">{{title}}</h5>
 
-  <div style="display: flex; flex-direction: row">
+  <div class="sg-flex-row">
     <button (click)="mode = GENERAL_VIEW" style="width: 50%;" class="btn btn-link btn-small">Widok skrócony</button>
     <button (click)="mode = DETAILED_VIEW" style="width: 50%;" class="btn btn-link btn-small">Szczegóły</button>
   </div>
   <div *ngIf="elements.length > 0 && mode === DETAILED_VIEW">
-    <div *ngFor="let element of elements" style="display: flex; flex-direction: row">
+    <div *ngFor="let element of elements" class="sg-flex-row">
       <div style="padding-right: 10px;width: 100px">{{element.dateString()}}</div>
       <div style="padding-left: 10px;padding-right: 10px;width: 100px">
         {{element.amount | currency: element.currency}}
@@ -17,18 +17,18 @@
     </div>
   </div>
   <div *ngIf="elements.length > 0 && mode === GENERAL_VIEW">
-    <div *ngFor="let perCategory of categoryBreakdown | keyvalue" style="display: flex; flex-direction: row">
+    <div *ngFor="let perCategory of categoryBreakdown | keyvalue" class="sg-flex-row">
       <div style="padding-right: 10px;width: 200px">{{perCategory.key}}</div>
-      <div style="display: flex; flex-direction: column; align-items: flex-end; padding-left: 10px;width: 100px">
+      <div class="sg-flex-column sg-flex-align-flex-end" style="padding-left: 10px;width: 100px">
         <span *ngFor="let perCurrency of perCategory.value | keyvalue">
           {{perCurrency.value | currency: perCurrency.key}}
         </span>
       </div>
     </div>
     -----------
-    <div style="display: flex; flex-direction: row;">
+    <div class="sg-flex-row">
       <div style="padding-right: 10px;width: 200px"></div>
-      <div style="display: flex; flex-direction: column; align-items: flex-end; padding-left: 10px;width: 100px">
+      <div class="sg-flex-column sg-flex-align-flex-end" style="padding-left: 10px;width: 100px">
         <span *ngFor="let perCurrency of summary | keyvalue">
           {{perCurrency.value | currency: perCurrency.key}}
         </span>
@@ -40,7 +40,7 @@
   </div>
   <button (click)="add()" class="btn btn-outline-primary">Wprowadź</button>
 </div>
-<app-create-billing-element *ngIf="mode === EDIT_VIEW" style="display: flex; flex-direction: column"
+<app-create-billing-element *ngIf="mode === EDIT_VIEW" class="sg-flex-column"
                             [elementType]="elementType"
                             [categories]="categories"
                             [userAccounts]="userAccounts"

@@ -1,0 +1,18 @@
+@media (max-width: 639px) {
+  .home-small {
+    display: block !important
+  }
+
+  .home-normal {
+    display: none !important
+  }
+}
+@media (min-width: 640px) {
+  .home-small {
+    display: none !important
+  }
+
+  .home-normal {
+    display: block !important
+  }
+}

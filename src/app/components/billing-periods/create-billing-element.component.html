@@ -1,4 +1,4 @@
-<div class="creating-billing-element-main">
+<div class="sg-flex-column creating-billing-element-main">
   <h5>Wprowadź szczegóły</h5>
   <form #createBillingElementForm="ngForm" class="needs-validation">
 
@@ -85,7 +85,7 @@
       </div>
     </div>
   </form>
-  <div style="display: flex; flex-direction: row;align-items: stretch">
+  <div class="sg-flex-row sg-flex-align-stretch">
     <button type="button" class="btn btn-outline-primary" *ngIf="forAccountId"
             [disabled]="amount?.errors?.required || !isAllowed()"
             (click)="add()">

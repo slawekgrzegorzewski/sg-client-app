@@ -3,7 +3,7 @@ import {LOCALE_ID, NgModule} from '@angular/core';
 
 import {AppComponent} from './app.component';
 import {HeaderComponent} from './pages/header/header.component';
-import {SettingsComponent} from './components/settings.component';
+import {SettingsComponent} from './components/settings/settings.component';
 import {LoginComponent} from './pages/login/login.component';
 import {RegisterComponent} from './pages/register/register.component';
 import {LoginService} from './services/login.service';
@@ -16,7 +16,7 @@ import {HomeComponent} from './pages/home/home.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {EditAccountComponent} from './components/accounts/edit-account.component';
 import {ToastService} from './services/toast.service';
-import {ToastsContainer} from './components/toast/toast-container.component';
+import {ToastsContainer} from './components/general/toast/toast-container.component';
 import {HoverableButtonsComponent} from './components/general/hoverable-buttons.component';
 import {UserAccountsComponent} from './components/accounts/user-accounts.component';
 import {CreateTransactionsComponent} from './components/transactions/create-transactions.component';
@@ -38,6 +38,8 @@ import {GeneralTypeaheadComponent} from './components/typeaheads/general-typeahe
 import {CurrencyTotalsComponent} from './components/general/currency-totals.component';
 import {MultiCurrencyTotalComponent} from './components/general/multi-currency-total.component';
 import {AccountsHistoryComponent} from './pages/accounts-history/accounts-history.component';
+import {GrandTotalComponent} from './components/grand-total/grand-total.component';
+import {HomeSmallComponent} from './pages/home/home-small.component';
 
 @NgModule({
   declarations: [
@@ -62,7 +64,9 @@ import {AccountsHistoryComponent} from './pages/accounts-history/accounts-histor
     GeneralTypeaheadComponent,
     CurrencyTotalsComponent,
     MultiCurrencyTotalComponent,
-    AccountsHistoryComponent
+    AccountsHistoryComponent,
+    GrandTotalComponent,
+    HomeSmallComponent
   ],
   imports: [
     BrowserModule,

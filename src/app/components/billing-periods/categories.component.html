@@ -1,5 +1,5 @@
 <div (mouseleave)="setOverAccount(null, null)" *ngIf="!editElement">
-  <div style="display: flex; flex-direction: column">
+  <div class="sg-flex-column">
     <div *ngFor="let category of categories" #row
          (mouseenter)="setOverAccount(category, row)">
       {{category.name}} {{category.description}}

@@ -30,6 +30,7 @@ export class CurrencyTotalsComponent<T> implements OnInit {
   }
 
   @Input() currencyExtractorLeft: (t: T) => string;
+
   @Input() balanceExtractorLeft: (t: T) => number;
 
   @Input() currencyExtractorRight: (t: T) => string;

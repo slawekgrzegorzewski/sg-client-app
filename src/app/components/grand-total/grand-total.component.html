@@ -1,0 +1,35 @@
+<div class="sg-flex-column">
+  <h5 style="text-align: center">{{title}}</h5>
+  <app-currency-totals style="margin-bottom: 10px"
+                       [title]="'Zgromadzone środki'"
+                       [valuesLeft]="accounts"
+                       [currencyExtractorLeft]="accountCurrencyExtractor"
+                       [balanceExtractorLeft]="accountBalanceExtractor"
+  ></app-currency-totals>
+  <app-currency-totals style="margin-bottom: 10px"
+                       [title]="'Środki rozlokowane w skarbonkach'"
+                       [valuesLeft]="piggyBanks"
+                       [currencyExtractorLeft]="piggyBankCurrencyExtractor"
+                       [balanceExtractorLeft]="piggyBankBalanceExtractor"
+  ></app-currency-totals>
+  <app-currency-totals
+    [title]="'Różnica'"
+    [valuesLeft]="accounts"
+    [currencyExtractorLeft]="accountCurrencyExtractor"
+    [balanceExtractorLeft]="accountBalanceExtractor"
+    [valuesRight]="piggyBanks"
+    [currencyExtractorRight]="piggyBankCurrencyExtractor"
+    [balanceExtractorRight]="piggyBankBalanceExtractor"
+  ></app-currency-totals>
+  <div *ngFor="let month of historicalSavings | keyvalue">
+    <app-multi-currency-total
+      [title]="month.key"
+      [values]="month.value">
+    </app-multi-currency-total>
+  </div>
+  <app-multi-currency-total
+    [title]="'Oszczędności'"
+    [values]="savingsTotal"
+  >
+  </app-multi-currency-total>
+</div>

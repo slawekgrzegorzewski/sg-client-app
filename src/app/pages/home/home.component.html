@@ -1,53 +1,27 @@
-<div style="display: flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap">
-  <div class="savings">
-    <div style="display:flex; flex-direction: column;justify-content: stretch;">
-      <app-currency-totals style="margin-bottom: 10px"
-                           [title]="'Zgromadzone środki'"
-                           [valuesLeft]="accounts"
-                           [currencyExtractorLeft]="accountCurrencyExtractor"
-                           [balanceExtractorLeft]="accountBalanceExtractor"
-      ></app-currency-totals>
-      <app-currency-totals style="margin-bottom: 10px"
-                           [title]="'Środki rozlokowane w skarbonkach'"
-                           [valuesLeft]="piggyBanks"
-                           [currencyExtractorLeft]="piggyBankCurrencyExtractor"
-                           [balanceExtractorLeft]="piggyBankBalanceExtractor"
-      ></app-currency-totals>
-      <app-currency-totals
-        [title]="'Różnica'"
-        [valuesLeft]="accounts"
-        [currencyExtractorLeft]="accountCurrencyExtractor"
-        [balanceExtractorLeft]="accountBalanceExtractor"
-        [valuesRight]="piggyBanks"
-        [currencyExtractorRight]="piggyBankCurrencyExtractor"
-        [balanceExtractorRight]="piggyBankBalanceExtractor"
-      ></app-currency-totals>
-      <div *ngFor="let month of historicalSavings | keyvalue">
-        <app-multi-currency-total
-          [title]="month.key"
-          [values]="month.value">
-        </app-multi-currency-total>
-      </div>
-      <app-multi-currency-total
-        [title]="'Oszczędności'"
-        [values]="savingsTotal"
-      >
-      </app-multi-currency-total>
-    </div>
+<div class="sg-flex-row sg-flex-justify-space-around sg-flex-wrap">
+  <div class="sg-flex-column sg-flex-justify-flex-start savings">
+    <app-accounts-grand-total
+      [title]="'Podsumowanie'"
+      [piggyBanks]="piggyBanks"
+      [accounts]="accounts"
+      [historicalSavings]="historicalSavings"
+      style="margin-bottom: 20px"
+    >
+    </app-accounts-grand-total>
     <app-user-accounts [userName]="loginService.getUserName()"
                        [accounts]="accounts"
                        [selectable]="false">
     </app-user-accounts>
   </div>
   <div class="billing">
-    <div style="display: flex; flex-direction: row; justify-content: space-between">
+    <div class="sg-flex-row sg-flex-justify-space-between">
       <div>
         <button class="btn btn-link btn-small" (click)="previous()">Wcześniej</button>
       </div>
       <div>
         <h4><span>{{monthYearString(displayingPeriod)}}</span></h4>
       </div>
-      <div style="display: flex; flex-direction: column;">
+      <div class="sg-flex-column">
         <button class="btn btn-link btn-small" (click)="next()">Później</button>
         <button *ngIf="currentBilling && !isCurrentBillingFinished"
                 (click)="finish(currentBilling)"
@@ -56,7 +30,7 @@
         </button>
       </div>
     </div>
-    <div *ngIf="currentBilling" style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center">
+    <div *ngIf="currentBilling" class="sg-flex-row sg-flex-justify-center sg-flex-wrap">
       <app-billing-elements style="margin:10px; max-width: 300px"
                             [title]="'Dochody'"
                             [billingPeriod]="currentBilling"

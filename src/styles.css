@@ -1,1 +1,51 @@
 @import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+
+.sg-flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.sg-flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.sg-flex-justify-flex-start {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.sg-flex-justify-center {
+  display: flex;
+  justify-content: center;
+}
+
+.sg-flex-justify-space-around {
+  display: flex;
+  justify-content: space-around;
+}
+
+.sg-flex-justify-space-between {
+  display: flex;
+  justify-content: space-between;
+}
+
+.sg-flex-align-stretch {
+  display: flex;
+  align-items: stretch;
+}
+
+.sg-flex-align-flex-end {
+  display: flex;
+  align-items: flex-end;
+}
+
+.sg-flex-align-center {
+  display: flex;
+  align-items: center;
+}
+
+.sg-flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}

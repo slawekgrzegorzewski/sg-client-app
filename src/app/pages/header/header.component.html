@@ -16,8 +16,11 @@
       <li class="nav-item" [routerLinkActive]="['active']">
         <a class="nav-link" [routerLink]="['/change-password/change-password']" *ngIf="!isLoggedIn">Zmiana hasła</a>
       </li>
-      <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
+      <li class="nav-item home-normal" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
         <a class="nav-link" [routerLink]="['/home']">Strona główna</a>
+      </li>
+      <li class="nav-item home-small" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
+        <a class="nav-link" [routerLink]="['/home-small']">Strona główna</a>
       </li>
       <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
         <a class="nav-link" [routerLink]="['/accounts-history']">Historia transakcji</a>

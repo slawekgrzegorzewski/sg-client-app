@@ -19,7 +19,23 @@ const EMPTY_EDIT_MODE = '';
 })
 export class PiggyBanksComponent implements OnInit {
   @Input() adminMode: boolean;
-  @Input() piggyBanks: PiggyBank[] = [];
+  piggyBanksInternal: PiggyBank[];
+
+  @Input() get piggyBanks(): PiggyBank[] {
+    return this.piggyBanksInternal;
+  }
+
+  set piggyBanks(value: PiggyBank[]) {
+    this.piggyBanksInternal = value;
+    (this.piggyBanksInternal || []).forEach(pg => {
+      this.calculateAndStoreSum(this.sumOfPiggyBanks, pg, pg.balance);
+      this.calculateAndStoreSum(this.sumOfMonthlyTopUps, pg, pg.monthlyTopUp);
+    });
+  }
+
+  sumOfPiggyBanks = new Map<string, number>();
+  sumOfMonthlyTopUps = new Map<string, number>();
+
   @Input() allCurrencies: Currency[];
   @Output() updateEvent = new EventEmitter<PiggyBank>();
   @Output() createEvent = new EventEmitter<PiggyBank>();
@@ -67,6 +83,12 @@ export class PiggyBanksComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  private calculateAndStoreSum(aMap: Map<string, number>, pg: PiggyBank, toAdd: number): void {
+    let sum = aMap.get(pg.currency) || 0;
+    sum += toAdd;
+    aMap.set(pg.currency, sum);
   }
 
   setOverPiggyBank(piggyBank: PiggyBank, row: HTMLTableRowElement): void {
