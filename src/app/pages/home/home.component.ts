@@ -146,8 +146,8 @@ export class HomeComponent implements OnInit {
 
     finish(currentBilling: BillingPeriod): void {
         this.billingsService.finishBillingPeriod(currentBilling).subscribe(
-            data => this.setBillingPeriodRelatedData(data),
-            error => this.clearBillingPeriodRelatedData()
+            data => this.refreshData(),
+            error => this.refreshData()
         );
     }
 
