@@ -49,7 +49,7 @@ export class BillingElementsComponent implements OnInit {
     this.selectElementsToShow();
   }
 
-  elements: Income[] | Expense[];
+  elements: (Income | Expense)[];
   categoryBreakdown: Map<string, Map<string, number>> = new Map<string, Map<string, number>>();
   summary: Map<string, number> = new Map<string, number>();
 
@@ -58,8 +58,10 @@ export class BillingElementsComponent implements OnInit {
   @Input() userAccounts: Account[];
   @Input() categories: Category[];
   @Input() piggyBanks: PiggyBank[];
+  @Input() editable = false;
   @Output() createElementEvent = new EventEmitter<[Income | Expense, number]>();
   @Output() updatePiggyBankEvent = new EventEmitter<PiggyBank>();
+  showCategory: string;
 
   constructor() {
   }
@@ -103,8 +105,10 @@ export class BillingElementsComponent implements OnInit {
   }
 
   add(): void {
-    this.previousMode = this.mode || this.GENERAL_VIEW;
-    this.mode = this.EDIT_VIEW;
+    if (this.editable) {
+      this.previousMode = this.mode || this.GENERAL_VIEW;
+      this.mode = this.EDIT_VIEW;
+    }
   }
 
   createElement(elementToCreate: Income | Expense, accountIdForElement: number, piggyBankToUpdate: PiggyBank): void {
@@ -120,5 +124,21 @@ export class BillingElementsComponent implements OnInit {
 
   nameOfType(): string {
     return this.elementType === INCOME ? 'incomes' : 'expenses';
+  }
+
+  setCategory(key: string): void {
+    if (this.showCategory === key) {
+      this.showCategory = null;
+    } else {
+      this.showCategory = key;
+    }
+  }
+
+  shouldShow(key: string): boolean {
+    return this.showCategory === key;
+  }
+
+  filterTransactions(key: string): (Income | Expense)[] {
+    return this.elements.filter(e => e.category.name === key);
   }
 }

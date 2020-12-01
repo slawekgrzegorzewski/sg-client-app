@@ -44,7 +44,11 @@ export class BillingPeriodsService {
   }
 
   finishBillingPeriod(period: BillingPeriod): Observable<BillingPeriodInfo> {
-    return this.http.get<BillingPeriodInfo>(environment.serviceUrl + '/billing-periods/' + this.datePipe.transform(period.period, 'yyyy-MM') + '/finish')
+    return this.finishBillingPeriodOf(period.period);
+  }
+
+  finishBillingPeriodOf(date: Date): Observable<BillingPeriodInfo> {
+    return this.http.get<BillingPeriodInfo>(environment.serviceUrl + '/billing-periods/' + this.datePipe.transform(date, 'yyyy-MM') + '/finish')
       .pipe(map(d => new BillingPeriodInfo(d)));
   }
 

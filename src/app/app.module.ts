@@ -40,6 +40,9 @@ import {MultiCurrencyTotalComponent} from './components/general/multi-currency-t
 import {AccountsHistoryComponent} from './pages/accounts-history/accounts-history.component';
 import {GrandTotalComponent} from './components/grand-total/grand-total.component';
 import {HomeSmallComponent} from './pages/home/home-small.component';
+import {BillingSmallComponent} from './pages/billings/billing-small..component';
+import {BrowseBillingElementsComponent} from './components/billing-periods/browse-billing-elements.component';
+import {PiggyBanksSmallComponent} from './pages/piggy-banks/piggy-banks-small..component';
 
 @NgModule({
   declarations: [
@@ -66,7 +69,10 @@ import {HomeSmallComponent} from './pages/home/home-small.component';
     MultiCurrencyTotalComponent,
     AccountsHistoryComponent,
     GrandTotalComponent,
-    HomeSmallComponent
+    HomeSmallComponent,
+    BillingSmallComponent,
+    BrowseBillingElementsComponent,
+    PiggyBanksSmallComponent
   ],
   imports: [
     BrowserModule,

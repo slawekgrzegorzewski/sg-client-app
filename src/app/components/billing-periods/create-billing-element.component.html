@@ -3,85 +3,75 @@
   <form #createBillingElementForm="ngForm" class="needs-validation">
 
     <div class="form-group row">
-      <label for="forAccount" class="col-sm-2 col-form-label">Konto</label>
-      <div class="col-sm-10">
-        <select id="forAccount" name="forAccount" class="form-control"
-                #forAccount="ngModel" [(ngModel)]="forAccountId" required ngbAutofocus>
-          <option *ngFor="let account of userAccounts" [value]="account.id">{{account.name}}
-            ({{account.currentBalance | currency:account.currency}})
-          </option>
-        </select>
-      </div>
+      <label for="forAccount" class="col-3 col-form-label">Konto</label>
+      <select id="forAccount" name="forAccount" class="form-control col-9"
+              #forAccount="ngModel" [(ngModel)]="forAccountId" required ngbAutofocus>
+        <option *ngFor="let account of userAccounts" [value]="account.id">{{account.name}}
+          ({{account.currentBalance | currency:account.currency}})
+        </option>
+      </select>
     </div>
 
     <div *ngIf="forAccountId">
       <div class="form-group row">
-        <label for="amount" class="col-sm-2 col-form-label">Kwota</label>
-        <div class="col-sm-8">
-          <input id="amount" name="amount" type="number" class="form-control"
-                 #amount="ngModel"
-                 [(ngModel)]="billingElement.amount"
-                 min=0 required/>
-        </div>
-        <div class="form-control col-sm-1">
-          <span>{{getCurrencySymbol(billingElement.currency)}}</span>
+        <label for="amount" class="col-3 col-form-label">Kwota</label>
+        <input id="amount" name="amount" type="number" class="form-control col-7"
+               #amount="ngModel"
+               [(ngModel)]="billingElement.amount"
+               min=0 required/>
+        <div class="sg-flex-row sg-flex-align-center sg-flex-justify-center col-2">
+          {{getCurrencySymbol(billingElement.currency)}}
         </div>
       </div>
 
       <div class="form-group row">
-        <label for="amount" class="col-sm-2 col-form-label">Kategoria</label>
-        <div class="col-sm-10">
-          <app-general-typeahead
-            id="category"
-            name="category"
-            [inputClass]="'form-control'"
-            [readonly]="null"
-            [(ngModel)]="categoryId"
-            [dataProvider]="categoriesForTypeAhead()"
-            [idExtractor]="categoryIdExtractor"
-            [tToString]="categoryToString"
-            #category="ngModel"
-            required>
-          </app-general-typeahead>
-        </div>
+        <label for="amount" class="col-3 col-form-label">Kategoria</label>
+        <app-general-typeahead
+          id="category"
+          name="category"
+          class="col-9"
+          [inputClass]="'form-control'"
+          [readonly]="null"
+          [(ngModel)]="categoryId"
+          [dataProvider]="categoriesForTypeAhead()"
+          [idExtractor]="categoryIdExtractor"
+          [tToString]="categoryToString"
+          #category="ngModel"
+          required>
+        </app-general-typeahead>
       </div>
 
       <div class="form-group row">
-        <label for="dateOfElement" class="col-sm-2 col-form-label">Data</label>
-        <div class="col-sm-10">
-          <input class="form-control" id="dateOfElement" name="dateOfElement" [(ngModel)]="elementDate"
-                 #d="ngbDatepicker" (click)="d.toggle()" ngbDatepicker>
-        </div>
+        <label for="dateOfElement" class="col-3 col-form-label">Data</label>
+        <input class="form-control col-9" id="dateOfElement" name="dateOfElement" [(ngModel)]="elementDate"
+               #d="ngbDatepicker" (click)="d.toggle()" ngbDatepicker>
       </div>
 
       <div class="form-group row">
-        <label for="description" class="col-sm-2 col-form-label">Opis</label>
-        <div class="col-sm-10">
-        <textarea id="description" name="description" class="form-control"
+        <label for="description" class="col-3 col-form-label">Opis</label>
+        <textarea id="description" name="description" class="form-control col-9"
                   #description="ngModel"
                   [(ngModel)]="billingElement.description">
 
         </textarea>
-        </div>
       </div>
 
       <div class="form-group row">
-        <label for="piggybank" class="col-sm-4 col-form-label">{{piggyBankAction()}}</label>
-        <div class="col-sm-8">
-          <app-general-typeahead
-            id="piggybank"
-            name="piggybank"
-            [inputClass]="'form-control'"
-            [readonly]="null"
-            [(ngModel)]="piggyBankId"
-            [availableData]="piggyBanksForSelectedAccount"
-            [dataProvider]="piggyBanksForTypeAhead()"
-            [idExtractor]="piggyBankIdExtractor"
-            [tToString]="piggyBankToString()"
-            #piggybank="ngModel"
-            required>
-          </app-general-typeahead>
-        </div>
+        <label for="piggybank" class="col-4 col-form-label">{{piggyBankAction()}}</label>
+        <app-general-typeahead
+          id="piggybank"
+          name="piggybank"
+          class="col-8"
+          [inputClass]="'form-control'"
+          [readonly]="null"
+          [(ngModel)]="piggyBankId"
+          [availableData]="piggyBanksForSelectedAccount"
+          [dataProvider]="piggyBanksForTypeAhead()"
+          [idExtractor]="piggyBankIdExtractor"
+          [tToString]="piggyBankToString()"
+          #piggybank="ngModel"
+          required>
+        </app-general-typeahead>
       </div>
     </div>
   </form>

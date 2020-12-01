@@ -1,0 +1,11 @@
+<app-browse-billing-elements
+  [accounts]="accounts"
+  [categories]="categories"
+  [piggyBanks]="piggyBanks"
+  [billingPeriodInfo]="billingPeriodInfo"
+  (dateSelected)="fetchBillingPeriod($event)"
+  (finishBillingPeriod)="finishBillingPeriod($event)"
+  (createBillingPeriod)="createBilling($event)"
+  (createElementEvent)="createElement($event[0], $event[1], $event[2])"
+  (updatePiggyBankEvent)="updatePiggyBank($event)"
+></app-browse-billing-elements>

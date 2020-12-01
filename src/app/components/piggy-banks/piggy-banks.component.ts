@@ -18,6 +18,7 @@ const EMPTY_EDIT_MODE = '';
   styleUrls: ['./piggy-banks.component.css']
 })
 export class PiggyBanksComponent implements OnInit {
+  @Input() title: string;
   @Input() adminMode: boolean;
   piggyBanksInternal: PiggyBank[];
 

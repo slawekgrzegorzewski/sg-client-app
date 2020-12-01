@@ -1,12 +1,16 @@
-<div class="sg-flex-row sg-flex-justify-space-between sg-flex-wrap">
+<div class="history-container">
   <app-user-accounts [userName]="loginService.getUserName()"
                      [accounts]="accounts"
                      (selectionChanged)="selectAccount($event)">
   </app-user-accounts>
-  <app-transactions-list [allAccounts]="accounts"
-                         [account]="selectedAccount"
-                         [transactions]="transactionsOfSelectedAccount"
-                         (transactionAction)="refreshData()"
-                         style="flex-grow: 1; margin-left: 50px">
-  </app-transactions-list>
+
+  <div class="sg-flex-column">
+    <h5 style="text-align: center">Historia dla zaznaczonego konta</h5>
+    <app-transactions-list [allAccounts]="accounts"
+                           [account]="selectedAccount"
+                           [transactions]="transactionsOfSelectedAccount"
+                           (transactionAction)="refreshData()"
+                           style="flex-grow: 1; margin-left: 50px">
+    </app-transactions-list>
+  </div>
 </div>

@@ -25,6 +25,11 @@
   justify-content: space-around;
 }
 
+.sg-flex-justify-left {
+  display: flex;
+  justify-content: left;
+}
+
 .sg-flex-justify-space-between {
   display: flex;
   justify-content: space-between;

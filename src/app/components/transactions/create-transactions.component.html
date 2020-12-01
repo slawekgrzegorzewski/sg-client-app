@@ -2,14 +2,14 @@
   <h5>Enter transaction details</h5>
   <form #createTransactionForm="ngForm" class="needs-validation">
     <div class="form-group row">
-      <label for="account" class="col-sm-4 col-form-label">{{accountLabel()}}</label>
-      <div class="col-sm-8">
+      <label for="account" class="col-4 col-form-label">{{accountLabel()}}</label>
+      <div class="col-8">
         <input id="account" name="account" readonly class="form-control-plaintext" value="{{account.name}}">
       </div>
     </div>
     <div class="form-group row" *ngIf="isTransfer() || isTransferWithConversion()">
-      <label for="destinationAccount" class="col-sm-4 col-form-label">To</label>
-      <div class="col-sm-8">
+      <label for="destinationAccount" class="col-4 col-form-label">To</label>
+      <div class="col-8">
         <select id="destinationAccount" name="destinationAccount" class="form-control"
                 #accountName="ngModel" [(ngModel)]="targetAccountId" required ngbAutofocus>
           <option *ngFor="let account of targetAccounts" [value]="account.id">{{account.name}}</option>
@@ -17,13 +17,13 @@
       </div>
     </div>
     <div class="form-group row">
-      <label for="transferAmount" class="col-sm-4 col-form-label">Amount</label>
-      <div class="col-sm-5">
+      <label for="transferAmount" class="col-4 col-form-label">Amount</label>
+      <div class="col-5">
         <input id="transferAmount" name="accountCurrency" type="number" min=0
                [readonly]="isPredefined() ? 'readonly' : null"
                class="form-control" #transferAmount="ngModel" [(ngModel)]="amount" required/>
       </div>
-      <div class="form-control col-sm-3">
+      <div class="form-control col-3">
         <span *ngIf="!isTransferWithConversion()">{{account.currency}}</span>
         <span *ngIf="isTransferWithConversion() && !targetAccount && !targetAmount">{{account.currency}} -> XXX ?</span>
         <span *ngIf="isTransferWithConversion() && targetAccount && !targetAmount">{{account.currency}}
@@ -33,15 +33,15 @@
       </div>
     </div>
     <div class="form-group row" *ngIf="isTransferWithConversion()">
-      <label for="currencyRate" class="col-sm-4 col-form-label">Rate</label>
-      <div class="col-sm-8">
+      <label for="currencyRate" class="col-4 col-form-label">Rate</label>
+      <div class="col-8">
         <input id="currencyRate" name="currencyRate" type="number" min=0
                class="form-control" #currencyRate="ngModel" [(ngModel)]="rate" required/>
       </div>
     </div>
     <div class="form-group row">
-      <label for="transferDescription" class="col-sm-4 col-form-label">Description</label>
-      <div class="col-sm-8">
+      <label for="transferDescription" class="col-4 col-form-label">Description</label>
+      <div class="col-8">
         <textarea id="transferDescription" name="transferDescription" class="form-control"
                   #transferDescription="ngModel" [(ngModel)]="description" required></textarea>
       </div>

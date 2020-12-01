@@ -16,17 +16,26 @@
       <li class="nav-item" [routerLinkActive]="['active']">
         <a class="nav-link" [routerLink]="['/change-password/change-password']" *ngIf="!isLoggedIn">Zmiana hasła</a>
       </li>
-      <li class="nav-item home-normal" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
+      <li class="nav-item menu-element-normal" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
         <a class="nav-link" [routerLink]="['/home']">Strona główna</a>
       </li>
-      <li class="nav-item home-small" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
+      <li class="nav-item menu-element-small" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
         <a class="nav-link" [routerLink]="['/home-small']">Strona główna</a>
+      </li>
+      <li class="nav-item menu-element-small" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
+        <a class="nav-link" [routerLink]="['/billing-small']">Okresy rozliczeniowe</a>
+      </li>
+      <li class="nav-item menu-element-small" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
+        <a class="nav-link" [routerLink]="['/piggy-banks-small']">Skarbonki</a>
       </li>
       <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
         <a class="nav-link" [routerLink]="['/accounts-history']">Historia transakcji</a>
       </li>
       <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
         <a class="nav-link" [routerLink]="['/settings']">Ustawienia</a>
+      </li>
+      <li class="nav-item menu-element-small" *ngIf="isLoggedIn">
+        <div class="nav-link">--------</div>
       </li>
     </ul>
     <ul class="navbar-nav ml-auto">

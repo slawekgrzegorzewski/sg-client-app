@@ -59,7 +59,7 @@ export class TransactionsListComponent {
     if (!this.internalAllAccounts) {
       return [];
     }
-    return this.internalAllAccounts.filter(account => this.internalAccount === undefined || account.id !== this.internalAccount.id);
+    return this.internalAllAccounts.filter(account => !this.internalAccount || account.id !== this.internalAccount.id);
   }
 
   setOverTransaction(value: Transaction, transactionRow: HTMLTableRowElement): void {

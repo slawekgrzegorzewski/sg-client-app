@@ -1,0 +1,53 @@
+<div class="sg-flex-row sg-flex-justify-space-between">
+  <div>
+    <button class="btn btn-link btn-small" (click)="previous()">Wcześniej</button>
+  </div>
+  <div>
+    <h4><span>{{monthYearString(displayingPeriod)}}</span></h4>
+  </div>
+  <div class="sg-flex-column">
+    <button class="btn btn-link btn-small" (click)="next()">Później</button>
+    <button *ngIf="currentBilling && !isCurrentBillingFinished"
+            (click)="finishBillingPeriod.emit(displayingPeriod)"
+            class="btn btn-link btn-small">
+      Zakończ okres
+    </button>
+  </div>
+</div>
+<div *ngIf="currentBilling" class="sg-flex-row sg-flex-justify-center sg-flex-wrap">
+  <app-billing-elements class="billing-elements"
+                        [title]="'Dochody'"
+                        [billingPeriod]="currentBilling"
+                        [elementType]="'income'"
+                        [userAccounts]="accounts"
+                        [categories]="categories"
+                        [piggyBanks]="piggyBanks"
+                        [editable]="!isCurrentBillingFinished"
+                        (createElementEvent)="createElementEvent.emit([currentBilling, $event[0], $event[1]])"
+                        (updatePiggyBankEvent)="updatePiggyBankEvent.emit($event)">
+
+  </app-billing-elements>
+  <app-billing-elements class="billing-elements"
+                        [title]="'Wydatki'"
+                        [billingPeriod]="currentBilling"
+                        [elementType]="'expense'"
+                        [userAccounts]="accounts"
+                        [categories]="categories"
+                        [piggyBanks]="piggyBanks"
+                        [editable]="!isCurrentBillingFinished"
+                        (createElementEvent)="createElementEvent.emit([currentBilling, $event[0], $event[1]])"
+                        (updatePiggyBankEvent)="updatePiggyBankEvent.emit($event)">
+
+  </app-billing-elements>
+</div>
+<div *ngIf="!currentBilling">
+  <button (click)="createBillingPeriod.emit(displayingPeriod)" *ngIf="unfinishedBillingPeriods.length == 0">
+    Create
+  </button>
+  <div *ngIf="unfinishedBillingPeriods.length > 0">
+    Nie można rozpocząć kolejnego okresu ponieważ następujące okresy nie zostały jeszcze zakończone:
+    <div *ngFor="let pb of unfinishedBillingPeriods">
+      {{monthYearString(pb.period)}}
+    </div>
+  </div>
+</div>

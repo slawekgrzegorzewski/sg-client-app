@@ -6,23 +6,22 @@
     <button (click)="mode = DETAILED_VIEW" style="width: 50%;" class="btn btn-link btn-small">Szczegóły</button>
   </div>
   <div *ngIf="elements.length > 0 && mode === DETAILED_VIEW">
-    <div *ngFor="let element of elements" class="sg-flex-row">
-      <div style="padding-right: 10px;width: 100px">{{element.dateString()}}</div>
-      <div style="padding-left: 10px;padding-right: 10px;width: 100px">
-        {{element.amount | currency: element.currency}}
-      </div>
-      <div style="padding-left: 10px;padding-right: 10px;width: 300px">
-        {{element.description}} ({{element.category.name}})
-      </div>
-    </div>
+    <ng-template [ngTemplateOutlet]="detailedRows"
+                 [ngTemplateOutletContext]="{rows:elements, showcategory: true}"
+    ></ng-template>
   </div>
   <div *ngIf="elements.length > 0 && mode === GENERAL_VIEW">
-    <div *ngFor="let perCategory of categoryBreakdown | keyvalue" class="sg-flex-row">
-      <div style="padding-right: 10px;width: 200px">{{perCategory.key}}</div>
-      <div class="sg-flex-column sg-flex-align-flex-end" style="padding-left: 10px;width: 100px">
+    <div *ngFor="let perCategory of categoryBreakdown | keyvalue" class="sg-flex-row sg-flex-wrap billing-element">
+      <div style="padding-right: 10px;width: 200px" (click)="setCategory(perCategory.key)">{{perCategory.key}}</div>
+      <div style="padding-left: 10px;width: 100px" class="sg-flex-column sg-flex-align-flex-end">
         <span *ngFor="let perCurrency of perCategory.value | keyvalue">
           {{perCurrency.value | currency: perCurrency.key}}
         </span>
+      </div>
+      <div *ngIf="shouldShow(perCategory.key)" style="padding-left: 10px; width: 290px">
+        <ng-template [ngTemplateOutlet]="detailedRows"
+                     [ngTemplateOutletContext]="{rows:filterTransactions(perCategory.key), showcategory: false, additionalclass: 'grayed'}"
+        ></ng-template>
       </div>
     </div>
     -----------
@@ -38,7 +37,7 @@
   <div *ngIf="elements.length === 0">
     Brak danych
   </div>
-  <button (click)="add()" class="btn btn-outline-primary">Wprowadź</button>
+  <button *ngIf="editable" (click)="add()" class="btn btn-outline-primary">Wprowadź</button>
 </div>
 <app-create-billing-element *ngIf="mode === EDIT_VIEW" class="sg-flex-column"
                             [elementType]="elementType"
@@ -50,3 +49,17 @@
 >
 
 </app-create-billing-element>
+
+<ng-template #detailedRows let-elements='rows' let-showcategorypart='showcategory'
+             let-additionalclass='additionalclass'>
+  <div *ngFor="let element of elements" class="sg-flex-row billing-element"
+       [ngClass]="additionalclass">
+    <div style="padding-right: 10px;width: 95px;min-width: 95px">{{element.dateString()}}</div>
+    <div style="padding-left: 10px;padding-right: 10px;width: 100px">
+      {{element.amount | currency: element.currency}}
+    </div>
+    <div style="padding-left: 10px;padding-right: 10px;width: 300px">
+      {{element.description}}<span *ngIf="showcategorypart"> ({{element.category.name}})</span>
+    </div>
+  </div>
+</ng-template>

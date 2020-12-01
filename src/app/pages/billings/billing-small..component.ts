@@ -1,44 +1,33 @@
 import {Component, OnInit} from '@angular/core';
-import {AccountsService} from '../../services/accounts.service';
-import {ToastService} from '../../services/toast.service';
 import {Account} from '../../model/account';
-import {LoginService} from '../../services/login.service';
-import {PiggyBanksService} from '../../services/piggy-banks.service';
 import {PiggyBank} from '../../model/piggy-bank';
-import {TransactionsService} from '../../services/transations.service';
-import {BillingPeriodsService} from '../../services/billing-periods.service';
-import {BillingPeriod, BillingPeriodInfo} from '../../model/billings/billing-period';
 import {Category} from '../../model/billings/category';
+import {BillingPeriod, BillingPeriodInfo} from '../../model/billings/billing-period';
+import {AccountsService} from '../../services/accounts.service';
+import {PiggyBanksService} from '../../services/piggy-banks.service';
+import {BillingPeriodsService} from '../../services/billing-periods.service';
 import {Income} from '../../model/billings/income';
 import {Expense} from '../../model/billings/expense';
-import {Router} from '@angular/router';
 
 @Component({
-  selector: 'app-accounts-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  selector: 'app-billing-small',
+  templateUrl: './billing-small..component.html',
+  styleUrls: ['./billing-small.component.css']
 })
-export class HomeComponent implements OnInit {
+export class BillingSmallComponent implements OnInit {
 
   accounts: Account[];
   piggyBanks: PiggyBank[];
   categories: Category[];
   billingPeriodInfo: BillingPeriodInfo;
-  historicalSavings: Map<Date, Map<string, number>>;
 
   constructor(private accountsService: AccountsService,
-              private transactionsService: TransactionsService,
               private piggyBanksService: PiggyBanksService,
-              private billingsService: BillingPeriodsService,
-              private toastService: ToastService,
-              public loginService: LoginService,
-              private router: Router) {
+              private billingsService: BillingPeriodsService
+  ) {
   }
 
   ngOnInit(): void {
-    if (window.innerWidth < 640) {
-      this.router.navigate(['/home-small']);
-    }
     this.refreshData();
     this.billingsService.getAllCategories().subscribe(data => this.categories = data);
   }
@@ -46,7 +35,6 @@ export class HomeComponent implements OnInit {
   refreshData(): void {
     this.fetchAccounts();
     this.fetchPiggyBanks();
-    this.fetchHistoricalSavings();
   }
 
   fetchAccounts(): void {
@@ -67,12 +55,6 @@ export class HomeComponent implements OnInit {
     this.piggyBanksService.getAllPiggyBanks().subscribe(data => {
       this.piggyBanks = data.sort((a, b) => a.name.localeCompare(b.name));
     });
-  }
-
-  private fetchHistoricalSavings(): void {
-    this.billingsService.getHistoricalSavings(12).subscribe(
-      data => this.historicalSavings = data
-    );
   }
 
   createElement(billingPeriod: BillingPeriod, element: Income | Expense, accountId: number): void {
@@ -107,4 +89,5 @@ export class HomeComponent implements OnInit {
       data => this.fetchBillingPeriod(date)
     );
   }
+
 }

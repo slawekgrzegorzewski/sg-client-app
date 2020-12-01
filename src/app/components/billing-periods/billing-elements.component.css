@@ -1,0 +1,7 @@
+.billing-element:not(:first-child) {
+  border-top: black dashed thin;
+}
+
+.grayed {
+  background-color: #e9e9e9;
+}

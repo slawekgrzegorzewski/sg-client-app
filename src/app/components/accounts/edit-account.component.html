@@ -2,15 +2,15 @@
   <h5>Enter new account details</h5>
   <form #createAccountForm="ngForm">
     <div class="form-group row">
-      <label for="accountName" class="col-sm-2 col-form-label">Name</label>
-      <div class="col-sm-10">
+      <label for="accountName" class="col-2 col-form-label">Name</label>
+      <div class="col-10">
         <input id="accountName" name="accountName" type="text" class="form-control" placeholder="Account name"
                #accountName="ngModel" [(ngModel)]="newAccount.name" required autofocus>
       </div>
     </div>
     <div class="form-group row">
-      <label for="accountCurrency" class="col-sm-2 col-form-label">Currency</label>
-      <div class="col-sm-10">
+      <label for="accountCurrency" class="col-2 col-form-label">Currency</label>
+      <div class="col-10">
         <app-general-typeahead
           id="accountCurrency"
           name="accountCurrency"
@@ -28,7 +28,7 @@
       </div>
     </div>
     <div class="form-group row">
-      <div class="col-sm-10">
+      <div class="col-10">
         <button type="button" class="btn btn-outline-dark" *ngIf="!isEditMode()" (click)="createAccount()"
                 [disabled]="accountName?.errors?.required || accountCurrency?.errors?.required">Create
         </button>
