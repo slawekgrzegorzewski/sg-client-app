@@ -16,6 +16,29 @@ import {Income} from '../model/billings/income';
 export class BillingPeriodsService {
   serviceUrl: string;
 
+  static sortHistoricalSavings(resultUnsorted: Map<Date, Map<string, number>>): Map<Date, Map<string, number>> {
+    const resultSorted = new Map<Date, Map<string, number>>();
+    BillingPeriodsService.getHistoricalSavingsKeysSorted(resultUnsorted).forEach(d => resultSorted.set(d, resultUnsorted.get(d)));
+    return resultSorted;
+  }
+
+  static getHistoricalSavingsKeysSorted(resultUnsorted: Map<Date, Map<string, number>>): Date[] {
+    let dates: Date[] = [];
+    for (const date of resultUnsorted.keys()) {
+      dates.push(date);
+    }
+    dates = dates.sort(((a, b) => {
+      if (a > b) {
+        return 1;
+      } else if (a < b) {
+        return -1;
+      } else {
+        return 0;
+      }
+    }));
+    return dates;
+  }
+
   constructor(private http: HttpClient,
               private settingsService: SettingsService,
               private datePipe: DatePipe,
@@ -79,6 +102,18 @@ export class BillingPeriodsService {
   }
 
   getHistoricalSavings(noOfMonths: number): Observable<Map<Date, Map<string, number>>> {
-    return this.http.get<Map<Date, Map<string, number>>>(environment.serviceUrl + '/month-summaries/savings/' + noOfMonths);
+    return this.http.get<Map<Date, Map<string, number>>>(environment.serviceUrl + '/month-summaries/savings/' + noOfMonths)
+      .pipe(map(d => {
+        const resultUnsorted = new Map<Date, Map<string, number>>();
+        Object.entries(d).forEach(value => {
+          const key = new Date(value[0]);
+          const entry = resultUnsorted.get(key) || new Map<string, number>();
+          Object.entries<number>(value[1]).forEach(v => {
+            entry.set(v[0], v[1]);
+          });
+          resultUnsorted.set(key, entry);
+        });
+        return BillingPeriodsService.sortHistoricalSavings(resultUnsorted);
+      }));
   }
 }

@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Account} from '../../model/account';
 import {PiggyBank} from '../../model/piggy-bank';
+import {BillingPeriodsService} from '../../services/billing-periods.service';
 
 @Component({
   selector: 'app-accounts-grand-total',
@@ -29,7 +30,18 @@ export class GrandTotalComponent implements OnInit {
     );
   }
 
-  @Input() historicalSavings: Map<Date, Map<string, number>>;
+  historicalSavingsInternal: Map<Date, Map<string, number>>;
+
+  @Input() get historicalSavings(): Map<Date, Map<string, number>> {
+    return this.historicalSavingsInternal;
+  }
+
+  set historicalSavings(value: Map<Date, Map<string, number>>) {
+    this.historicalSavingsInternal = value;
+    this.dates = BillingPeriodsService.getHistoricalSavingsKeysSorted(this.historicalSavings);
+  }
+
+  dates: Date[];
   savingsTotal = new Map<string, number>();
 
   accountCurrencyExtractor = (acc: Account) => acc.currency;

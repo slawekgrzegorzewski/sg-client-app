@@ -11,7 +11,7 @@ import {Expense} from '../../model/billings/expense';
 
 @Component({
   selector: 'app-billing-small',
-  templateUrl: './billing-small..component.html',
+  templateUrl: './billing-small.component.html',
   styleUrls: ['./billing-small.component.css']
 })
 export class BillingSmallComponent implements OnInit {

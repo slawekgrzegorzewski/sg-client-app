@@ -40,9 +40,11 @@ import {MultiCurrencyTotalComponent} from './components/general/multi-currency-t
 import {AccountsHistoryComponent} from './pages/accounts-history/accounts-history.component';
 import {GrandTotalComponent} from './components/grand-total/grand-total.component';
 import {HomeSmallComponent} from './pages/home/home-small.component';
-import {BillingSmallComponent} from './pages/billings/billing-small..component';
+import {BillingSmallComponent} from './pages/billings/billing-small.component';
 import {BrowseBillingElementsComponent} from './components/billing-periods/browse-billing-elements.component';
 import {PiggyBanksSmallComponent} from './pages/piggy-banks/piggy-banks-small..component';
+import {ChartsModule} from 'ng2-charts';
+import {ChartsComponent} from './pages/charts/charts.component';
 
 @NgModule({
   declarations: [
@@ -72,7 +74,8 @@ import {PiggyBanksSmallComponent} from './pages/piggy-banks/piggy-banks-small..c
     HomeSmallComponent,
     BillingSmallComponent,
     BrowseBillingElementsComponent,
-    PiggyBanksSmallComponent
+    PiggyBanksSmallComponent,
+    ChartsComponent
   ],
   imports: [
     BrowserModule,
@@ -80,7 +83,8 @@ import {PiggyBanksSmallComponent} from './pages/piggy-banks/piggy-banks-small..c
     FormsModule,
     HttpClientModule,
     ReactiveFormsModule,
-    NgbModule
+    NgbModule,
+    ChartsModule
   ],
   providers: [
     LoginService,

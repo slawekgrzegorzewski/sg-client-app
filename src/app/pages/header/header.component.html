@@ -32,6 +32,9 @@
         <a class="nav-link" [routerLink]="['/accounts-history']">Historia transakcji</a>
       </li>
       <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
+        <a class="nav-link" [routerLink]="['/charts']">Wykresy</a>
+      </li>
+      <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
         <a class="nav-link" [routerLink]="['/settings']">Ustawienia</a>
       </li>
       <li class="nav-item menu-element-small" *ngIf="isLoggedIn">

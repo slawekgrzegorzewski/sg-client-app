@@ -21,10 +21,10 @@
     [currencyExtractorRight]="piggyBankCurrencyExtractor"
     [balanceExtractorRight]="piggyBankBalanceExtractor"
   ></app-currency-totals>
-  <div *ngFor="let month of historicalSavings | keyvalue">
+  <div *ngFor="let month of dates">
     <app-multi-currency-total
-      [title]="month.key"
-      [values]="month.value">
+      [title]="month | date: 'yyyy-MM'"
+      [values]="historicalSavings.get(month)">
     </app-multi-currency-total>
   </div>
   <app-multi-currency-total

@@ -8,8 +8,9 @@ import {LoginGuard} from './guards/Login/login.guard';
 import {HomeComponent} from './pages/home/home.component';
 import {AccountsHistoryComponent} from './pages/accounts-history/accounts-history.component';
 import {HomeSmallComponent} from './pages/home/home-small.component';
-import {BillingSmallComponent} from './pages/billings/billing-small..component';
+import {BillingSmallComponent} from './pages/billings/billing-small.component';
 import {PiggyBanksSmallComponent} from './pages/piggy-banks/piggy-banks-small..component';
+import {ChartsComponent} from './pages/charts/charts.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/login', pathMatch: 'full', canActivate: [LoginGuard]},
@@ -19,6 +20,7 @@ const routes: Routes = [
   {path: 'home-small', component: HomeSmallComponent, canActivate: [AuthGuardGuard]},
   {path: 'billing-small', component: BillingSmallComponent, canActivate: [AuthGuardGuard]},
   {path: 'piggy-banks-small', component: PiggyBanksSmallComponent, canActivate: [AuthGuardGuard]},
+  {path: 'charts', component: ChartsComponent, canActivate: [AuthGuardGuard]},
   {path: 'accounts-history', component: AccountsHistoryComponent, canActivate: [AuthGuardGuard]},
   {path: 'register/:type', component: RegisterComponent, canActivate: [LoginGuard]},
   {path: 'change-password/:type', component: RegisterComponent},
