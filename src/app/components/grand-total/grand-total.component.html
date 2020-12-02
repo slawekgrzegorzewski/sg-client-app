@@ -13,7 +13,7 @@
                        [balanceExtractorLeft]="piggyBankBalanceExtractor"
   ></app-currency-totals>
   <app-currency-totals
-    [title]="'Różnica'"
+    [title]="'Wolne środki'"
     [valuesLeft]="accounts"
     [currencyExtractorLeft]="accountCurrencyExtractor"
     [balanceExtractorLeft]="accountBalanceExtractor"
@@ -21,6 +21,7 @@
     [currencyExtractorRight]="piggyBankCurrencyExtractor"
     [balanceExtractorRight]="piggyBankBalanceExtractor"
   ></app-currency-totals>
+  <h5 style="text-align: center">Historyczne oszczędonści</h5>
   <div *ngFor="let month of dates">
     <app-multi-currency-total
       [title]="month | date: 'yyyy-MM'"
@@ -28,7 +29,7 @@
     </app-multi-currency-total>
   </div>
   <app-multi-currency-total
-    [title]="'Oszczędności'"
+    [title]="'Bieżące oszczędności'"
     [values]="savingsTotal"
   >
   </app-multi-currency-total>

@@ -1,15 +1,15 @@
 <div class="creating-account-main">
-  <h5>Enter new account details</h5>
+  <h5>Wprowadź dane nowego konta</h5>
   <form #createAccountForm="ngForm">
     <div class="form-group row">
-      <label for="accountName" class="col-2 col-form-label">Name</label>
+      <label for="accountName" class="col-2 col-form-label">Nazwa</label>
       <div class="col-10">
-        <input id="accountName" name="accountName" type="text" class="form-control" placeholder="Account name"
+        <input id="accountName" name="accountName" type="text" class="form-control" placeholder="Nazwa konta"
                #accountName="ngModel" [(ngModel)]="newAccount.name" required autofocus>
       </div>
     </div>
     <div class="form-group row">
-      <label for="accountCurrency" class="col-2 col-form-label">Currency</label>
+      <label for="accountCurrency" class="col-2 col-form-label">Waluta</label>
       <div class="col-10">
         <app-general-typeahead
           id="accountCurrency"
@@ -30,12 +30,12 @@
     <div class="form-group row">
       <div class="col-10">
         <button type="button" class="btn btn-outline-dark" *ngIf="!isEditMode()" (click)="createAccount()"
-                [disabled]="accountName?.errors?.required || accountCurrency?.errors?.required">Create
+                [disabled]="accountName?.errors?.required || accountCurrency?.errors?.required">Stwórz
         </button>
         <button type="button" class="btn btn-outline-dark" *ngIf="isEditMode()" (click)="updateAccount()"
-                [disabled]="accountName?.errors?.required">Save
+                [disabled]="accountName?.errors?.required">Zapisz
         </button>
-        <button type="button" class="btn btn-outline-dark" (click)="cancel()">Cancel</button>
+        <button type="button" class="btn btn-outline-dark" (click)="cancel()">Anuluj</button>
       </div>
     </div>
   </form>

@@ -1,47 +1,49 @@
-<div (mouseleave)="setOverAccount(null, null)" *ngIf="!editElement">
+<div class="sg-flex-row sg-flex-justify-center">
   <div class="sg-flex-column">
-    <div *ngFor="let category of categories" #row
-         (mouseenter)="setOverAccount(category, row)">
-      {{category.name}} {{category.description}}
+    <div (mouseleave)="setOverAccount(null, null)" *ngIf="!editElement">
+      <div *ngFor="let category of categories" #row
+           (mouseenter)="setOverAccount(category, row)">
+        {{category.name}} {{category.description}}
+      </div>
+      <div #utilBox style="position: fixed;"
+           [ngStyle]="{'top.px': utilBoxTop, 'left.px': utilBoxLeft, 'visibility': utilBoxVisibility}">
+        <button (click)="prepareToEdit()" class="btn btn-primary">
+          Edytuj
+        </button>
+      </div>
     </div>
-  </div>
-  <div #utilBox style="position: fixed;"
-       [ngStyle]="{'top.px': utilBoxTop, 'left.px': utilBoxLeft, 'visibility': utilBoxVisibility}">
-    <button (click)="prepareToEdit()" class="btn btn-primary">
-      Edytuj
+
+    <button (click)="prepareToCreate()" *ngIf="!editElement" class="btn btn-primary">
+      Nowa kategoria
     </button>
   </div>
-</div>
 
-<button (click)="prepareToCreate()" *ngIf="!editElement" class="btn btn-primary">
-  Nowa kategoria
-</button>
-
-<div *ngIf="editElement">
-  <div class="form-group row">
-    <label for="name" class="col-2 col-form-label">Nazwa</label>
-    <div class="col-10">
-      <input id="name" name="name" type="name" class="form-control"
-             #name="ngModel"
-             [(ngModel)]="editElement.name"
-             required/>
+  <div *ngIf="editElement">
+    <div class="form-group row">
+      <label for="name" class="col-2 col-form-label">Nazwa</label>
+      <div class="col-10">
+        <input id="name" name="name" type="name" class="form-control"
+               #name="ngModel"
+               [(ngModel)]="editElement.name"
+               required/>
+      </div>
     </div>
-  </div>
-  <div class="form-group row">
-    <label for="description" class="col-2 col-form-label">Opis</label>
-    <div class="col-10">
+    <div class="form-group row">
+      <label for="description" class="col-2 col-form-label">Opis</label>
+      <div class="col-10">
       <textarea id="description" name="description" type="description" class="form-control"
                 #description="ngModel"
                 [(ngModel)]="editElement.description"
                 required>
       </textarea>
+      </div>
     </div>
+    <button *ngIf="editElement.id" [disabled]="name?.errors?.required || description?.errors?.required"
+            (click)="update()" class="btn btn-primary">Zapisz
+    </button>
+    <button *ngIf="!editElement.id" [disabled]="name?.errors?.required || description?.errors?.required"
+            (click)="create()" class="btn btn-primary">Stwórz
+    </button>
+    <button (click)="reset()" class="btn btn-primary">Anuluj</button>
   </div>
-  <button *ngIf="editElement.id" [disabled]="name?.errors?.required || description?.errors?.required"
-          (click)="update()" class="btn btn-primary">Zapisz
-  </button>
-  <button *ngIf="!editElement.id" [disabled]="name?.errors?.required || description?.errors?.required"
-          (click)="create()" class="btn btn-primary">Stwórz
-  </button>
-  <button (click)="reset()" class="btn btn-primary" >Anuluj</button>
 </div>

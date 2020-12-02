@@ -1,8 +1,8 @@
-import {Component, OnInit, TemplateRef} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {LoginService} from 'src/app/services/login.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Account} from '../../model/account';
-import {EditAccountComponent, Mode} from '../accounts/edit-account.component';
+import {Mode} from '../../components/accounts/edit-account.component';
 import {ToastService} from '../../services/toast.service';
 import {AccountsService} from '../../services/accounts.service';
 import {Observable} from 'rxjs';
@@ -20,17 +20,23 @@ export class SettingsComponent implements OnInit {
   userAccounts: Account[];
   otherUsers: number[];
   othersAccounts: Map<number, Account[]>;
-  accountBeingDeletedDescription: string;
   piggyBanks: PiggyBank[];
   allCurrencies: Currency[];
+
+  isEditAccount = false;
+  accountToEdit: Account;
+  accountToDelete: null;
+  mode: Mode = Mode.CREATE;
+  showAccountDeletionConfirmation = false;
+  accountBeingDeletedDescription: string;
 
   constructor(
     private accountsService: AccountsService,
     private piggyBanksService: PiggyBanksService,
-    private loginService: LoginService,
+    public loginService: LoginService,
     private modalService: NgbModal,
     private toastService: ToastService) {
-    loginService.authSub.subscribe(data => this.isLoggedIn = data);
+    this.loginService.authSub.subscribe(data => this.isLoggedIn = data);
   }
 
   ngOnInit(): void {
@@ -95,64 +101,68 @@ export class SettingsComponent implements OnInit {
     });
   }
 
-  openCreationDialog(): void {
-    const component = this.setupEditDialog();
-    component.mode = Mode.CREATE;
-    component.entity = null;
-  }
-
-  openEditDialog(account: Account): void {
-    const component = this.setupEditDialog();
-    component.mode = Mode.EDIT;
-    component.entity = account;
-  }
-
-  private setupEditDialog(): EditAccountComponent {
-    const ngbModalRef = this.modalService.open(EditAccountComponent, {centered: true});
-    const component = ngbModalRef.componentInstance as EditAccountComponent;
-    const closeHandler = this.onModalClose(ngbModalRef, this);
-    component.closeSubject.subscribe(closeHandler, closeHandler);
-    return component;
-  }
-
-  onModalClose(ngbModalRef, that): (input) => void {
-    return input => {
-      ngbModalRef.close();
-      that.fetchData();
+  rename(that): (a: Account) => void {
+    return (a: Account) => {
+      that.editAccount(a);
     };
   }
 
-  deleteAccount(a: Account): void {
-    this.accountsService.delete(a).subscribe(
+  editAccount(account: Account): void {
+    this.mode = Mode.EDIT;
+    this.accountToEdit = account;
+    this.isEditAccount = true;
+  }
+
+  createAccount(): void {
+    this.mode = Mode.CREATE;
+    this.accountToEdit = null;
+    this.isEditAccount = true;
+  }
+
+  deleteAccount(that): (account: Account) => void {
+    return (account: Account) => {
+      that.accountToDelete = account;
+      that.accountBeingDeletedDescription = account.name + ' - ' + account.userId;
+      this.showAccountDeletionConfirmation = true;
+    };
+  }
+
+  createAccountMethod(account: Account): void {
+    this.callAccountsService(this.accountsService.create(account));
+  }
+
+  updateAccountMethod(account: Account): void {
+    this.callAccountsService(this.accountsService.update(account));
+  }
+
+  deleteAccountMethod(): void {
+    this.callAccountsService(this.accountsService.delete(this.accountToDelete));
+  }
+
+  private callAccountsService(result: Observable<any>): void {
+    result.subscribe(
       data => {
-        this.userAccounts = this.userAccounts.filter(acc => acc.id !== a.id);
+        this.closeEdit();
+        this.fetchData();
       },
-      err => {
-        this.toastService.showWarning('\'' + this.simpleAccountInfo(a) + '\' could not be deleted.', 'Can not delete!');
+      error => {
+        this.closeEdit();
+        this.fetchData();
       }
     );
   }
 
+  closeEdit(): void {
+    this.isEditAccount = false;
+    this.showAccountDeletionConfirmation = false;
+    this.accountToEdit = null;
+    this.accountToDelete = null;
+    this.accountBeingDeletedDescription = '';
+    this.fetchData();
+  }
+
   simpleAccountInfo(a: Account): string {
     return a.name + ' - ' + a.currency;
-  }
-
-  delete(that, deleteConfirmation: TemplateRef<any>): (a: Account) => void {
-    return (a: Account) => {
-      that.accountBeingDeletedDescription = a.name + ' - ' + a.userId;
-      const m: NgbModal = that.modalService;
-      m.open(deleteConfirmation, {centered: true}).result.then(
-        result => that.deleteAccount(a),
-        reason => {
-        }
-      );
-    };
-  }
-
-  rename(that): (a: Account) => void {
-    return (a: Account) => {
-      that.openEditDialog(a);
-    };
   }
 
   entries(map: Map<string, Account[]>): [string, Account[]][] {

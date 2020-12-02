@@ -1,12 +1,24 @@
-<div *ngIf="showChart">
+<div *ngIf="savingsLineChart">
   <canvas baseChart height="800"
-          [datasets]="lineChartData"
-          [labels]="lineChartLabels"
-          [options]="lineChartOptions"
-          [colors]="lineChartColors"
-          [legend]="lineChartLegend"
-          [chartType]="lineChartType"
-          [plugins]="lineChartPlugins"
-          (chartHover)="chartHovered($event)"
-          (chartClick)="chartClicked($event)"></canvas>
+          [datasets]="savingsLineChart.lineChartData"
+          [labels]="savingsLineChart.lineChartLabels"
+          [options]="savingsLineChart.lineChartOptions"
+          [colors]="savingsLineChart.lineChartColors"
+          [legend]="savingsLineChart.lineChartLegend"
+          [chartType]="savingsLineChart.lineChartType"
+          [plugins]="savingsLineChart.lineChartPlugins">
+
+  </canvas>
+</div>
+<div *ngIf="piggyBanksLineChart">
+  <canvas baseChart height="800"
+          [datasets]="piggyBanksLineChart.lineChartData"
+          [labels]="piggyBanksLineChart.lineChartLabels"
+          [options]="piggyBanksLineChart.lineChartOptions"
+          [colors]="piggyBanksLineChart.lineChartColors"
+          [legend]="piggyBanksLineChart.lineChartLegend"
+          [chartType]="piggyBanksLineChart.lineChartType"
+          [plugins]="piggyBanksLineChart.lineChartPlugins">
+
+  </canvas>
 </div>

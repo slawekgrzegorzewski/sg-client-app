@@ -1,4 +1,4 @@
-<div *ngIf="adminMode" class="sg-flex-row">
+<div *ngIf="adminMode" class="row col-sm sg-flex-justify-center">
   <ng-container *ngTemplateOutlet="piggyBanksTemplate"></ng-container>
   <div style="margin-left: 20px">
     <app-multi-currency-total
@@ -56,7 +56,7 @@
     </div>
 
     <div *ngIf="isGeneralEditMode() || isCreateEditMode()">
-      <div class="form-group row">
+      <div class="form-group sg-flex-row">
         <label for="name" class="col-2 col-form-label">Nazwa</label>
         <div class="col-10">
           <input id="name" name="name" type="name" class="form-control"
@@ -65,7 +65,7 @@
                  required/>
         </div>
       </div>
-      <div class="form-group row">
+      <div class="form-group sg-flex-row">
         <label for="description" class="col-2 col-form-label">Opis</label>
         <div class="col-10">
       <textarea id="description" name="description" type="description" class="form-control"
@@ -75,14 +75,14 @@
       </textarea>
         </div>
       </div>
-      <div class="form-group row" *ngIf="isCreateEditMode()">
+      <div class="form-group sg-flex-row" *ngIf="isCreateEditMode()">
         <label for="balance" class="col-2 col-form-label">Wartość</label>
         <div class="col-10">
           <input id="balance" name="balance" type="number" min=0 class="form-control"
                  #balance="ngModel" [(ngModel)]="editElement.balance" required/>
         </div>
       </div>
-      <div class="form-group row" *ngIf="isCreateEditMode()">
+      <div class="form-group sg-flex-row" *ngIf="isCreateEditMode()">
         <label for="currency" class="col-2 col-form-label">Waluta</label>
         <div class="col-10">
           <app-general-typeahead
@@ -99,13 +99,13 @@
           </app-general-typeahead>
         </div>
       </div>
-      <div class="form-group row">
+      <div class="form-group sg-flex-row">
         <div class="custom-control custom-switch">
           <input id="savings" type="checkbox" class="custom-control-input" [(ngModel)]="editElement.savings">
           <label class="col-2 custom-control-label" for="savings">Oczędnościowa</label>
         </div>
       </div>
-      <div class="form-group row" style="align-items: center">
+      <div class="form-group sg-flex-row" style="align-items: center">
         <div class="custom-control custom-switch col-2">
           <input type="checkbox" class="custom-control-input" id="monthlyTopUpEnabled"
                  [(ngModel)]="monthlyTopUpEnabled">
@@ -119,7 +119,7 @@
           <span *ngIf="monthlyTopUpEnabled">{{getCurrencySymbol(editElement.currency)}}</span>
         </div>
       </div>
-      <div class="form-group row" *ngIf="isGeneralEditMode()">
+      <div class="form-group sg-flex-row" *ngIf="isGeneralEditMode()">
         <div class="custom-control custom-switch col-2">
           Wartość
         </div>
@@ -129,11 +129,11 @@
       </div>
     </div>
 
-    <div class="form-group row" *ngIf="isTopUpEditMode() || isDebitEditMode()">
+    <div class="form-group sg-flex-row" *ngIf="isTopUpEditMode() || isDebitEditMode()">
       {{editElement.name}} - aktualnie: {{editElement.balance | currency: editElement.currency}}
     </div>
 
-    <div class="form-group row" *ngIf="isTopUpEditMode()">
+    <div class="form-group sg-flex-row" *ngIf="isTopUpEditMode()">
       <label for="topUp" class="col-2 col-form-label">Kwota</label>
       <div class="col-10">
         <input id="topUp" name="topUp" type="number" min=0 class="form-control"
@@ -141,7 +141,7 @@
       </div>
     </div>
 
-    <div class="form-group row" *ngIf="isDebitEditMode()">
+    <div class="form-group sg-flex-row" *ngIf="isDebitEditMode()">
       <label for="debit" class="col-2 col-form-label">Kwota</label>
       <div class="col-10">
         <input id="debit" name="debit" type="number" max=0 class="form-control"
@@ -149,11 +149,11 @@
       </div>
     </div>
 
-    <div class="form-group row" *ngIf="isTopUpEditMode()">
+    <div class="form-group sg-flex-row" *ngIf="isTopUpEditMode()">
       Wartość po operacji: {{editElement.balance + operationAmount | currency: editElement.currency}}
     </div>
 
-    <div class="form-group row" *ngIf="isDebitEditMode()">
+    <div class="form-group sg-flex-row" *ngIf="isDebitEditMode()">
       Wartość po operacji: {{editElement.balance - operationAmount | currency: editElement.currency}}
     </div>
 

@@ -1,10 +1,7 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {Observable, Subject} from 'rxjs';
-import {ToastService} from '../../services/toast.service';
+import {Component, Input, OnInit, Output} from '@angular/core';
+import {Observable, of, Subject} from 'rxjs';
 import {Currency} from '../../model/currency';
 import {Account} from '../../model/account';
-import {AccountsService} from '../../services/accounts.service';
-import {map} from 'rxjs/operators';
 
 export enum Mode {EDIT, CREATE}
 
@@ -18,6 +15,8 @@ export class EditAccountComponent implements OnInit {
 
   internalEntity: Account;
 
+  @Input() currencies: Currency[];
+
   @Input() set entity(account: Account) {
     this.internalEntity = account;
     this.newAccount = {name: '', currency: ''};
@@ -29,14 +28,16 @@ export class EditAccountComponent implements OnInit {
     return this.internalEntity;
   }
 
-  closeSubject = new Subject<any>();
-  currencies: Currency[];
+  @Output() createSubject = new Subject<Account>();
+  @Output() updateSubject = new Subject<Account>();
+  @Output() cancelSubject = new Subject<string>();
+
   newAccount: {
     name: string,
     currency: string
   };
 
-  constructor(private accountsService: AccountsService, private toastService: ToastService) {
+  constructor() {
     this.entity = null;
   }
 
@@ -45,40 +46,18 @@ export class EditAccountComponent implements OnInit {
 
   createAccount(): void {
     this.entity = new Account(this.newAccount);
-    this.accountsService.create(this.entity).subscribe(
-      data => {
-        this.confirm();
-        this.entity = null;
-      },
-      error => {
-        this.cancel();
-        this.toastService.showWarning('Can not perform operation.');
-        this.entity = null;
-      }
-    );
+    this.createSubject.next(this.entity);
+    this.entity = null;
   }
 
   updateAccount(): void {
     this.entity.name = this.newAccount.name;
-    this.accountsService.update(this.entity).subscribe(
-      data => {
-        this.confirm();
-        this.entity = null;
-      },
-      error => {
-        this.cancel();
-        this.toastService.showWarning('Can not perform operation.');
-        this.entity = null;
-      }
-    );
-  }
-
-  confirm(): void {
-    this.closeSubject.next('ok');
+    this.updateSubject.next(this.entity);
+    this.entity = null;
   }
 
   cancel(): void {
-    this.closeSubject.next('cancel');
+    this.cancelSubject.next('cancel');
   }
 
   isEditMode(): boolean {
@@ -87,8 +66,7 @@ export class EditAccountComponent implements OnInit {
 
   currenciesForTypeAhead(): () => Observable<Currency[]> {
     const that = this;
-    return () => that.accountsService.possibleCurrencies()
-      .pipe(map(data => data.sort((a, b) => a.code.localeCompare(b.code))));
+    return () => of(that.currencies);
   }
 
   currencyIdExtractor(currency: Currency): string {

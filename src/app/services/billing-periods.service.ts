@@ -9,6 +9,8 @@ import {Category} from '../model/billings/category';
 import {map} from 'rxjs/operators';
 import {Expense} from '../model/billings/expense';
 import {Income} from '../model/billings/income';
+import {PiggyBank} from '../model/piggy-bank';
+import {Dates} from '../../utils/dates';
 
 @Injectable({
   providedIn: 'root'
@@ -16,26 +18,23 @@ import {Income} from '../model/billings/income';
 export class BillingPeriodsService {
   serviceUrl: string;
 
-  static sortHistoricalSavings(resultUnsorted: Map<Date, Map<string, number>>): Map<Date, Map<string, number>> {
-    const resultSorted = new Map<Date, Map<string, number>>();
-    BillingPeriodsService.getHistoricalSavingsKeysSorted(resultUnsorted).forEach(d => resultSorted.set(d, resultUnsorted.get(d)));
+  static sortMapWithDatesKeys(resultUnsorted: Map<Date, any>): Map<Date, any> {
+    const resultSorted = new Map<Date, any>();
+    if (resultUnsorted) {
+      BillingPeriodsService.getMapWithDatesKeysSorted(resultUnsorted)
+        .forEach(d => resultSorted.set(d, resultUnsorted.get(d)));
+    }
     return resultSorted;
   }
 
-  static getHistoricalSavingsKeysSorted(resultUnsorted: Map<Date, Map<string, number>>): Date[] {
+  static getMapWithDatesKeysSorted(resultUnsorted: Map<Date, any>): Date[] {
     let dates: Date[] = [];
-    for (const date of resultUnsorted.keys()) {
-      dates.push(date);
-    }
-    dates = dates.sort(((a, b) => {
-      if (a > b) {
-        return 1;
-      } else if (a < b) {
-        return -1;
-      } else {
-        return 0;
+    if (resultUnsorted) {
+      for (const date of resultUnsorted.keys()) {
+        dates.push(date);
       }
-    }));
+    }
+    dates = dates.sort(Dates.compareDates);
     return dates;
   }
 
@@ -113,7 +112,21 @@ export class BillingPeriodsService {
           });
           resultUnsorted.set(key, entry);
         });
-        return BillingPeriodsService.sortHistoricalSavings(resultUnsorted);
+        return BillingPeriodsService.sortMapWithDatesKeys(resultUnsorted);
+      }));
+  }
+
+  getHistoricalPiggyBanks(noOfMonths: number): Observable<Map<Date, PiggyBank[]>> {
+    return this.http.get<Map<Date, PiggyBank[]>>(environment.serviceUrl + '/month-summaries/piggy-banks/' + noOfMonths)
+      .pipe(map(d => {
+        const resultUnsorted = new Map<Date, PiggyBank[]>();
+        Object.entries(d).forEach(value => {
+          const key = new Date(value[0]);
+          const entry = resultUnsorted.get(key) || [];
+          value[1].forEach(pg => entry.push(new PiggyBank(pg)));
+          resultUnsorted.set(key, entry);
+        });
+        return BillingPeriodsService.sortMapWithDatesKeys(resultUnsorted);
       }));
   }
 }

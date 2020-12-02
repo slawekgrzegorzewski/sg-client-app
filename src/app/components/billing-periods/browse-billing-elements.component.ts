@@ -36,6 +36,7 @@ export class BrowseBillingElementsComponent implements OnInit {
   @Input() accounts: Account[];
   @Input() piggyBanks: PiggyBank[];
   @Input() categories: Category[];
+  @Input() minRowHeight: number;
 
   @Output() dateSelected = new EventEmitter<Date>();
   @Output() finishBillingPeriod = new EventEmitter<Date>();

@@ -3,7 +3,7 @@ import {LOCALE_ID, NgModule} from '@angular/core';
 
 import {AppComponent} from './app.component';
 import {HeaderComponent} from './pages/header/header.component';
-import {SettingsComponent} from './components/settings/settings.component';
+import {SettingsComponent} from './pages/settings/settings.component';
 import {LoginComponent} from './pages/login/login.component';
 import {RegisterComponent} from './pages/register/register.component';
 import {LoginService} from './services/login.service';

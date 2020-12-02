@@ -38,16 +38,16 @@ export class GrandTotalComponent implements OnInit {
 
   set historicalSavings(value: Map<Date, Map<string, number>>) {
     this.historicalSavingsInternal = value;
-    this.dates = BillingPeriodsService.getHistoricalSavingsKeysSorted(this.historicalSavings);
+    this.dates = BillingPeriodsService.getMapWithDatesKeysSorted(this.historicalSavings);
   }
 
   dates: Date[];
   savingsTotal = new Map<string, number>();
 
-  accountCurrencyExtractor = (acc: Account) => acc.currency;
-  accountBalanceExtractor = (acc: Account) => acc.currentBalance;
-  piggyBankCurrencyExtractor = (pg: PiggyBank) => pg.currency;
-  piggyBankBalanceExtractor = (pg: PiggyBank) => pg.balance;
+  public accountCurrencyExtractor = (acc: Account) => acc.currency;
+  public accountBalanceExtractor = (acc: Account) => acc.currentBalance;
+  public piggyBankCurrencyExtractor = (pg: PiggyBank) => pg.currency;
+  public piggyBankBalanceExtractor = (pg: PiggyBank) => pg.balance;
 
   constructor() {
   }

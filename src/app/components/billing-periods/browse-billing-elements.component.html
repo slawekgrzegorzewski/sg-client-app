@@ -23,6 +23,7 @@
                         [categories]="categories"
                         [piggyBanks]="piggyBanks"
                         [editable]="!isCurrentBillingFinished"
+                        [minRowHeight]="minRowHeight"
                         (createElementEvent)="createElementEvent.emit([currentBilling, $event[0], $event[1]])"
                         (updatePiggyBankEvent)="updatePiggyBankEvent.emit($event)">
 
@@ -35,6 +36,7 @@
                         [categories]="categories"
                         [piggyBanks]="piggyBanks"
                         [editable]="!isCurrentBillingFinished"
+                        [minRowHeight]="minRowHeight"
                         (createElementEvent)="createElementEvent.emit([currentBilling, $event[0], $event[1]])"
                         (updatePiggyBankEvent)="updatePiggyBankEvent.emit($event)">
 

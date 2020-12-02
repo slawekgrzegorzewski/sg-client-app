@@ -60,16 +60,25 @@ export class CurrencyTotalsComponent<T> implements OnInit {
 
 
   private calculateTotalLeft(): Map<string, number> {
-    return this.processValues(this.valuesLeft,
-      this.currencyExtractorLeft,
-      this.balanceExtractorLeft);
+    return this.calculateOneSideTotals(this.valuesLeft, this.currencyExtractorLeft, this.balanceExtractorLeft);
+  }
+
+  private calculateTotalsRight(): Map<string, number> {
+    return this.calculateOneSideTotals(this.valuesRight, this.currencyExtractorRight, this.balanceExtractorRight);
+  }
+
+  private calculateOneSideTotals(values: T[], currencyExtractor: (t: T) => string, balanceExtractor: (t: T) => number): Map<string, number> {
+    if (!values || !currencyExtractor || !balanceExtractor) {
+      return new Map<string, number>();
+    }
+    return this.processValues(values,
+      currencyExtractor,
+      balanceExtractor);
   }
 
   private calculateTotalDifference(): Map<string, number> {
     const left = this.calculateTotalLeft();
-    const right = this.processValues(this.valuesRight,
-      this.currencyExtractorRight,
-      this.balanceExtractorRight);
+    const right = this.calculateTotalsRight();
     const currencies = new Set<string>();
     for (const c of left.keys()) {
       currencies.add(c);
