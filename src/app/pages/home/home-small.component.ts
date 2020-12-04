@@ -30,7 +30,7 @@ export class HomeSmallComponent implements OnInit {
   billingPeriod: BillingPeriod;
   mode = this.DISPLAY;
 
-  constructor(private loginService: LoginService,
+  constructor(public loginService: LoginService,
               private accountsService: AccountsService,
               private piggyBanksService: PiggyBanksService,
               private billingsService: BillingPeriodsService,
