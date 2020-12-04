@@ -1,5 +1,5 @@
 <div *ngIf="savingsLineChart">
-  <canvas baseChart height="800"
+  <canvas baseChart #savingsChart height="800"
           [datasets]="savingsLineChart.lineChartData"
           [labels]="savingsLineChart.lineChartLabels"
           [options]="savingsLineChart.lineChartOptions"
@@ -11,7 +11,7 @@
   </canvas>
 </div>
 <div *ngIf="piggyBanksLineChart">
-  <canvas baseChart height="800"
+  <canvas baseChart #piggyBanksChart height="800"
           [datasets]="piggyBanksLineChart.lineChartData"
           [labels]="piggyBanksLineChart.lineChartLabels"
           [options]="piggyBanksLineChart.lineChartOptions"

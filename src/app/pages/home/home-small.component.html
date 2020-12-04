@@ -1,12 +1,16 @@
 <div class="sg-flex-column sg-flex-align-center">
   <div style="width: 320px">
-    <app-accounts-grand-total
-                              [title]="'Podsumowanie'"
-                              [piggyBanks]="piggyBanks"
-                              [accounts]="accounts"
-                              [historicalSavings]="historicalSavings"
+    <button (click)="addIncome()" class="btn btn-outline-primary" style="width: 100%" *ngIf="mode === DISPLAY">Dodaj dochód</button>
+    <button (click)="addExpense()" class="btn btn-outline-primary" style="width: 100%" *ngIf="mode === DISPLAY">Dodaj wydatek</button>
+    <app-create-billing-element *ngIf="mode === CREATE_INCOME" class="sg-flex-column"
+                                [elementType]="'income'"
+                                [categories]="categories"
+                                [userAccounts]="accounts"
+                                [billingPeriod]="billingPeriod"
+                                [piggyBanks]="piggyBanks"
+                                (editEvent)="createElement($event[0], $event[1], $event[2])"
     >
-    </app-accounts-grand-total>
+    </app-create-billing-element>
     <app-create-billing-element *ngIf="mode === CREATE_EXPENSE" class="sg-flex-column"
                                 [elementType]="'expense'"
                                 [categories]="categories"
@@ -16,6 +20,16 @@
                                 (editEvent)="createElement($event[0], $event[1], $event[2])"
     >
     </app-create-billing-element>
-    <button (click)="add()" class="btn btn-outline-primary" *ngIf="mode === DISPLAY">Dodaj wydatek</button>
+    <app-user-accounts [userName]="loginService.getUserName()"
+                       [accounts]="accounts"
+                       [selectable]="false">
+    </app-user-accounts>
+    <app-accounts-grand-total
+      [title]="'Podsumowanie'"
+      [piggyBanks]="piggyBanks"
+      [accounts]="accounts"
+      [historicalSavings]="historicalSavings"
+    >
+    </app-accounts-grand-total>
   </div>
 </div>

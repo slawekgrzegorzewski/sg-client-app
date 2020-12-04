@@ -1,7 +1,5 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {BillingPeriodsService} from '../../services/billing-periods.service';
+import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {Category} from '../../model/billings/category';
-import {ToastService} from '../../services/toast.service';
 
 export const INCOME = 'income';
 export const EXPENSE = 'expense';
@@ -13,7 +11,9 @@ export const EXPENSE = 'expense';
 })
 export class CategoriesComponent implements OnInit {
 
-  categories: Category[] = [];
+  @Input() categories: Category[] = [];
+  @Output() createEvent = new EventEmitter<Category>();
+  @Output() updateEvent = new EventEmitter<Category>();
   editElement: Category;
 
   @ViewChild('utilBox') utilBox: ElementRef;
@@ -22,17 +22,10 @@ export class CategoriesComponent implements OnInit {
   utilBoxLeft: number;
   utilBoxVisibility = 'hidden';
 
-  constructor(
-    private billingsService: BillingPeriodsService,
-    private toastService: ToastService
-  ) {
+  constructor() {
   }
 
   ngOnInit(): void {
-    this.billingsService.getAllCategories().subscribe(
-      data => this.categories = data,
-      error => this.toastService.showWarning('Could not obtain categories ' + error)
-    );
   }
 
   setOverAccount(category: Category, row: HTMLDivElement): void {
@@ -67,27 +60,12 @@ export class CategoriesComponent implements OnInit {
   }
 
   create(): void {
-    this.billingsService.createCategory(this.editElement).subscribe(
-      data => {
-        this.categories.push(data);
-        this.reset();
-      },
-      error => {
-        this.toastService.showWarning('Can not create new category ' + error);
-        this.reset();
-      }
-    );
+    this.createEvent.emit(this.editElement);
+    this.reset();
   }
 
   update(): void {
-    this.billingsService.updateCategory(this.editElement).subscribe(
-      data => {
-        this.reset();
-      },
-      error => {
-        this.toastService.showWarning('Can not create new category ' + error);
-        this.reset();
-      }
-    );
+    this.createEvent.emit(this.editElement);
+    this.reset();
   }
 }

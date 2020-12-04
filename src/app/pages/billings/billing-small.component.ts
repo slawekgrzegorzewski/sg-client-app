@@ -58,7 +58,7 @@ export class BillingSmallComponent implements OnInit {
   }
 
   createElement(billingPeriod: BillingPeriod, element: Income | Expense, accountId: number): void {
-    this.billingsService.createBillingElement(billingPeriod, element, accountId)
+    this.billingsService.createBillingElement(element, accountId)
       .subscribe(
         success => {
           this.refreshData();

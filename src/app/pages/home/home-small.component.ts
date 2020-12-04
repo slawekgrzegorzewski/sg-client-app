@@ -9,6 +9,7 @@ import {Category} from '../../model/billings/category';
 import {BillingPeriod} from '../../model/billings/billing-period';
 import {Expense} from '../../model/billings/expense';
 import {Income} from '../../model/billings/income';
+import {LoginService} from '../../services/login.service';
 
 
 @Component({
@@ -19,6 +20,7 @@ import {Income} from '../../model/billings/income';
 export class HomeSmallComponent implements OnInit {
 
   public readonly DISPLAY = 'DISPLAY';
+  public readonly CREATE_INCOME = 'CREATE_INCOME';
   public readonly CREATE_EXPENSE = 'CREATE_EXPENSE';
 
   accounts: Account[];
@@ -28,7 +30,8 @@ export class HomeSmallComponent implements OnInit {
   billingPeriod: BillingPeriod;
   mode = this.DISPLAY;
 
-  constructor(private accountsService: AccountsService,
+  constructor(private loginService: LoginService,
+              private accountsService: AccountsService,
               private piggyBanksService: PiggyBanksService,
               private billingsService: BillingPeriodsService,
               private router: Router) {
@@ -74,17 +77,25 @@ export class HomeSmallComponent implements OnInit {
     );
   }
 
-  add(): void {
+  addIncome(): void {
+    this.mode = this.CREATE_INCOME;
+  }
+
+  addExpense(): void {
     this.mode = this.CREATE_EXPENSE;
   }
 
   createElement(elementToCreate: Income | Expense, accountIdForElement: number, piggyBankToUpdate: PiggyBank): void {
-    if (elementToCreate && accountIdForElement) {
-      // this.createElementEvent.emit([elementToCreate, accountIdForElement]);
-      // if (piggyBankToUpdate) {
-      //   this.updatePiggyBankEvent.emit(piggyBankToUpdate);
-      // }
-    }
+    this.billingsService.createBillingElement(elementToCreate, accountIdForElement)
+      .subscribe(
+        success => {
+          this.refreshData();
+          this.fetchBillingPeriods();
+        },
+        error => {
+          this.refreshData();
+          this.fetchBillingPeriods();
+        });
     this.mode = this.DISPLAY;
   }
 }

@@ -56,7 +56,11 @@
     <li ngbNavItem>
       <a ngbNavLink>Kategorie</a>
       <ng-template ngbNavContent>
-        <app-categories></app-categories>
+        <app-categories
+        [categories]="categories"
+        (createEvent)="createCategory($event)"
+        (updateEvent)="updateCategory($event)"
+        ></app-categories>
       </ng-template>
     </li>
     <li ngbNavItem>

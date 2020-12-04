@@ -1,9 +1,10 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {BillingPeriodsService} from '../../services/billing-periods.service';
 import {DatePipe} from '@angular/common';
 import {SavingsLineChart} from '../../model/charts/SavingsLineChart';
 import {PiggyBank} from '../../model/piggy-bank';
 import {PiggyBanksLineChart} from '../../model/charts/PiggyBanksLineChart';
+import {BaseChartDirective} from 'ng2-charts';
 
 @Component({
   selector: 'app-charts',
@@ -15,6 +16,11 @@ export class ChartsComponent implements OnInit {
   private piggyBanksData: Map<Date, PiggyBank[]>;
   savingsLineChart: SavingsLineChart;
   piggyBanksLineChart: PiggyBanksLineChart;
+
+  @ViewChild('savingsChart')
+  public savingsChart: BaseChartDirective;
+  @ViewChild('piggyBanksChart')
+  public piggyBanksChart: BaseChartDirective;
 
   constructor(private billingPeriodsService: BillingPeriodsService,
               private datePipe: DatePipe) {

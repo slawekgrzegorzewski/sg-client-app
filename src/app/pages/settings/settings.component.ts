@@ -9,6 +9,8 @@ import {Observable} from 'rxjs';
 import {PiggyBank} from '../../model/piggy-bank';
 import {PiggyBanksService} from '../../services/piggy-banks.service';
 import {Currency} from '../../model/currency';
+import {BillingPeriodsService} from '../../services/billing-periods.service';
+import {Category} from '../../model/billings/category';
 
 @Component({
   selector: 'app-accounts',
@@ -22,6 +24,7 @@ export class SettingsComponent implements OnInit {
   othersAccounts: Map<number, Account[]>;
   piggyBanks: PiggyBank[];
   allCurrencies: Currency[];
+  categories: Category[];
 
   isEditAccount = false;
   accountToEdit: Account;
@@ -35,6 +38,7 @@ export class SettingsComponent implements OnInit {
     private piggyBanksService: PiggyBanksService,
     public loginService: LoginService,
     private modalService: NgbModal,
+    private billingsService: BillingPeriodsService,
     private toastService: ToastService) {
     this.loginService.authSub.subscribe(data => this.isLoggedIn = data);
   }
@@ -62,6 +66,7 @@ export class SettingsComponent implements OnInit {
     this.fetchAccounts();
     this.fetchPiggyBanks();
     this.fetchCurrencies();
+    this.fetchCategories();
   }
 
   private fetchAccounts(): void {
@@ -99,6 +104,12 @@ export class SettingsComponent implements OnInit {
     this.accountsService.possibleCurrencies().subscribe(data => {
       this.allCurrencies = data.sort((a, b) => a.code.localeCompare(b.code));
     });
+  }
+
+  private fetchCategories(): void {
+    this.billingsService.getAllCategories().subscribe(
+      data => this.categories = data
+    );
   }
 
   rename(that): (a: Account) => void {
@@ -177,5 +188,17 @@ export class SettingsComponent implements OnInit {
 
   updatePiggyBank(piggyBank: PiggyBank): void {
     this.piggyBanksService.update(piggyBank).subscribe();
+  }
+
+  createCategory(category: Category): void {
+    this.billingsService.createCategory(category).subscribe(
+      data => this.fetchCategories()
+    );
+  }
+
+  updateCategory(category: Category): void {
+    this.billingsService.updateCategory(category).subscribe(
+      data => this.fetchCategories()
+    );
   }
 }

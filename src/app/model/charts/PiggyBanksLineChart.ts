@@ -19,15 +19,8 @@ export class PiggyBanksLineChart {
         {
           id: 'y-axis-0',
           position: 'left',
-        },
-        {
-          id: 'y-axis-1',
-          position: 'right',
-          gridLines: {
-            color: 'rgba(255,0,0,0.3)',
-          },
           ticks: {
-            fontColor: 'red',
+            beginAtZero: true
           }
         }
       ]
@@ -49,6 +42,9 @@ export class PiggyBanksLineChart {
         },
       ],
     },
+    legend: {
+      position: 'left'
+    }
   };
   public lineChartLegend = true;
   public lineChartType: ChartType = 'line';
@@ -111,9 +107,8 @@ export class PiggyBanksLineChart {
         }
       });
     });
-    for (const piggyBankName of dataPerPiggyName.keys()) {
-      this.lineChartData.push({data: dataPerPiggyName.get(piggyBankName), label: piggyBankName});
-    }
+    Array.from(piggyBanksNames).sort((a, b) => a.localeCompare(b))
+      .forEach(piggyBankName => this.lineChartData.push({data: dataPerPiggyName.get(piggyBankName), label: piggyBankName}));
   }
 
   private descriptionOfPiggyBank(piggyBank: PiggyBank): string {

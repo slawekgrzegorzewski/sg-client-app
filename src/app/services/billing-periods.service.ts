@@ -92,11 +92,11 @@ export class BillingPeriodsService {
       .pipe(map(d => new Category(d)));
   }
 
-  createBillingElement(period: BillingPeriod, element: Income | Expense, accountId: number): Observable<string> {
+  createBillingElement(element: Income | Expense, accountId: number): Observable<string> {
     if (element instanceof Income) {
-      return this.http.put<string>(environment.serviceUrl + '/billing-periods/' + period.id + '/income/' + accountId, element);
+      return this.http.put<string>(environment.serviceUrl + '/billing-periods/income/' + accountId, element);
     } else {
-      return this.http.put<string>(environment.serviceUrl + '/billing-periods/' + period.id + '/expense/' + accountId, element);
+      return this.http.put<string>(environment.serviceUrl + '/billing-periods/expense/' + accountId, element);
     }
   }
 
