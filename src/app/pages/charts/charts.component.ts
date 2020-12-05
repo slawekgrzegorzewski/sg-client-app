@@ -37,7 +37,22 @@ export class ChartsComponent implements OnInit {
       data => {
         this.piggyBanksData = data;
         this.piggyBanksLineChart = new PiggyBanksLineChart(data, this.datePipe);
+        this.piggyBanksLineChart.updateChart.subscribe(d => this.piggyBanksChart.chart.update());
       }
     );
+  }
+
+  hideAllPiggyBanksDataSets(): void {
+    this.piggyBanksChart.chart.data.datasets.forEach(value => {
+      value.hidden = true;
+    });
+    this.piggyBanksChart.chart.update();
+  }
+
+  showAllPiggyBanksDataSets(): void {
+    this.piggyBanksChart.chart.data.datasets.forEach(value => {
+      value.hidden = false;
+    });
+    this.piggyBanksChart.chart.update();
   }
 }

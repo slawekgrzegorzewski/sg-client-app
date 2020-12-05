@@ -1,0 +1,19 @@
+.sg-flex-charts {
+  display: flex;
+  flex-direction: row;
+}
+
+.sg-chart {
+  width: 50%;
+}
+
+@media (max-width: 600px ) {
+  .sg-flex-charts {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sg-chart {
+    width: 100%;
+  }
+}

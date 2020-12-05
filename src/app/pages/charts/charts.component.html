@@ -1,24 +1,30 @@
-<div *ngIf="savingsLineChart">
-  <canvas baseChart #savingsChart height="800"
-          [datasets]="savingsLineChart.lineChartData"
-          [labels]="savingsLineChart.lineChartLabels"
-          [options]="savingsLineChart.lineChartOptions"
-          [colors]="savingsLineChart.lineChartColors"
-          [legend]="savingsLineChart.lineChartLegend"
-          [chartType]="savingsLineChart.lineChartType"
-          [plugins]="savingsLineChart.lineChartPlugins">
+<div class="sg-flex-charts">
+  <div *ngIf="savingsLineChart" class="sg-chart">
+    <canvas baseChart #savingsChart='base-chart'
+            [datasets]="savingsLineChart.lineChartData"
+            [labels]="savingsLineChart.lineChartLabels"
+            [options]="savingsLineChart.lineChartOptions"
+            [colors]="savingsLineChart.lineChartColors"
+            [legend]="savingsLineChart.lineChartLegend"
+            [chartType]="savingsLineChart.lineChartType"
+            [plugins]="savingsLineChart.lineChartPlugins">
 
-  </canvas>
-</div>
-<div *ngIf="piggyBanksLineChart">
-  <canvas baseChart #piggyBanksChart height="800"
-          [datasets]="piggyBanksLineChart.lineChartData"
-          [labels]="piggyBanksLineChart.lineChartLabels"
-          [options]="piggyBanksLineChart.lineChartOptions"
-          [colors]="piggyBanksLineChart.lineChartColors"
-          [legend]="piggyBanksLineChart.lineChartLegend"
-          [chartType]="piggyBanksLineChart.lineChartType"
-          [plugins]="piggyBanksLineChart.lineChartPlugins">
+    </canvas>
+  </div>
+  <div *ngIf="piggyBanksLineChart" class="sg-chart">
+    <div class="sg-flex-row">
+      <button (click)="hideAllPiggyBanksDataSets()" class="btn btn-outline-primary" style="width: 50%;">Ukryj wszystkie wykresy</button>
+      <button (click)="showAllPiggyBanksDataSets()" class="btn btn-outline-primary" style="width: 50%;">Pokaż wszystkie wykresy</button>
+    </div>
+    <canvas baseChart #piggyBanksChart='base-chart'
+            [datasets]="piggyBanksLineChart.lineChartData"
+            [labels]="piggyBanksLineChart.lineChartLabels"
+            [options]="piggyBanksLineChart.lineChartOptions"
+            [colors]="piggyBanksLineChart.lineChartColors"
+            [legend]="piggyBanksLineChart.lineChartLegend"
+            [chartType]="piggyBanksLineChart.lineChartType"
+            [plugins]="piggyBanksLineChart.lineChartPlugins">
 
-  </canvas>
+    </canvas>
+  </div>
 </div>

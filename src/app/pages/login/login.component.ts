@@ -26,11 +26,11 @@ export class LoginComponent implements OnInit {
       this.loginService.authenticate(this.userObject).subscribe(
         data => {
           if (data.status !== 200) {
-            this.message = data.body;
+            this.message = 'ok:' + data.body;
           }
         },
         error => {
-          this.message = JSON.stringify(error.error);
+          this.message = 'not ok:' + JSON.stringify(error);
         });
     }
   }

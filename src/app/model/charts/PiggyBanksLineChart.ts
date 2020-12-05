@@ -4,14 +4,17 @@ import * as pluginAnnotations from 'chartjs-plugin-annotation';
 import {DatePipe} from '@angular/common';
 import {Dates} from '../../../utils/dates';
 import {PiggyBank} from '../piggy-bank';
+import {EventEmitter} from '@angular/core';
 
 export class PiggyBanksLineChart {
 
+  public updateChart = new EventEmitter<any>();
   public lineChartData: ChartDataSets[];
   public lineChartLabels: Label[];
   public lineChartOptions: (ChartOptions & { annotation: any }) = {
     responsive: true,
-    maintainAspectRatio: false,
+    maintainAspectRatio: true,
+    aspectRatio: screen.width < 600 ? 0.5 : 1.5,
     scales: {
       // We use this empty structure as a placeholder for dynamic theming.
       xAxes: [{}],
@@ -43,7 +46,13 @@ export class PiggyBanksLineChart {
       ],
     },
     legend: {
-      position: 'left'
+      position: 'bottom',
+      align: 'start',
+      onClick: (event, legendItem) => {
+        const hidden = this.lineChartData[legendItem.datasetIndex].hidden;
+        this.lineChartData[legendItem.datasetIndex].hidden = !hidden;
+        this.updateChart.emit();
+      }
     }
   };
   public lineChartLegend = true;
@@ -113,5 +122,9 @@ export class PiggyBanksLineChart {
 
   private descriptionOfPiggyBank(piggyBank: PiggyBank): string {
     return piggyBank.name + ' (' + piggyBank.currency + ')';
+  }
+
+  hideAllDataSets(): void {
+    this.lineChartData.forEach(value => value.hidden = true);
   }
 }
