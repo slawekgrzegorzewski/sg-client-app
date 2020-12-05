@@ -41,6 +41,9 @@ export class SavingsLineChart {
         },
       ],
     },
+    legend: {
+      position: 'bottom'
+    }
   };
   public lineChartLegend = true;
   public lineChartType: ChartType = 'line';
