@@ -14,7 +14,7 @@
         <tr #row *ngFor="let account of accounts"
             (mouseenter)="setOverAccount(account, row)"
             (click)="select(account);"
-            class="account-row" [class.selected]="account === selectedAccount">
+            class="account-row sg-row-hoverable" [class.selected]="account === selectedAccount">
           <td>{{account.name}}</td>
           <td style="text-align: right">{{account.currentBalance | currency: account.currency :undefined:'1.2-2' }}</td>
         </tr>

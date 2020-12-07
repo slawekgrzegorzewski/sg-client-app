@@ -1,7 +1,7 @@
 <div *ngIf="account && !transferCreationMode">
   <div (mouseleave)="setOverTransaction(null, null)">
     <table>
-      <tr #row *ngFor="let transaction of transactions"
+      <tr #row *ngFor="let transaction of transactions" class="sg-row-hoverable"
           (mouseenter)="setOverTransaction(transaction, row)">
         <td>{{transaction.timeOfTransaction | localizedDate:'y-MM-d'}}</td>
         <td>

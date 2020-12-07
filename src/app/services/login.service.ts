@@ -82,7 +82,7 @@ export class LoginService {
 
   isAdmin(): boolean {
     try {
-      return jwt_decode(this.getToken()).roles.includes('ADMIN');
+      return jwt_decode(this.getToken()).roles.includes('ACCOUNTANT_ADMIN ');
     } catch (Error) {
       return false;
     }

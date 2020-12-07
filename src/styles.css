@@ -54,3 +54,8 @@
   display: flex;
   flex-wrap: wrap;
 }
+
+.sg-row-hoverable:hover {
+  background-color: #d0d0d0;
+  color: black;
+}

@@ -1,7 +1,7 @@
 <div class="sg-flex-row sg-flex-justify-center">
   <div class="sg-flex-column">
     <div (mouseleave)="setOverAccount(null, null)" *ngIf="!editElement">
-      <div *ngFor="let category of categories" #row
+      <div *ngFor="let category of categories" #row class="sg-row-hoverable"
            (mouseenter)="setOverAccount(category, row)">
         {{category.name}} {{category.description}}
       </div>

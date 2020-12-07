@@ -29,7 +29,7 @@
         </tr>
         </thead>
         <tr *ngFor="let piggyBank of piggyBanks" #row (mouseenter)="setOverPiggyBank(piggyBank, row)"
-            class="piggy-bank-row">
+            class="piggy-bank-row sg-row-hoverable">
           <td>{{piggyBank.name}}</td>
           <td style="text-align:right">{{piggyBank.balance | currency: piggyBank.currency}}</td>
           <td *ngIf="adminMode" style="text-align:center">

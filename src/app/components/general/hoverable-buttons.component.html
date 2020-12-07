@@ -1,5 +1,5 @@
 <div *ngFor="let element of data" (mouseenter)="mouseOver=element" (mouseleave)="mouseOver=null"
-     class="flex-container row">
+     class="sg-flex-row sg-row-hoverable">
   <div>{{ converter(element) }}</div>
   <div>
     <div *ngIf="mouseIsOver(element)">

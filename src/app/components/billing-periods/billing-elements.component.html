@@ -11,7 +11,7 @@
     ></ng-template>
   </div>
   <div *ngIf="elements.length > 0 && mode === GENERAL_VIEW">
-    <div *ngFor="let perCategory of categoryBreakdown | keyvalue" class="sg-flex-row sg-flex-wrap billing-element"
+    <div *ngFor="let perCategory of categoryBreakdown | keyvalue" class="sg-flex-row sg-flex-wrap billing-element sg-row-hoverable"
          (click)="setCategory(perCategory.key)" [ngStyle]="{'min-height.px':minRowHeight || 0}">
       <div class="sg-flex-align-center" style="padding-right: 10px;width: 200px">{{perCategory.key}}</div>
       <div class="sg-flex-align-center" style="padding-left: 10px;width: 100px"
@@ -54,7 +54,7 @@
 
 <ng-template #detailedRows let-elements='rows' let-showcategorypart='showcategory'
              let-additionalclass='additionalclass' let-minheight='minheight'>
-  <div *ngFor="let element of elements" class="sg-flex-row billing-element"
+  <div *ngFor="let element of elements" class="sg-flex-row billing-element sg-row-hoverable"
        [ngClass]="additionalclass" [ngStyle]="{'min-height.px' : minheight}">
     <div style="padding-right: 10px;width: 95px;min-width: 95px">{{element.dateString()}}</div>
     <div style="padding-left: 10px;padding-right: 10px;width: 100px">
