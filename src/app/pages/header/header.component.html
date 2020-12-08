@@ -1,8 +1,8 @@
 <nav class="navbar navbar-expand-md navbar-dark bg-dark" style="z-index: 99998;">
 
   <div class="navbar-brand bg-dark">
-    <select [(ngModel)]="selectedApp" class="navbar-brand bg-dark" style="border-color: #343a40">
-      <option *ngFor="let app of availableApps" [value]="app[0]">{{app[0]}}</option>
+    <select *ngIf="availableApps && availableApps.length > 0" [(ngModel)]="selectedApp" class="navbar-brand bg-dark" style="border-color: #343a40">
+      <option *ngFor="let app of availableApps" [value]="app.app">{{app.app}}</option>
     </select>
   </div>
 

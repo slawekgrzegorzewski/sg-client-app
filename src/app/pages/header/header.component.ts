@@ -10,16 +10,17 @@ import {Router} from '@angular/router';
 export class HeaderComponent implements OnInit {
   isLoggedIn = false;
   selectedProduct: string;
-  availableApps: string[][] = [];
-  selectedAppInternal: string[] = [];
+  availableApps: { app: string, routerLink: string }[] = [];
+  selectedAppInternal: string;
 
   get selectedApp(): string {
-    return this.selectedAppInternal[0];
+    return this.selectedAppInternal;
   }
 
   set selectedApp(value: string) {
-    this.selectedAppInternal = this.availableApps.find(v => v[0] === value);
-    this.router.navigate([this.selectedAppInternal[1]]);
+    this.selectedAppInternal = value;
+    const app = this.availableApps.find(v => v.app === value);
+    this.router.navigate([app.routerLink]);
   }
 
   constructor(
@@ -32,17 +33,20 @@ export class HeaderComponent implements OnInit {
     });
   }
 
-  private getAvailableApps(): void {
-    const apps = this.loginService.getAvailableApps();
-    for (const app of apps.keys()) {
-      this.availableApps.push([app, apps.get(app)]);
-    }
-    this.selectedApp = this.availableApps[0][0];
-  }
-
   ngOnInit(): void {
     this.isLoggedIn = this.loginService.isLoggedIn();
     this.getAvailableApps();
+  }
+
+  private getAvailableApps(): void {
+    const apps = this.loginService.getAvailableApps();
+    this.availableApps = [];
+    for (const a of apps.keys()) {
+      this.availableApps.push({app: a, routerLink: apps.get(a)});
+    }
+    if (this.availableApps && this.availableApps.length > 0) {
+      this.selectedApp = this.availableApps[0].app;
+    }
   }
 
   toggleMenuBar(): void {
