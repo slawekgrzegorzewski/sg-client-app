@@ -4,7 +4,7 @@ import {ToastService} from '../../services/toast.service';
 import {merge, Observable, Subject} from 'rxjs';
 import {NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
 import {debounceTime, distinctUntilChanged, filter, map} from 'rxjs/operators';
-import {BillingPeriodsService} from '../../services/billing-periods.service';
+import {BillingPeriodsService} from '../../services/accountant/billing-periods.service';
 
 @Component({
   selector: 'app-general-typeahead',

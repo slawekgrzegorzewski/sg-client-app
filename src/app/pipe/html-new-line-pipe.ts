@@ -1,5 +1,5 @@
 import {Pipe, PipeTransform} from '@angular/core';
-import {SettingsService} from '../services/settings.service';
+import {SettingsService} from '../services/accountant/settings.service';
 
 @Pipe({
   name: 'htmlNewLine',

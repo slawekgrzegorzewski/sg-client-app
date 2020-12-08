@@ -1,5 +1,11 @@
 <nav class="navbar navbar-expand-md navbar-dark bg-dark" style="z-index: 99998;">
-  <a class="navbar-brand" [routerLink]="['/login']">Accountant</a>
+
+  <div class="navbar-brand bg-dark">
+    <select [(ngModel)]="selectedApp" class="navbar-brand bg-dark" style="border-color: #343a40">
+      <option *ngFor="let app of availableApps" [value]="app[0]">{{app[0]}}</option>
+    </select>
+  </div>
+
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavId"
           aria-controls="collapsibleNavId" aria-expanded="false" aria-label="Toggle navigation"
           (click)="toggleMenuBar()">
@@ -16,25 +22,25 @@
       <li class="nav-item" [routerLinkActive]="['active']">
         <a class="nav-link" [routerLink]="['/change-password/change-password']" *ngIf="!isLoggedIn">Zmiana hasła</a>
       </li>
-      <li class="nav-item menu-element-normal" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
-        <a class="nav-link" [routerLink]="['/home']">Strona główna</a>
+      <li class="nav-item menu-element-normal" [routerLinkActive]="['active']" *ngIf="isLoggedIn && isAccountant()">
+        <a class="nav-link" [routerLink]="['/accountant-home']">Strona główna</a>
       </li>
-      <li class="nav-item menu-element-small" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
-        <a class="nav-link" [routerLink]="['/home-small']">Strona główna</a>
+      <li class="nav-item menu-element-small" [routerLinkActive]="['active']" *ngIf="isLoggedIn && isAccountant()">
+        <a class="nav-link" [routerLink]="['/accountant-home-small']">Strona główna</a>
       </li>
-      <li class="nav-item menu-element-small" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
+      <li class="nav-item menu-element-small" [routerLinkActive]="['active']" *ngIf="isLoggedIn && isAccountant()">
         <a class="nav-link" [routerLink]="['/billing-small']">Okresy rozliczeniowe</a>
       </li>
-      <li class="nav-item menu-element-small" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
+      <li class="nav-item menu-element-small" [routerLinkActive]="['active']" *ngIf="isLoggedIn && isAccountant()">
         <a class="nav-link" [routerLink]="['/piggy-banks-small']">Skarbonki</a>
       </li>
-      <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
+      <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn && isAccountant()">
         <a class="nav-link" [routerLink]="['/accounts-history']">Historia transakcji</a>
       </li>
-      <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
+      <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn && isAccountant()">
         <a class="nav-link" [routerLink]="['/charts']">Wykresy</a>
       </li>
-      <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn">
+      <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn && isAccountant()">
         <a class="nav-link" [routerLink]="['/settings']">Ustawienia</a>
       </li>
       <li class="nav-item menu-element-small" *ngIf="isLoggedIn">

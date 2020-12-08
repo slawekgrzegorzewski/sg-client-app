@@ -1,0 +1,39 @@
+<div class="sg-flex-row sg-flex-justify-space-around sg-flex-wrap">
+  <div class="sg-flex-column sg-flex-justify-flex-start savings">
+    <app-accounts-grand-total
+      [title]="'Podsumowanie'"
+      [piggyBanks]="piggyBanks"
+      [accounts]="accounts"
+      [historicalSavings]="historicalSavings"
+      style="margin-bottom: 20px"
+    >
+    </app-accounts-grand-total>
+    <app-user-accounts [userName]="loginService.getUserName()"
+                       [accounts]="accounts"
+                       [selectable]="false">
+    </app-user-accounts>
+  </div>
+  <div class="billing">
+    <app-browse-billing-elements
+      [accounts]="accounts"
+      [categories]="categories"
+      [piggyBanks]="piggyBanks"
+      [billingPeriodInfo]="billingPeriodInfo"
+      (dateSelected)="fetchBillingPeriod($event)"
+      (finishBillingPeriod)="finishBillingPeriod($event)"
+      (createBillingPeriod)="createBilling($event)"
+      (createElementEvent)="createElement($event[0], $event[1], $event[2])"
+      (updatePiggyBankEvent)="updatePiggyBank($event)"
+    ></app-browse-billing-elements>
+  </div>
+  <div class="piggy-banks">
+    <app-piggy-banks
+      [title]="'Skarbonki'"
+      [adminMode]="false"
+      [piggyBanks]="piggyBanks"
+      (updateEvent)="updatePiggyBank($event)"
+      style="margin-left: 50px; margin-top: 50px;margin-right: 50px">
+
+    </app-piggy-banks>
+  </div>
+</div>

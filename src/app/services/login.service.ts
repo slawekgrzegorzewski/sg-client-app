@@ -5,6 +5,9 @@ import {environment} from '../../environments/environment';
 import {Router} from '@angular/router';
 import * as jwt_decode from 'jwt-decode';
 
+export const ACCOUNTANT_APP = 'Accountant';
+export const CHECKER_APP = 'Checker';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -74,7 +77,7 @@ export class LoginService {
     localStorage.setItem('token', token);
     this.authSub.next(this.isLoggedIn());
     if (this.isLoggedIn()) {
-      setTimeout(() => this.router.navigate(['/home']), 100);
+      setTimeout(() => this.router.navigate(['/accountant-home']), 100);
     } else {
       setTimeout(() => this.router.navigate(['/login']), 100);
     }
@@ -82,7 +85,7 @@ export class LoginService {
 
   isAdmin(): boolean {
     try {
-      return jwt_decode(this.getToken()).roles.includes('ACCOUNTANT_ADMIN ');
+      return jwt_decode(this.getToken()).roles.includes('ACCOUNTANT_ADMIN');
     } catch (Error) {
       return false;
     }
@@ -105,5 +108,19 @@ export class LoginService {
     } catch (Error) {
       return '';
     }
+  }
+
+  getAvailableApps(): Map<string, string> {
+    const apps = new Map<string, string>();
+    if (this.getToken()) {
+      const roles = jwt_decode(this.getToken()).roles;
+      if (roles.includes('ACCOUNTANT_ADMIN') || roles.includes('ACCOUNTANT_USER')) {
+        apps.set(ACCOUNTANT_APP, 'accountant-home');
+      }
+      if (roles.includes('CHECKER_ADMIN') || roles.includes('CHECKER_USER')) {
+        apps.set(CHECKER_APP, 'checker-home');
+      }
+    }
+    return apps;
   }
 }
