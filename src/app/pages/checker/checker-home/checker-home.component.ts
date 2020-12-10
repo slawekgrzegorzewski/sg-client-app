@@ -10,6 +10,7 @@ import {PageVersion} from '../../../model/checker/page-version';
 export class CheckerHomeComponent implements OnInit {
 
   versions: PageVersion[];
+  selectedVersion: PageVersion;
 
 
   constructor(private pageVersionsService: PageVersionsService) {
@@ -21,4 +22,18 @@ export class CheckerHomeComponent implements OnInit {
     });
   }
 
+  switchSelection(version: PageVersion): void {
+    if (this.selectedVersion && this.selectedVersion === version) {
+      this.selectedVersion = null;
+    } else {
+      this.selectedVersion = version;
+    }
+  }
+
+  shouldShow(version: PageVersion): boolean {
+    if (!this.selectedVersion) {
+      return false;
+    }
+    return this.selectedVersion.id === version.id;
+  }
 }
