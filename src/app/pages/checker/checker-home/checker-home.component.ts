@@ -1,4 +1,6 @@
 import {Component, OnInit} from '@angular/core';
+import {PageVersionsService} from '../../../services/checker/page-versions.service';
+import {PageVersion} from '../../../model/checker/page-version';
 
 @Component({
   selector: 'app-checker-home',
@@ -7,11 +9,16 @@ import {Component, OnInit} from '@angular/core';
 })
 export class CheckerHomeComponent implements OnInit {
 
+  versions: PageVersion[];
 
-  constructor() {
+
+  constructor(private pageVersionsService: PageVersionsService) {
   }
 
   ngOnInit(): void {
+    this.pageVersionsService.getAllPageVersions().subscribe(data => {
+      this.versions = data.sort((a, b) => a.versionTime.getMilliseconds() - b.versionTime.getMilliseconds());
+    });
   }
 
 }

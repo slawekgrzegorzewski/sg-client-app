@@ -1,9 +1,9 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {BillingPeriodsService} from '../../../services/accountant/billing-periods.service';
 import {DatePipe} from '@angular/common';
-import {SavingsLineChart} from '../../../model/charts/SavingsLineChart';
-import {PiggyBank} from '../../../model/piggy-bank';
-import {PiggyBanksLineChart} from '../../../model/charts/PiggyBanksLineChart';
+import {SavingsLineChart} from '../../../model/accountant/charts/SavingsLineChart';
+import {PiggyBank} from '../../../model/accountant/piggy-bank';
+import {PiggyBanksLineChart} from '../../../model/accountant/charts/PiggyBanksLineChart';
 import {BaseChartDirective} from 'ng2-charts';
 
 @Component({

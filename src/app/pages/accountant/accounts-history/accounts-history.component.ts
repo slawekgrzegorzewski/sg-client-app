@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {AccountsService} from '../../../services/accountant/accounts.service';
 import {ToastService} from '../../../services/toast.service';
-import {Account} from '../../../model/account';
+import {Account} from '../../../model/accountant/account';
 import {LoginService} from '../../../services/login.service';
 import {TransactionsService} from '../../../services/accountant/transations.service';
-import {Transaction} from '../../../model/transaction';
+import {Transaction} from '../../../model/accountant/transaction';
 
 @Component({
   selector: 'app-accounts-history',

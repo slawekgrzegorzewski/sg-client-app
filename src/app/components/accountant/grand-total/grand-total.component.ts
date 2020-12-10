@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Account} from '../../../model/account';
-import {PiggyBank} from '../../../model/piggy-bank';
+import {Account} from '../../../model/accountant/account';
+import {PiggyBank} from '../../../model/accountant/piggy-bank';
 import {BillingPeriodsService} from '../../../services/accountant/billing-periods.service';
 
 @Component({

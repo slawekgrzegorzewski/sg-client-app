@@ -1,7 +1,7 @@
 import {Component, Input, OnInit, Output} from '@angular/core';
 import {Observable, of, Subject} from 'rxjs';
-import {Currency} from '../../../model/currency';
-import {Account} from '../../../model/account';
+import {Currency} from '../../../model/accountant/currency';
+import {Account} from '../../../model/accountant/account';
 
 export enum Mode {EDIT, CREATE}
 

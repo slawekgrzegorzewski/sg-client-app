@@ -1,13 +1,13 @@
 import {Component, OnInit} from '@angular/core';
-import {Account} from '../../../model/account';
-import {PiggyBank} from '../../../model/piggy-bank';
-import {Category} from '../../../model/billings/category';
-import {BillingPeriod, BillingPeriodInfo} from '../../../model/billings/billing-period';
+import {Account} from '../../../model/accountant/account';
+import {PiggyBank} from '../../../model/accountant/piggy-bank';
+import {Category} from '../../../model/accountant/billings/category';
+import {BillingPeriod, BillingPeriodInfo} from '../../../model/accountant/billings/billing-period';
 import {AccountsService} from '../../../services/accountant/accounts.service';
 import {PiggyBanksService} from '../../../services/accountant/piggy-banks.service';
 import {BillingPeriodsService} from '../../../services/accountant/billing-periods.service';
-import {Income} from '../../../model/billings/income';
-import {Expense} from '../../../model/billings/expense';
+import {Income} from '../../../model/accountant/billings/income';
+import {Expense} from '../../../model/accountant/billings/expense';
 
 @Component({
   selector: 'app-billing-small',

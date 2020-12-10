@@ -3,13 +3,13 @@ import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
 import {Observable} from 'rxjs';
 import {SettingsService} from './settings.service';
-import {BillingPeriod, BillingPeriodInfo} from '../../model/billings/billing-period';
+import {BillingPeriod, BillingPeriodInfo} from '../../model/accountant/billings/billing-period';
 import {DatePipe} from '@angular/common';
-import {Category} from '../../model/billings/category';
+import {Category} from '../../model/accountant/billings/category';
 import {map} from 'rxjs/operators';
-import {Expense} from '../../model/billings/expense';
-import {Income} from '../../model/billings/income';
-import {PiggyBank} from '../../model/piggy-bank';
+import {Expense} from '../../model/accountant/billings/expense';
+import {Income} from '../../model/accountant/billings/income';
+import {PiggyBank} from '../../model/accountant/piggy-bank';
 import {Dates} from '../../../utils/dates';
 
 @Injectable({

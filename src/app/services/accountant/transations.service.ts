@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
-import {Account} from '../../model/account';
+import {Account} from '../../model/accountant/account';
 import {Observable} from 'rxjs';
-import {Currency} from '../../model/currency';
-import {Transaction} from '../../model/transaction';
+import {Currency} from '../../model/accountant/currency';
+import {Transaction} from '../../model/accountant/transaction';
 import {map} from 'rxjs/operators';
 
 @Injectable({

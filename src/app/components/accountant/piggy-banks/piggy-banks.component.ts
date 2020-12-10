@@ -1,7 +1,7 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {PiggyBank} from '../../../model/piggy-bank';
+import {PiggyBank} from '../../../model/accountant/piggy-bank';
 import {Observable, of} from 'rxjs';
-import {Currency} from '../../../model/currency';
+import {Currency} from '../../../model/accountant/currency';
 import {getCurrencySymbol} from '@angular/common';
 
 export const INCOME = 'income';

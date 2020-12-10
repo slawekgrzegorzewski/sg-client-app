@@ -1,16 +1,16 @@
 import {Component, OnInit} from '@angular/core';
 import {AccountsService} from '../../../services/accountant/accounts.service';
 import {ToastService} from '../../../services/toast.service';
-import {Account} from '../../../model/account';
+import {Account} from '../../../model/accountant/account';
 import {LoginService} from '../../../services/login.service';
 import {PiggyBanksService} from '../../../services/accountant/piggy-banks.service';
-import {PiggyBank} from '../../../model/piggy-bank';
+import {PiggyBank} from '../../../model/accountant/piggy-bank';
 import {TransactionsService} from '../../../services/accountant/transations.service';
 import {BillingPeriodsService} from '../../../services/accountant/billing-periods.service';
-import {BillingPeriod, BillingPeriodInfo} from '../../../model/billings/billing-period';
-import {Category} from '../../../model/billings/category';
-import {Income} from '../../../model/billings/income';
-import {Expense} from '../../../model/billings/expense';
+import {BillingPeriod, BillingPeriodInfo} from '../../../model/accountant/billings/billing-period';
+import {Category} from '../../../model/accountant/billings/category';
+import {Income} from '../../../model/accountant/billings/income';
+import {Expense} from '../../../model/accountant/billings/expense';
 import {Router} from '@angular/router';
 
 @Component({

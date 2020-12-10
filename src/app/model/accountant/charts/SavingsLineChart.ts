@@ -2,19 +2,15 @@ import {ChartDataSets, ChartOptions, ChartType} from 'chart.js';
 import {Color, Label} from 'ng2-charts';
 import * as pluginAnnotations from 'chartjs-plugin-annotation';
 import {DatePipe} from '@angular/common';
-import {Dates} from '../../../utils/dates';
-import {PiggyBank} from '../piggy-bank';
-import {EventEmitter} from '@angular/core';
+import {Dates} from '../../../../utils/dates';
 
-export class PiggyBanksLineChart {
+export class SavingsLineChart {
 
-  public updateChart = new EventEmitter<any>();
   public lineChartData: ChartDataSets[];
   public lineChartLabels: Label[];
   public lineChartOptions: (ChartOptions & { annotation: any }) = {
     responsive: true,
     maintainAspectRatio: true,
-    aspectRatio: screen.width < 600 ? 0.5 : 1.5,
     scales: {
       // We use this empty structure as a placeholder for dynamic theming.
       xAxes: [{}],
@@ -46,13 +42,7 @@ export class PiggyBanksLineChart {
       ],
     },
     legend: {
-      position: 'bottom',
-      align: 'start',
-      onClick: (event, legendItem) => {
-        const hidden = this.lineChartData[legendItem.datasetIndex].hidden;
-        this.lineChartData[legendItem.datasetIndex].hidden = !hidden;
-        this.updateChart.emit();
-      }
+      position: 'bottom'
     }
   };
   public lineChartLegend = true;
@@ -85,46 +75,27 @@ export class PiggyBanksLineChart {
     }
   ];
 
-  constructor(data: Map<Date, PiggyBank[]>, datePipe: DatePipe) {
+  constructor(data: Map<Date, Map<string, number>>, datePipe: DatePipe) {
 
     this.lineChartData = [];
     this.lineChartLabels = [];
-
     let dates: Date[] = [];
-    const piggyBanksNames = new Set<string>();
-    for (const entry of data.entries()) {
-      dates.push(entry[0]);
-      entry[1].map(this.descriptionOfPiggyBank).forEach(value => piggyBanksNames.add(value));
+    for (const key of data.keys()) {
+      dates.push(key);
     }
     dates = dates.sort(Dates.compareDates);
-
-    const dataPerPiggyName = new Map<string, number[]>();
+    const dataPerCurrency = new Map<string, number[]>();
     dates.forEach(d => {
       this.lineChartLabels.push(datePipe.transform(d, 'yyyy-MM'));
       const dateData = data.get(d);
-      for (const piggyBank of dateData) {
-        const key = this.descriptionOfPiggyBank(piggyBank);
-        const values = dataPerPiggyName.get(key) || [];
-        values.push(piggyBank.balance);
-        dataPerPiggyName.set(key, values);
+      for (const currency of dateData.keys()) {
+        const values = dataPerCurrency.get(currency) || [];
+        values.push(dateData.get(currency));
+        dataPerCurrency.set(currency, values);
       }
-      piggyBanksNames.forEach(pgName => {
-        if (!dateData.find(pg => this.descriptionOfPiggyBank(pg) === pgName)) {
-          const values = dataPerPiggyName.get(pgName) || [];
-          values.push(null);
-          dataPerPiggyName.set(pgName, values);
-        }
-      });
     });
-    Array.from(piggyBanksNames).sort((a, b) => a.localeCompare(b))
-      .forEach(piggyBankName => this.lineChartData.push({data: dataPerPiggyName.get(piggyBankName), label: piggyBankName}));
-  }
-
-  private descriptionOfPiggyBank(piggyBank: PiggyBank): string {
-    return piggyBank.name + ' (' + piggyBank.currency + ')';
-  }
-
-  hideAllDataSets(): void {
-    this.lineChartData.forEach(value => value.hidden = true);
+    for (const currency of dataPerCurrency.keys()) {
+      this.lineChartData.push({data: dataPerCurrency.get(currency), label: 'Oszczędności (' + currency + ')'});
+    }
   }
 }

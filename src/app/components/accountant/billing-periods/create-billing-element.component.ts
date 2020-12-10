@@ -1,12 +1,12 @@
 import {Component, Input, OnInit, Output} from '@angular/core';
-import {BillingPeriod} from '../../../model/billings/billing-period';
+import {BillingPeriod} from '../../../model/accountant/billings/billing-period';
 import {Observable, of, Subject, throwError} from 'rxjs';
-import {Income} from '../../../model/billings/income';
-import {Expense} from '../../../model/billings/expense';
-import {Account} from '../../../model/account';
-import {Category} from '../../../model/billings/category';
+import {Income} from '../../../model/accountant/billings/income';
+import {Expense} from '../../../model/accountant/billings/expense';
+import {Account} from '../../../model/accountant/account';
+import {Category} from '../../../model/accountant/billings/category';
 import {NgbCalendar, NgbDateStruct} from '@ng-bootstrap/ng-bootstrap';
-import {PiggyBank} from '../../../model/piggy-bank';
+import {PiggyBank} from '../../../model/accountant/piggy-bank';
 import {CurrencyPipe, getCurrencySymbol} from '@angular/common';
 
 export const INCOME = 'income';

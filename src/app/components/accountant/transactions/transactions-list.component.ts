@@ -1,7 +1,7 @@
 import {Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
-import {TransactionType} from '../../../model/transaction-type';
-import {Account} from '../../../model/account';
-import {Transaction} from '../../../model/transaction';
+import {TransactionType} from '../../../model/accountant/transaction-type';
+import {Account} from '../../../model/accountant/account';
+import {Transaction} from '../../../model/accountant/transaction';
 import {CreateTransactionsComponent} from './create-transactions.component';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 

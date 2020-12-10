@@ -1,10 +1,10 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {BillingPeriod} from '../../../model/billings/billing-period';
+import {BillingPeriod} from '../../../model/accountant/billings/billing-period';
 import {throwError} from 'rxjs';
-import {Income} from '../../../model/billings/income';
-import {Expense} from '../../../model/billings/expense';
-import {Category} from '../../../model/billings/category';
-import {PiggyBank} from '../../../model/piggy-bank';
+import {Income} from '../../../model/accountant/billings/income';
+import {Expense} from '../../../model/accountant/billings/expense';
+import {Category} from '../../../model/accountant/billings/category';
+import {PiggyBank} from '../../../model/accountant/piggy-bank';
 
 export const INCOME = 'income';
 export const EXPENSE = 'expense';

@@ -1,5 +1,5 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {Category} from '../../../model/billings/category';
+import {Category} from '../../../model/accountant/billings/category';
 
 export const INCOME = 'income';
 export const EXPENSE = 'expense';

@@ -4,7 +4,7 @@ import {environment} from '../../../environments/environment';
 import {Observable} from 'rxjs';
 import {SettingsService} from './settings.service';
 import {map} from 'rxjs/operators';
-import {PiggyBank} from '../../model/piggy-bank';
+import {PiggyBank} from '../../model/accountant/piggy-bank';
 
 @Injectable({
   providedIn: 'root'

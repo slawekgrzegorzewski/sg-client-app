@@ -1,10 +1,10 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {BillingPeriod, BillingPeriodInfo} from '../../../model/billings/billing-period';
-import {Account} from '../../../model/account';
-import {PiggyBank} from '../../../model/piggy-bank';
-import {Category} from '../../../model/billings/category';
-import {Income} from '../../../model/billings/income';
-import {Expense} from '../../../model/billings/expense';
+import {BillingPeriod, BillingPeriodInfo} from '../../../model/accountant/billings/billing-period';
+import {Account} from '../../../model/accountant/account';
+import {PiggyBank} from '../../../model/accountant/piggy-bank';
+import {Category} from '../../../model/accountant/billings/category';
+import {Income} from '../../../model/accountant/billings/income';
+import {Expense} from '../../../model/accountant/billings/expense';
 import {DatePipe, TitleCasePipe} from '@angular/common';
 
 @Component({

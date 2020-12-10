@@ -47,6 +47,7 @@ import {ChartsModule} from 'ng2-charts';
 import {ChartsComponent} from './pages/accountant/charts/charts.component';
 import {HomeComponent} from './pages/home/home.component';
 import {CheckerHomeComponent} from './pages/checker/checker-home/checker-home.component';
+import {PageVersionsService} from './services/checker/page-versions.service';
 
 @NgModule({
   declarations: [
@@ -95,6 +96,7 @@ import {CheckerHomeComponent} from './pages/checker/checker-home/checker-home.co
     httpInterceptorProviders,
     ToastService,
     AccountsService,
+    PageVersionsService,
     TransactionsService,
     SettingsService,
     BillingPeriodsService,

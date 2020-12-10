@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {PiggyBank} from '../../../model/piggy-bank';
+import {PiggyBank} from '../../../model/accountant/piggy-bank';
 import {PiggyBanksService} from '../../../services/accountant/piggy-banks.service';
 
 @Component({

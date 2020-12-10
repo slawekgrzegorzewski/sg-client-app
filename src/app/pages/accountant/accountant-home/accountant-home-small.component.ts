@@ -1,14 +1,14 @@
 import {Component, OnInit} from '@angular/core';
 import {AccountsService} from '../../../services/accountant/accounts.service';
-import {Account} from '../../../model/account';
+import {Account} from '../../../model/accountant/account';
 import {PiggyBanksService} from '../../../services/accountant/piggy-banks.service';
-import {PiggyBank} from '../../../model/piggy-bank';
+import {PiggyBank} from '../../../model/accountant/piggy-bank';
 import {BillingPeriodsService} from '../../../services/accountant/billing-periods.service';
 import {Router} from '@angular/router';
-import {Category} from '../../../model/billings/category';
-import {BillingPeriod} from '../../../model/billings/billing-period';
-import {Expense} from '../../../model/billings/expense';
-import {Income} from '../../../model/billings/income';
+import {Category} from '../../../model/accountant/billings/category';
+import {BillingPeriod} from '../../../model/accountant/billings/billing-period';
+import {Expense} from '../../../model/accountant/billings/expense';
+import {Income} from '../../../model/accountant/billings/income';
 import {LoginService} from '../../../services/login.service';
 
 

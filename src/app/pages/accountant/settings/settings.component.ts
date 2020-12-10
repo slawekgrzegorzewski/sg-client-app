@@ -1,16 +1,16 @@
 import {Component, OnInit} from '@angular/core';
 import {LoginService} from 'src/app/services/login.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {Account} from '../../../model/account';
+import {Account} from '../../../model/accountant/account';
 import {Mode} from '../../../components/accountant/accounts/edit-account.component';
 import {ToastService} from '../../../services/toast.service';
 import {AccountsService} from '../../../services/accountant/accounts.service';
 import {Observable} from 'rxjs';
-import {PiggyBank} from '../../../model/piggy-bank';
+import {PiggyBank} from '../../../model/accountant/piggy-bank';
 import {PiggyBanksService} from '../../../services/accountant/piggy-banks.service';
-import {Currency} from '../../../model/currency';
+import {Currency} from '../../../model/accountant/currency';
 import {BillingPeriodsService} from '../../../services/accountant/billing-periods.service';
-import {Category} from '../../../model/billings/category';
+import {Category} from '../../../model/accountant/billings/category';
 
 @Component({
   selector: 'app-accounts',

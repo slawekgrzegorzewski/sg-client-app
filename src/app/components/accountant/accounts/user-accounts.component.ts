@@ -1,5 +1,5 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {Account} from '../../../model/account';
+import {Account} from '../../../model/accountant/account';
 import {Button} from '../../general/hoverable-buttons.component';
 
 @Component({

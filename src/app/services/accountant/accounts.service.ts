@@ -1,9 +1,9 @@
 import {Inject, Injectable, LOCALE_ID} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
-import {Account} from '../../model/account';
+import {Account} from '../../model/accountant/account';
 import {Observable, of, throwError} from 'rxjs';
-import {Currency} from '../../model/currency';
+import {Currency} from '../../model/accountant/currency';
 import {SettingsService} from './settings.service';
 import {map} from 'rxjs/operators';
 
