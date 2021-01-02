@@ -120,13 +120,32 @@ export class BillingPeriodsService {
     return this.http.get<Map<Date, PiggyBank[]>>(environment.serviceUrl + '/month-summaries/piggy-banks/' + noOfMonths)
       .pipe(map(d => {
         const resultUnsorted = new Map<Date, PiggyBank[]>();
-        Object.entries(d).forEach(value => {
-          const key = new Date(value[0]);
-          const entry = resultUnsorted.get(key) || [];
-          value[1].forEach(pg => entry.push(new PiggyBank(pg)));
-          resultUnsorted.set(key, entry);
+        const piggyBanksPerId = new Map<number, PiggyBank[]>();
+        Object.entries(d).forEach(dateToPiggyBanks => {
+          const date = new Date(dateToPiggyBanks[0]);
+          const piggyBanksForDate = resultUnsorted.get(date) || [];
+          dateToPiggyBanks[1].forEach(pg => {
+            const piggyBank = new PiggyBank(pg);
+            this.updatePerIdMap(piggyBanksPerId, piggyBank);
+            piggyBanksForDate.push(piggyBank);
+          });
+          resultUnsorted.set(date, piggyBanksForDate);
         });
+        this.makeTheSameNamesForEqualId(piggyBanksPerId);
         return BillingPeriodsService.sortMapWithDatesKeys(resultUnsorted);
       }));
+  }
+
+  private updatePerIdMap(piggyBanksPerId: Map<number, PiggyBank[]>, piggyBank: PiggyBank): void {
+    const piggyBanksForId = piggyBanksPerId.get(piggyBank.id) || [];
+    piggyBanksForId.push(piggyBank);
+    piggyBanksPerId.set(piggyBank.id, piggyBanksForId);
+  }
+
+  private makeTheSameNamesForEqualId(piggyBanksPerId: Map<number, PiggyBank[]>): void {
+    piggyBanksPerId.forEach((piggyBanksWithTheSameId, id) => {
+      const commonName = piggyBanksWithTheSameId[piggyBanksWithTheSameId.length - 1].name;
+      piggyBanksWithTheSameId.forEach(pb => pb.name = commonName);
+    });
   }
 }
