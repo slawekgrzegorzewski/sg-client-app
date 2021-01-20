@@ -1,0 +1,16 @@
+<select [(ngModel)]="country">
+  <option *ngFor="let country of availableCountries" [ngValue]="country">{{country.names.join(',')}}</option>
+</select>
+
+<div *ngIf="countrySyrLineChart" class="sg-chart">
+  <canvas baseChart #savingsChart='base-chart'
+          [datasets]="countrySyrLineChart.lineChartData"
+          [labels]="countrySyrLineChart.lineChartLabels"
+          [options]="countrySyrLineChart.lineChartOptions"
+          [colors]="countrySyrLineChart.lineChartColors"
+          [legend]="countrySyrLineChart.lineChartLegend"
+          [chartType]="countrySyrLineChart.lineChartType"
+          [plugins]="countrySyrLineChart.lineChartPlugins">
+
+  </canvas>
+</div>

@@ -48,6 +48,9 @@ import {ChartsComponent} from './pages/accountant/charts/charts.component';
 import {HomeComponent} from './pages/home/home.component';
 import {CheckerHomeComponent} from './pages/checker/checker-home/checker-home.component';
 import {PageVersionsService} from './services/checker/page-versions.service';
+import {SyrHomeComponent} from './pages/syr/syr-home.component';
+import {SyrService} from './services/syr/syr.service';
+import {SyrAdminComponent} from './pages/syr/syr-admin.component';
 
 @NgModule({
   declarations: [
@@ -80,7 +83,9 @@ import {PageVersionsService} from './services/checker/page-versions.service';
     PiggyBanksSmallComponent,
     ChartsComponent,
     HomeComponent,
-    CheckerHomeComponent
+    CheckerHomeComponent,
+    SyrHomeComponent,
+    SyrAdminComponent
   ],
   imports: [
     BrowserModule,
@@ -101,6 +106,7 @@ import {PageVersionsService} from './services/checker/page-versions.service';
     SettingsService,
     BillingPeriodsService,
     PiggyBanksService,
+    SyrService,
     DatePipe,
     TitleCasePipe,
     NgEventBus,

@@ -1,0 +1,23 @@
+<input type="file" (change)="fileChange($event)" placeholder="Wczytaj raporty" accept=".xlsx">
+<div *ngIf="countriesToMatch && countriesToMatch.length > 0" style="display: flex; flex-direction: column">
+  <div>Niektre kraje nie mogą być sparowane</div>
+  <div *ngFor="let country of countriesToMatch" style="display: flex; flex-direction: row">
+    <div style="width:20%">{{country.name}}</div>
+    <div style="width:80%">
+      <app-general-typeahead
+        id="matchedCountry"
+        name="matchedCountry"
+        [readonly]="false"
+        [(ngModel)]="country.country"
+
+        [dataProvider]="countriesForTypeAhead()"
+        [idExtractor]="countryIdExtractor"
+        [tToString]="countryToString"
+
+        #matchedCountry="ngModel"
+        required>
+      </app-general-typeahead>
+    </div>
+  </div>
+  <button (click)="importSYR()">Import</button>
+</div>

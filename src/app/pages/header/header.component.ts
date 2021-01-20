@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ACCOUNTANT_APP, CHECKER_APP, LoginService} from 'src/app/services/login.service';
+import {ACCOUNTANT_APP, CHECKER_APP, LoginService, SYR_APP} from 'src/app/services/login.service';
 import {Router} from '@angular/router';
 
 @Component({
@@ -68,5 +68,13 @@ export class HeaderComponent implements OnInit {
 
   isChecker(): boolean {
     return this.selectedApp === CHECKER_APP;
+  }
+
+  isSYR(): boolean {
+    return this.selectedApp === SYR_APP;
+  }
+
+  isSYRAdmin(): boolean {
+    return this.isSYR() && this.loginService.containsRole('SYR_ADMIN');
   }
 }

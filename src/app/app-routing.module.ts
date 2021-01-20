@@ -12,6 +12,8 @@ import {BillingSmallComponent} from './pages/accountant/billings/billing-small.c
 import {PiggyBanksSmallComponent} from './pages/accountant/piggy-banks/piggy-banks-small..component';
 import {ChartsComponent} from './pages/accountant/charts/charts.component';
 import {CheckerHomeComponent} from './pages/checker/checker-home/checker-home.component';
+import {SyrHomeComponent} from './pages/syr/syr-home.component';
+import {SyrAdminComponent} from './pages/syr/syr-admin.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/login', pathMatch: 'full', canActivate: [LoginGuard]},
@@ -27,6 +29,9 @@ const routes: Routes = [
   {path: 'change-password/:type', component: RegisterComponent},
 
   {path: 'checker-home', component: CheckerHomeComponent},
+
+  {path: 'syr-home', component: SyrHomeComponent},
+  {path: 'syr-admin', component: SyrAdminComponent},
 
   {path: '**', redirectTo: '/home', pathMatch: 'full', canActivate: [LoginGuard]}
 ];

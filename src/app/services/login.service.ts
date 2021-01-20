@@ -7,6 +7,7 @@ import * as jwt_decode from 'jwt-decode';
 
 export const ACCOUNTANT_APP = 'Accountant';
 export const CHECKER_APP = 'Checker';
+export const SYR_APP = 'SYR';
 
 @Injectable({
   providedIn: 'root'
@@ -120,7 +121,14 @@ export class LoginService {
       if (roles.includes('CHECKER_ADMIN') || roles.includes('CHECKER_USER')) {
         apps.set(CHECKER_APP, 'checker-home');
       }
+      if (roles.includes('SYR_ADMIN') || roles.includes('SYR_USER')) {
+        apps.set(SYR_APP, 'syr-home');
+      }
     }
     return apps;
+  }
+
+  containsRole(role: string): boolean {
+    return this.getToken() ? jwt_decode(this.getToken()).roles.includes(role) : false;
   }
 }
