@@ -1,3 +1,5 @@
+import {Domain} from '../domain';
+
 export class PiggyBank {
   public id: number;
   public name: string;
@@ -7,6 +9,7 @@ export class PiggyBank {
   public savings: boolean;
   public monthlyTopUp: number;
   public userId: number;
+  public domain: Domain;
 
   constructor(data?: any) {
     this.id = data && data.id;
@@ -17,5 +20,6 @@ export class PiggyBank {
     this.savings = data && data.savings || false;
     this.monthlyTopUp = data && data.monthlyTopUp || 0;
     this.userId = data && data.userId || 0;
+    this.domain = data && new Domain(data.domain) || null;
   }
 }
