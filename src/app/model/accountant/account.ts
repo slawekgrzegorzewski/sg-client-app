@@ -1,10 +1,12 @@
+import {Domain} from '../domain';
+
 export class Account {
   public id: number;
   public name: string;
   public currency: string;
   public currentBalance: number;
   public balanceIndex: number;
-  public userId: number;
+  public domain: Domain;
 
   constructor(data?: any) {
     this.id = data && data.id;
@@ -12,7 +14,7 @@ export class Account {
     this.currency = data && data.currency || '';
     this.currentBalance = data && data.currentBalance || 0;
     this.balanceIndex = data && data.balanceIndex || 0;
-    this.userId = data && data.userId || 0;
+    this.domain = data && new Domain(data.domain) || null;
   }
 
   public static compareByCurrencyAndName(first: Account, second: Account): number {

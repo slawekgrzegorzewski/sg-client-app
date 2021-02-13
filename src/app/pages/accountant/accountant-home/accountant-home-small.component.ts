@@ -10,6 +10,7 @@ import {BillingPeriod} from '../../../model/accountant/billings/billing-period';
 import {Expense} from '../../../model/accountant/billings/expense';
 import {Income} from '../../../model/accountant/billings/income';
 import {LoginService} from '../../../services/login.service';
+import {CategoriesService} from '../../../services/accountant/categories.service';
 
 
 @Component({
@@ -32,6 +33,7 @@ export class AccountantHomeSmallComponent implements OnInit {
 
   constructor(public loginService: LoginService,
               private accountsService: AccountsService,
+              private categoriesService: CategoriesService,
               private piggyBanksService: PiggyBanksService,
               private billingsService: BillingPeriodsService,
               private router: Router) {
@@ -42,7 +44,7 @@ export class AccountantHomeSmallComponent implements OnInit {
       this.router.navigate(['/accountant-home']);
     }
     this.refreshData();
-    this.billingsService.getAllCategories().subscribe(data => this.categories = data);
+    this.categoriesService.getAllCategories().subscribe(data => this.categories = data);
   }
 
   refreshData(): void {

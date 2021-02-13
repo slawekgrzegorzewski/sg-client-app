@@ -51,6 +51,8 @@ import {PageVersionsService} from './services/checker/page-versions.service';
 import {SyrHomeComponent} from './pages/syr/syr-home.component';
 import {SyrService} from './services/syr/syr.service';
 import {SyrAdminComponent} from './pages/syr/syr-admin.component';
+import {DomainService} from './services/domain.service';
+import {CategoriesService} from './services/accountant/categories.service';
 
 @NgModule({
   declarations: [
@@ -114,7 +116,9 @@ import {SyrAdminComponent} from './pages/syr/syr-admin.component';
     {
       provide: LOCALE_ID,
       useValue: 'pl-PL'
-    }
+    },
+    DomainService,
+    CategoriesService
   ],
   bootstrap: [AppComponent]
 })

@@ -6,6 +6,7 @@ import {Observable} from 'rxjs';
 import {Currency} from '../../model/accountant/currency';
 import {Transaction} from '../../model/accountant/transaction';
 import {map} from 'rxjs/operators';
+import {LoginService} from '../login.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,13 +15,14 @@ export class TransactionsService {
   serviceUrl: string;
   currencies: Currency[] = [];
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,
+              private loginService: LoginService) {
     this.serviceUrl = environment.serviceUrl;
   }
 
   userTransactions(): Observable<Transaction[]> {
     return this.http.get<Transaction[]>(
-      environment.serviceUrl + '/transactions',
+      environment.serviceUrl + '/transactions/' + this.loginService.currentDomainId,
       {responseType: 'json'}
     )
       .pipe(map(data => (data.map(d => new Transaction(d)))));

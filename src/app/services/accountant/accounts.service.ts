@@ -5,7 +5,8 @@ import {Account} from '../../model/accountant/account';
 import {Observable, of, throwError} from 'rxjs';
 import {Currency} from '../../model/accountant/currency';
 import {SettingsService} from './settings.service';
-import {map} from 'rxjs/operators';
+import {flatMap, map, tap} from 'rxjs/internal/operators';
+import {LoginService} from '../login.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,12 +17,13 @@ export class AccountsService {
 
   constructor(private http: HttpClient,
               private settingsService: SettingsService,
+              private loginService: LoginService,
               @Inject(LOCALE_ID) private defaultLocale: string) {
     this.serviceUrl = environment.serviceUrl;
   }
 
   private fetchCurrencies(): Observable<Currency[]> {
-    return this.http.get<Currency[]>(environment.serviceUrl + '/currency/all/' + this.settingsService.getUsersLocale())
+    return this.http.get<Currency[]>(environment.serviceUrl + '/currencies/' + this.settingsService.getUsersLocale())
       .pipe(map(data => data.map(d => Currency.fromData(d))))
       .pipe(map(data => {
         this.currencies = data;
@@ -35,7 +37,7 @@ export class AccountsService {
   }
 
   currentUserAccounts(): Observable<Account[]> {
-    return this.http.get<Account[]>(environment.serviceUrl + '/accounts/mine')
+    return this.http.get<Account[]>(environment.serviceUrl + '/accounts/mine/' + this.loginService.currentDomainId)
       .pipe(map(data => data.map(d => new Account(d))));
   }
 
@@ -50,8 +52,12 @@ export class AccountsService {
   }
 
   create(account: Account): Observable<Account> {
-    return this.http.put<Account>(environment.serviceUrl + '/accounts', account)
-      .pipe(map(d => new Account(d)));
+    return this.loginService.currentDomain
+      .pipe(
+        tap(d => account.domain = d),
+        flatMap(_ => this.http.put<Account>(environment.serviceUrl + '/accounts', account)),
+        map(a => new Account(a))
+      );
   }
 
   update(account: Account): Observable<string> {

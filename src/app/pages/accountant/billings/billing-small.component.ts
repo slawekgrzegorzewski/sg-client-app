@@ -8,6 +8,7 @@ import {PiggyBanksService} from '../../../services/accountant/piggy-banks.servic
 import {BillingPeriodsService} from '../../../services/accountant/billing-periods.service';
 import {Income} from '../../../model/accountant/billings/income';
 import {Expense} from '../../../model/accountant/billings/expense';
+import {CategoriesService} from '../../../services/accountant/categories.service';
 
 @Component({
   selector: 'app-billing-small',
@@ -23,13 +24,14 @@ export class BillingSmallComponent implements OnInit {
 
   constructor(private accountsService: AccountsService,
               private piggyBanksService: PiggyBanksService,
+              private categoriesService: CategoriesService,
               private billingsService: BillingPeriodsService
   ) {
   }
 
   ngOnInit(): void {
     this.refreshData();
-    this.billingsService.getAllCategories().subscribe(data => this.categories = data);
+    this.categoriesService.getAllCategories().subscribe(data => this.categories = data);
   }
 
   refreshData(): void {

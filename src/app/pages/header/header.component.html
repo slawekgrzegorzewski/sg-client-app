@@ -6,6 +6,13 @@
       <option *ngFor="let app of availableApps" [value]="app.app">{{app.app}}</option>
     </select>
   </div>
+  <div class="navbar-brand bg-dark">
+    <select *ngIf="loginService.availableDomains | async"
+            [(ngModel)]="loginService.currentDomainId" class="navbar-brand bg-dark"
+            style="border-color: #343a40">
+      <option *ngFor="let d of loginService.availableDomains | async" [value]="d.id">{{d.name}}</option>
+    </select>
+  </div>
 
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavId"
           aria-controls="collapsibleNavId" aria-expanded="false" aria-label="Toggle navigation"
@@ -49,9 +56,6 @@
       </li>
       <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn && isSYRAdmin()">
         <a class="nav-link" [routerLink]="['/syr-admin']">Zarządzanie</a>
-      </li>
-      <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn && isAccountant()">
-        <a class="nav-link" [routerLink]="['/settings']">Ustawienia</a>
       </li>
       <li class="nav-item menu-element-small" *ngIf="isLoggedIn">
         <div class="nav-link">--------</div>

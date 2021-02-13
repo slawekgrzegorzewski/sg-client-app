@@ -11,6 +11,7 @@ import {PiggyBanksService} from '../../../services/accountant/piggy-banks.servic
 import {Currency} from '../../../model/accountant/currency';
 import {BillingPeriodsService} from '../../../services/accountant/billing-periods.service';
 import {Category} from '../../../model/accountant/billings/category';
+import {CategoriesService} from '../../../services/accountant/categories.service';
 
 @Component({
   selector: 'app-accounts',
@@ -19,9 +20,9 @@ import {Category} from '../../../model/accountant/billings/category';
 })
 export class SettingsComponent implements OnInit {
   private isLoggedIn = false;
-  userAccounts: Account[];
-  otherUsers: number[];
-  othersAccounts: Map<number, Account[]>;
+  accountsInCurrentDomain: Account[];
+  otherDomains: number[];
+  otherDomainsAccounts: Map<number, Account[]>;
   piggyBanks: PiggyBank[];
   allCurrencies: Currency[];
   categories: Category[];
@@ -35,6 +36,7 @@ export class SettingsComponent implements OnInit {
 
   constructor(
     private accountsService: AccountsService,
+    private categoriesService: CategoriesService,
     private piggyBanksService: PiggyBanksService,
     public loginService: LoginService,
     private modalService: NgbModal,
@@ -58,8 +60,8 @@ export class SettingsComponent implements OnInit {
 
   fetchData(): void {
     if (!this.loggedIn()) {
-      this.userAccounts = [];
-      this.othersAccounts = new Map<number, Account[]>();
+      this.accountsInCurrentDomain = [];
+      this.otherDomainsAccounts = new Map<number, Account[]>();
       return;
     }
 
@@ -70,25 +72,25 @@ export class SettingsComponent implements OnInit {
   }
 
   private fetchAccounts(): void {
-    const userId = this.loginService.getUserId();
+    const currentDomain = this.loginService.currentDomainId;
     const accounts: Observable<Account[]> = this.loginService.isAdmin() ?
       this.accountsService.allAccounts() : this.accountsService.currentUserAccounts();
     accounts.subscribe(
       data => {
         const accountsFromData = data.map(d => new Account(d));
-        this.userAccounts = data.filter(a => a.userId === userId).sort(Account.compareByCurrencyAndName);
-        this.othersAccounts = data.filter(a => a.userId !== userId).reduce(
-          (map, acc) => map.set(acc.userId, [...map.get(acc.userId) || [], acc]),
+        this.accountsInCurrentDomain = data.filter(a => a.domain.id === currentDomain).sort(Account.compareByCurrencyAndName);
+        this.otherDomainsAccounts = data.filter(a => a.domain.id !== currentDomain).reduce(
+          (map, acc) => map.set(acc.domain.id, [...map.get(acc.domain.id) || [], acc]),
           new Map<number, Account[]>()
         );
-        this.otherUsers = Array.from(this.othersAccounts.keys());
-        for (const user of this.otherUsers) {
-          this.othersAccounts[user] = (this.othersAccounts[user] || []).sort(Account.compareByCurrencyAndName);
+        this.otherDomains = Array.from(this.otherDomainsAccounts.keys());
+        for (const user of this.otherDomains) {
+          this.otherDomainsAccounts[user] = (this.otherDomainsAccounts[user] || []).sort(Account.compareByCurrencyAndName);
         }
       },
       err => {
-        this.userAccounts = [];
-        this.othersAccounts = new Map<number, Account[]>();
+        this.accountsInCurrentDomain = [];
+        this.otherDomainsAccounts = new Map<number, Account[]>();
         this.toastService.showWarning('Current data has been cleared out.', 'Can not obtain data!');
       }
     );
@@ -107,7 +109,7 @@ export class SettingsComponent implements OnInit {
   }
 
   private fetchCategories(): void {
-    this.billingsService.getAllCategories().subscribe(
+    this.categoriesService.getAllCategories().subscribe(
       data => this.categories = data
     );
   }
@@ -133,7 +135,7 @@ export class SettingsComponent implements OnInit {
   deleteAccount(that): (account: Account) => void {
     return (account: Account) => {
       that.accountToDelete = account;
-      that.accountBeingDeletedDescription = account.name + ' - ' + account.userId;
+      that.accountBeingDeletedDescription = account.name;
       this.showAccountDeletionConfirmation = true;
     };
   }
@@ -191,13 +193,13 @@ export class SettingsComponent implements OnInit {
   }
 
   createCategory(category: Category): void {
-    this.billingsService.createCategory(category).subscribe(
+    this.categoriesService.createCategory(category).subscribe(
       data => this.fetchCategories()
     );
   }
 
   updateCategory(category: Category): void {
-    this.billingsService.updateCategory(category).subscribe(
+    this.categoriesService.updateCategory(category).subscribe(
       data => this.fetchCategories()
     );
   }

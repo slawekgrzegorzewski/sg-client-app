@@ -6,7 +6,7 @@
         <div class="sg-flex-row sg-flex-justify-center">
           <div *ngIf="!isEditAccount && !showAccountDeletionConfirmation">
             <app-user-accounts [userName]="loginService.getUserName()"
-                               [accounts]="userAccounts"
+                               [accounts]="accountsInCurrentDomain"
                                [buttons]="[{name: 'delete', action:deleteAccount(this)}, {name: 'rename', action:rename(this)}]">
             </app-user-accounts>
 
@@ -35,12 +35,12 @@
         </div>
       </ng-template>
     </li>
-    <li ngbNavItem *ngIf="isAdmin() && othersAccounts">
+    <li ngbNavItem *ngIf="isAdmin() && otherDomainsAccounts">
       <a ngbNavLink>Konta innych użytkowników</a>
       <ng-template ngbNavContent>
         <div class="sg-flex-row sg-flex-justify-center">
           <div class="sg-flex-column" *ngIf="othersAccounts.size > 0">
-            <app-user-accounts *ngFor="let user of otherUsers"
+            <app-user-accounts *ngFor="let user of otherDomains"
                                [userName]="user"
                                [accounts]="othersAccounts.get(user)">
             </app-user-accounts>
