@@ -12,6 +12,8 @@ import {Currency} from '../../../model/accountant/currency';
 import {BillingPeriodsService} from '../../../services/accountant/billing-periods.service';
 import {Category} from '../../../model/accountant/billings/category';
 import {CategoriesService} from '../../../services/accountant/categories.service';
+import {DomainService} from '../../../services/domain.service';
+import {DetailedDomain} from '../../../model/domain';
 
 @Component({
   selector: 'app-accounts',
@@ -20,29 +22,37 @@ import {CategoriesService} from '../../../services/accountant/categories.service
 })
 export class SettingsComponent implements OnInit {
   private isLoggedIn = false;
-  accountsInCurrentDomain: Account[];
-  otherDomains: number[];
-  otherDomainsAccounts: Map<number, Account[]>;
-  piggyBanks: PiggyBank[];
-  allCurrencies: Currency[];
-  categories: Category[];
 
+  mode: Mode = Mode.CREATE;
+
+  accountsInCurrentDomain: Account[];
+  otherDomainsAccounts: Map<string, Account[]>;
   isEditAccount = false;
   accountToEdit: Account;
   accountToDelete: null;
-  mode: Mode = Mode.CREATE;
   showAccountDeletionConfirmation = false;
   accountBeingDeletedDescription: string;
+  currentDomainName: string;
+
+  piggyBanks: PiggyBank[];
+
+  allCurrencies: Currency[];
+
+  categories: Category[];
+
+  userDomains: DetailedDomain[];
+
 
   constructor(
     private accountsService: AccountsService,
     private categoriesService: CategoriesService,
+    private domainsService: DomainService,
     private piggyBanksService: PiggyBanksService,
-    public loginService: LoginService,
+    private loginService: LoginService,
     private modalService: NgbModal,
     private billingsService: BillingPeriodsService,
     private toastService: ToastService) {
-    this.loginService.authSub.subscribe(data => this.isLoggedIn = data);
+    this.loginService.loginSubject.subscribe(data => this.isLoggedIn = data);
   }
 
   ngOnInit(): void {
@@ -54,6 +64,10 @@ export class SettingsComponent implements OnInit {
     return this.isLoggedIn;
   }
 
+  currentUserLogin(): string {
+    return this.loginService.getUserName();
+  }
+
   isAdmin(): boolean {
     return this.loginService.isAdmin();
   }
@@ -61,7 +75,7 @@ export class SettingsComponent implements OnInit {
   fetchData(): void {
     if (!this.loggedIn()) {
       this.accountsInCurrentDomain = [];
-      this.otherDomainsAccounts = new Map<number, Account[]>();
+      this.otherDomainsAccounts = new Map<string, Account[]>();
       return;
     }
 
@@ -69,35 +83,36 @@ export class SettingsComponent implements OnInit {
     this.fetchPiggyBanks();
     this.fetchCurrencies();
     this.fetchCategories();
+    this.currentDomainName = this.domainsService.currentDomain?.name || '';
+    this.fetchDomains();
   }
 
   private fetchAccounts(): void {
-    const currentDomain = this.loginService.currentDomainId;
+    const currentDomain = this.domainsService.currentDomainId;
     const accounts: Observable<Account[]> = this.loginService.isAdmin() ?
-      this.accountsService.allAccounts() : this.accountsService.currentUserAccounts();
+      this.accountsService.allAccounts() : this.accountsService.currentDomainAccounts();
     accounts.subscribe(
       data => {
         const accountsFromData = data.map(d => new Account(d));
         this.accountsInCurrentDomain = data.filter(a => a.domain.id === currentDomain).sort(Account.compareByCurrencyAndName);
         this.otherDomainsAccounts = data.filter(a => a.domain.id !== currentDomain).reduce(
-          (map, acc) => map.set(acc.domain.id, [...map.get(acc.domain.id) || [], acc]),
-          new Map<number, Account[]>()
+          (map, acc) => map.set(acc.domain.name, [...map.get(acc.domain.name) || [], acc]),
+          new Map<string, Account[]>()
         );
-        this.otherDomains = Array.from(this.otherDomainsAccounts.keys());
-        for (const user of this.otherDomains) {
-          this.otherDomainsAccounts[user] = (this.otherDomainsAccounts[user] || []).sort(Account.compareByCurrencyAndName);
+        for (const domainName of this.otherDomainsAccounts.keys()) {
+          this.otherDomainsAccounts[domainName] = (this.otherDomainsAccounts[domainName] || []).sort(Account.compareByCurrencyAndName);
         }
       },
       err => {
         this.accountsInCurrentDomain = [];
-        this.otherDomainsAccounts = new Map<number, Account[]>();
+        this.otherDomainsAccounts = new Map<string, Account[]>();
         this.toastService.showWarning('Current data has been cleared out.', 'Can not obtain data!');
       }
     );
   }
 
   private fetchPiggyBanks(): void {
-    this.piggyBanksService.getAllPiggyBanks().subscribe(data => {
+    this.piggyBanksService.currentDomainPiggyBanks().subscribe(data => {
       this.piggyBanks = data.sort((a, b) => a.name.localeCompare(b.name));
     });
   }
@@ -109,8 +124,14 @@ export class SettingsComponent implements OnInit {
   }
 
   private fetchCategories(): void {
-    this.categoriesService.getAllCategories().subscribe(
+    this.categoriesService.currentDomainCategories().subscribe(
       data => this.categories = data
+    );
+  }
+
+  private fetchDomains(): void {
+    this.domainsService.getAllDomains().subscribe(
+      data => this.userDomains = data
     );
   }
 
@@ -201,6 +222,59 @@ export class SettingsComponent implements OnInit {
   updateCategory(category: Category): void {
     this.categoriesService.updateCategory(category).subscribe(
       data => this.fetchCategories()
+    );
+  }
+
+  createDomain(domain: DetailedDomain): void {
+    this.domainsService.create(domain.name).subscribe(data => this.fetchDomains());
+  }
+
+  updateDomain(domain: DetailedDomain): void {
+    this.domainsService.update(domain.toSimpleDomain()).subscribe(
+      data => this.userDomains = [...this.userDomains.filter(d => d.id !== data.id), data]
+    );
+  }
+
+  changeDomainUserAccess(data: { domain: DetailedDomain; user: string }): void {
+    let newDomain: Observable<DetailedDomain> = null;
+    if (data.domain.usersAccessLevel.get(data.user) === 'ADMIN') {
+      newDomain = this.domainsService.makeUserMember(data.domain.id, data.user);
+    } else {
+      newDomain = this.domainsService.makeUserAdmin(data.domain.id, data.user);
+    }
+    newDomain.subscribe(
+      changedDomain => this.refreshDomains(changedDomain),
+      error => this.toastService.showWarning(error.error, 'W czasie zmiany uprawnień domeny wystąpił błąd')
+    );
+  }
+
+  removeUserFromDomain(data: { domain: DetailedDomain; user: string }): void {
+    this.domainsService.removeUserFromDomain(data.domain.id, data.user).subscribe(
+      changedDomain => this.refreshDomains(changedDomain),
+      error => this.toastService.showWarning(error.error, 'W czasie zmiany uprawnień domeny wystąpił błąd')
+    );
+  }
+
+  private refreshDomains(changedDomain: DetailedDomain): void {
+    if (changedDomain.usersAccessLevel.size === 0) {
+      this.userDomains = this.userDomains.filter(d => d.id !== changedDomain.id);
+    } else {
+      this.userDomains = [...this.userDomains.filter(d => d.id !== changedDomain.id), changedDomain];
+    }
+  }
+
+  inviteUserToDomain(data: { domain: DetailedDomain; user: string }): void {
+    this.domainsService.inviteUserToDomain(data.domain.id, data.user).subscribe(
+      changedDomain => {
+      },
+      error => this.toastService.showWarning(error.error, 'W czasie tworzenia zaproszenia wystąpił błąd')
+    );
+  }
+
+  leaveDomain(data: { domain: DetailedDomain; user: string }): void {
+    this.domainsService.removeUserFromDomain(data.domain.id, data.user).subscribe(
+      changedDomain => this.refreshDomains(changedDomain),
+      error => this.toastService.showWarning(error.error, 'W czasie zmiany uprawnień domeny wystąpił błąd')
     );
   }
 }

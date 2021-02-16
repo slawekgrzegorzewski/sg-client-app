@@ -18,7 +18,7 @@ import {EditAccountComponent} from './components/accountant/accounts/edit-accoun
 import {ToastService} from './services/toast.service';
 import {ToastsContainer} from './components/general/toast/toast-container.component';
 import {HoverableButtonsComponent} from './components/general/hoverable-buttons.component';
-import {UserAccountsComponent} from './components/accountant/accounts/user-accounts.component';
+import {DomainAccountsComponent} from './components/accountant/accounts/domain-accounts.component';
 import {CreateTransactionsComponent} from './components/accountant/transactions/create-transactions.component';
 import {TransactionsService} from './services/accountant/transations.service';
 import {LocalizedDatePipe} from './pipe/localized-date-pipe';
@@ -53,6 +53,8 @@ import {SyrService} from './services/syr/syr.service';
 import {SyrAdminComponent} from './pages/syr/syr-admin.component';
 import {DomainService} from './services/domain.service';
 import {CategoriesService} from './services/accountant/categories.service';
+import {DomainsComponent} from './components/accountant/general/domains/domains.component';
+import {DomainInvitationsComponent} from './components/general/domain/domain-invitations.component';
 
 @NgModule({
   declarations: [
@@ -65,7 +67,7 @@ import {CategoriesService} from './services/accountant/categories.service';
     EditAccountComponent,
     ToastsContainer,
     HoverableButtonsComponent,
-    UserAccountsComponent,
+    DomainAccountsComponent,
     CreateTransactionsComponent,
     LocalizedDatePipe,
     HtmlNewLinePipe,
@@ -87,7 +89,9 @@ import {CategoriesService} from './services/accountant/categories.service';
     HomeComponent,
     CheckerHomeComponent,
     SyrHomeComponent,
-    SyrAdminComponent
+    SyrAdminComponent,
+    DomainsComponent,
+    DomainInvitationsComponent
   ],
   imports: [
     BrowserModule,

@@ -24,7 +24,7 @@ export class PiggyBanksSmallComponent implements OnInit {
   }
 
   private fetchPiggyBanks(): void {
-    this.piggyBanksService.getAllPiggyBanks().subscribe(data => {
+    this.piggyBanksService.currentDomainPiggyBanks().subscribe(data => {
       this.piggyBanks = data.sort((a, b) => a.name.localeCompare(b.name));
     });
   }

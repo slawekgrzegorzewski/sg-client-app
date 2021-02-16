@@ -6,8 +6,7 @@ import {SettingsService} from './settings.service';
 import {DatePipe} from '@angular/common';
 import {Category} from '../../model/accountant/billings/category';
 import {map} from 'rxjs/operators';
-import {LoginService} from '../login.service';
-import {flatMap, tap} from 'rxjs/internal/operators';
+import {DomainService} from '../domain.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,14 +16,14 @@ export class CategoriesService {
 
   constructor(private http: HttpClient,
               private settingsService: SettingsService,
-              private loginService: LoginService,
+              private domainService: DomainService,
               private datePipe: DatePipe,
               @Inject(LOCALE_ID) private defaultLocale: string) {
     this.serviceUrl = environment.serviceUrl;
   }
 
-  getAllCategories(): Observable<Category[]> {
-    return this.http.get<Category[]>(environment.serviceUrl + '/categories/' + this.loginService.currentDomainId)
+  currentDomainCategories(): Observable<Category[]> {
+    return this.http.get<Category[]>(environment.serviceUrl + '/categories/' + this.domainService.currentDomainId)
       .pipe(map(data => (data.map(d => new Category(d)))));
   }
 
@@ -37,11 +36,8 @@ export class CategoriesService {
   }
 
   private putCategory(category: Category): Observable<Category> {
-    return this.loginService.currentDomain
-      .pipe(
-        tap(d => category.domain = d),
-        flatMap(_ => this.http.put(environment.serviceUrl + '/categories', category)),
-        map(d => new Category(d))
-      );
+    category.domain = this.domainService.currentDomain;
+    return this.http.put(environment.serviceUrl + '/categories', category)
+      .pipe(map(d => new Category(d)));
   }
 }

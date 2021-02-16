@@ -1,6 +1,6 @@
 <div class="sg-flex-row sg-flex-justify-center">
   <div style="padding:10px; width: 320px;" class="sg-flex-column">
-    <h5 *ngIf="showTitle" style="text-align: center">Konta użytkownika {{userName}}</h5>
+    <h5 *ngIf="showTitle" style="text-align: center">Konta w domenie {{domain}}</h5>
     <div style="margin-left: auto; margin-right: 10px; width: 65%">
       <app-multi-currency-total
         class="mb-2 text-muted"
@@ -14,7 +14,7 @@
         <tr #row *ngFor="let account of accounts"
             (mouseenter)="setOverAccount(account, row)"
             (click)="select(account);"
-            class="account-row sg-row-hoverable" [class.selected]="account === selectedAccount">
+            class="domain-row sg-row-hoverable" [class.selected]="account === selectedAccount">
           <td>{{account.name}}</td>
           <td style="text-align: right">{{account.currentBalance | currency: account.currency :undefined:'1.2-2' }}</td>
         </tr>

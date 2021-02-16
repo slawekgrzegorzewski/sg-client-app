@@ -20,10 +20,10 @@
                                 (editEvent)="createElement($event[0], $event[1], $event[2])"
     >
     </app-create-billing-element>
-    <app-user-accounts [userName]="loginService.getUserName()"
-                       [accounts]="accounts"
-                       [selectable]="false">
-    </app-user-accounts>
+    <app-domain-accounts [domain]="currentDomainName"
+                         [accounts]="accounts"
+                         [selectable]="false">
+    </app-domain-accounts>
     <app-accounts-grand-total
       [title]="'Podsumowanie'"
       [piggyBanks]="piggyBanks"

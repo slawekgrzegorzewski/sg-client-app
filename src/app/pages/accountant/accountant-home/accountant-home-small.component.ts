@@ -9,8 +9,8 @@ import {Category} from '../../../model/accountant/billings/category';
 import {BillingPeriod} from '../../../model/accountant/billings/billing-period';
 import {Expense} from '../../../model/accountant/billings/expense';
 import {Income} from '../../../model/accountant/billings/income';
-import {LoginService} from '../../../services/login.service';
 import {CategoriesService} from '../../../services/accountant/categories.service';
+import {DomainService} from '../../../services/domain.service';
 
 
 @Component({
@@ -30,8 +30,9 @@ export class AccountantHomeSmallComponent implements OnInit {
   categories: Category[];
   billingPeriod: BillingPeriod;
   mode = this.DISPLAY;
+  currentDomainName: string;
 
-  constructor(public loginService: LoginService,
+  constructor(private domainService: DomainService,
               private accountsService: AccountsService,
               private categoriesService: CategoriesService,
               private piggyBanksService: PiggyBanksService,
@@ -44,7 +45,7 @@ export class AccountantHomeSmallComponent implements OnInit {
       this.router.navigate(['/accountant-home']);
     }
     this.refreshData();
-    this.categoriesService.getAllCategories().subscribe(data => this.categories = data);
+    this.categoriesService.currentDomainCategories().subscribe(data => this.categories = data);
   }
 
   refreshData(): void {
@@ -52,17 +53,18 @@ export class AccountantHomeSmallComponent implements OnInit {
     this.fetchPiggyBanks();
     this.fetchHistoricalSavings();
     this.fetchBillingPeriods();
+    this.currentDomainName = this.domainService.currentDomain?.name || '';
   }
 
   fetchAccounts(): void {
-    this.accountsService.currentUserAccounts().subscribe(
+    this.accountsService.currentDomainAccounts().subscribe(
       data => this.accounts = data.sort(Account.compareByCurrencyAndName),
       error => this.accounts = []
     );
   }
 
   private fetchPiggyBanks(): void {
-    this.piggyBanksService.getAllPiggyBanks().subscribe(data => {
+    this.piggyBanksService.currentDomainPiggyBanks().subscribe(data => {
       this.piggyBanks = data.sort((a, b) => a.name.localeCompare(b.name));
     });
   }

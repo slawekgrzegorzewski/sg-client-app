@@ -7,10 +7,10 @@
     </select>
   </div>
   <div class="navbar-brand bg-dark">
-    <select *ngIf="loginService.availableDomains | async"
-            [(ngModel)]="loginService.currentDomainId" class="navbar-brand bg-dark"
+    <select *ngIf="availableDomains"
+            [(ngModel)]="domainService.currentDomainId" class="navbar-brand bg-dark"
             style="border-color: #343a40">
-      <option *ngFor="let d of loginService.availableDomains | async" [value]="d.id">{{d.name}}</option>
+      <option *ngFor="let d of availableDomains" [value]="d.id">{{d.name}}</option>
     </select>
   </div>
 
@@ -72,3 +72,8 @@
   </div>
 </nav>
 <app-toasts aria-live="polite" aria-atomic="true" style="top: 60px !important;"></app-toasts>
+<app-domain-invitations
+  [invitations]="invitations"
+  (acceptInvitationEvent)="acceptInvitation($event)"
+  (rejectInvitationEvent)="rejectInvitation($event)"
+></app-domain-invitations>

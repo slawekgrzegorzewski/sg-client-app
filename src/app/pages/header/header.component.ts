@@ -1,6 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {ACCOUNTANT_APP, CHECKER_APP, LoginService, SYR_APP} from 'src/app/services/login.service';
 import {Router} from '@angular/router';
+import {DomainService} from '../../services/domain.service';
+import {DetailedDomain, Domain} from '../../model/domain';
 
 @Component({
   selector: 'app-header',
@@ -12,6 +14,8 @@ export class HeaderComponent implements OnInit {
   selectedProduct: string;
   availableApps: { app: string, routerLink: string }[] = [];
   selectedAppInternal: string;
+  invitations: Domain[];
+  availableDomains: DetailedDomain[];
 
   get selectedApp(): string {
     return this.selectedAppInternal;
@@ -25,17 +29,22 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     public loginService: LoginService,
+    public domainService: DomainService,
     private router: Router
   ) {
-    this.loginService.authSub.subscribe(data => {
-      this.isLoggedIn = data;
-      this.getAvailableApps();
-    });
+    this.loginService.loginSubject.subscribe(data => this.fetchData());
+    this.domainService.domainsChangeEvent.subscribe(domains => this.availableDomains = domains);
+    this.domainService.invitationChangeEvent.subscribe(domains => this.invitations = domains);
   }
 
   ngOnInit(): void {
+    this.fetchData();
+  }
+
+  private fetchData(): void {
     this.isLoggedIn = this.loginService.isLoggedIn();
     this.getAvailableApps();
+    this.invitations = this.domainService.invitations;
   }
 
   private getAvailableApps(): void {
@@ -76,5 +85,15 @@ export class HeaderComponent implements OnInit {
 
   isSYRAdmin(): boolean {
     return this.isSYR() && this.loginService.containsRole('SYR_ADMIN');
+  }
+
+  acceptInvitation(domain: Domain): void {
+    this.domainService.acceptInvitation(domain.id).subscribe(data => {
+    });
+  }
+
+  rejectInvitation(domain: Domain): void {
+    this.domainService.rejectInvitation(domain.id).subscribe(data => {
+    });
   }
 }
