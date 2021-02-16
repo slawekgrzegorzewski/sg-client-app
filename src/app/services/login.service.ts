@@ -1,13 +1,9 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
-import {Observable, of, Subject} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {Router} from '@angular/router';
 import * as jwt_decode from 'jwt-decode';
-import {DomainService} from './domain.service';
-import {Domain} from '../model/domain';
-import {map} from 'rxjs/operators';
-import {tap} from 'rxjs/internal/operators';
 
 export const ACCOUNTANT_APP = 'Accountant';
 export const CHECKER_APP = 'Checker';
@@ -17,51 +13,15 @@ export const SYR_APP = 'SYR';
   providedIn: 'root'
 })
 export class LoginService {
-  authSub = new Subject<any>();
+  loginSubject = new Subject<any>();
   serviceUrl: string;
-  availableDomainsInternal: Domain[] = [];
-  domainsFetching: Observable<Domain[]> = null;
-
-  get availableDomains(): Observable<Domain[]> {
-    if (this.domainsFetching !== null) {
-      return this.domainsFetching;
-    }
-    return (this.availableDomainsInternal && this.availableDomainsInternal.length > 0) ?
-      of(this.availableDomainsInternal) : this.fetchDomains();
-  }
-
-  get currentDomain(): Observable<Domain> {
-    return this.availableDomains.pipe(map(domains => domains.find(d => d.id === (this.currentDomainId || -1))));
-  }
-
-  currentDomainInternal: number;
-
-  get currentDomainId(): number {
-    if (!this.currentDomainInternal) {
-      this.currentDomainInternal = this.getDefaultDomain();
-    }
-    return this.currentDomainInternal;
-  }
-
-  set currentDomainId(value: number) {
-    this.currentDomainInternal = value;
-  }
 
   constructor(
     private http: HttpClient,
-    private domainService: DomainService,
     private router: Router
   ) {
     this.serviceUrl = environment.serviceUrl;
-  }
-
-  private fetchDomains(): Observable<Domain[]> {
-    this.domainsFetching = this.domainService.getAllDomains()
-      .pipe(
-        tap(domains => this.availableDomainsInternal = domains),
-        tap(_ => this.domainsFetching = null)
-      );
-    return this.domainsFetching;
+    setTimeout(() => this.loginSubject.next(this.isLoggedIn()), 500);
   }
 
   authenticate(userObj: any): Observable<HttpResponse<string>> {
@@ -118,10 +78,10 @@ export class LoginService {
   private setToken(token: string): void {
     localStorage.setItem('token', token);
     if (this.isLoggedIn()) {
-      this.authSub.next(true);
+      this.loginSubject.next(true);
       setTimeout(() => this.router.navigate(['/accountant-home']), 100);
     } else {
-      this.authSub.next(false);
+      this.loginSubject.next(false);
       setTimeout(() => this.router.navigate(['/login']), 100);
     }
   }
@@ -174,7 +134,7 @@ export class LoginService {
     return this.getToken() ? jwt_decode(this.getToken()).roles.includes(role) : false;
   }
 
-  private getDefaultDomain(): number {
+  public getDefaultDomain(): number {
     if (this.getToken()) {
       return jwt_decode(this.getToken()).defaultDomain;
     }

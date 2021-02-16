@@ -5,8 +5,8 @@ import {Account} from '../../model/accountant/account';
 import {Observable, of, throwError} from 'rxjs';
 import {Currency} from '../../model/accountant/currency';
 import {SettingsService} from './settings.service';
-import {flatMap, map, tap} from 'rxjs/internal/operators';
-import {LoginService} from '../login.service';
+import {map} from 'rxjs/internal/operators';
+import {DomainService} from '../domain.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +17,7 @@ export class AccountsService {
 
   constructor(private http: HttpClient,
               private settingsService: SettingsService,
-              private loginService: LoginService,
+              private domainService: DomainService,
               @Inject(LOCALE_ID) private defaultLocale: string) {
     this.serviceUrl = environment.serviceUrl;
   }
@@ -36,8 +36,8 @@ export class AccountsService {
       .pipe(map(data => data.map(d => new Account(d))));
   }
 
-  currentUserAccounts(): Observable<Account[]> {
-    return this.http.get<Account[]>(environment.serviceUrl + '/accounts/mine/' + this.loginService.currentDomainId)
+  currentDomainAccounts(): Observable<Account[]> {
+    return this.http.get<Account[]>(environment.serviceUrl + '/accounts/mine/' + this.domainService.currentDomainId)
       .pipe(map(data => data.map(d => new Account(d))));
   }
 
@@ -52,12 +52,9 @@ export class AccountsService {
   }
 
   create(account: Account): Observable<Account> {
-    return this.loginService.currentDomain
-      .pipe(
-        tap(d => account.domain = d),
-        flatMap(_ => this.http.put<Account>(environment.serviceUrl + '/accounts', account)),
-        map(a => new Account(a))
-      );
+    account.domain = this.domainService.currentDomain;
+    return this.http.put<Account>(environment.serviceUrl + '/accounts', account)
+      .pipe(map(a => new Account(a)));
   }
 
   update(account: Account): Observable<string> {

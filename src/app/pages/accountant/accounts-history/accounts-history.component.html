@@ -1,8 +1,8 @@
 <div class="history-container">
-  <app-user-accounts [userName]="loginService.getUserName()"
-                     [accounts]="accounts"
-                     (selectionChanged)="selectAccount($event)">
-  </app-user-accounts>
+  <app-domain-accounts [domain]="currentDomainName"
+                       [accounts]="accounts"
+                       (selectionChanged)="selectAccount($event)">
+  </app-domain-accounts>
 
   <div class="sg-flex-column">
     <h5 style="text-align: center">Historia dla zaznaczonego konta</h5>

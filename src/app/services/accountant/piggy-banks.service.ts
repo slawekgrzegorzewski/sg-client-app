@@ -5,8 +5,7 @@ import {Observable} from 'rxjs';
 import {SettingsService} from './settings.service';
 import {map} from 'rxjs/operators';
 import {PiggyBank} from '../../model/accountant/piggy-bank';
-import {LoginService} from '../login.service';
-import {flatMap, tap} from 'rxjs/internal/operators';
+import {DomainService} from '../domain.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,21 +15,18 @@ export class PiggyBanksService {
 
   constructor(private http: HttpClient,
               private settingsService: SettingsService,
-              private loginService: LoginService) {
+              private domainService: DomainService) {
     this.serviceUrl = environment.serviceUrl;
   }
 
-  getAllPiggyBanks(): Observable<PiggyBank[]> {
-    return this.http.get<PiggyBank[]>(environment.serviceUrl + '/piggy-banks/' + this.loginService.currentDomainId)
+  currentDomainPiggyBanks(): Observable<PiggyBank[]> {
+    return this.http.get<PiggyBank[]>(environment.serviceUrl + '/piggy-banks/' + this.domainService.currentDomainId)
       .pipe(map(data => data.map(d => new PiggyBank(d))));
   }
 
   create(piggyBank: PiggyBank): Observable<number> {
-    return this.loginService.currentDomain
-      .pipe(
-        tap(d => piggyBank.domain = d),
-        flatMap(_ => this.http.put<number>(environment.serviceUrl + '/piggy-banks', piggyBank))
-      );
+    piggyBank.domain = this.domainService.currentDomain;
+    return this.http.put<number>(environment.serviceUrl + '/piggy-banks', piggyBank);
   }
 
   update(piggyBank: PiggyBank): Observable<string> {

@@ -1,14 +1,14 @@
 <div *ngIf="this.loggedIn()" class="sg-flex-column">
   <ul ngbNav #nav="ngbNav" class="nav-tabs">
     <li ngbNavItem>
-      <a ngbNavLink>Twoje konta</a>
+      <a ngbNavLink>Konta w bieżącej domenie</a>
       <ng-template ngbNavContent>
         <div class="sg-flex-row sg-flex-justify-center">
           <div *ngIf="!isEditAccount && !showAccountDeletionConfirmation">
-            <app-user-accounts [userName]="loginService.getUserName()"
-                               [accounts]="accountsInCurrentDomain"
-                               [buttons]="[{name: 'delete', action:deleteAccount(this)}, {name: 'rename', action:rename(this)}]">
-            </app-user-accounts>
+            <app-domain-accounts [domain]="currentDomainName"
+                                 [accounts]="accountsInCurrentDomain"
+                                 [buttons]="[{name: 'delete', action:deleteAccount(this)}, {name: 'rename', action:rename(this)}]">
+            </app-domain-accounts>
 
             <button type="button" class="btn btn-primary" (click)="fetchData()">Odśwież</button>
             <button type="button" class="btn btn-primary" (click)="createAccount()">Nowe konto</button>
@@ -36,17 +36,17 @@
       </ng-template>
     </li>
     <li ngbNavItem *ngIf="isAdmin() && otherDomainsAccounts">
-      <a ngbNavLink>Konta innych użytkowników</a>
+      <a ngbNavLink>Konta w innych domenach</a>
       <ng-template ngbNavContent>
         <div class="sg-flex-row sg-flex-justify-center">
-          <div class="sg-flex-column" *ngIf="othersAccounts.size > 0">
-            <app-user-accounts *ngFor="let user of otherDomains"
-                               [userName]="user"
-                               [accounts]="othersAccounts.get(user)">
-            </app-user-accounts>
+          <div class="sg-flex-column" *ngIf="otherDomainsAccounts.size > 0">
+            <app-domain-accounts *ngFor="let user of otherDomainsAccounts | keyvalue"
+                                 [domain]="user.key"
+                                 [accounts]="user.value">
+            </app-domain-accounts>
             <button type="button" class="btn btn-primary" (click)="fetchData()">Odśwież</button>
           </div>
-          <div class="sg-flex-column" *ngIf="othersAccounts.size === 0">
+          <div class="sg-flex-column" *ngIf="otherDomainsAccounts.size === 0">
             <div>Brak kont</div>
             <button type="button" class="btn btn-primary" (click)="fetchData()">Odśwież</button>
           </div>
@@ -57,9 +57,9 @@
       <a ngbNavLink>Kategorie</a>
       <ng-template ngbNavContent>
         <app-categories
-        [categories]="categories"
-        (createEvent)="createCategory($event)"
-        (updateEvent)="updateCategory($event)"
+          [categories]="categories"
+          (createEvent)="createCategory($event)"
+          (updateEvent)="updateCategory($event)"
         ></app-categories>
       </ng-template>
     </li>
@@ -72,8 +72,22 @@
           [allCurrencies]="allCurrencies"
           (createEvent)="createPiggyBank($event)"
           (updateEvent)="updatePiggyBank($event)"
-
         ></app-piggy-banks>
+      </ng-template>
+    </li>
+    <li ngbNavItem>
+      <a ngbNavLink>Domeny</a>
+      <ng-template ngbNavContent>
+        <app-domains
+          [adminMode]="true"
+          [domains]="userDomains"
+          [currentUserLogin]="currentUserLogin()"
+          (createEvent)="createDomain($event)"
+          (updateEvent)="updateDomain($event)"
+          (changeUserAccessEvent)="changeDomainUserAccess($event)"
+          (removeUserFromDomainEvent)="removeUserFromDomain($event)"
+          (inviteUserToDomainEvent)="inviteUserToDomain($event)"
+        ></app-domains>
       </ng-template>
     </li>
   </ul>

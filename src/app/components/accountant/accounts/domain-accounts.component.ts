@@ -3,13 +3,13 @@ import {Account} from '../../../model/accountant/account';
 import {Button} from '../../general/hoverable-buttons.component';
 
 @Component({
-  selector: 'app-user-accounts',
-  templateUrl: './user-accounts.component.html',
-  styleUrls: ['./user-accounts.component.css']
+  selector: 'app-domain-accounts',
+  templateUrl: './domain-accounts.component.html',
+  styleUrls: ['./domain-accounts.component.css']
 })
-export class UserAccountsComponent implements OnInit {
+export class DomainAccountsComponent implements OnInit {
   @Input() showTitle = true;
-  @Input() userName: string;
+  @Input() domain: string;
   @Input() buttons: Button<Account>[];
   @Input() selectable = true;
   @Output() selectionChanged = new EventEmitter<Account>();

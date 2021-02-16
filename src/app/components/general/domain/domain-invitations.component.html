@@ -1,0 +1,9 @@
+<div *ngIf="invitations && invitations.length > 0" style="padding-left: 20px;" class="alert alert-secondary"
+     role="alert">
+  Dostałeś/aś zaproszenie do następujących domen:
+  <div *ngFor="let invitation of invitations">
+    {{invitation.name}}
+    <button class="btn btn-outline-primary btn-small" (click)="acceptInvitation(invitation.id)">Zaakceptuj</button>
+    <button class="btn btn-outline-primary btn-small" (click)="rejectInvitation(invitation.id)">Odrzuć</button>
+  </div>
+</div>

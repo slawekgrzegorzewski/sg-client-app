@@ -5,6 +5,8 @@ import {Account} from '../../../model/accountant/account';
 import {LoginService} from '../../../services/login.service';
 import {TransactionsService} from '../../../services/accountant/transations.service';
 import {Transaction} from '../../../model/accountant/transaction';
+import {take} from 'rxjs/operators';
+import {DomainService} from '../../../services/domain.service';
 
 @Component({
   selector: 'app-accounts-history',
@@ -17,6 +19,7 @@ export class AccountsHistoryComponent implements OnInit {
   selectedAccount: Account;
   allTransactions: Transaction[];
   transactionsOfSelectedAccount: Transaction[];
+  currentDomainName: string;
 
   private static areAccountsEqual(a: Account, b: Account): boolean {
     if (!a || !b) {
@@ -28,7 +31,7 @@ export class AccountsHistoryComponent implements OnInit {
   constructor(private accountsService: AccountsService,
               private transactionsService: TransactionsService,
               private toastService: ToastService,
-              public loginService: LoginService) {
+              private domainService: DomainService) {
   }
 
   ngOnInit(): void {
@@ -38,10 +41,11 @@ export class AccountsHistoryComponent implements OnInit {
   refreshData(): void {
     this.fetchAccounts();
     this.fetchTransactions();
+    this.currentDomainName = this.domainService.currentDomain?.name || '';
   }
 
   fetchAccounts(): void {
-    this.accountsService.currentUserAccounts().subscribe(
+    this.accountsService.currentDomainAccounts().subscribe(
       data => this.accounts = data.sort(Account.compareByCurrencyAndName),
       error => this.accounts = []
     );

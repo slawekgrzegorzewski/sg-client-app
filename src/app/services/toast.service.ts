@@ -4,15 +4,15 @@ import {Injectable, TemplateRef} from '@angular/core';
 export class ToastService {
   toasts: any[] = [];
 
-  show(textOrTpl: string | TemplateRef<any>, options: any = {}) {
+  show(textOrTpl: string | TemplateRef<any>, options: any = {}): void {
     this.toasts.push({textOrTpl, ...options});
   }
 
-  showWarning(textOrTpl: string | TemplateRef<any>, header?: string) {
+  showWarning(textOrTpl: string | TemplateRef<any>, header?: string): void {
     this.toasts.push({textOrTpl: textOrTpl, header: header, classname: 'bg-danger text-light', delay: 15000});
   }
 
-  remove(toast) {
+  remove(toast): void {
     this.toasts = this.toasts.filter(t => t !== toast);
   }
 }

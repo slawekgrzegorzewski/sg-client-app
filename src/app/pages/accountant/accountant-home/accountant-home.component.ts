@@ -2,7 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {AccountsService} from '../../../services/accountant/accounts.service';
 import {ToastService} from '../../../services/toast.service';
 import {Account} from '../../../model/accountant/account';
-import {LoginService} from '../../../services/login.service';
 import {PiggyBanksService} from '../../../services/accountant/piggy-banks.service';
 import {PiggyBank} from '../../../model/accountant/piggy-bank';
 import {TransactionsService} from '../../../services/accountant/transations.service';
@@ -13,6 +12,7 @@ import {Income} from '../../../model/accountant/billings/income';
 import {Expense} from '../../../model/accountant/billings/expense';
 import {Router} from '@angular/router';
 import {CategoriesService} from '../../../services/accountant/categories.service';
+import {DomainService} from '../../../services/domain.service';
 
 @Component({
   selector: 'app-accounts-home',
@@ -26,6 +26,7 @@ export class AccountantHomeComponent implements OnInit {
   categories: Category[];
   billingPeriodInfo: BillingPeriodInfo;
   historicalSavings: Map<Date, Map<string, number>>;
+  currentDomainName: string;
 
   constructor(private accountsService: AccountsService,
               private transactionsService: TransactionsService,
@@ -33,7 +34,7 @@ export class AccountantHomeComponent implements OnInit {
               private billingsService: BillingPeriodsService,
               private categoriesService: CategoriesService,
               private toastService: ToastService,
-              public loginService: LoginService,
+              private domainService: DomainService,
               private router: Router) {
   }
 
@@ -42,17 +43,18 @@ export class AccountantHomeComponent implements OnInit {
       this.router.navigate(['/accountant-home-small']);
     }
     this.refreshData();
-    this.categoriesService.getAllCategories().subscribe(data => this.categories = data);
+    this.categoriesService.currentDomainCategories().subscribe(data => this.categories = data);
   }
 
   refreshData(): void {
     this.fetchAccounts();
     this.fetchPiggyBanks();
     this.fetchHistoricalSavings();
+    this.currentDomainName = this.domainService.currentDomain?.name || '';
   }
 
   fetchAccounts(): void {
-    this.accountsService.currentUserAccounts().subscribe(
+    this.accountsService.currentDomainAccounts().subscribe(
       data => this.accounts = data.sort(Account.compareByCurrencyAndName),
       error => this.accounts = []
     );
@@ -66,7 +68,7 @@ export class AccountantHomeComponent implements OnInit {
   }
 
   private fetchPiggyBanks(): void {
-    this.piggyBanksService.getAllPiggyBanks().subscribe(data => {
+    this.piggyBanksService.currentDomainPiggyBanks().subscribe(data => {
       this.piggyBanks = data.sort((a, b) => a.name.localeCompare(b.name));
     });
   }

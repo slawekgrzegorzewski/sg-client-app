@@ -8,10 +8,10 @@
       style="margin-bottom: 20px"
     >
     </app-accounts-grand-total>
-    <app-user-accounts [userName]="loginService.getUserName()"
-                       [accounts]="accounts"
-                       [selectable]="false">
-    </app-user-accounts>
+    <app-domain-accounts [domain]="currentDomainName"
+                         [accounts]="accounts"
+                         [selectable]="false">
+    </app-domain-accounts>
   </div>
   <div class="billing">
     <app-browse-billing-elements

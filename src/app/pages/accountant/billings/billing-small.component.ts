@@ -31,7 +31,7 @@ export class BillingSmallComponent implements OnInit {
 
   ngOnInit(): void {
     this.refreshData();
-    this.categoriesService.getAllCategories().subscribe(data => this.categories = data);
+    this.categoriesService.currentDomainCategories().subscribe(data => this.categories = data);
   }
 
   refreshData(): void {
@@ -40,7 +40,7 @@ export class BillingSmallComponent implements OnInit {
   }
 
   fetchAccounts(): void {
-    this.accountsService.currentUserAccounts().subscribe(
+    this.accountsService.currentDomainAccounts().subscribe(
       data => this.accounts = data.sort(Account.compareByCurrencyAndName),
       error => this.accounts = []
     );
@@ -54,7 +54,7 @@ export class BillingSmallComponent implements OnInit {
   }
 
   private fetchPiggyBanks(): void {
-    this.piggyBanksService.getAllPiggyBanks().subscribe(data => {
+    this.piggyBanksService.currentDomainPiggyBanks().subscribe(data => {
       this.piggyBanks = data.sort((a, b) => a.name.localeCompare(b.name));
     });
   }
