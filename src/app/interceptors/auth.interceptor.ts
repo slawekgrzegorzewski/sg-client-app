@@ -4,11 +4,12 @@ import {Observable, throwError} from 'rxjs';
 import {LoginService} from '../services/login.service';
 import {Router} from '@angular/router';
 import {catchError, map} from 'rxjs/operators';
+import {DomainService} from '../services/domain.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
-  constructor(private loginService: LoginService, private router: Router) {
+  constructor(private loginService: LoginService, private domainService: DomainService, private router: Router) {
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -34,6 +35,7 @@ export class AuthInterceptor implements HttpInterceptor {
       }),
       catchError(err => {
         if (err instanceof HttpErrorResponse && err.status === 401) {
+          this.domainService.resetCurrentDomainId();
           this.loginService.logout();
         }
         return throwError(err);

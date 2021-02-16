@@ -20,17 +20,24 @@ export class DomainService {
     return (this.availableDomains || []).find(d => d.id === (this.currentDomainId || -1));
   }
 
-  currentDomainInternal: number;
 
   get currentDomainId(): number {
-    if (!this.currentDomainInternal) {
-      this.currentDomainInternal = this.loginService.getDefaultDomain();
+    const item: string = localStorage.getItem('domain');
+    if (!item) {
+      this.currentDomainId = this.loginService.getDefaultDomain();
+      return this.currentDomainId;
+    } else {
+      return Number(item);
     }
-    return this.currentDomainInternal;
   }
 
   set currentDomainId(value: number) {
-    this.currentDomainInternal = value;
+    localStorage.setItem('domain', value.toString());
+    window.location.reload();
+  }
+
+  resetCurrentDomainId(): void {
+    localStorage.removeItem('domain');
   }
 
   constructor(
