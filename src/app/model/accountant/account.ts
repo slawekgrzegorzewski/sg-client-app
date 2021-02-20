@@ -1,6 +1,7 @@
 import {Domain} from '../domain';
+import {Balance, WithBalance} from './with-balance';
 
-export class Account {
+export class Account implements WithBalance {
   public id: number;
   public name: string;
   public currency: string;
@@ -24,5 +25,9 @@ export class Account {
     } else {
       return first.name.localeCompare(second.name);
     }
+  }
+
+  getBalance(): Balance {
+    return new Balance(this.currentBalance, this.currency);
   }
 }

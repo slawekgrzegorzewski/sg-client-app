@@ -16,7 +16,7 @@ import {SyrHomeComponent} from './pages/syr/syr-home.component';
 import {SyrAdminComponent} from './pages/syr/syr-admin.component';
 
 const routes: Routes = [
-  {path: '', redirectTo: '/login', pathMatch: 'full', canActivate: [LoginGuard]},
+  {path: '', redirectTo: '/login', pathMatch: 'full'},
   {path: 'login', component: LoginComponent, canActivate: [LoginGuard]},
   {path: 'settings', component: SettingsComponent, canActivate: [AuthGuardGuard]},
   {path: 'accountant-home', component: AccountantHomeComponent, canActivate: [AuthGuardGuard]},
@@ -33,7 +33,7 @@ const routes: Routes = [
   {path: 'syr-home', component: SyrHomeComponent},
   {path: 'syr-admin', component: SyrAdminComponent},
 
-  {path: '**', redirectTo: '/home', pathMatch: 'full', canActivate: [LoginGuard]}
+  {path: '**', redirectTo: '/home', pathMatch: 'full'}
 ];
 
 @NgModule({

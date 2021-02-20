@@ -20,12 +20,11 @@ export class PiggyBanksService {
   }
 
   currentDomainPiggyBanks(): Observable<PiggyBank[]> {
-    return this.http.get<PiggyBank[]>(environment.serviceUrl + '/piggy-banks/' + this.domainService.currentDomainId)
+    return this.http.get<PiggyBank[]>(environment.serviceUrl + '/piggy-banks')
       .pipe(map(data => data.map(d => new PiggyBank(d))));
   }
 
   create(piggyBank: PiggyBank): Observable<number> {
-    piggyBank.domain = this.domainService.currentDomain;
     return this.http.put<number>(environment.serviceUrl + '/piggy-banks', piggyBank);
   }
 

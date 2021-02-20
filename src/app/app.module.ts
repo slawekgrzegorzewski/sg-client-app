@@ -53,7 +53,7 @@ import {SyrService} from './services/syr/syr.service';
 import {SyrAdminComponent} from './pages/syr/syr-admin.component';
 import {DomainService} from './services/domain.service';
 import {CategoriesService} from './services/accountant/categories.service';
-import {DomainsComponent} from './components/accountant/general/domains/domains.component';
+import {DomainsComponent} from './components/general/domain/domains.component';
 import {DomainInvitationsComponent} from './components/general/domain/domain-invitations.component';
 
 @NgModule({

@@ -65,7 +65,7 @@ export class CategoriesComponent implements OnInit {
   }
 
   update(): void {
-    this.createEvent.emit(this.editElement);
+    this.updateEvent.emit(this.editElement);
     this.reset();
   }
 }

@@ -1,7 +1,11 @@
 <div class="sg-flex-column sg-flex-align-center">
   <div style="width: 320px">
-    <button (click)="addIncome()" class="btn btn-outline-primary" style="width: 100%" *ngIf="mode === DISPLAY">Dodaj dochód</button>
-    <button (click)="addExpense()" class="btn btn-outline-primary" style="width: 100%" *ngIf="mode === DISPLAY">Dodaj wydatek</button>
+    <button (click)="addIncome()" class="btn btn-outline-primary" style="width: 100%" *ngIf="mode === DISPLAY">Dodaj
+      dochód
+    </button>
+    <button (click)="addExpense()" class="btn btn-outline-primary" style="width: 100%" *ngIf="mode === DISPLAY">Dodaj
+      wydatek
+    </button>
     <app-create-billing-element *ngIf="mode === CREATE_INCOME" class="sg-flex-column"
                                 [elementType]="'income'"
                                 [categories]="categories"
@@ -20,7 +24,8 @@
                                 (editEvent)="createElement($event[0], $event[1], $event[2])"
     >
     </app-create-billing-element>
-    <app-domain-accounts [domain]="currentDomainName"
+    <app-domain-accounts *ngIf="accounts && accounts.length > 0"
+                         [domain]="currentDomainName"
                          [accounts]="accounts"
                          [selectable]="false">
     </app-domain-accounts>

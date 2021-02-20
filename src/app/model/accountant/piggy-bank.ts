@@ -1,6 +1,7 @@
 import {Domain} from '../domain';
+import {Balance, WithBalance} from './with-balance';
 
-export class PiggyBank {
+export class PiggyBank implements WithBalance {
   public id: number;
   public name: string;
   public description: string;
@@ -21,5 +22,9 @@ export class PiggyBank {
     this.monthlyTopUp = data && data.monthlyTopUp || 0;
     this.userId = data && data.userId || 0;
     this.domain = data && new Domain(data.domain) || null;
+  }
+
+  getBalance(): Balance {
+    return new Balance(this.balance, this.currency);
   }
 }
