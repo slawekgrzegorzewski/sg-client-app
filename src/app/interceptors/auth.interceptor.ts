@@ -14,9 +14,11 @@ export class AuthInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (this.loginService.getToken()) {
+      const domainId = this.domainService.currentDomainId;
       request = request.clone({
         setHeaders: {
-          Authorization: `Bearer ${this.loginService.getToken()}`
+          Authorization: `Bearer ${this.loginService.getToken()}`,
+          DomainId: domainId ? domainId.toString() : ''
         }
       });
     }

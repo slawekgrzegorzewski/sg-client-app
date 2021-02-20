@@ -1,11 +1,12 @@
 import {Component, Input, OnInit} from '@angular/core';
+import {WithBalance} from '../../../model/accountant/with-balance';
 
 @Component({
   selector: 'app-currency-totals',
   templateUrl: './currency-totals.component.html',
   styleUrls: ['./currency-totals.component.css']
 })
-export class CurrencyTotalsComponent<T> implements OnInit {
+export class CurrencyTotalsComponent<T extends WithBalance> implements OnInit {
 
   private valuesLeftInternal: T[] = [];
 
@@ -28,13 +29,6 @@ export class CurrencyTotalsComponent<T> implements OnInit {
     this.valuesRightInternal = value;
     this.calulateTotals();
   }
-
-  @Input() currencyExtractorLeft: (t: T) => string;
-
-  @Input() balanceExtractorLeft: (t: T) => number;
-
-  @Input() currencyExtractorRight: (t: T) => string;
-  @Input() balanceExtractorRight: (t: T) => number;
 
   totalsLeft = new Map<string, number>();
   totalsDifference = new Map<string, number>();
@@ -60,20 +54,18 @@ export class CurrencyTotalsComponent<T> implements OnInit {
 
 
   private calculateTotalLeft(): Map<string, number> {
-    return this.calculateOneSideTotals(this.valuesLeft, this.currencyExtractorLeft, this.balanceExtractorLeft);
+    return this.calculateOneSideTotals(this.valuesLeft);
   }
 
   private calculateTotalsRight(): Map<string, number> {
-    return this.calculateOneSideTotals(this.valuesRight, this.currencyExtractorRight, this.balanceExtractorRight);
+    return this.calculateOneSideTotals(this.valuesRight);
   }
 
-  private calculateOneSideTotals(values: T[], currencyExtractor: (t: T) => string, balanceExtractor: (t: T) => number): Map<string, number> {
-    if (!values || !currencyExtractor || !balanceExtractor) {
+  private calculateOneSideTotals(values: T[]): Map<string, number> {
+    if (!values) {
       return new Map<string, number>();
     }
-    return this.processValues(values,
-      currencyExtractor,
-      balanceExtractor);
+    return this.processValues(values);
   }
 
   private calculateTotalDifference(): Map<string, number> {
@@ -95,13 +87,13 @@ export class CurrencyTotalsComponent<T> implements OnInit {
     return result;
   }
 
-  private processValues(vals: T[], currencyExtractor: (t: T) => string, balanceExtractor: (t: T) => number): Map<string, number> {
+  private processValues(vals: T[]): Map<string, number> {
     const result = new Map<string, number>();
     for (const value of vals || []) {
-      const currency = currencyExtractor(value);
-      let total = result.get(currency) || 0;
-      total += balanceExtractor(value);
-      result.set(currency, total);
+      const balance = value.getBalance();
+      let total = result.get(balance.currency) || 0;
+      total += balance.balance;
+      result.set(balance.currency, total);
     }
     return result;
   }

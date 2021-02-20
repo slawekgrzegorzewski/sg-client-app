@@ -1,8 +1,8 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {Observable, of} from 'rxjs';
-import {Currency} from '../../../../model/accountant/currency';
+import {Currency} from '../../../model/accountant/currency';
 import {getCurrencySymbol} from '@angular/common';
-import {DetailedDomain} from '../../../../model/domain';
+import {DetailedDomain} from '../../../model/domain';
 
 const GENERAL_EDIT_MODE = 'general';
 const CREATE_EDIT_MODE = 'create';

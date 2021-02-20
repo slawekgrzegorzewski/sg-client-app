@@ -20,9 +20,9 @@ export class TransactionsService {
     this.serviceUrl = environment.serviceUrl;
   }
 
-  userTransactions(): Observable<Transaction[]> {
+  domainTransactions(): Observable<Transaction[]> {
     return this.http.get<Transaction[]>(
-      environment.serviceUrl + '/transactions/' + this.domainService.currentDomainId,
+      `${environment.serviceUrl}/transactions`,
       {responseType: 'json'}
     )
       .pipe(map(data => (data.map(d => new Transaction(d)))));
@@ -30,7 +30,7 @@ export class TransactionsService {
 
   credit(account: Account, amount: number, description: string): Observable<Transaction> {
     return this.http.post<Transaction>(
-      environment.serviceUrl + '/transactions/credit/' + account.id + '/' + amount,
+      `${environment.serviceUrl}/transactions/credit/${account.id}/${amount}`,
       description,
       {responseType: 'json'}
     )
@@ -39,7 +39,7 @@ export class TransactionsService {
 
   debit(account: Account, amount: number, description: string): Observable<Transaction> {
     return this.http.post<Transaction>(
-      environment.serviceUrl + '/transactions/debit/' + account.id + '/' + amount,
+      `${environment.serviceUrl}/transactions/debit/${account.id}/${amount}`,
       description,
       {responseType: 'json'}
     )
@@ -48,16 +48,17 @@ export class TransactionsService {
 
   transfer(account: Account, targetAccount: Account, amount: number, description: string): Observable<Transaction> {
     return this.http.post<Transaction>(
-      environment.serviceUrl + '/transactions/transfer/' + account.id + '/' + targetAccount.id + '/' + amount,
+      `${environment.serviceUrl}/transactions/transfer/${account.id}/${targetAccount.id}/${amount}`,
       description,
       {responseType: 'json'}
     )
       .pipe(map(d => new Transaction(d)));
   }
 
-  transferWithConversion(account: Account, targetAccount: Account, amount: number, targetAmount: number, description: string, rate: number): Observable<Transaction> {
+  transferWithConversion(account: Account, targetAccount: Account, amount: number, targetAmount: number, description: string,
+                         rate: number): Observable<Transaction> {
     return this.http.post<Transaction>(
-      environment.serviceUrl + '/transactions/transfer_with_conversion/' + account.id + '/' + targetAccount.id + '/' + amount + '/' + targetAmount + '/' + rate,
+      `${environment.serviceUrl}/transactions/transfer_with_conversion/${account.id}/${targetAccount.id}/${amount}/${targetAmount}/${rate}`,
       description,
       {responseType: 'json'}
     )

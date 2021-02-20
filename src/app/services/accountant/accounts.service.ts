@@ -37,7 +37,7 @@ export class AccountsService {
   }
 
   currentDomainAccounts(): Observable<Account[]> {
-    return this.http.get<Account[]>(environment.serviceUrl + '/accounts/mine/' + this.domainService.currentDomainId)
+    return this.http.get<Account[]>(environment.serviceUrl + '/accounts/mine')
       .pipe(map(data => data.map(d => new Account(d))));
   }
 

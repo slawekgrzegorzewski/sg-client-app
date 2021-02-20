@@ -44,15 +44,18 @@ export class GrandTotalComponent implements OnInit {
   dates: Date[];
   savingsTotal = new Map<string, number>();
 
-  public accountCurrencyExtractor = (acc: Account) => acc.currency;
-  public accountBalanceExtractor = (acc: Account) => acc.currentBalance;
-  public piggyBankCurrencyExtractor = (pg: PiggyBank) => pg.currency;
-  public piggyBankBalanceExtractor = (pg: PiggyBank) => pg.balance;
-
   constructor() {
   }
 
   ngOnInit(): void {
+  }
+
+  accountsPresent(): boolean {
+    return this.accounts && this.accounts.length > 0;
+  }
+
+  piggyBanksPresent(): boolean {
+    return this.piggyBanks && this.piggyBanks.length > 0;
   }
 
 }

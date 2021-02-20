@@ -3,11 +3,18 @@ import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {Observable, Subject} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {Router} from '@angular/router';
-import * as jwt_decode from 'jwt-decode';
+import jwt_decode from 'jwt-decode';
 
 export const ACCOUNTANT_APP = 'Accountant';
 export const CHECKER_APP = 'Checker';
 export const SYR_APP = 'SYR';
+
+class TokenData {
+  sub: string;
+  roles: string[];
+  defaultDomain: number;
+  exp: Date;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -88,7 +95,7 @@ export class LoginService {
 
   isAdmin(): boolean {
     try {
-      return jwt_decode(this.getToken()).roles.includes('ACCOUNTANT_ADMIN');
+      return jwt_decode<TokenData>(this.getToken()).roles.includes('ACCOUNTANT_ADMIN');
     } catch (Error) {
       return false;
     }
@@ -96,7 +103,7 @@ export class LoginService {
 
   getUserId(): number {
     try {
-      const sub = jwt_decode(this.getToken()).sub;
+      const sub = jwt_decode<TokenData>(this.getToken()).sub;
       return Number(sub.split(':')[0]);
     } catch (Error) {
       return Number.NaN;
@@ -105,7 +112,7 @@ export class LoginService {
 
   getUserName(): string {
     try {
-      const sub = jwt_decode(this.getToken()).sub;
+      const sub = jwt_decode<TokenData>(this.getToken()).sub;
       const split = sub.split(':');
       return sub.replace(split[0] + ':', '');
     } catch (Error) {
@@ -116,7 +123,7 @@ export class LoginService {
   getAvailableApps(): Map<string, string> {
     const apps = new Map<string, string>();
     if (this.getToken()) {
-      const roles = jwt_decode(this.getToken()).roles;
+      const roles = jwt_decode<TokenData>(this.getToken()).roles;
       if (roles.includes('ACCOUNTANT_ADMIN') || roles.includes('ACCOUNTANT_USER')) {
         apps.set(ACCOUNTANT_APP, 'accountant-home');
       }
@@ -131,12 +138,12 @@ export class LoginService {
   }
 
   containsRole(role: string): boolean {
-    return this.getToken() ? jwt_decode(this.getToken()).roles.includes(role) : false;
+    return this.getToken() ? jwt_decode<TokenData>(this.getToken()).roles.includes(role) : false;
   }
 
   public getDefaultDomain(): number {
     if (this.getToken()) {
-      return jwt_decode(this.getToken()).defaultDomain;
+      return jwt_decode<TokenData>(this.getToken()).defaultDomain;
     }
     return null;
   }

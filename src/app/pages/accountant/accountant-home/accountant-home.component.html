@@ -8,7 +8,8 @@
       style="margin-bottom: 20px"
     >
     </app-accounts-grand-total>
-    <app-domain-accounts [domain]="currentDomainName"
+    <app-domain-accounts *ngIf="accounts && accounts.length > 0"
+                         [domain]="currentDomainName"
                          [accounts]="accounts"
                          [selectable]="false">
     </app-domain-accounts>
@@ -28,6 +29,7 @@
   </div>
   <div class="piggy-banks">
     <app-piggy-banks
+      *ngIf="piggyBanks && piggyBanks.length > 0"
       [title]="'Skarbonki'"
       [adminMode]="false"
       [piggyBanks]="piggyBanks"

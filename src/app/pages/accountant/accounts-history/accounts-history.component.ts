@@ -52,7 +52,7 @@ export class AccountsHistoryComponent implements OnInit {
   }
 
   fetchTransactions(): void {
-    this.transactionsService.userTransactions().subscribe(
+    this.transactionsService.domainTransactions().subscribe(
       data => {
         this.allTransactions = data;
         this.transactionsOfSelectedAccount = this.filterTransactionsForSelectedAccount();
