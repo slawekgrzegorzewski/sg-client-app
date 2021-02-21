@@ -6,7 +6,6 @@ import {Observable} from 'rxjs';
 import {Currency} from '../../model/accountant/currency';
 import {Transaction} from '../../model/accountant/transaction';
 import {map} from 'rxjs/operators';
-import {DomainService} from '../domain.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +14,7 @@ export class TransactionsService {
   serviceUrl: string;
   currencies: Currency[] = [];
 
-  constructor(private http: HttpClient,
-              private domainService: DomainService) {
+  constructor(private http: HttpClient) {
     this.serviceUrl = environment.serviceUrl;
   }
 

@@ -1,0 +1,39 @@
+<div class="sg-flex-row sg-flex-justify-center">
+  <div class="sg-flex-column">
+    <div (mouseleave)="setOverAccount(null, null)" *ngIf="!editElement">
+      <div *ngFor="let category of clients" #row class="sg-row-hoverable"
+           (mouseenter)="setOverAccount(category, row)">
+        {{category.name}}
+      </div>
+      <div #utilBox style="position: fixed;"
+           [ngStyle]="{'top.px': utilBoxTop, 'left.px': utilBoxLeft, 'visibility': utilBoxVisibility}">
+        <button (click)="prepareToEdit()" class="btn btn-primary">
+          Edytuj
+        </button>
+      </div>
+    </div>
+
+    <button (click)="prepareToCreate()" *ngIf="!editElement" class="btn btn-primary">
+      Nowy klient
+    </button>
+  </div>
+
+  <div *ngIf="editElement">
+    <div class="form-group row">
+      <label for="name" class="col-2 col-form-label">Nazwa</label>
+      <div class="col-10">
+        <input id="name" name="name" type="name" class="form-control"
+               #name="ngModel"
+               [(ngModel)]="editElement.name"
+               required/>
+      </div>
+    </div>
+    <button *ngIf="editElement.id" [disabled]="name?.errors?.required"
+            (click)="update()" class="btn btn-primary">Zapisz
+    </button>
+    <button *ngIf="!editElement.id" [disabled]="name?.errors?.required"
+            (click)="create()" class="btn btn-primary">Stwórz
+    </button>
+    <button (click)="reset()" class="btn btn-primary">Anuluj</button>
+  </div>
+</div>

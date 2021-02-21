@@ -6,7 +6,6 @@ import {Observable, of, throwError} from 'rxjs';
 import {Currency} from '../../model/accountant/currency';
 import {SettingsService} from './settings.service';
 import {map} from 'rxjs/internal/operators';
-import {DomainService} from '../domain.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +16,6 @@ export class AccountsService {
 
   constructor(private http: HttpClient,
               private settingsService: SettingsService,
-              private domainService: DomainService,
               @Inject(LOCALE_ID) private defaultLocale: string) {
     this.serviceUrl = environment.serviceUrl;
   }
@@ -52,7 +50,6 @@ export class AccountsService {
   }
 
   create(account: Account): Observable<Account> {
-    account.domain = this.domainService.currentDomain;
     return this.http.put<Account>(environment.serviceUrl + '/accounts', account)
       .pipe(map(a => new Account(a)));
   }

@@ -1,19 +1,21 @@
 import {Component, OnInit} from '@angular/core';
 import {LoginService} from 'src/app/services/login.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {Account} from '../../../model/accountant/account';
-import {Mode} from '../../../components/accountant/accounts/edit-account.component';
-import {ToastService} from '../../../services/toast.service';
-import {AccountsService} from '../../../services/accountant/accounts.service';
+import {Account} from '../../model/accountant/account';
+import {Mode} from '../../components/accountant/accounts/edit-account.component';
+import {ToastService} from '../../services/toast.service';
+import {AccountsService} from '../../services/accountant/accounts.service';
 import {Observable} from 'rxjs';
-import {PiggyBank} from '../../../model/accountant/piggy-bank';
-import {PiggyBanksService} from '../../../services/accountant/piggy-banks.service';
-import {Currency} from '../../../model/accountant/currency';
-import {BillingPeriodsService} from '../../../services/accountant/billing-periods.service';
-import {Category} from '../../../model/accountant/billings/category';
-import {CategoriesService} from '../../../services/accountant/categories.service';
-import {DomainService} from '../../../services/domain.service';
-import {DetailedDomain} from '../../../model/domain';
+import {PiggyBank} from '../../model/accountant/piggy-bank';
+import {PiggyBanksService} from '../../services/accountant/piggy-banks.service';
+import {Currency} from '../../model/accountant/currency';
+import {BillingPeriodsService} from '../../services/accountant/billing-periods.service';
+import {Category} from '../../model/accountant/billings/category';
+import {CategoriesService} from '../../services/accountant/categories.service';
+import {DomainService} from '../../services/domain.service';
+import {DetailedDomain} from '../../model/domain';
+import {Client} from '../../model/accountant/client';
+import {ClientsService} from '../../services/accountant/clients.service';
 
 @Component({
   selector: 'app-accounts',
@@ -21,10 +23,9 @@ import {DetailedDomain} from '../../../model/domain';
   styleUrls: ['./settings.component.css']
 })
 export class SettingsComponent implements OnInit {
+
   private isLoggedIn = false;
-
   mode: Mode = Mode.CREATE;
-
   accountsInCurrentDomain: Account[];
   otherDomainsAccounts: Map<string, Account[]>;
   isEditAccount = false;
@@ -33,19 +34,17 @@ export class SettingsComponent implements OnInit {
   showAccountDeletionConfirmation = false;
   accountBeingDeletedDescription: string;
   currentDomainName: string;
-
   piggyBanks: PiggyBank[];
-
   allCurrencies: Currency[];
-
   categories: Category[];
-
+  clients: Client[];
   userDomains: DetailedDomain[];
 
 
   constructor(
     private accountsService: AccountsService,
     private categoriesService: CategoriesService,
+    private clientsService: ClientsService,
     private domainsService: DomainService,
     private piggyBanksService: PiggyBanksService,
     private loginService: LoginService,
@@ -83,6 +82,7 @@ export class SettingsComponent implements OnInit {
     this.fetchPiggyBanks();
     this.fetchCurrencies();
     this.fetchCategories();
+    this.fetchClients();
     this.currentDomainName = this.domainsService.currentDomain?.name || '';
     this.fetchDomains();
   }
@@ -126,6 +126,12 @@ export class SettingsComponent implements OnInit {
   private fetchCategories(): void {
     this.categoriesService.currentDomainCategories().subscribe(
       data => this.categories = data
+    );
+  }
+
+  private fetchClients(): void {
+    this.clientsService.currentDomainClients().subscribe(
+      data => this.clients = data
     );
   }
 
@@ -222,6 +228,18 @@ export class SettingsComponent implements OnInit {
   updateCategory(category: Category): void {
     this.categoriesService.updateCategory(category).subscribe(
       data => this.fetchCategories()
+    );
+  }
+
+  createClient(client: Client): void {
+    this.clientsService.createClient(client).subscribe(
+      data => this.fetchClients()
+    );
+  }
+
+  updateClient(client: Client): void {
+    this.clientsService.updateClient(client).subscribe(
+      data => this.fetchClients()
     );
   }
 

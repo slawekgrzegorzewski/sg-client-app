@@ -2,7 +2,6 @@ import {Inject, Injectable, LOCALE_ID} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
 import {Observable} from 'rxjs';
-import {SettingsService} from './settings.service';
 import {BillingPeriod, BillingPeriodInfo} from '../../model/accountant/billings/billing-period';
 import {DatePipe} from '@angular/common';
 import {map} from 'rxjs/operators';
@@ -10,7 +9,6 @@ import {Expense} from '../../model/accountant/billings/expense';
 import {Income} from '../../model/accountant/billings/income';
 import {PiggyBank} from '../../model/accountant/piggy-bank';
 import {Dates} from '../../../utils/dates';
-import {DomainService} from '../domain.service';
 
 @Injectable({
   providedIn: 'root'
@@ -39,8 +37,6 @@ export class BillingPeriodsService {
   }
 
   constructor(private http: HttpClient,
-              private settingsService: SettingsService,
-              private domainService: DomainService,
               private datePipe: DatePipe,
               @Inject(LOCALE_ID) private defaultLocale: string) {
     this.serviceUrl = environment.serviceUrl;

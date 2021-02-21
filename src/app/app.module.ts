@@ -3,7 +3,7 @@ import {LOCALE_ID, NgModule} from '@angular/core';
 
 import {AppComponent} from './app.component';
 import {HeaderComponent} from './pages/header/header.component';
-import {SettingsComponent} from './pages/accountant/settings/settings.component';
+import {SettingsComponent} from './pages/settings/settings.component';
 import {LoginComponent} from './pages/login/login.component';
 import {RegisterComponent} from './pages/register/register.component';
 import {LoginService} from './services/login.service';
@@ -55,6 +55,8 @@ import {DomainService} from './services/domain.service';
 import {CategoriesService} from './services/accountant/categories.service';
 import {DomainsComponent} from './components/general/domain/domains.component';
 import {DomainInvitationsComponent} from './components/general/domain/domain-invitations.component';
+import {ClientsService} from './services/accountant/clients.service';
+import {ClientsComponent} from './components/accountant/clients/clients.component';
 
 @NgModule({
   declarations: [
@@ -91,7 +93,8 @@ import {DomainInvitationsComponent} from './components/general/domain/domain-inv
     SyrHomeComponent,
     SyrAdminComponent,
     DomainsComponent,
-    DomainInvitationsComponent
+    DomainInvitationsComponent,
+    ClientsComponent
   ],
   imports: [
     BrowserModule,
@@ -122,7 +125,8 @@ import {DomainInvitationsComponent} from './components/general/domain/domain-inv
       useValue: 'pl-PL'
     },
     DomainService,
-    CategoriesService
+    CategoriesService,
+    ClientsService
   ],
   bootstrap: [AppComponent]
 })

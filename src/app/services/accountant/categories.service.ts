@@ -1,12 +1,9 @@
-import {Inject, Injectable, LOCALE_ID} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
 import {Observable} from 'rxjs';
-import {SettingsService} from './settings.service';
-import {DatePipe} from '@angular/common';
 import {Category} from '../../model/accountant/billings/category';
 import {map} from 'rxjs/operators';
-import {DomainService} from '../domain.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,11 +11,7 @@ import {DomainService} from '../domain.service';
 export class CategoriesService {
   serviceUrl: string;
 
-  constructor(private http: HttpClient,
-              private settingsService: SettingsService,
-              private domainService: DomainService,
-              private datePipe: DatePipe,
-              @Inject(LOCALE_ID) private defaultLocale: string) {
+  constructor(private http: HttpClient) {
     this.serviceUrl = environment.serviceUrl;
   }
 

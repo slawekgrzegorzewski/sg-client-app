@@ -2,10 +2,8 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
 import {Observable} from 'rxjs';
-import {SettingsService} from './settings.service';
 import {map} from 'rxjs/operators';
 import {PiggyBank} from '../../model/accountant/piggy-bank';
-import {DomainService} from '../domain.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,9 +11,7 @@ import {DomainService} from '../domain.service';
 export class PiggyBanksService {
   serviceUrl: string;
 
-  constructor(private http: HttpClient,
-              private settingsService: SettingsService,
-              private domainService: DomainService) {
+  constructor(private http: HttpClient) {
     this.serviceUrl = environment.serviceUrl;
   }
 

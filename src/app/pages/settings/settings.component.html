@@ -1,7 +1,7 @@
 <div *ngIf="this.loggedIn()" class="sg-flex-column">
   <ul ngbNav #nav="ngbNav" class="nav-tabs">
     <li ngbNavItem>
-      <a ngbNavLink>Konta w bieżącej domenie</a>
+      <a ngbNavLink>Konta</a>
       <ng-template ngbNavContent>
         <div class="sg-flex-row sg-flex-justify-center">
           <div *ngIf="!isEditAccount && !showAccountDeletionConfirmation">
@@ -33,12 +33,8 @@
             </div>
           </div>
         </div>
-      </ng-template>
-    </li>
-    <li ngbNavItem *ngIf="isAdmin() && otherDomainsAccounts">
-      <a ngbNavLink>Konta w innych domenach</a>
-      <ng-template ngbNavContent>
-        <div class="sg-flex-row sg-flex-justify-center">
+
+        <div class="sg-flex-row sg-flex-justify-center" *ngIf="isAdmin() && otherDomainsAccounts">
           <div class="sg-flex-column" *ngIf="otherDomainsAccounts.size > 0">
             <app-domain-accounts *ngFor="let user of otherDomainsAccounts | keyvalue"
                                  [domain]="user.key"
@@ -61,6 +57,16 @@
           (createEvent)="createCategory($event)"
           (updateEvent)="updateCategory($event)"
         ></app-categories>
+      </ng-template>
+    </li>
+    <li ngbNavItem>
+      <a ngbNavLink>Klienci</a>
+      <ng-template ngbNavContent>
+        <app-clients
+          [clients]="clients"
+          (createEvent)="createClient($event)"
+          (updateEvent)="updateClient($event)"
+        ></app-clients>
       </ng-template>
     </li>
     <li ngbNavItem>
