@@ -11,6 +11,7 @@ import {Expense} from '../../../model/accountant/billings/expense';
 import {Income} from '../../../model/accountant/billings/income';
 import {CategoriesService} from '../../../services/accountant/categories.service';
 import {DomainService} from '../../../services/domain.service';
+import {forkJoin, Observable} from 'rxjs';
 
 
 @Component({
@@ -90,7 +91,13 @@ export class AccountantHomeSmallComponent implements OnInit {
   }
 
   createElement(elementToCreate: Income | Expense, accountIdForElement: number, piggyBankToUpdate: PiggyBank): void {
-    this.billingsService.createBillingElement(elementToCreate, accountIdForElement)
+    const requests: Observable<any>[] = [
+      this.billingsService.createBillingElement(elementToCreate, accountIdForElement)
+    ];
+    if (piggyBankToUpdate) {
+      requests.push(this.piggyBanksService.update(piggyBankToUpdate));
+    }
+    forkJoin(requests)
       .subscribe(
         success => {
           this.refreshData();
