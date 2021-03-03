@@ -38,7 +38,7 @@ export class ClientPayment {
   public static compareByDateAndCurrency(first: ClientPayment, second: ClientPayment): number {
     const dateComparison = first.date.getTime() - second.date.getTime();
     if (dateComparison !== 0) {
-      return dateComparison;
+      return -dateComparison;
     } else {
       return first.currency.localeCompare(second.currency);
     }
@@ -49,6 +49,10 @@ export class ClientPayment {
       .filter(psp => psp.clientPaymentId === this.id)
       .map(psp => psp.price)
       .reduce((previousValue, currentValue) => previousValue + currentValue, 0);
+  }
+
+  public isForCurrentMonth(): boolean {
+    return this.date.getMonth() === new Date().getMonth();
   }
 
   public getPaymentStatus(): ClientPaymentStatus {

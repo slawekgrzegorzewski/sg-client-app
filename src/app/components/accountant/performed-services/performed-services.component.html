@@ -5,6 +5,11 @@
 <ng-template #piggyBanksTemplate>
   <div class="sg-flex-column">
     <h5 *ngIf="title" style="text-align: center">{{title}}</h5>
+
+    <div class="sg-flex-row sg-flex-justify-center">
+      <button (click)="prepareToCreate()" *ngIf="isNonEditMode()" class="btn btn-primary">Stwórz</button>
+    </div>
+
     <div *ngIf="isNonEditMode()" class="sg-flex-row sg-flex-justify-center">
       <table>
         <thead>
@@ -92,9 +97,5 @@
                            (createEvent)="createPerformedServicePayment($event)"
                            (cancelEvent)="resetEditForm()">
     </app-payment-selection>
-
-    <div class="sg-flex-row sg-flex-justify-center">
-      <button (click)="prepareToCreate()" *ngIf="isNonEditMode()" class="btn btn-primary">Stwórz</button>
-    </div>
   </div>
 </ng-template>

@@ -34,7 +34,7 @@ export class PerformedService {
   public static compareByDateAndClientAndService(first: PerformedService, second: PerformedService): number {
     const dateComparison = first.date.getTime() - second.date.getTime();
     if (dateComparison !== 0) {
-      return dateComparison;
+      return -dateComparison;
     } else {
       const clientComparison = first.client.name.localeCompare(second.client.name);
       if (clientComparison !== 0) {

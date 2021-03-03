@@ -25,7 +25,9 @@ export class ClientPaymentComponent implements OnInit {
   }
 
   set clientPayments(value: ClientPayment[]) {
-    this.clientPaymentsInternal = (value || []).sort(ClientPayment.compareByDateAndCurrency);
+    this.clientPaymentsInternal = (value || [])
+      .filter(cp => cp.isForCurrentMonth() || cp.getPaymentStatus() !== ClientPaymentStatus.PAID)
+      .sort(ClientPayment.compareByDateAndCurrency);
   }
 
   @Input() allCurrencies: Currency[];
