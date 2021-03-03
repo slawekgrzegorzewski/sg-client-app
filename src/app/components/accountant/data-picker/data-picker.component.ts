@@ -53,6 +53,7 @@ export class DataPickerComponent implements ControlValueAccessor {
     result.setFullYear(date.year);
     result.setMonth(date.month - 1);
     result.setDate(date.day);
+    result.setHours(12, 0, 0, 0);
     return result;
   }
 
