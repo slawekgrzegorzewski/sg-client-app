@@ -20,6 +20,11 @@
   justify-content: center;
 }
 
+.sg-flex-justify-flex-end {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .sg-flex-justify-space-around {
   display: flex;
   justify-content: space-around;
@@ -59,3 +64,14 @@
   background-color: #d0d0d0;
   color: black;
 }
+
+.sg-text-center {
+  text-align: center;
+}
+
+app-general-typeahead, app-date-picker {
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+}
+

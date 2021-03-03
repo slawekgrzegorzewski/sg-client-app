@@ -1,6 +1,7 @@
 import {Domain} from '../../domain';
+import {ForTypeahead} from '../for-typeahead';
 
-export class Category {
+export class Category implements ForTypeahead {
   public id: number;
   public name: string;
   public description: string;
@@ -15,5 +16,13 @@ export class Category {
 
   public fullName(): string {
     return this.name + ' - ' + this.description;
+  }
+
+  getTypeaheadId(): string {
+    return String(this.id);
+  }
+
+  getTypeaheadDescription(): string {
+    return this.fullName();
   }
 }

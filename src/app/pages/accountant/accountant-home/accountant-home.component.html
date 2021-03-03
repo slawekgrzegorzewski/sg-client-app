@@ -1,5 +1,6 @@
 <div class="sg-flex-row sg-flex-justify-space-around sg-flex-wrap">
-  <div class="sg-flex-column sg-flex-justify-flex-start savings">
+  <div *ngIf="loginService.accountantSettings && !loginService.accountantSettings.company"
+       class="sg-flex-column sg-flex-justify-flex-start savings">
     <app-accounts-grand-total
       [title]="'Podsumowanie'"
       [piggyBanks]="piggyBanks"
@@ -14,6 +15,33 @@
                          [selectable]="false">
     </app-domain-accounts>
   </div>
+  <div *ngIf="loginService.accountantSettings && loginService.accountantSettings.company"
+       class="sg-flex-row sg-flex-justify-flex-start">
+    <app-performed-services
+      [title]="'Wykonane usługi'"
+      [performedServices]="performedServices"
+      [services]="services"
+      [clients]="clients"
+      [clientPayments]="clientPayments"
+      [allCurrencies]="allCurrencies"
+      (createEvent)="createPerformedService($event)"
+      (updateEvent)="updatePerformedService($event)"
+      (createPerformedServicePaymentEvent)="createPerformedServicePayment($event)"
+      style="margin-bottom: 20px; width: 400px"
+    >
+    </app-performed-services>
+    <app-client-payments
+      [title]="'Płatności'"
+      [clientPayments]="clientPayments"
+      [clients]="clients"
+      [allCurrencies]="allCurrencies"
+      [performedServices]="performedServices"
+      (createEvent)="createClientPayment($event)"
+      (updateEvent)="updateClientPayment($event)"
+      style="margin-bottom: 20px; width: 400px"
+    >
+    </app-client-payments>
+  </div>
   <div class="billing">
     <app-browse-billing-elements
       [accounts]="accounts"
@@ -27,9 +55,8 @@
       (updatePiggyBankEvent)="updatePiggyBank($event)"
     ></app-browse-billing-elements>
   </div>
-  <div class="piggy-banks">
+  <div *ngIf="loginService.accountantSettings && !loginService.accountantSettings.company" class="piggy-banks">
     <app-piggy-banks
-      *ngIf="piggyBanks && piggyBanks.length > 0"
       [title]="'Skarbonki'"
       [adminMode]="false"
       [piggyBanks]="piggyBanks"

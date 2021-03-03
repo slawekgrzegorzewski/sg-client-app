@@ -9,23 +9,21 @@ import {Client} from '../../model/accountant/client';
   providedIn: 'root'
 })
 export class ClientsService {
-  serviceUrl: string;
+  private endpoint = `${environment.serviceUrl}/clients`;
 
   constructor(private http: HttpClient) {
-    this.serviceUrl = environment.serviceUrl;
+
   }
 
   currentDomainClients(): Observable<Client[]> {
-    return this.http.get<Client[]>(environment.serviceUrl + '/clients').pipe(map(data => (data.map(d => new Client(d)))));
+    return this.http.get<Client[]>(this.endpoint).pipe(map(data => (data.map(d => new Client(d)))));
   }
 
   updateClient(client: Client): Observable<Client> {
-    return this.http.patch(environment.serviceUrl + '/clients', client)
-      .pipe(map(d => new Client(d)));
+    return this.http.patch(this.endpoint, client).pipe(map(d => new Client(d)));
   }
 
   createClient(client: Client): Observable<Client> {
-    return this.http.put(environment.serviceUrl + '/clients', client)
-      .pipe(map(d => new Client(d)));
+    return this.http.put(this.endpoint, client).pipe(map(d => new Client(d)));
   }
 }

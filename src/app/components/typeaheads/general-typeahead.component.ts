@@ -5,6 +5,7 @@ import {merge, Observable, Subject} from 'rxjs';
 import {NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
 import {debounceTime, distinctUntilChanged, filter, map} from 'rxjs/operators';
 import {BillingPeriodsService} from '../../services/accountant/billing-periods.service';
+import {ForTypeahead} from '../../model/accountant/for-typeahead';
 
 @Component({
   selector: 'app-general-typeahead',
@@ -14,34 +15,42 @@ import {BillingPeriodsService} from '../../services/accountant/billing-periods.s
     {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => GeneralTypeaheadComponent), multi: true}
   ]
 })
-export class GeneralTypeaheadComponent<T, ID extends string | number> implements OnInit, ControlValueAccessor {
+export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit, ControlValueAccessor {
 
-  private internalValue: ID;
+  @Input() id: string;
   @Input() dataProvider: () => Observable<T[]>;
-  @Input() idExtractor: (t: T) => ID;
-  @Input() tToString: (t: T) => string;
+  private internalValue: T;
 
   get value(): T {
-    return (this.values || []).find(t => this.idExtractor(t) === this.internalValue);
+    return this.internalValue;
   }
 
   set value(value: T) {
-    if ((value instanceof String) || (value instanceof Number)) {
+    if (typeof value === 'string' || value instanceof String
+      || typeof value === 'number' || value instanceof Number) {
       return;
     }
-    const id = this.idExtractor(value);
-    this.internalValue = id;
-    this.propagateChange(id);
-    this.propagateTouch(id);
+    this.internalValue = value;
+    const id = this.getElementId(value);
+    this.propagateChange(value);
+    this.propagateTouch(value);
   }
 
-  private availableDataInternal: ID[] = null;
+  get readonlyValue(): string {
+    if (!this.value) {
+      return '';
+    } else {
+      return this.getElementDescription(this.value);
+    }
+  }
 
-  @Input() get availableData(): ID[] {
+  private availableDataInternal: string[] = null;
+
+  @Input() get availableData(): string[] {
     return this.availableDataInternal;
   }
 
-  set availableData(value: ID[]) {
+  set availableData(value: string[]) {
     this.availableDataInternal = value;
     this.filterData();
   }
@@ -64,16 +73,38 @@ export class GeneralTypeaheadComponent<T, ID extends string | number> implements
     this.loadData();
   }
 
-  registerOnChange(fn: (_: number) => void): void {
+  private findValue(elementId: string): T {
+    return (this.values || []).find(t => this.getElementId(t) === elementId);
+  }
+
+  public getElementId(element: T): any {
+    if (element) {
+      return element.getTypeaheadId();
+    } else {
+      return '';
+    }
+  }
+
+  private getElementDescription(element: T): any {
+    if (element) {
+      return element.getTypeaheadDescription();
+    } else {
+      return '';
+    }
+  }
+
+  registerOnChange(fn: (_: T) => void): void {
     this.propagateChange = fn;
   }
 
-  registerOnTouched(fn: (_: number) => void): void {
+  registerOnTouched(fn: (_: T) => void): void {
     this.propagateTouch = fn;
   }
 
-  writeValue(obj: ID): void {
-    this.internalValue = obj as ID;
+  writeValue(obj: T): void {
+    const id = typeof obj === 'string' ? obj : this.getElementId(obj);
+    const value = this.findValue(id);
+    this.internalValue = value;
   }
 
   private loadData(): void {
@@ -91,27 +122,31 @@ export class GeneralTypeaheadComponent<T, ID extends string | number> implements
 
   private filterData(): void {
     this.values = (this.allValues || []).filter(c =>
-      this.availableData === null ? true : this.availableData.includes(this.idExtractor(c))
+      this.availableData === null ? true : this.availableData.includes(this.getElementId(c))
     );
   }
 
-  searchClosure(that: GeneralTypeaheadComponent<T, ID>): (text$: Observable<string>) => Observable<T[]> {
+  searchClosure(that: GeneralTypeaheadComponent<T>): (text$: Observable<string>) => Observable<T[]> {
     return (text$: Observable<string>) => {
       const debouncedText = text$.pipe(debounceTime(200), distinctUntilChanged());
-      const clicksWithClosedPopup = that.click.pipe(filter(() => !that.tTypeAhead.isPopupOpen()));
+      const clicksWithClosedPopup = that.click.pipe(filter(() => !that.tTypeAhead || !that.tTypeAhead.isPopupOpen()));
       const inputFocus = that.focus;
 
       return merge(debouncedText, inputFocus, clicksWithClosedPopup).pipe(
         map(term => (
-          term === '' ? that.values : that.values.filter(c => that.tToString(c).toLowerCase().indexOf(term.toLowerCase()) > -1)
+          term === '' ? that.values : that.values.filter(c => this.getElementDescription(c).toLowerCase().indexOf(term.toLowerCase()) > -1)
         ).slice(0, 10))
       );
     };
   }
 
   formatter(): (t: T) => string {
-    const stringFunction = this.tToString;
-    return (t: T) => t === null ? '' : stringFunction(t);
+    return (t: T) => {
+      if (!t) {
+        return '';
+      } else {
+        return this.getElementDescription(t);
+      }
+    };
   }
-
 }

@@ -1,35 +1,27 @@
 <div class="sg-flex-column">
-  <div class="sg-flex-column" *ngIf="accountsPresent() || piggyBanksPresent()">
-    <h5 style="text-align: center">{{title}}</h5>
-    <app-currency-totals *ngIf="accountsPresent()"
-                         [title]="'Zgromadzone środki'"
-                         [valuesLeft]="accounts"
-                         style="margin-bottom: 10px"
-    ></app-currency-totals>
-    <app-currency-totals *ngIf="piggyBanksPresent()"
-                         [title]="'Środki rozlokowane w skarbonkach'"
-                         [valuesLeft]="piggyBanks"
-                         style="margin-bottom: 10px"
-    ></app-currency-totals>
-    <app-currency-totals *ngIf="accountsPresent() && piggyBanksPresent()"
-                         [title]="'Wolne środki'"
-                         [valuesLeft]="accounts"
-                         [valuesRight]="piggyBanks"
-    ></app-currency-totals>
-  </div>
-
-  <div class="sg-flex-column" *ngIf="historicalSavings && historicalSavings.size > 0">
-    <h5 style="text-align: center">Historyczne oszczędonści</h5>
-    <div *ngFor="let month of dates">
-      <app-multi-currency-total
-        [title]="month | date: 'yyyy-MM'"
-        [values]="historicalSavings.get(month)">
-      </app-multi-currency-total>
-    </div>
+  <h5 style="text-align: center">{{title}}</h5>
+  <app-currency-totals [title]="'Zgromadzone środki'"
+                       [valuesLeft]="accounts"
+                       style="margin-bottom: 10px"
+  ></app-currency-totals>
+  <app-currency-totals [title]="'Środki rozlokowane w skarbonkach'"
+                       [valuesLeft]="piggyBanks"
+                       style="margin-bottom: 10px"
+  ></app-currency-totals>
+  <app-currency-totals [title]="'Wolne środki'"
+                       [valuesLeft]="accounts"
+                       [valuesRight]="piggyBanks"
+  ></app-currency-totals>
+  <h5 style="text-align: center">Historyczne oszczędonści</h5>
+  <div *ngFor="let month of dates">
     <app-multi-currency-total
-      [title]="'Bieżące oszczędności'"
-      [values]="savingsTotal"
-    >
+      [title]="month | date: 'yyyy-MM'"
+      [values]="historicalSavings.get(month)">
     </app-multi-currency-total>
   </div>
+  <app-multi-currency-total
+    [title]="'Bieżące oszczędności'"
+    [values]="savingsTotal"
+  >
+  </app-multi-currency-total>
 </div>

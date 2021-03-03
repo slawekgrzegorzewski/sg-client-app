@@ -16,6 +16,10 @@ import {DomainService} from '../../services/domain.service';
 import {DetailedDomain} from '../../model/domain';
 import {Client} from '../../model/accountant/client';
 import {ClientsService} from '../../services/accountant/clients.service';
+import {AccountantSettingsService} from '../../services/accountant/accountant-settings.service';
+import {AccountantSettings} from '../../model/accountant/accountant-settings';
+import {Service} from '../../model/accountant/service';
+import {ServicesService} from '../../services/accountant/services.service';
 
 @Component({
   selector: 'app-accounts',
@@ -38,16 +42,19 @@ export class SettingsComponent implements OnInit {
   allCurrencies: Currency[];
   categories: Category[];
   clients: Client[];
+  services: Service[];
   userDomains: DetailedDomain[];
 
 
   constructor(
     private accountsService: AccountsService,
+    private accountantSettingsService: AccountantSettingsService,
     private categoriesService: CategoriesService,
     private clientsService: ClientsService,
+    private servicesService: ServicesService,
     private domainsService: DomainService,
     private piggyBanksService: PiggyBanksService,
-    private loginService: LoginService,
+    public loginService: LoginService,
     private modalService: NgbModal,
     private billingsService: BillingPeriodsService,
     private toastService: ToastService) {
@@ -83,12 +90,13 @@ export class SettingsComponent implements OnInit {
     this.fetchCurrencies();
     this.fetchCategories();
     this.fetchClients();
+    this.fetchServices();
     this.currentDomainName = this.domainsService.currentDomain?.name || '';
     this.fetchDomains();
   }
 
   private fetchAccounts(): void {
-    const currentDomain = this.domainsService.currentDomainId;
+    const currentDomain = this.loginService.currentDomainId;
     const accounts: Observable<Account[]> = this.loginService.isAdmin() ?
       this.accountsService.allAccounts() : this.accountsService.currentDomainAccounts();
     accounts.subscribe(
@@ -132,6 +140,12 @@ export class SettingsComponent implements OnInit {
   private fetchClients(): void {
     this.clientsService.currentDomainClients().subscribe(
       data => this.clients = data
+    );
+  }
+
+  private fetchServices(): void {
+    this.servicesService.currentDomainServices().subscribe(
+      data => this.services = data
     );
   }
 
@@ -243,6 +257,18 @@ export class SettingsComponent implements OnInit {
     );
   }
 
+  createService(service: Service): void {
+    this.servicesService.createService(service).subscribe(
+      data => this.fetchServices()
+    );
+  }
+
+  updateService(service: Service): void {
+    this.servicesService.updateService(service).subscribe(
+      data => this.fetchServices()
+    );
+  }
+
   createDomain(domain: DetailedDomain): void {
     this.domainsService.create(domain.name).subscribe(data => this.fetchDomains());
   }
@@ -294,5 +320,11 @@ export class SettingsComponent implements OnInit {
       changedDomain => this.refreshDomains(changedDomain),
       error => this.toastService.showWarning(error.error, 'W czasie zmiany uprawnień domeny wystąpił błąd')
     );
+  }
+
+  updateIsCompany(settings: AccountantSettings): void {
+    this.accountantSettingsService.setIsCompany(settings.company).subscribe(data => {
+      this.loginService.accountantSettings = data;
+    });
   }
 }

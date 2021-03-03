@@ -11,17 +11,19 @@ import {map} from 'rxjs/internal/operators';
   providedIn: 'root'
 })
 export class AccountsService {
-  serviceUrl: string;
+
+  private readonly accountEndpoint = `${environment.serviceUrl}/accounts`;
+  private readonly currenciesEndpoint = `${environment.serviceUrl}/currencies`;
+
   currencies: Currency[] = [];
 
   constructor(private http: HttpClient,
               private settingsService: SettingsService,
               @Inject(LOCALE_ID) private defaultLocale: string) {
-    this.serviceUrl = environment.serviceUrl;
   }
 
   private fetchCurrencies(): Observable<Currency[]> {
-    return this.http.get<Currency[]>(environment.serviceUrl + '/currencies/' + this.settingsService.getUsersLocale())
+    return this.http.get<Currency[]>(`${this.currenciesEndpoint}/${this.settingsService.getUsersLocale()}`)
       .pipe(map(data => data.map(d => Currency.fromData(d))))
       .pipe(map(data => {
         this.currencies = data;
@@ -29,18 +31,17 @@ export class AccountsService {
       }));
   }
 
+
   allAccounts(): Observable<Account[]> {
-    return this.http.get<Account[]>(environment.serviceUrl + '/accounts')
-      .pipe(map(data => data.map(d => new Account(d))));
+    return this.http.get<Account[]>(this.accountEndpoint).pipe(map(data => data.map(d => new Account(d))));
   }
 
   currentDomainAccounts(): Observable<Account[]> {
-    return this.http.get<Account[]>(environment.serviceUrl + '/accounts/mine')
-      .pipe(map(data => data.map(d => new Account(d))));
+    return this.http.get<Account[]>(`${this.accountEndpoint}/mine`).pipe(map(data => data.map(d => new Account(d))));
   }
 
   delete(a: Account): Observable<string> {
-    return this.http.delete(environment.serviceUrl + '/accounts/' + a.id, {responseType: 'text'});
+    return this.http.delete(`${this.accountEndpoint}/${a.id}`, {responseType: 'text'});
   }
 
   possibleCurrencies(): Observable<Currency[]> {
@@ -50,11 +51,11 @@ export class AccountsService {
   }
 
   create(account: Account): Observable<Account> {
-    return this.http.put<Account>(environment.serviceUrl + '/accounts', account)
+    return this.http.put<Account>(this.accountEndpoint, account)
       .pipe(map(a => new Account(a)));
   }
 
   update(account: Account): Observable<string> {
-    return this.http.patch(environment.serviceUrl + '/accounts', account, {responseType: 'text'});
+    return this.http.patch(this.accountEndpoint, account, {responseType: 'text'});
   }
 }

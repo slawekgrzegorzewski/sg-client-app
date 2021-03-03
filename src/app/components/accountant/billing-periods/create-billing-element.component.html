@@ -25,17 +25,15 @@
       </div>
 
       <div class="form-group row">
-        <label for="amount" class="col-3 col-form-label">Kategoria</label>
+        <label for="category" class="col-3 col-form-label">Kategoria</label>
         <app-general-typeahead
-          id="category"
+          [id]="'category'"
           name="category"
           class="col-9"
           [inputClass]="'form-control'"
           [readonly]="null"
-          [(ngModel)]="categoryId"
+          [(ngModel)]="billingElement.category"
           [dataProvider]="categoriesForTypeAhead()"
-          [idExtractor]="categoryIdExtractor"
-          [tToString]="categoryToString"
           #category="ngModel"
           required>
         </app-general-typeahead>
@@ -43,8 +41,8 @@
 
       <div class="form-group row">
         <label for="dateOfElement" class="col-3 col-form-label">Data</label>
-        <input class="form-control col-9" id="dateOfElement" name="dateOfElement" [(ngModel)]="elementDate"
-               #d="ngbDatepicker" (click)="d.toggle()" ngbDatepicker>
+        <app-date-picker class="col-9" [id]="'dateOfElement'" name="dateOfElement" [(ngModel)]="elementDate">
+        </app-date-picker>
       </div>
 
       <div class="form-group row">
@@ -59,7 +57,7 @@
       <div class="form-group row">
         <label for="piggybank" class="col-4 col-form-label">{{piggyBankAction()}}</label>
         <app-general-typeahead
-          id="piggybank"
+          [id]="'piggybank'"
           name="piggybank"
           class="col-8"
           [inputClass]="'form-control'"
@@ -67,8 +65,6 @@
           [(ngModel)]="piggyBankId"
           [availableData]="piggyBanksForSelectedAccount"
           [dataProvider]="piggyBanksForTypeAhead()"
-          [idExtractor]="piggyBankIdExtractor"
-          [tToString]="piggyBankToString()"
           #piggybank="ngModel"
           required>
         </app-general-typeahead>

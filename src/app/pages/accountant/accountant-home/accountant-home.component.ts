@@ -13,6 +13,20 @@ import {Expense} from '../../../model/accountant/billings/expense';
 import {Router} from '@angular/router';
 import {CategoriesService} from '../../../services/accountant/categories.service';
 import {DomainService} from '../../../services/domain.service';
+import {LoginService} from '../../../services/login.service';
+import {PerformedService} from '../../../model/accountant/performed-service';
+import {PerformedServicesService} from '../../../services/accountant/performed-services.service';
+import {Service} from '../../../model/accountant/service';
+import {ServicesService} from '../../../services/accountant/services.service';
+import {Currency} from '../../../model/accountant/currency';
+import {Client} from '../../../model/accountant/client';
+import {ClientsService} from '../../../services/accountant/clients.service';
+import {switchMap} from 'rxjs/operators';
+import {ClientPayment} from '../../../model/accountant/client-payment';
+import {ClientPaymentsService} from '../../../services/accountant/client-payments.service';
+import {forkJoin} from 'rxjs';
+import {PerformedServicePaymentsService} from '../../../services/accountant/performed-service-payments.service';
+import {PerformedServicePayment} from '../../../model/accountant/performed-service-payment';
 
 @Component({
   selector: 'app-accounts-home',
@@ -24,6 +38,14 @@ export class AccountantHomeComponent implements OnInit {
   accounts: Account[];
   piggyBanks: PiggyBank[];
   categories: Category[];
+
+  performedServices: PerformedService[];
+  clientPayments: ClientPayment[];
+  performedServicesPayments: PerformedServicePayment[];
+
+  services: Service[];
+  clients: Client[];
+  allCurrencies: Currency[];
   billingPeriodInfo: BillingPeriodInfo;
   historicalSavings: Map<Date, Map<string, number>>;
   currentDomainName: string;
@@ -35,6 +57,12 @@ export class AccountantHomeComponent implements OnInit {
               private categoriesService: CategoriesService,
               private toastService: ToastService,
               private domainService: DomainService,
+              public loginService: LoginService,
+              private performedServicesService: PerformedServicesService,
+              private clientPaymentsService: ClientPaymentsService,
+              private performedServicePaymentsService: PerformedServicePaymentsService,
+              private servicesService: ServicesService,
+              private clientsService: ClientsService,
               private router: Router) {
   }
 
@@ -48,8 +76,12 @@ export class AccountantHomeComponent implements OnInit {
 
   refreshData(): void {
     this.fetchAccounts();
+    this.fetchCurrencies();
     this.fetchPiggyBanks();
     this.fetchHistoricalSavings();
+    this.fetchCompanyData();
+    this.fetchServices();
+    this.fetchClients();
     this.currentDomainName = this.domainService.currentDomain?.name || '';
   }
 
@@ -57,6 +89,12 @@ export class AccountantHomeComponent implements OnInit {
     this.accountsService.currentDomainAccounts().subscribe(
       data => this.accounts = data.sort(Account.compareByCurrencyAndName),
       error => this.accounts = []
+    );
+  }
+
+  private fetchCurrencies(): void {
+    this.accountsService.possibleCurrencies().subscribe(
+      data => this.allCurrencies = data
     );
   }
 
@@ -76,6 +114,29 @@ export class AccountantHomeComponent implements OnInit {
   private fetchHistoricalSavings(): void {
     this.billingsService.getHistoricalSavings(12).subscribe(
       data => this.historicalSavings = data
+    );
+  }
+
+  private fetchCompanyData(): void {
+    forkJoin([
+      this.performedServicesService.currentDomainServices(),
+      this.clientPaymentsService.currentDomainClientPayments()
+    ])
+      .subscribe(([ps, sp]) => {
+        this.performedServices = ps;
+        this.clientPayments = sp;
+      });
+  }
+
+  private fetchServices(): void {
+    this.servicesService.currentDomainServices().subscribe(
+      data => this.services = data
+    );
+  }
+
+  private fetchClients(): void {
+    this.clientsService.currentDomainClients().subscribe(
+      data => this.clients = data
     );
   }
 
@@ -110,5 +171,45 @@ export class AccountantHomeComponent implements OnInit {
     this.billingsService.createBillingPeriodFor(date).subscribe(
       data => this.fetchBillingPeriod(date)
     );
+  }
+
+  createPerformedService(performedService: PerformedService): void {
+    this.performedServicesService.createService(performedService)
+      .pipe(
+        switchMap(value => this.performedServicesService.currentDomainServices())
+      )
+      .subscribe(data => this.performedServices = data);
+  }
+
+  updatePerformedService(performedService: PerformedService): void {
+    this.performedServicesService.updateService(performedService)
+      .pipe(
+        switchMap(value => this.performedServicesService.currentDomainServices())
+      )
+      .subscribe(data => this.performedServices = data);
+  }
+
+  createClientPayment(clientPayment: ClientPayment): void {
+    this.clientPaymentsService.createClientPayment(clientPayment)
+      .pipe(
+        switchMap(value => this.clientPaymentsService.currentDomainClientPayments())
+      )
+      .subscribe(data => this.clientPayments = data);
+  }
+
+  updateClientPayment(clientPayment: ClientPayment): void {
+    this.clientPaymentsService.updateClientPayment(clientPayment)
+      .pipe(
+        switchMap(value => this.clientPaymentsService.currentDomainClientPayments())
+      )
+      .subscribe(data => this.clientPayments = data);
+  }
+
+  createPerformedServicePayment(performedServicePayment: PerformedServicePayment): void {
+    this.performedServicePaymentsService.createPerformedServicePayments(performedServicePayment)
+      .subscribe(
+        data => this.fetchCompanyData(),
+        error => this.fetchCompanyData()
+      );
   }
 }

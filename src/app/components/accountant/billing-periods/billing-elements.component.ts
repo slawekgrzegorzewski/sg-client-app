@@ -5,6 +5,7 @@ import {Income} from '../../../model/accountant/billings/income';
 import {Expense} from '../../../model/accountant/billings/expense';
 import {Category} from '../../../model/accountant/billings/category';
 import {PiggyBank} from '../../../model/accountant/piggy-bank';
+import {Account} from '../../../model/accountant/account';
 
 export const INCOME = 'income';
 export const EXPENSE = 'expense';

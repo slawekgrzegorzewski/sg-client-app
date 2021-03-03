@@ -35,17 +35,6 @@ export class SyrAdminComponent implements OnInit {
     return () => of(that.allCountries);
   }
 
-  countryIdExtractor(country: Country): number {
-    if (!country) {
-      return null;
-    }
-    return country.id;
-  }
-
-  countryToString(country: Country): string {
-    return country.names.join(', ');
-  }
-
   importSYR(): void {
     this.import(this.countriesToMatch);
   }

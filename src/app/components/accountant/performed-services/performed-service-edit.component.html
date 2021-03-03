@@ -1,0 +1,62 @@
+<div>
+  <div class="form-group sg-flex-row">
+    <label for="service" class="col-3 col-form-label">Usługa</label>
+    <app-general-typeahead class="col-9"
+                           [id]="'service'"
+                           name="service"
+                           [inputClass]="'form-control'"
+                           [readonly]="editMode"
+                           [(ngModel)]="performedService.service"
+                           [dataProvider]="servicesForTypeAhead()"
+                           #service="ngModel"
+                           required>
+    </app-general-typeahead>
+  </div>
+  <div class="form-group sg-flex-row">
+    <label for="client" class="col-3 col-form-label">Klient</label>
+    <app-general-typeahead class="col-9"
+                           [id]="'client'"
+                           name="client"
+                           [inputClass]="'form-control'"
+                           [readonly]="editMode"
+                           [(ngModel)]="performedService.client"
+                           [dataProvider]="clientsForTypeAhead()"
+                           #service="ngModel"
+                           required>
+    </app-general-typeahead>
+  </div>
+  <div class="form-group sg-flex-row">
+    <label for="price" class="col-3 col-form-label">Cena</label>
+    <input id="price" name="price" type="number" min=0 class="form-control col-9"
+           #name="ngModel"
+           [(ngModel)]="performedService.price"
+           required/>
+  </div>
+  <div class="form-group sg-flex-row">
+    <label for="currency" class="col-3 col-form-label">Waluta</label>
+    <app-general-typeahead class="col-9"
+                           [id]="'currency'"
+                           name="currency"
+                           [inputClass]="'form-control'"
+                           [readonly]="editMode"
+                           [(ngModel)]="performedService.currency"
+                           [dataProvider]="currenciesForTypeAhead()"
+                           #currency="ngModel"
+                           required>
+    </app-general-typeahead>
+  </div>
+
+  <div class="form-group sg-flex-row">
+    <label for="paymentDate" class="col-3 col-form-label">Data</label>
+    <app-date-picker class="col-9" [id]="'paymentDate'" name="paymentDate" [(ngModel)]="performedService.date">
+    </app-date-picker>
+  </div>
+</div>
+
+<div class="sg-flex-row sg-flex-justify-center">
+  <button *ngIf="editMode" [disabled]="!canEdit()" (click)="update()" class="btn btn-primary">Zapisz
+  </button>
+  <button *ngIf="createMode" [disabled]="!canCreate()" (click)="create()" class="btn btn-primary">Stwórz
+  </button>
+  <button (click)="resetEditForm()" class="btn btn-primary">Anuluj</button>
+</div>

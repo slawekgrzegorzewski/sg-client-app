@@ -46,12 +46,14 @@ export class EditAccountComponent implements OnInit {
 
   createAccount(): void {
     this.entity = new Account(this.newAccount);
+    this.entity.correctCurrencyToString();
     this.createSubject.next(this.entity);
     this.entity = null;
   }
 
   updateAccount(): void {
     this.entity.name = this.newAccount.name;
+    this.entity.correctCurrencyToString();
     this.updateSubject.next(this.entity);
     this.entity = null;
   }
@@ -67,16 +69,5 @@ export class EditAccountComponent implements OnInit {
   currenciesForTypeAhead(): () => Observable<Currency[]> {
     const that = this;
     return () => of(that.currencies);
-  }
-
-  currencyIdExtractor(currency: Currency): string {
-    if (!currency) {
-      return null;
-    }
-    return currency.code;
-  }
-
-  currencyToString(currency: Currency): string {
-    return currency.description();
   }
 }

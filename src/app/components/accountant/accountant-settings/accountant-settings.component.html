@@ -1,0 +1,5 @@
+<div *ngIf="accountantSettings" class="form-group row">
+  <label class="col-form-label">Dla firmy
+    <input type="checkbox" [checked]="accountantSettings.company" (change)="changeIsCompany()">
+  </label>
+</div>

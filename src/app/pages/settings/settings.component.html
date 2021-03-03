@@ -50,50 +50,80 @@
       </ng-template>
     </li>
     <li ngbNavItem>
-      <a ngbNavLink>Kategorie</a>
+      <a ngbNavLink>Zarządzanie wydatkami</a>
       <ng-template ngbNavContent>
-        <app-categories
-          [categories]="categories"
-          (createEvent)="createCategory($event)"
-          (updateEvent)="updateCategory($event)"
-        ></app-categories>
+        <div class="sg-flex-row sg-flex-justify-center">
+          <div class="sg-flex-column">
+            <h5 class="sg-text-center">Kategorie</h5>
+            <app-categories
+              [categories]="categories"
+              (createEvent)="createCategory($event)"
+              (updateEvent)="updateCategory($event)"
+            ></app-categories>
+          </div>
+          <div class="sg-flex-column sg-flex-align-stretch"
+               *ngIf="loginService.accountantSettings && !loginService.accountantSettings.company">
+            <h5 class="sg-text-center">Skarbonki</h5>
+            <app-piggy-banks
+              [adminMode]="true"
+              [piggyBanks]="piggyBanks"
+              [allCurrencies]="allCurrencies"
+              (createEvent)="createPiggyBank($event)"
+              (updateEvent)="updatePiggyBank($event)"
+            ></app-piggy-banks>
+          </div>
+        </div>
       </ng-template>
     </li>
-    <li ngbNavItem>
-      <a ngbNavLink>Klienci</a>
+    <li ngbNavItem *ngIf="loginService.accountantSettings && loginService.accountantSettings.company">
+      <a ngbNavLink>Firma</a>
       <ng-template ngbNavContent>
-        <app-clients
-          [clients]="clients"
-          (createEvent)="createClient($event)"
-          (updateEvent)="updateClient($event)"
-        ></app-clients>
-      </ng-template>
-    </li>
-    <li ngbNavItem>
-      <a ngbNavLink>Skarbonki</a>
-      <ng-template ngbNavContent>
-        <app-piggy-banks
-          [adminMode]="true"
-          [piggyBanks]="piggyBanks"
-          [allCurrencies]="allCurrencies"
-          (createEvent)="createPiggyBank($event)"
-          (updateEvent)="updatePiggyBank($event)"
-        ></app-piggy-banks>
+        <div class="sg-flex-row">
+          <div class="sg-flex-column">
+            <h5>Klienci</h5>
+            <app-clients
+              [clients]="clients"
+              (createEvent)="createClient($event)"
+              (updateEvent)="updateClient($event)"
+            ></app-clients>
+          </div>
+          <div class="sg-flex-column">
+            <h5>Usługi</h5>
+            <app-services
+              [services]="services"
+              (createEvent)="createService($event)"
+              (updateEvent)="updateService($event)"
+            ></app-services>
+          </div>
+        </div>
       </ng-template>
     </li>
     <li ngbNavItem>
       <a ngbNavLink>Domeny</a>
       <ng-template ngbNavContent>
-        <app-domains
-          [adminMode]="true"
-          [domains]="userDomains"
-          [currentUserLogin]="currentUserLogin()"
-          (createEvent)="createDomain($event)"
-          (updateEvent)="updateDomain($event)"
-          (changeUserAccessEvent)="changeDomainUserAccess($event)"
-          (removeUserFromDomainEvent)="removeUserFromDomain($event)"
-          (inviteUserToDomainEvent)="inviteUserToDomain($event)"
-        ></app-domains>
+        <div class="sg-flex-row sg-flex-justify-center">
+          <div class="sg-flex-column">
+            <h5 class="sg-text-center">Ustawienia accountant</h5>
+            <app-accountant-settings
+              [accountantSettings]="loginService.accountantSettings"
+              (isCompanyUpdateEvent)="updateIsCompany($event)"
+            >
+            </app-accountant-settings>
+          </div>
+          <div class="sg-flex-column">
+            <h5 class="sg-text-center">Domeny</h5>
+            <app-domains
+              [adminMode]="true"
+              [domains]="userDomains"
+              [currentUserLogin]="currentUserLogin()"
+              (createEvent)="createDomain($event)"
+              (updateEvent)="updateDomain($event)"
+              (changeUserAccessEvent)="changeDomainUserAccess($event)"
+              (removeUserFromDomainEvent)="removeUserFromDomain($event)"
+              (inviteUserToDomainEvent)="inviteUserToDomain($event)"
+            ></app-domains>
+          </div>
+        </div>
       </ng-template>
     </li>
   </ul>

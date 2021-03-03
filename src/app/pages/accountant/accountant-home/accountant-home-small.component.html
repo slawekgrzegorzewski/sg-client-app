@@ -24,8 +24,7 @@
                                 (editEvent)="createElement($event[0], $event[1], $event[2])"
     >
     </app-create-billing-element>
-    <app-domain-accounts *ngIf="accounts && accounts.length > 0"
-                         [domain]="currentDomainName"
+    <app-domain-accounts [domain]="currentDomainName"
                          [accounts]="accounts"
                          [selectable]="false">
     </app-domain-accounts>

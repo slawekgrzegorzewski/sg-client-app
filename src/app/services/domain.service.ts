@@ -10,41 +10,21 @@ import {LoginService} from './login.service';
   providedIn: 'root'
 })
 export class DomainService {
+
+  private readonly endpoint = `${environment.serviceUrl}/domains`;
   domainsChangeEvent = new EventEmitter<DetailedDomain[]>();
   invitationChangeEvent = new EventEmitter<Domain[]>();
-  serviceUrl: string;
   availableDomains: DetailedDomain[];
   invitations: Domain[];
 
   get currentDomain(): DetailedDomain {
-    return (this.availableDomains || []).find(d => d.id === (this.currentDomainId || -1));
-  }
-
-
-  get currentDomainId(): number {
-    const item: string = localStorage.getItem('domain');
-    if (!item) {
-      this.currentDomainId = this.loginService.getDefaultDomain();
-      return this.currentDomainId;
-    } else {
-      return Number(item);
-    }
-  }
-
-  set currentDomainId(value: number) {
-    localStorage.setItem('domain', value.toString());
-    window.location.reload();
-  }
-
-  resetCurrentDomainId(): void {
-    localStorage.removeItem('domain');
+    return (this.availableDomains || []).find(d => d.id === (this.loginService.currentDomainId || -1));
   }
 
   constructor(
     private http: HttpClient,
     private loginService: LoginService
   ) {
-    this.serviceUrl = environment.serviceUrl;
     this.loginService.loginSubject.subscribe(isLoggedIn => this.refreshData(isLoggedIn));
   }
 
@@ -69,12 +49,12 @@ export class DomainService {
   }
 
   getAllDomains(): Observable<DetailedDomain[]> {
-    return this.http.get<DetailedDomain[]>(`${this.serviceUrl}/domains`, {responseType: 'json'})
+    return this.http.get<DetailedDomain[]>(this.endpoint, {responseType: 'json'})
       .pipe(map(r => r.map(r1 => new DetailedDomain(r1))));
   }
 
   create(name: string): Observable<Domain> {
-    return this.http.put<Domain>(`${this.serviceUrl}/domains/${name}`, {responseType: 'json'})
+    return this.http.put<Domain>(`${this.endpoint}/${name}`, {responseType: 'json'})
       .pipe(
         map(r => new Domain(r)),
         tap(d => this.refreshData(this.loginService.isLoggedIn()))
@@ -82,7 +62,7 @@ export class DomainService {
   }
 
   update(domain: Domain): Observable<DetailedDomain> {
-    return this.http.patch<DetailedDomain>(`${environment.serviceUrl}/domains`, domain, {responseType: 'json'})
+    return this.http.patch<DetailedDomain>(this.endpoint, domain, {responseType: 'json'})
       .pipe(
         map(d => new DetailedDomain(d)),
         tap(d => this.refreshData(this.loginService.isLoggedIn()))
@@ -98,7 +78,7 @@ export class DomainService {
   }
 
   private changeUserAccessLevel(domainId: number, userLogin: string, accessLevel: string): Observable<DetailedDomain> {
-    return this.http.post<DetailedDomain>(`${this.serviceUrl}/domains/${accessLevel}/${domainId}/${userLogin}`, {responseType: 'json'})
+    return this.http.post<DetailedDomain>(`${this.endpoint}/${accessLevel}/${domainId}/${userLogin}`, {responseType: 'json'})
       .pipe(
         map(d => new DetailedDomain(d)),
         tap(d => this.refreshData(this.loginService.isLoggedIn()))
@@ -106,12 +86,12 @@ export class DomainService {
   }
 
   getInvitations(): Observable<Domain[]> {
-    return this.http.get<Domain[]>(`${this.serviceUrl}/domains/invitations`, {responseType: 'json'})
+    return this.http.get<Domain[]>(`${this.endpoint}/invitations`, {responseType: 'json'})
       .pipe(map(data => data.map(d => new Domain(d))));
   }
 
   removeUserFromDomain(domainId: number, userLogin: string): Observable<DetailedDomain> {
-    return this.http.delete<DetailedDomain>(`${this.serviceUrl}/domains/${domainId}/${userLogin}`, {responseType: 'json'})
+    return this.http.delete<DetailedDomain>(`${this.endpoint}/${domainId}/${userLogin}`, {responseType: 'json'})
       .pipe(
         map(d => new DetailedDomain(d)),
         tap(d => this.refreshData(this.loginService.isLoggedIn()))
@@ -119,17 +99,17 @@ export class DomainService {
   }
 
   inviteUserToDomain(domainId: number, userLogin: string): Observable<object> {
-    return this.http.post(`${this.serviceUrl}/domains/invite/${domainId}/${userLogin}`, {observe: 'response'})
+    return this.http.post(`${this.endpoint}/invite/${domainId}/${userLogin}`, {observe: 'response'})
       .pipe(tap(d => this.refreshData(this.loginService.isLoggedIn())));
   }
 
   acceptInvitation(domainId: number): Observable<object> {
-    return this.http.post(`${this.serviceUrl}/domains/invitations/accept/${domainId}`, {observe: 'response'})
+    return this.http.post(`${this.endpoint}/invitations/accept/${domainId}`, {observe: 'response'})
       .pipe(tap(d => this.refreshData(this.loginService.isLoggedIn())));
   }
 
   rejectInvitation(domainId: number): Observable<object> {
-    return this.http.post(`${this.serviceUrl}/domains/invitations/reject/${domainId}`, {observe: 'response'})
+    return this.http.post(`${this.endpoint}/invitations/reject/${domainId}`, {observe: 'response'})
       .pipe(tap(d => this.refreshData(this.loginService.isLoggedIn())));
   }
 }

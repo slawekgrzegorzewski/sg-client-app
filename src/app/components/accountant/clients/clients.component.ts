@@ -1,5 +1,4 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {Category} from '../../../model/accountant/billings/category';
 import {Client} from '../../../model/accountant/client';
 
 @Component({
@@ -49,7 +48,7 @@ export class ClientsComponent implements OnInit {
   }
 
   prepareToCreate(): void {
-    this.editElement = new Category();
+    this.editElement = new Client();
   }
 
   reset(): void {

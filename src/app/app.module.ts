@@ -2,7 +2,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {LOCALE_ID, NgModule} from '@angular/core';
 
 import {AppComponent} from './app.component';
-import {HeaderComponent} from './pages/header/header.component';
+import {HeaderComponent} from './components/general/header/header.component';
 import {SettingsComponent} from './pages/settings/settings.component';
 import {LoginComponent} from './pages/login/login.component';
 import {RegisterComponent} from './pages/register/register.component';
@@ -57,6 +57,19 @@ import {DomainsComponent} from './components/general/domain/domains.component';
 import {DomainInvitationsComponent} from './components/general/domain/domain-invitations.component';
 import {ClientsService} from './services/accountant/clients.service';
 import {ClientsComponent} from './components/accountant/clients/clients.component';
+import {AccountantSettingsComponent} from './components/accountant/accountant-settings/accountant-settings.component';
+import {AccountantSettingsService} from './services/accountant/accountant-settings.service';
+import {ServicesService} from './services/accountant/services.service';
+import {ServicesComponent} from './components/accountant/services/services.component';
+import {PerformedServicesService} from './services/accountant/performed-services.service';
+import {PerformedServicesComponent} from './components/accountant/performed-services/performed-services.component';
+import {DataPickerComponent} from './components/accountant/data-picker/data-picker.component';
+import {ClientPaymentComponent} from './components/accountant/service-payments/client-payments.component';
+import {ClientPaymentsService} from './services/accountant/client-payments.service';
+import {PerformedServicePaymentsService} from './services/accountant/performed-service-payments.service';
+import {PerformedServiceEditComponent} from './components/accountant/performed-services/performed-service-edit.component';
+import {ClientPaymentEditComponent} from './components/accountant/service-payments/client-payment-edit.component';
+import {PaymentSelectionComponent} from './components/accountant/performed-services/payment-selection.component';
 
 @NgModule({
   declarations: [
@@ -94,7 +107,15 @@ import {ClientsComponent} from './components/accountant/clients/clients.componen
     SyrAdminComponent,
     DomainsComponent,
     DomainInvitationsComponent,
-    ClientsComponent
+    ClientsComponent,
+    AccountantSettingsComponent,
+    ServicesComponent,
+    PerformedServicesComponent,
+    DataPickerComponent,
+    ClientPaymentComponent,
+    PerformedServiceEditComponent,
+    ClientPaymentEditComponent,
+    PaymentSelectionComponent
   ],
   imports: [
     BrowserModule,
@@ -126,7 +147,12 @@ import {ClientsComponent} from './components/accountant/clients/clients.componen
     },
     DomainService,
     CategoriesService,
-    ClientsService
+    ClientsService,
+    AccountantSettingsService,
+    ServicesService,
+    PerformedServicesService,
+    ClientPaymentsService,
+    PerformedServicePaymentsService
   ],
   bootstrap: [AppComponent]
 })

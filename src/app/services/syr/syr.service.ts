@@ -12,27 +12,24 @@ import {SecretCountriesSYR} from '../../model/syr/secret-countries-syr';
   providedIn: 'root'
 })
 export class SyrService {
-  serviceUrl: string;
+
+  private readonly endpoint = `${environment.serviceUrl}/syr`;
 
   constructor(private http: HttpClient,
               private settingsService: SettingsService,
               @Inject(LOCALE_ID) private defaultLocale: string) {
-    this.serviceUrl = environment.serviceUrl;
+
   }
 
   public import(file: File, newCountriesMatch: { name: string; country: number }[]): Observable<SyrCreationResult> {
     const formData: FormData = new FormData();
     formData.append('uploadFile', file);
     formData.append('newCountriesMatch', JSON.stringify(newCountriesMatch));
-
-    return this.http.post(this.serviceUrl + '/syr', formData, {responseType: 'json'})
-      .pipe(map(r => new SyrCreationResult(r)));
+    return this.http.post(this.endpoint, formData, {responseType: 'json'}).pipe(map(r => new SyrCreationResult(r)));
   }
 
   public getAll(): Observable<(CountrySYR | SecretCountriesSYR) []> {
-    return this.http.get<(CountrySYR | SecretCountriesSYR) []>(
-      this.serviceUrl + '/syr',
-      {responseType: 'json'})
+    return this.http.get<(CountrySYR | SecretCountriesSYR) []>(this.endpoint, {responseType: 'json'})
       .pipe(map(r => r.map(r1 => CountrySYR.isInstanceOf(r1) ? new CountrySYR(r1) : new SecretCountriesSYR(r1))));
   }
 

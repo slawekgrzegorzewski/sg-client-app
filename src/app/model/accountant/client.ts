@@ -1,6 +1,7 @@
 import {Domain} from '../domain';
+import {ForTypeahead} from './for-typeahead';
 
-export class Client {
+export class Client implements ForTypeahead {
   public id: number;
   public name: string;
   public domain: Domain;
@@ -9,5 +10,13 @@ export class Client {
     this.id = data && data.id;
     this.name = data && data.name || '';
     this.domain = data && new Domain(data.domain) || null;
+  }
+
+  getTypeaheadId(): string {
+    return String(this.id);
+  }
+
+  getTypeaheadDescription(): string {
+    return this.name;
   }
 }

@@ -1,7 +1,10 @@
 import {Domain} from '../domain';
 import {Balance, WithBalance} from './with-balance';
+import {ForTypeahead} from './for-typeahead';
+import {CurrencyPipe} from '@angular/common';
+import {Currency} from './currency';
 
-export class PiggyBank implements WithBalance {
+export class PiggyBank implements WithBalance, ForTypeahead {
   public id: number;
   public name: string;
   public description: string;
@@ -12,7 +15,7 @@ export class PiggyBank implements WithBalance {
   public userId: number;
   public domain: Domain;
 
-  constructor(data?: any) {
+  constructor(private currencyPipe: CurrencyPipe, data?: any) {
     this.id = data && data.id;
     this.name = data && data.name || '';
     this.description = data && data.description || '';
@@ -26,5 +29,19 @@ export class PiggyBank implements WithBalance {
 
   getBalance(): Balance {
     return new Balance(this.balance, this.currency);
+  }
+
+  getTypeaheadId(): string {
+    return String(this.id);
+  }
+
+  getTypeaheadDescription(): string {
+    return this.name + ' ' + this.currencyPipe.transform(this.balance, this.currency);
+  }
+
+  correctCurrencyToString(): void {
+    if (this.currency && typeof this.currency === 'object') {
+      this.currency = (this.currency as Currency).code;
+    }
   }
 }

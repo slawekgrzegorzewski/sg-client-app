@@ -8,7 +8,7 @@
   </div>
   <div class="navbar-brand bg-dark">
     <select *ngIf="availableDomains"
-            [(ngModel)]="domainService.currentDomainId" class="navbar-brand bg-dark"
+            [(ngModel)]="loginService.currentDomainId" class="navbar-brand bg-dark"
             style="border-color: #343a40">
       <option *ngFor="let d of availableDomains" [value]="d.id">{{d.name}}</option>
     </select>
@@ -39,7 +39,8 @@
       <li class="nav-item menu-element-small" [routerLinkActive]="['active']" *ngIf="isLoggedIn && isAccountant()">
         <a class="nav-link" [routerLink]="['/billing-small']">Okresy rozliczeniowe</a>
       </li>
-      <li class="nav-item menu-element-small" [routerLinkActive]="['active']" *ngIf="isLoggedIn && isAccountant()">
+      <li class="nav-item menu-element-small" [routerLinkActive]="['active']"
+          *ngIf="isLoggedIn && isAccountant() && loginService.accountantSettings && !loginService.accountantSettings.company">
         <a class="nav-link" [routerLink]="['/piggy-banks-small']">Skarbonki</a>
       </li>
       <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn && isAccountant()">

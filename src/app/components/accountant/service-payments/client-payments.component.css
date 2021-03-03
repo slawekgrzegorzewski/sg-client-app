@@ -1,0 +1,21 @@
+.performed-service-row {
+  border-top: black dashed thin;
+}
+
+thead > tr > td {
+  text-align: center;
+  font-weight: bold;
+}
+
+.paid-ps {
+   background-color: #a2ff9b;
+ }
+
+.not-paid-ps {
+  background-color: #faafaf
+}
+
+.underpaid-ps {
+  background-color: #fffec6;
+}
+

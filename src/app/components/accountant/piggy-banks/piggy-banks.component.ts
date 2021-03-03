@@ -2,7 +2,7 @@ import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} f
 import {PiggyBank} from '../../../model/accountant/piggy-bank';
 import {Observable, of} from 'rxjs';
 import {Currency} from '../../../model/accountant/currency';
-import {getCurrencySymbol} from '@angular/common';
+import {CurrencyPipe, getCurrencySymbol} from '@angular/common';
 
 export const INCOME = 'income';
 export const EXPENSE = 'expense';
@@ -76,7 +76,7 @@ export class PiggyBanksComponent implements OnInit {
   utilBoxLeft: number;
   utilBoxVisibility = 'hidden';
 
-  constructor() {
+  constructor(private currencyPipe: CurrencyPipe) {
   }
 
   private static isEmptyString(value: string): boolean {
@@ -104,15 +104,9 @@ export class PiggyBanksComponent implements OnInit {
     }
   }
 
-  buttonClicked(): PiggyBank {
-    const acc = this.overElement;
-    this.setOverPiggyBank(null, null);
-    return acc;
-  }
-
   prepareToCreate(): void {
     if (this.adminMode) {
-      this.prepareToEdit(new PiggyBank(), CREATE_EDIT_MODE);
+      this.prepareToEdit(new PiggyBank(this.currencyPipe, null), CREATE_EDIT_MODE);
     }
   }
 
@@ -144,6 +138,7 @@ export class PiggyBanksComponent implements OnInit {
   }
 
   create(): void {
+    this.editElement.correctCurrencyToString();
     this.createEvent.emit(this.editElement);
     this.resetEditForm();
   }
@@ -171,6 +166,7 @@ export class PiggyBanksComponent implements OnInit {
   }
 
   private updateEditElement(): void {
+    this.editElement.correctCurrencyToString();
     this.updateEvent.emit(this.editElement);
     this.resetEditForm();
   }
@@ -208,17 +204,6 @@ export class PiggyBanksComponent implements OnInit {
   currenciesForTypeAhead(): () => Observable<Currency[]> {
     const that = this;
     return () => of(that.allCurrencies);
-  }
-
-  currencyIdExtractor(currency: Currency): string {
-    if (!currency) {
-      return null;
-    }
-    return currency.code;
-  }
-
-  currencyToString(currency: Currency): string {
-    return currency.description();
   }
 
   getCurrencySymbol(currency: string): string {

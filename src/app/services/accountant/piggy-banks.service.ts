@@ -4,28 +4,28 @@ import {environment} from '../../../environments/environment';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {PiggyBank} from '../../model/accountant/piggy-bank';
+import {CurrencyPipe} from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PiggyBanksService {
-  serviceUrl: string;
 
-  constructor(private http: HttpClient) {
-    this.serviceUrl = environment.serviceUrl;
+  private readonly endpoint = `${environment.serviceUrl}/piggy-banks`;
+
+  constructor(private http: HttpClient, private currencyPipe: CurrencyPipe) {
   }
 
   currentDomainPiggyBanks(): Observable<PiggyBank[]> {
-    return this.http.get<PiggyBank[]>(environment.serviceUrl + '/piggy-banks')
-      .pipe(map(data => data.map(d => new PiggyBank(d))));
+    return this.http.get<PiggyBank[]>(this.endpoint).pipe(map(data => data.map(d => new PiggyBank(this.currencyPipe, d))));
   }
 
   create(piggyBank: PiggyBank): Observable<number> {
-    return this.http.put<number>(environment.serviceUrl + '/piggy-banks', piggyBank);
+    return this.http.put<number>(this.endpoint, piggyBank);
   }
 
   update(piggyBank: PiggyBank): Observable<string> {
-    return this.http.patch(environment.serviceUrl + '/piggy-banks', piggyBank, {responseType: 'text'});
+    return this.http.patch(this.endpoint, piggyBank, {responseType: 'text'});
   }
 
 }

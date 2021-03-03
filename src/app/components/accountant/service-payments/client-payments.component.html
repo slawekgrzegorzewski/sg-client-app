@@ -1,0 +1,83 @@
+<div class="row col-sm sg-flex-justify-center">
+  <ng-container *ngTemplateOutlet="servicePaymenstTemplate"></ng-container>
+</div>
+
+<ng-template #servicePaymenstTemplate>
+  <div class="sg-flex-column">
+    <h5 *ngIf="title" style="text-align: center">{{title}}</h5>
+    <div (mouseleave)="setOverClientPayment(null, null)" *ngIf="isNonEditMode()"
+         class="sg-flex-row sg-flex-justify-center">
+      <table>
+        <thead>
+        <tr>
+          <td style="width: 100px">Data</td>
+          <td style="width: 100px">Klient</td>
+          <td style="width: 100px">Cena</td>
+          <td style="width: 30px">P</td>
+          <td style="width: 30px">PF</td>
+          <td style="width: 30px">F</td>
+        </tr>
+        </thead>
+        <ng-container *ngFor="let clientPayment of clientPayments">
+          <tr #row (click)="setClientPayment(clientPayment)"
+              (mouseenter)="setOverClientPayment(clientPayment, row)"
+              class="performed-service-row sg-row-hoverable"
+              [ngClass]="getClientPaymentClass(clientPayment)">
+            <td>{{clientPayment.date | localizedDate }}</td>
+            <td>{{clientPayment.client.name}}</td>
+            <td style="text-align:right">{{clientPayment.price| currency: clientPayment.currency}}</td>
+            <td style="text-align:center"><input type="checkbox" [ngModel]="clientPayment.billOfSale" disabled></td>
+            <td style="text-align:center"><input type="checkbox" [ngModel]="clientPayment.billOfSaleAsInvoice" disabled>
+            </td>
+            <td style="text-align:center"><input type="checkbox" [ngModel]="clientPayment.invoice" disabled></td>
+          </tr>
+          <tr *ngIf="isEqualToSelectedElement(clientPayment)" (click)="setClientPayment(clientPayment)"
+              [ngClass]="getClientPaymentClass(clientPayment)">
+            <td colspan="6">
+              <div class="sg-flex-column">
+                <table style="width: 100%">
+                  <thead>
+                  <tr>
+                    <td>Data</td>
+                    <td>Usługa</td>
+                    <td>Cena</td>
+                  </tr>
+                  </thead>
+                  <tr *ngFor="let payment of clientPayment.serviceRelations">
+                    <td style="text-align:center">{{getPerformedService(payment).date | localizedDate}}</td>
+                    <td style="text-align:center">{{getPerformedService(payment).service.name}}</td>
+                    <td style="text-align:right">{{payment.price | currency: getPerformedService(payment).currency}}</td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+      </table>
+      <div #utilBox style="position: fixed;"
+           [ngStyle]="{'top.px': utilBoxTop, 'left.px': utilBoxLeft, 'visibility': utilBoxVisibility}">
+        <button (click)="prepareToGeneralEdit()" class="btn btn-primary btn-sm">
+          Edytuj
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="isGeneralEditMode() || isCreateEditMode()">
+      <app-client-payment-edit
+        [clientPayment]="editElement"
+        [editMode]="isGeneralEditMode()"
+        [createMode]="isCreateEditMode()"
+        [allCurrencies]="allCurrencies"
+        [clients]="clients"
+        (createEvent)="create($event)"
+        (updateEvent)="update($event)"
+        (cancelEvent)="resetEditForm()"
+      >
+      </app-client-payment-edit>
+    </div>
+
+    <div class="sg-flex-row sg-flex-justify-center">
+      <button (click)="prepareToCreate()" *ngIf="isNonEditMode()" class="btn btn-primary">Stwórz</button>
+    </div>
+  </div>
+</ng-template>

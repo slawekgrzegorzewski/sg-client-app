@@ -3,7 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
 import {Observable} from 'rxjs';
 import {BillingPeriod, BillingPeriodInfo} from '../../model/accountant/billings/billing-period';
-import {DatePipe} from '@angular/common';
+import {CurrencyPipe, DatePipe} from '@angular/common';
 import {map} from 'rxjs/operators';
 import {Expense} from '../../model/accountant/billings/expense';
 import {Income} from '../../model/accountant/billings/income';
@@ -14,7 +14,9 @@ import {Dates} from '../../../utils/dates';
   providedIn: 'root'
 })
 export class BillingPeriodsService {
-  serviceUrl: string;
+
+  private readonly billingEndpoint = `${environment.serviceUrl}/billing-periods`;
+  private readonly summariesEndpoint = `${environment.serviceUrl}/month-summaries`;
 
   static sortMapWithDatesKeys(resultUnsorted: Map<Date, any>): Map<Date, any> {
     const resultSorted = new Map<Date, any>();
@@ -38,27 +40,28 @@ export class BillingPeriodsService {
 
   constructor(private http: HttpClient,
               private datePipe: DatePipe,
+              private currencyPipe: CurrencyPipe,
               @Inject(LOCALE_ID) private defaultLocale: string) {
-    this.serviceUrl = environment.serviceUrl;
   }
 
+
   currentBillingPeriod(): Observable<BillingPeriodInfo> {
-    return this.http.get<BillingPeriodInfo>(environment.serviceUrl + '/billing-periods')
+    return this.http.get<BillingPeriodInfo>(this.billingEndpoint)
       .pipe(map(d => new BillingPeriodInfo(d)));
   }
 
   billingPeriodFor(date: Date): Observable<BillingPeriodInfo> {
     return this.http.get<BillingPeriodInfo>(
-      `${environment.serviceUrl}/billing-periods/${this.datePipe.transform(date, 'yyyy-MM')}`)
+      `${this.billingEndpoint}/${this.datePipe.transform(date, 'yyyy-MM')}`)
       .pipe(map(d => new BillingPeriodInfo(d)));
   }
 
   createCurrentBillingPeriod(): Observable<BillingPeriodInfo> {
-    return this.createBillingPeriod(environment.serviceUrl + '/billing-periods');
+    return this.createBillingPeriod(this.billingEndpoint);
   }
 
   createBillingPeriodFor(date: Date): Observable<BillingPeriodInfo> {
-    return this.createBillingPeriod(environment.serviceUrl + '/billing-periods/' + this.datePipe.transform(date, 'yyyy-MM'));
+    return this.createBillingPeriod(`${this.billingEndpoint}/${this.datePipe.transform(date, 'yyyy-MM')}`);
   }
 
   private createBillingPeriod(url: string): Observable<BillingPeriodInfo> {
@@ -71,20 +74,21 @@ export class BillingPeriodsService {
 
   finishBillingPeriodOf(date: Date): Observable<BillingPeriodInfo> {
     const dateString = this.datePipe.transform(date, 'yyyy-MM');
-    const url = `${environment.serviceUrl}/billing-periods/${dateString}/finish`;
+    const url = `${this.billingEndpoint}/${dateString}/finish`;
     return this.http.patch<BillingPeriodInfo>(url, {responseType: 'json'}).pipe(map(d => new BillingPeriodInfo(d)));
   }
 
   createBillingElement(element: Income | Expense, accountId: number): Observable<string> {
     if (element instanceof Income) {
-      return this.http.put<string>(environment.serviceUrl + '/billing-periods/income/' + accountId, element);
+      return this.http.put<string>(`${this.billingEndpoint}/income/${accountId}`, element);
     } else {
-      return this.http.put<string>(environment.serviceUrl + '/billing-periods/expense/' + accountId, element);
+      return this.http.put<string>(`${this.billingEndpoint}/expense/${accountId}`, element);
     }
   }
 
+
   getHistoricalSavings(noOfMonths: number): Observable<Map<Date, Map<string, number>>> {
-    const url = `${environment.serviceUrl}/month-summaries/savings/${noOfMonths}`;
+    const url = `${this.summariesEndpoint}/savings/${noOfMonths}`;
     return this.http.get<Map<Date, Map<string, number>>>(url)
       .pipe(map(d => {
         const resultUnsorted = new Map<Date, Map<string, number>>();
@@ -101,7 +105,7 @@ export class BillingPeriodsService {
   }
 
   getHistoricalPiggyBanks(noOfMonths: number): Observable<Map<Date, PiggyBank[]>> {
-    const url = `${environment.serviceUrl}/month-summaries/piggy-banks/${noOfMonths}`;
+    const url = `${this.summariesEndpoint}/piggy-banks/${noOfMonths}`;
     return this.http.get<Map<Date, PiggyBank[]>>(url)
       .pipe(map(d => {
         const resultUnsorted = new Map<Date, PiggyBank[]>();
@@ -110,7 +114,7 @@ export class BillingPeriodsService {
           const date = new Date(dateToPiggyBanks[0]);
           const piggyBanksForDate = resultUnsorted.get(date) || [];
           dateToPiggyBanks[1].forEach(pg => {
-            const piggyBank = new PiggyBank(pg);
+            const piggyBank = new PiggyBank(this.currencyPipe, pg);
             this.updatePerIdMap(piggyBanksPerId, piggyBank);
             piggyBanksForDate.push(piggyBank);
           });

@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import {ACCOUNTANT_APP, CHECKER_APP, LoginService, SYR_APP} from 'src/app/services/login.service';
+import {LoginService} from 'src/app/services/login.service';
 import {Router} from '@angular/router';
-import {DomainService} from '../../services/domain.service';
-import {DetailedDomain, Domain} from '../../model/domain';
+import {DomainService} from '../../../services/domain.service';
+import {DetailedDomain, Domain} from '../../../model/domain';
 
 @Component({
   selector: 'app-header',
@@ -72,19 +72,19 @@ export class HeaderComponent implements OnInit {
   }
 
   isAccountant(): boolean {
-    return this.selectedApp === ACCOUNTANT_APP;
+    return this.loginService.isAccountant(this.selectedApp);
   }
 
   isChecker(): boolean {
-    return this.selectedApp === CHECKER_APP;
+    return this.loginService.isChecker(this.selectedApp);
   }
 
   isSYR(): boolean {
-    return this.selectedApp === SYR_APP;
+    return this.loginService.isSYR(this.selectedApp);
   }
 
   isSYRAdmin(): boolean {
-    return this.isSYR() && this.loginService.containsRole('SYR_ADMIN');
+    return this.loginService.isSYRAdmin(this.selectedApp);
   }
 
   acceptInvitation(domain: Domain): void {

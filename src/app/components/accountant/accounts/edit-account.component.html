@@ -12,16 +12,12 @@
       <label for="accountCurrency" class="col-2 col-form-label">Waluta</label>
       <div class="col-10">
         <app-general-typeahead
-          id="accountCurrency"
+          [id]="'accountCurrency'"
           name="accountCurrency"
           [inputClass]="'form-control'"
           [readonly]="isEditMode() ? 'readonly' : null" [class.form-control-plaintext]="isEditMode()"
           [(ngModel)]="newAccount.currency"
-
           [dataProvider]="currenciesForTypeAhead()"
-          [idExtractor]="currencyIdExtractor"
-          [tToString]="currencyToString"
-
           #accountCurrency="ngModel"
           required>
         </app-general-typeahead>

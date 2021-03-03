@@ -1,5 +1,6 @@
 import {Domain} from '../domain';
 import {Balance, WithBalance} from './with-balance';
+import {Currency} from './currency';
 
 export class Account implements WithBalance {
   public id: number;
@@ -29,5 +30,11 @@ export class Account implements WithBalance {
 
   getBalance(): Balance {
     return new Balance(this.currentBalance, this.currency);
+  }
+
+  correctCurrencyToString(): void {
+    if (this.currency && typeof this.currency === 'object') {
+      this.currency = (this.currency as Currency).code;
+    }
   }
 }

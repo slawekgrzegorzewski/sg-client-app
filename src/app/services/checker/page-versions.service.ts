@@ -10,17 +10,16 @@ import {SettingsService} from '../accountant/settings.service';
   providedIn: 'root'
 })
 export class PageVersionsService {
-  serviceUrl: string;
+
+  private readonly endpoint = `${environment.serviceUrl}/page-version`;
 
   constructor(private http: HttpClient,
               private settingsService: SettingsService,
               @Inject(LOCALE_ID) private defaultLocale: string) {
-    this.serviceUrl = environment.serviceUrl;
   }
 
   public getAllPageVersions(): Observable<PageVersion[]> {
-    return this.http.get<PageVersion[]>(environment.serviceUrl + '/page-version')
-      .pipe(map(data => data.map(d => new PageVersion(d))));
+    return this.http.get<PageVersion[]>(this.endpoint).pipe(map(data => data.map(d => new PageVersion(d))));
   }
 
 }
