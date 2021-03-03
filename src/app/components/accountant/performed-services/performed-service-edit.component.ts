@@ -13,6 +13,7 @@ import {Client} from '../../../model/accountant/client';
 export class PerformedServiceEditComponent implements OnInit {
 
   @Input() performedService: PerformedService;
+  @Input() performedServices: PerformedService[];
   @Input() editMode: boolean;
   @Input() createMode: boolean;
 
@@ -71,7 +72,18 @@ export class PerformedServiceEditComponent implements OnInit {
 
   clientsForTypeAhead(): () => Observable<Client[]> {
     const that = this;
-    return () => of(that.clients);
+    const clientsOccurrences: Map<number, number> = new Map<number, number>();
+    that.performedServices.filter(ps => ps.date.getMonth() >= new Date().getMonth() - 1).forEach(ps => {
+      clientsOccurrences.set(ps.client.id, (clientsOccurrences.get(ps.client.id) || 0) + 1);
+    });
+    const clientsToShow = that.clients.sort((a, b) => {
+      const order = (clientsOccurrences.get(b.id) || 0) - (clientsOccurrences.get(a.id) || 0);
+      if (order !== 0) {
+        return order;
+      }
+      return a.name.localeCompare(b.name);
+    });
+    return () => of(clientsToShow);
   }
 
   currenciesForTypeAhead(): () => Observable<Currency[]> {

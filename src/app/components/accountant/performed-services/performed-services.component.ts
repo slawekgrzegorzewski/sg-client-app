@@ -20,6 +20,7 @@ const EMPTY_EDIT_MODE = '';
 export class PerformedServicesComponent implements OnInit {
   @Input() title: string;
 
+  allPerformedServices: PerformedService[];
   performedServicesInternal: PerformedService[];
 
   @Input() get performedServices(): PerformedService[] {
@@ -27,6 +28,7 @@ export class PerformedServicesComponent implements OnInit {
   }
 
   set performedServices(value: PerformedService[]) {
+    this.allPerformedServices = value;
     this.performedServicesInternal = (value || [])
       .filter(ps => ps.isForCurrentMonth() || ps.getPaymentStatus() !== PaymentStatus.PAID)
       .sort(PerformedService.compareByDateAndClientAndService);

@@ -81,6 +81,7 @@
 
     <app-performed-service-edit *ngIf="isGeneralEditMode() || isCreateEditMode()"
                                 [performedService]="editElement"
+                                [performedServices]="allPerformedServices"
                                 [editMode]="isGeneralEditMode()"
                                 [createMode]="isCreateEditMode()"
                                 [services]="services"
