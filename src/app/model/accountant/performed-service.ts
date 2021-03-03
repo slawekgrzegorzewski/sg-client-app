@@ -45,6 +45,10 @@ export class PerformedService {
     }
   }
 
+  public isForCurrentMonth(): boolean {
+    return this.date.getMonth() === new Date().getMonth();
+  }
+
   public getPaymentStatus(): PaymentStatus {
     const sum = this.getPaidAmountForNow();
     if (sum === this.price) {

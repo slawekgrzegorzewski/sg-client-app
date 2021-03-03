@@ -47,6 +47,7 @@
                     <td style="width: 30px">P</td>
                     <td style="width: 30px">PF</td>
                     <td style="width: 30px">F</td>
+                    <td style="width: 30px">C</td>
                   </tr>
                   </thead>
                   <tr *ngFor="let payment of performedService.clientPaymentsRelations">
@@ -60,6 +61,9 @@
                     </td>
                     <td style="text-align:center">
                       <input type="checkbox" [ngModel]="clientPayment(payment).invoice" disabled>
+                    </td>
+                    <td style="text-align:center">
+                      <input type="checkbox" [ngModel]="clientPayment(payment).notRegistered" disabled>
                     </td>
                   </tr>
                 </table>

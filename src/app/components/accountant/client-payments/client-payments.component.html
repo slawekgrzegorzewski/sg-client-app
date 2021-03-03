@@ -16,6 +16,7 @@
           <td style="width: 30px">P</td>
           <td style="width: 30px">PF</td>
           <td style="width: 30px">F</td>
+          <td style="width: 30px">C</td>
         </tr>
         </thead>
         <ng-container *ngFor="let clientPayment of clientPayments">
@@ -30,6 +31,7 @@
             <td style="text-align:center"><input type="checkbox" [ngModel]="clientPayment.billOfSaleAsInvoice" disabled>
             </td>
             <td style="text-align:center"><input type="checkbox" [ngModel]="clientPayment.invoice" disabled></td>
+            <td style="text-align:center"><input type="checkbox" [ngModel]="clientPayment.notRegistered" disabled></td>
           </tr>
           <tr *ngIf="isEqualToSelectedElement(clientPayment)" (click)="setClientPayment(clientPayment)"
               [ngClass]="getClientPaymentClass(clientPayment)">
@@ -46,7 +48,8 @@
                   <tr *ngFor="let payment of clientPayment.serviceRelations">
                     <td style="text-align:center">{{getPerformedService(payment).date | localizedDate}}</td>
                     <td style="text-align:center">{{getPerformedService(payment).service.name}}</td>
-                    <td style="text-align:right">{{payment.price | currency: getPerformedService(payment).currency}}</td>
+                    <td
+                      style="text-align:right">{{payment.price | currency: getPerformedService(payment).currency}}</td>
                   </tr>
                 </table>
               </div>

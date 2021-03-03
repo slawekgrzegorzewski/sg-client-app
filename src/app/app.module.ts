@@ -64,11 +64,11 @@ import {ServicesComponent} from './components/accountant/services/services.compo
 import {PerformedServicesService} from './services/accountant/performed-services.service';
 import {PerformedServicesComponent} from './components/accountant/performed-services/performed-services.component';
 import {DataPickerComponent} from './components/accountant/data-picker/data-picker.component';
-import {ClientPaymentComponent} from './components/accountant/service-payments/client-payments.component';
+import {ClientPaymentComponent} from './components/accountant/client-payments/client-payments.component';
 import {ClientPaymentsService} from './services/accountant/client-payments.service';
 import {PerformedServicePaymentsService} from './services/accountant/performed-service-payments.service';
 import {PerformedServiceEditComponent} from './components/accountant/performed-services/performed-service-edit.component';
-import {ClientPaymentEditComponent} from './components/accountant/service-payments/client-payment-edit.component';
+import {ClientPaymentEditComponent} from './components/accountant/client-payments/client-payment-edit.component';
 import {PaymentSelectionComponent} from './components/accountant/performed-services/payment-selection.component';
 
 @NgModule({

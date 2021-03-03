@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Observable, of} from 'rxjs';
 import {Currency} from '../../../model/accountant/currency';
 import {ClientPayment} from '../../../model/accountant/client-payment';
@@ -21,6 +21,9 @@ export class ClientPaymentEditComponent implements OnInit {
     if (this.clientPayment.invoice) {
       return 'I';
     }
+    if (this.clientPayment.notRegistered) {
+      return 'NR';
+    }
   }
 
   set receiptType(value: string) {
@@ -30,6 +33,8 @@ export class ClientPaymentEditComponent implements OnInit {
       this.setBillAsInvoice();
     } else if (value === 'I') {
       this.setInvoice();
+    } else if (value === 'NR') {
+      this.setNotRegistered();
     } else {
       this.clearReceiptType();
     }
@@ -96,23 +101,34 @@ export class ClientPaymentEditComponent implements OnInit {
     this.clientPayment.billOfSale = true;
     this.clientPayment.billOfSaleAsInvoice = false;
     this.clientPayment.invoice = false;
+    this.clientPayment.notRegistered = false;
   }
 
   setBillAsInvoice(): void {
     this.clientPayment.billOfSale = false;
     this.clientPayment.billOfSaleAsInvoice = true;
     this.clientPayment.invoice = false;
+    this.clientPayment.notRegistered = false;
   }
 
   setInvoice(): void {
     this.clientPayment.billOfSale = false;
     this.clientPayment.billOfSaleAsInvoice = false;
     this.clientPayment.invoice = true;
+    this.clientPayment.notRegistered = false;
+  }
+
+  setNotRegistered(): void {
+    this.clientPayment.billOfSale = false;
+    this.clientPayment.billOfSaleAsInvoice = false;
+    this.clientPayment.invoice = false;
+    this.clientPayment.notRegistered = true;
   }
 
   private clearReceiptType(): void {
     this.clientPayment.billOfSale = false;
     this.clientPayment.billOfSaleAsInvoice = false;
     this.clientPayment.invoice = false;
+    this.clientPayment.notRegistered = false;
   }
 }

@@ -15,6 +15,7 @@ export class ClientPayment {
   public billOfSale: boolean;
   public billOfSaleAsInvoice: boolean;
   public invoice: boolean;
+  public notRegistered: boolean;
   public serviceRelations: SimplePerformedServicePayment[];
   public domain: Domain;
 
@@ -27,6 +28,7 @@ export class ClientPayment {
     this.billOfSale = data && data.billOfSale || false;
     this.billOfSaleAsInvoice = data && data.billOfSaleAsInvoice || false;
     this.invoice = data && data.invoice || false;
+    this.notRegistered = data && data.notRegistered || false;
     this.serviceRelations = data
       && data.serviceRelations
       && data.serviceRelations.map(sr => new SimplePerformedServicePayment(sr)) || [];
