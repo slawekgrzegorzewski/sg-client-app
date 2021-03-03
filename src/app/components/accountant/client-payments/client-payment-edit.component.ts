@@ -3,6 +3,7 @@ import {Observable, of} from 'rxjs';
 import {Currency} from '../../../model/accountant/currency';
 import {ClientPayment} from '../../../model/accountant/client-payment';
 import {Client} from '../../../model/accountant/client';
+import {PerformedService} from '../../../model/accountant/performed-service';
 
 @Component({
   selector: 'app-client-payment-edit',
@@ -41,6 +42,7 @@ export class ClientPaymentEditComponent implements OnInit {
   }
 
   @Input() clientPayment: ClientPayment;
+  @Input() performedServices: PerformedService[];
   @Input() editMode = false;
   @Input() createMode = false;
   @Input() allCurrencies: Currency[];
@@ -94,7 +96,18 @@ export class ClientPaymentEditComponent implements OnInit {
 
   clientsForTypeAhead(): () => Observable<Client[]> {
     const that = this;
-    return () => of(that.clients);
+    const clientsOccurrences: Map<number, number> = new Map<number, number>();
+    that.performedServices.filter(ps => ps.date.getMonth() >= new Date().getMonth() - 1).forEach(ps => {
+      clientsOccurrences.set(ps.client.id, (clientsOccurrences.get(ps.client.id) || 0) + 1);
+    });
+    const clientsToShow = that.clients.sort((a, b) => {
+      const order = (clientsOccurrences.get(b.id) || 0) - (clientsOccurrences.get(a.id) || 0);
+      if (order !== 0) {
+        return order;
+      }
+      return a.name.localeCompare(b.name);
+    });
+    return () => of(clientsToShow);
   }
 
   setBillOfSale(): void {

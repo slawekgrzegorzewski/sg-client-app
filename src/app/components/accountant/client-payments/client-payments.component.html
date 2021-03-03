@@ -73,6 +73,7 @@
     <div *ngIf="isGeneralEditMode() || isCreateEditMode()">
       <app-client-payment-edit
         [clientPayment]="editElement"
+        [performedServices]="performedServices"
         [editMode]="isGeneralEditMode()"
         [createMode]="isCreateEditMode()"
         [allCurrencies]="allCurrencies"
