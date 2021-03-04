@@ -96,14 +96,14 @@ export class CreateBillingElementComponent implements OnInit {
     this.availableCurrenciesInternal = value;
   }
 
-  private piggyBankIdInternal: number;
+  private piggyBankInternal: PiggyBank;
 
-  get piggyBankId(): number {
-    return Number(this.piggyBankIdInternal);
+  get piggyBank(): PiggyBank {
+    return this.piggyBankInternal;
   }
 
-  set piggyBankId(value: number) {
-    this.piggyBankIdInternal = value;
+  set piggyBank(value: PiggyBank) {
+    this.piggyBankInternal = value;
   }
 
   piggyBanksInternal: PiggyBank[] = [];
@@ -140,8 +140,8 @@ export class CreateBillingElementComponent implements OnInit {
 
   piggyBankToFinance(): PiggyBank {
     let piggyBank: PiggyBank = null;
-    if (this.piggyBankIdInternal) {
-      piggyBank = this.piggyBanks.find(pg => pg.id === this.piggyBankId);
+    if (this.piggyBankInternal) {
+      piggyBank = this.piggyBanks.find(pg => pg.id === this.piggyBankInternal.id);
     }
     return piggyBank;
   }
