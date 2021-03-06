@@ -1,12 +1,9 @@
 import {Domain} from '../domain';
 import {Client} from './client';
 import {SimplePerformedServicePayment} from './simple-performed-service-payment';
+import {Payable, PaymentStatus} from './payable';
 
-export enum ClientPaymentStatus {
-  NOT_PAID, UNDERPAID, PAID
-}
-
-export class ClientPayment {
+export class ClientPayment implements Payable {
   public id: number;
   public date: Date;
   public client: Client;
@@ -59,14 +56,22 @@ export class ClientPayment {
     return this.date.getMonth() === new Date().getMonth();
   }
 
-  public getPaymentStatus(): ClientPaymentStatus {
+  public getPaymentStatus(): PaymentStatus {
     const sum = this.serviceRelations.map(p => p.price).reduce((a, b) => a + b, 0);
     if (sum === this.price) {
-      return ClientPaymentStatus.PAID;
+      return PaymentStatus.PAID;
     } else if (sum > 0) {
-      return ClientPaymentStatus.UNDERPAID;
+      return PaymentStatus.UNDERPAID;
     } else {
-      return ClientPaymentStatus.NOT_PAID;
+      return PaymentStatus.NOT_PAID;
     }
+  }
+
+  getPrice(): number {
+    return this.price;
+  }
+
+  getCurrency(): string {
+    return this.currency;
   }
 }

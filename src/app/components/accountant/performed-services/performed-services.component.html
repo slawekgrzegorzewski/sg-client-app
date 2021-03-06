@@ -6,9 +6,15 @@
 </div>
 
 <ng-template #displayTypeSelectorTemplate>
-  <div class="sg-flex-row">
+  <div class="sg-flex-row sg-flex-justify-center">
     <button (click)="byClients()" class="btn btn-link btn-sm">
-      Wg klientów
+      Według klientów
+    </button>
+    <button (click)="byDates()" class="btn btn-link btn-sm">
+      Według dat
+    </button>
+    <button (click)="byServices()" class="btn btn-link btn-sm">
+      Według usług
     </button>
     <button (click)="noGrouping()" class="btn btn-link btn-sm">
       Szczegółowy
@@ -18,55 +24,57 @@
 
 <ng-template #performedServicesTemplate>
   <div class="sg-flex-column">
-    <h5 *ngIf="title" style="text-align: center">{{title}}</h5>
 
-    <div class="sg-flex-row sg-flex-justify-center">
-      <button (click)="prepareToCreate()" *ngIf="isNonEditMode()" class="btn btn-primary">Stwórz</button>
+    <div class="sg-flex-row">
+      <div style="width: 20%"></div>
+      <h5 *ngIf="title" style="text-align: center; width: 60%">{{title}}</h5>
+      <button style="width: 20%" (click)="prepareToCreate()" *ngIf="isNonEditMode()" class="btn btn-primary btn-sm">Stwórz</button>
     </div>
 
     <div *ngIf="isNonEditMode()" class="sg-flex-row sg-flex-justify-center">
-      <table>
-        <thead>
-        <tr>
-          <td *ngIf="maxColumns!==visibleColumns" style="width: 50px"></td>
-          <td *ngIf="showDateColumn" style="width: 100px">Data</td>
-          <td *ngIf="showClientColumn" style="width: 100px">Klient</td>
-          <td *ngIf="showServiceColumn" style="width: 100px">Usługa</td>
-          <td *ngIf="showPriceColumn" style="width: 100px">Cena</td>
-        </tr>
-        </thead>
+      <table style="width: 400px;">
         <ng-container *ngFor="let group of displayData">
-          <tr *ngIf="group.title" (click)="setGroupToDisplay(group)" [ngClass]="getGroupClass(group)">
-            <td [colSpan]="floor((visibleColumns + 1) / 2)" style="font-weight: bold">
+          <tr *ngIf="group.title" (click)="setGroupToDisplay(group)"
+              [ngClass]="getGroupClass(group)"
+              [class.expanded-highlight-top]="isGrouped() && isEqualToSelectedGroup(group)"
+              [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)">
+            <td colspan="2" style="font-weight: bold">
               {{group.title}}
             </td>
-            <td [colSpan]="ceil((visibleColumns + 1) / 2)" style="font-weight: bold">
-              <app-multi-currency-total
-                *ngIf="group.additionalFinancialData"
-                [title]="'Do zapłaty'"
-                [values]="group.additionalFinancialData"
-                [hoverable]="false">
-              </app-multi-currency-total>
+            <td colspan="2">
+              <div class="sg-flex-column">
+                <div *ngFor="let pi of group.additionalFinancialData | keyvalue" style="text-align: right">
+                  {{ pi.value.paid | currency: pi.key }} / {{ pi.value.of | currency: pi.key }}
+                </div>
+              </div>
             </td>
           </tr>
           <ng-container *ngIf="isEqualToSelectedGroup(group)">
+            <tr [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)">
+              <td *ngIf="isGrouped()" style="width: 50px"></td>
+              <td *ngIf="showDateColumn" style="width: 110px">Data</td>
+              <td *ngIf="showClientColumn" style="width: 130px">Klient</td>
+              <td *ngIf="showServiceColumn" style="width: 100px">Usługa</td>
+              <td style="width: 60px">Cena</td>
+            </tr>
             <ng-container *ngFor="let performedService of group.data">
               <tr #row [ngClass]="getPerformedServiceClass(performedService)"
                   (click)="setPerformedService(performedService)"
+                  [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)"
                   class="performed-service-row sg-row-hoverable">
-                <td *ngIf="maxColumns!==visibleColumns" style="width: 50px"></td>
+                <td *ngIf="isGrouped()" style="width: 50px"></td>
                 <td *ngIf="showDateColumn">{{performedService.date | localizedDate }}</td>
                 <td *ngIf="showClientColumn">{{performedService.client.name}}</td>
                 <td *ngIf="showServiceColumn">{{performedService.service.name}}</td>
-                <td *ngIf="showPriceColumn"
-                    style="text-align:right">{{performedService.price| currency: performedService.currency}}</td>
+                <td style="text-align:right">{{performedService.price| currency: performedService.currency}}</td>
               </tr>
 
               <tr *ngIf="isEqualToSelectedElement(performedService)"
                   [ngClass]="getPerformedServiceClass(performedService)"
-                  (click)="setPerformedService(performedService)">
-                <td *ngIf="maxColumns!==visibleColumns" style="width: 50px"></td>
-                <td [colSpan]="visibleColumns">
+                  (click)="setPerformedService(performedService)"
+                  [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)">
+                <td *ngIf="isGrouped()" style="width: 50px"></td>
+                <td [colSpan]="isGrouped() ? 3 :4">
                   <div class="sg-flex-column">
                     <div class="sg-flex-row sg-flex-justify-flex-end">
                       <button (click)="prepareToGeneralEdit()" class="btn btn-link btn-sm">
@@ -109,6 +117,10 @@
                 </td>
               </tr>
             </ng-container>
+            <tr [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)"
+                [class.expanded-highlight-bottom]="isGrouped() && isEqualToSelectedGroup(group)">
+              <td colspan="4"></td>
+            </tr>
           </ng-container>
         </ng-container>
       </table>

@@ -1,9 +1,11 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {Currency} from '../../../model/accountant/currency';
-import {ClientPayment, ClientPaymentStatus} from '../../../model/accountant/client-payment';
+import {ClientPayment} from '../../../model/accountant/client-payment';
 import {Client} from '../../../model/accountant/client';
 import {SimplePerformedServicePayment} from '../../../model/accountant/simple-performed-service-payment';
 import {PerformedService} from '../../../model/accountant/performed-service';
+import {PaymentStatus} from '../../../model/accountant/payable';
+import {PayableGroup} from '../../../model/accountant/payable-groupper';
 
 const GENERAL_EDIT_MODE = 'general';
 const CREATE_EDIT_MODE = 'create';
@@ -26,9 +28,12 @@ export class ClientPaymentComponent implements OnInit {
 
   set clientPayments(value: ClientPayment[]) {
     this.clientPaymentsInternal = (value || [])
-      .filter(cp => cp.isForCurrentMonth() || cp.getPaymentStatus() !== ClientPaymentStatus.PAID)
+      .filter(cp => cp.isForCurrentMonth() || cp.getPaymentStatus() !== PaymentStatus.PAID)
       .sort(ClientPayment.compareByDateAndCurrencyAndId);
+    this.noGrouping();
   }
+
+  displayData: PayableGroup<ClientPayment>[];
 
   @Input() allCurrencies: Currency[];
   @Input() clients: Client[];
@@ -46,12 +51,31 @@ export class ClientPaymentComponent implements OnInit {
   utilBoxLeft: number;
   utilBoxVisibility = 'hidden';
 
+  selectedGroup: PayableGroup<ClientPayment>;
   private selectedElement: ClientPayment;
+
+  showClientColumn = true;
 
   constructor() {
   }
 
   ngOnInit(): void {
+  }
+
+  noGrouping(): void {
+    this.displayData = PayableGroup.groupData(this.clientPayments, ps => null, ps => '');
+    this.selectedGroup = this.displayData.length > 0 ? this.displayData[0] : null;
+    this.showClientColumn = true;
+  }
+
+  byClients(): void {
+    this.displayData = PayableGroup.groupData(
+      this.clientPayments,
+      cp => cp && cp.client && cp.client.id || null,
+      cp => cp && cp.client && cp.client.name || ''
+    );
+    this.selectedGroup = null;
+    this.showClientColumn = false;
   }
 
   setOverClientPayment(cp: ClientPayment, row: HTMLTableRowElement): void {
@@ -114,6 +138,14 @@ export class ClientPaymentComponent implements OnInit {
     return this.editMode === CREATE_EDIT_MODE;
   }
 
+  setGroupToDisplay(payableGroup: PayableGroup<ClientPayment>): void {
+    if (this.selectedGroup && this.selectedGroup.isEqual(payableGroup)) {
+      this.selectedGroup = null;
+    } else {
+      this.selectedGroup = payableGroup;
+    }
+  }
+
   setClientPayment(clientPayment: ClientPayment): void {
     if (this.isEqualToSelectedElement(clientPayment)) {
       this.selectedElement = null;
@@ -122,25 +154,40 @@ export class ClientPaymentComponent implements OnInit {
     }
   }
 
+  isGrouped(): boolean {
+    return this.displayData.length > 1;
+  }
+
+  isEqualToSelectedGroup(payableGroup: PayableGroup<ClientPayment>): boolean {
+    return this.selectedGroup && this.selectedGroup.isEqual(payableGroup);
+  }
+
   isEqualToSelectedElement(clientPayment: ClientPayment): boolean {
     return this.selectedElement && this.selectedElement.id === clientPayment.id;
   }
 
-  getClientPaymentClass(clientPayment: ClientPayment): string {
-    const paymentStatus = clientPayment.getPaymentStatus();
-    if (paymentStatus === ClientPaymentStatus.PAID) {
-      return 'paid-ps';
+  getGroupClass(payableGroup: PayableGroup<ClientPayment>): string {
+    if (this.selectedGroup && this.selectedGroup.isEqual(payableGroup)) {
+      return '';
     }
-    if (paymentStatus === ClientPaymentStatus.NOT_PAID) {
-      return 'not-paid-ps';
-    }
-    if (paymentStatus === ClientPaymentStatus.UNDERPAID) {
-      return 'underpaid-ps';
-    }
+    return this.getPaymentStatusClass(payableGroup.status);
   }
 
-  getClientPayment(payment: SimplePerformedServicePayment): ClientPayment {
-    return this.clientPayments.find(cp => cp.id === payment.clientPaymentId);
+  getClientPaymentClass(clientPayment: ClientPayment): string {
+    const paymentStatus = clientPayment.getPaymentStatus();
+    return this.getPaymentStatusClass(paymentStatus);
+  }
+
+  private getPaymentStatusClass(paymentStatus: PaymentStatus): string {
+    if (paymentStatus === PaymentStatus.PAID) {
+      return 'paid-ps';
+    }
+    if (paymentStatus === PaymentStatus.NOT_PAID) {
+      return 'not-paid-ps';
+    }
+    if (paymentStatus === PaymentStatus.UNDERPAID) {
+      return 'underpaid-ps';
+    }
   }
 
   getPerformedService(payment: SimplePerformedServicePayment): PerformedService {

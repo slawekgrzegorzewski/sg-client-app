@@ -8,8 +8,8 @@ thead > tr > td {
 }
 
 .paid-ps {
-   background-color: #a2ff9b;
- }
+  background-color: #a2ff9b;
+}
 
 .not-paid-ps {
   background-color: #faafaf
@@ -19,3 +19,15 @@ thead > tr > td {
   background-color: #fffec6;
 }
 
+.expanded-highlight-top {
+  border-top: #343a40 solid 3px;
+}
+
+.expanded-highlight-sides {
+  border-left: #343a40 solid 3px;
+  border-right: #343a40 solid 3px;
+}
+
+.expanded-highlight-bottom {
+  border-bottom: #343a40 solid 3px;
+}

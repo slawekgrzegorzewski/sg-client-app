@@ -2,12 +2,9 @@ import {Domain} from '../domain';
 import {Service} from './service';
 import {Client} from './client';
 import {SimplePerformedServicePayment} from './simple-performed-service-payment';
+import {Payable, PaymentStatus} from './payable';
 
-export enum PaymentStatus {
-  NOT_PAID, UNDERPAID, PAID
-}
-
-export class PerformedService {
+export class PerformedService implements Payable {
 
   public id: number;
   public date: Date;
@@ -66,5 +63,13 @@ export class PerformedService {
 
   getPaidAmountForNow(): number {
     return this.clientPaymentsRelations.map(p => p.price).reduce((a, b) => a + b, 0);
+  }
+
+  getPrice(): number {
+    return this.price;
+  }
+
+  getCurrency(): string {
+    return this.currency;
   }
 }

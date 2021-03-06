@@ -1,12 +1,14 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {PaymentStatus, PerformedService} from '../../../model/accountant/performed-service';
+import {PerformedService} from '../../../model/accountant/performed-service';
 import {Service} from '../../../model/accountant/service';
 import {Currency} from '../../../model/accountant/currency';
 import {Client} from '../../../model/accountant/client';
 import {PerformedServicePayment} from '../../../model/accountant/performed-service-payment';
 import {ClientPayment} from '../../../model/accountant/client-payment';
 import {SimplePerformedServicePayment} from '../../../model/accountant/simple-performed-service-payment';
-import {CurrencyPipe} from '@angular/common';
+import {DatePipe} from '@angular/common';
+import {Payable, PaymentStatus} from '../../../model/accountant/payable';
+import {PayableGroup} from '../../../model/accountant/payable-groupper';
 
 const GENERAL_EDIT_MODE = 'general';
 const CREATE_EDIT_MODE = 'create';
@@ -42,9 +44,8 @@ export class PerformedServicesComponent implements OnInit {
     this.noGrouping();
   }
 
-  displayData: PerformedServicesGroup[];
+  displayData: PayableGroup<PerformedService>[];
 
-  generatedGroups = 0;
   @Input() services: Service[];
 
   @Input() clients: Client[];
@@ -57,65 +58,62 @@ export class PerformedServicesComponent implements OnInit {
   editMode: string = EMPTY_EDIT_MODE;
 
   editElement: PerformedService;
-  selectedGroup: PerformedServicesGroup;
+  selectedGroup: PayableGroup<PerformedService>;
   selectedElement: PerformedService;
-  showDateColumn = true;
 
+  showDateColumn = true;
   showClientColumn = true;
   showServiceColumn = true;
-  showPriceColumn = true;
-  readonly maxColumns = 4;
-  visibleColumns = this.maxColumns;
 
-  constructor(currencyPipe: CurrencyPipe) {
+  constructor(private datePipe: DatePipe) {
   }
 
   ngOnInit(): void {
   }
 
-  byClients(): void {
-    const data = new Map<number, PerformedServicesGroup>();
-    for (const performedService of this.performedServices) {
-      const group = data.get(performedService.client.id) || this.createGroup([], data.size);
-      group.data.push(performedService);
-      group.title = performedService.client.name;
-      let toPay = group.additionalFinancialData.get(performedService.currency) || 0;
-      toPay += (performedService.price - performedService.getPaidAmountForNow());
-      group.additionalFinancialData.set(performedService.currency, toPay);
-      data.set(performedService.client.id, group);
-    }
-    for (const group of data.values()) {
-      const sum = Array.from(group.additionalFinancialData.values()).reduce((a, b) => a + b, 0);
-      if (!sum) {
-        group.additionalFinancialData = null;
-      }
-    }
-    this.displayData = Array.from(data.values());
-    this.selectedGroup = null;
-    this.showDateColumn = true;
-    this.showClientColumn = false;
-    this.showServiceColumn = true;
-    this.showPriceColumn = true;
-    this.visibleColumns = 3;
-  }
-
-  private createGroup(performedServices: PerformedService[], order: number): PerformedServicesGroup {
-    const group = new PerformedServicesGroup();
-    group.id = this.generatedGroups++;
-    group.data = performedServices;
-    group.order = order;
-    return group;
-  }
-
   noGrouping(): void {
-    const servicesGroup = this.createGroup(this.performedServices, 0);
-    this.displayData = [servicesGroup];
-    this.selectedGroup = servicesGroup;
+    this.displayData = PayableGroup.groupData(this.performedServices, ps => null, ps => '');
+    this.selectedGroup = this.displayData.length > 0 ? this.displayData[0] : null;
+    this.enableAllColumns();
+  }
+
+  byClients(): void {
+    this.displayData = PayableGroup.groupData(
+      this.performedServices,
+      ps => ps && ps.client && ps.client.id || null,
+      ps => ps && ps.client && ps.client.name || ''
+    );
+    this.selectedGroup = null;
+    this.enableAllColumns();
+    this.showClientColumn = false;
+  }
+
+  byDates(): void {
+    this.displayData = PayableGroup.groupData(
+      this.performedServices,
+      ps => ps && ps.date && ps.date.getTime() || null,
+      ps => ps && ps.date && this.datePipe.transform(ps.date, 'dd MMMM yyyy') || ''
+    );
+    this.selectedGroup = null;
+    this.enableAllColumns();
+    this.showDateColumn = false;
+  }
+
+  byServices(): void {
+    this.displayData = PayableGroup.groupData(
+      this.performedServices,
+      ps => ps && ps.service && ps.service.id || null,
+      ps => ps && ps.service && ps.service.name || ''
+    );
+    this.selectedGroup = null;
+    this.enableAllColumns();
+    this.showServiceColumn = false;
+  }
+
+  private enableAllColumns(): void {
     this.showDateColumn = true;
     this.showClientColumn = true;
     this.showServiceColumn = true;
-    this.showPriceColumn = true;
-    this.visibleColumns = this.maxColumns;
   }
 
   prepareToCreate(): void {
@@ -173,23 +171,19 @@ export class PerformedServicesComponent implements OnInit {
     return this.editMode === PAYMENT_SELECTION_EDIT_MODE;
   }
 
-  setGroupToDisplay(performedServicesGroup: PerformedServicesGroup): void {
-    if (this.isEqualToSelectedGroup(performedServicesGroup)) {
+  setGroupToDisplay(payableGroup: PayableGroup<PerformedService>): void {
+    if (this.isEqualToSelectedGroup(payableGroup)) {
       this.selectedGroup = null;
     } else {
-      this.selectedGroup = performedServicesGroup;
+      this.selectedGroup = payableGroup;
     }
   }
 
-  isEqualToSelectedGroup(performedServicesGroup: PerformedServicesGroup): boolean {
-    return this.selectedGroup && this.selectedGroup.id === performedServicesGroup.id;
-  }
-
-  setPerformedService(performedService: PerformedService): void {
-    if (this.isEqualToSelectedElement(performedService)) {
+  setPerformedService(ps: PerformedService): void {
+    if (this.isEqualToSelectedElement(ps)) {
       this.selectedElement = null;
     } else {
-      this.selectedElement = performedService;
+      this.selectedElement = ps;
     }
   }
 
@@ -197,16 +191,24 @@ export class PerformedServicesComponent implements OnInit {
     return this.selectedElement && this.selectedElement.id === performedService.id;
   }
 
-  getPerformedServiceClass(performedService: PerformedService): string {
-    const paymentStatus = performedService.getPaymentStatus();
+  getPerformedServiceClass(p: Payable): string {
+    const paymentStatus = p.getPaymentStatus();
     return this.getPaymentStatusClass(paymentStatus);
   }
 
-  getGroupClass(group: PerformedServicesGroup): string {
-    if (this.isEqualToSelectedGroup(group)) {
+  getGroupClass(payableGroup: PayableGroup<PerformedService>): string {
+    if (this.isEqualToSelectedGroup(payableGroup)) {
       return '';
     }
-    return this.getPaymentStatusClass(group.status);
+    return this.getPaymentStatusClass(payableGroup.status);
+  }
+
+  isGrouped(): boolean {
+    return this.displayData.length > 1 || (this.displayData.length === 1 && this.displayData[0].title !== '');
+  }
+
+  isEqualToSelectedGroup(payableGroup: PayableGroup<PerformedService>): boolean {
+    return this.selectedGroup && this.selectedGroup.isEqual(payableGroup);
   }
 
   getPaymentStatusClass(paymentStatus: PaymentStatus): string {
@@ -244,38 +246,4 @@ export class PerformedServicesComponent implements OnInit {
   clientPayment(payment: SimplePerformedServicePayment): ClientPayment {
     return this.clientPayments.find(cp => cp.id === payment.clientPaymentId);
   }
-
-  ceil(n: number): number {
-    return Math.ceil(n);
-  }
-
-  floor(n: number): number {
-    return Math.floor(n);
-  }
-}
-
-class PerformedServicesGroup {
-
-  id: number;
-  title: string;
-  additionalFinancialData = new Map<string, number>();
-  data: PerformedService[];
-  order: number;
-  statusInternal: PaymentStatus;
-
-  get status(): PaymentStatus {
-    if (!this.statusInternal) {
-      this.statusInternal = PaymentStatus.PAID;
-      this.data.forEach(ps => {
-        const paymentStatus = ps.getPaymentStatus();
-        if (paymentStatus === PaymentStatus.UNDERPAID && this.statusInternal !== PaymentStatus.NOT_PAID) {
-          this.statusInternal = PaymentStatus.UNDERPAID;
-        } else if (paymentStatus === PaymentStatus.NOT_PAID) {
-          this.statusInternal = PaymentStatus.NOT_PAID;
-        }
-      });
-    }
-    return this.statusInternal;
-  }
-
 }
