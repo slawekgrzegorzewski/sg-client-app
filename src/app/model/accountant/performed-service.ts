@@ -31,7 +31,7 @@ export class PerformedService {
     this.domain = data && new Domain(data.domain) || null;
   }
 
-  public static compareByDateAndClientAndService(first: PerformedService, second: PerformedService): number {
+  public static compareByDateAndClientAndServiceAndId(first: PerformedService, second: PerformedService): number {
     const dateComparison = first.date.getTime() - second.date.getTime();
     if (dateComparison !== 0) {
       return -dateComparison;
@@ -40,7 +40,11 @@ export class PerformedService {
       if (clientComparison !== 0) {
         return clientComparison;
       } else {
-        return first.service.name.localeCompare(second.service.name);
+        const serviceComparison = first.service.name.localeCompare(second.service.name);
+        if (serviceComparison !== 0) {
+          return serviceComparison;
+        }
+        return first.id - second.id;
       }
     }
   }

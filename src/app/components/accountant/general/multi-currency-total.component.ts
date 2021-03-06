@@ -9,6 +9,7 @@ export class MultiCurrencyTotalComponent implements OnInit {
 
   @Input() title: string;
   @Input() values: Map<string, number>;
+  @Input() hoverable = true;
 
   constructor() {
   }

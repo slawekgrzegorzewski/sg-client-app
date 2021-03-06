@@ -1,8 +1,22 @@
 <div class="row col-sm sg-flex-justify-center">
-  <ng-container *ngTemplateOutlet="piggyBanksTemplate"></ng-container>
+  <div class="sg-flex-column">
+    <ng-container *ngTemplateOutlet="displayTypeSelectorTemplate"></ng-container>
+    <ng-container *ngTemplateOutlet="performedServicesTemplate"></ng-container>
+  </div>
 </div>
 
-<ng-template #piggyBanksTemplate>
+<ng-template #displayTypeSelectorTemplate>
+  <div class="sg-flex-row">
+    <button (click)="byClients()" class="btn btn-link btn-sm">
+      Wg klientów
+    </button>
+    <button (click)="noGrouping()" class="btn btn-link btn-sm">
+      Szczegółowy
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #performedServicesTemplate>
   <div class="sg-flex-column">
     <h5 *ngIf="title" style="text-align: center">{{title}}</h5>
 
@@ -14,67 +28,88 @@
       <table>
         <thead>
         <tr>
-          <td style="width: 100px">Data</td>
-          <td style="width: 100px">Klient</td>
-          <td style="width: 100px">Usługa</td>
-          <td style="width: 100px">Cena</td>
+          <td *ngIf="maxColumns!==visibleColumns" style="width: 50px"></td>
+          <td *ngIf="showDateColumn" style="width: 100px">Data</td>
+          <td *ngIf="showClientColumn" style="width: 100px">Klient</td>
+          <td *ngIf="showServiceColumn" style="width: 100px">Usługa</td>
+          <td *ngIf="showPriceColumn" style="width: 100px">Cena</td>
         </tr>
         </thead>
-        <ng-container *ngFor="let performedService of performedServices">
-          <tr #row [ngClass]="getPerformedServiceClass(performedService)"
-              (click)="setPerformedService(performedService)"
-              class="performed-service-row sg-row-hoverable">
-            <td>{{performedService.date | localizedDate }}</td>
-            <td>{{performedService.client.name}}</td>
-            <td>{{performedService.service.name}}</td>
-            <td style="text-align:right">{{performedService.price| currency: performedService.currency}}</td>
-          </tr>
-
-          <tr *ngIf="isEqualToSelectedElement(performedService)"
-              [ngClass]="getPerformedServiceClass(performedService)"
-              (click)="setPerformedService(performedService)">
-            <td colspan="4">
-              <div class="sg-flex-column">
-                <div class="sg-flex-row sg-flex-justify-flex-end">
-                  <button (click)="prepareToGeneralEdit()" class="btn btn-link btn-sm">
-                    Edytuj
-                  </button>
-                  <button (click)="prepareToPaymentSelectionEdit()" *ngIf="serviceNeedsPayment()"
-                          class="btn btn-link btn-sm">
-                    Opłać
-                  </button>
-                </div>
-                <table style="width: 100%">
-                  <thead>
-                  <tr>
-                    <td>Data</td>
-                    <td>Cena</td>
-                    <td style="width: 30px">P</td>
-                    <td style="width: 30px">PF</td>
-                    <td style="width: 30px">F</td>
-                    <td style="width: 30px">C</td>
-                  </tr>
-                  </thead>
-                  <tr *ngFor="let payment of performedService.clientPaymentsRelations">
-                    <td style="text-align:center">{{clientPayment(payment).date | localizedDate}}</td>
-                    <td style="text-align:right">{{payment.price | currency: clientPayment(payment).currency}}</td>
-                    <td style="text-align:center">
-                      <input type="checkbox" [ngModel]="clientPayment(payment).billOfSale" disabled>
-                    </td>
-                    <td style="text-align:center">
-                      <input type="checkbox" [ngModel]="clientPayment(payment).billOfSaleAsInvoice" disabled>
-                    </td>
-                    <td style="text-align:center">
-                      <input type="checkbox" [ngModel]="clientPayment(payment).invoice" disabled>
-                    </td>
-                    <td style="text-align:center">
-                      <input type="checkbox" [ngModel]="clientPayment(payment).notRegistered" disabled>
-                    </td>
-                  </tr>
-                </table>
-              </div>
+        <ng-container *ngFor="let group of displayData">
+          <tr *ngIf="group.title" (click)="setGroupToDisplay(group)" [ngClass]="getGroupClass(group)">
+            <td [colSpan]="floor((visibleColumns + 1) / 2)" style="font-weight: bold">
+              {{group.title}}
+            </td>
+            <td [colSpan]="ceil((visibleColumns + 1) / 2)" style="font-weight: bold">
+              <app-multi-currency-total
+                *ngIf="group.additionalFinancialData"
+                [title]="'Do zapłaty'"
+                [values]="group.additionalFinancialData"
+                [hoverable]="false">
+              </app-multi-currency-total>
             </td>
           </tr>
+          <ng-container *ngIf="isEqualToSelectedGroup(group)">
+            <ng-container *ngFor="let performedService of group.data">
+              <tr #row [ngClass]="getPerformedServiceClass(performedService)"
+                  (click)="setPerformedService(performedService)"
+                  class="performed-service-row sg-row-hoverable">
+                <td *ngIf="maxColumns!==visibleColumns" style="width: 50px"></td>
+                <td *ngIf="showDateColumn">{{performedService.date | localizedDate }}</td>
+                <td *ngIf="showClientColumn">{{performedService.client.name}}</td>
+                <td *ngIf="showServiceColumn">{{performedService.service.name}}</td>
+                <td *ngIf="showPriceColumn"
+                    style="text-align:right">{{performedService.price| currency: performedService.currency}}</td>
+              </tr>
+
+              <tr *ngIf="isEqualToSelectedElement(performedService)"
+                  [ngClass]="getPerformedServiceClass(performedService)"
+                  (click)="setPerformedService(performedService)">
+                <td *ngIf="maxColumns!==visibleColumns" style="width: 50px"></td>
+                <td [colSpan]="visibleColumns">
+                  <div class="sg-flex-column">
+                    <div class="sg-flex-row sg-flex-justify-flex-end">
+                      <button (click)="prepareToGeneralEdit()" class="btn btn-link btn-sm">
+                        Edytuj
+                      </button>
+                      <button (click)="prepareToPaymentSelectionEdit()" *ngIf="serviceNeedsPayment()"
+                              class="btn btn-link btn-sm">
+                        Opłać
+                      </button>
+                    </div>
+                    <table style="width: 100%">
+                      <thead>
+                      <tr>
+                        <td>Data</td>
+                        <td>Cena</td>
+                        <td style="width: 30px">P</td>
+                        <td style="width: 30px">PF</td>
+                        <td style="width: 30px">F</td>
+                        <td style="width: 30px">C</td>
+                      </tr>
+                      </thead>
+                      <tr *ngFor="let payment of performedService.clientPaymentsRelations">
+                        <td style="text-align:center">{{clientPayment(payment).date | localizedDate}}</td>
+                        <td style="text-align:right">{{payment.price | currency: clientPayment(payment).currency}}</td>
+                        <td style="text-align:center">
+                          <input type="checkbox" [ngModel]="clientPayment(payment).billOfSale" disabled>
+                        </td>
+                        <td style="text-align:center">
+                          <input type="checkbox" [ngModel]="clientPayment(payment).billOfSaleAsInvoice" disabled>
+                        </td>
+                        <td style="text-align:center">
+                          <input type="checkbox" [ngModel]="clientPayment(payment).invoice" disabled>
+                        </td>
+                        <td style="text-align:center">
+                          <input type="checkbox" [ngModel]="clientPayment(payment).notRegistered" disabled>
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </ng-container>
         </ng-container>
       </table>
     </div>

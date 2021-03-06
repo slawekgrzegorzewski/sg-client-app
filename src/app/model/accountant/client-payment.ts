@@ -35,12 +35,16 @@ export class ClientPayment {
     this.domain = data && new Domain(data.domain) || null;
   }
 
-  public static compareByDateAndCurrency(first: ClientPayment, second: ClientPayment): number {
+  public static compareByDateAndCurrencyAndId(first: ClientPayment, second: ClientPayment): number {
     const dateComparison = first.date.getTime() - second.date.getTime();
     if (dateComparison !== 0) {
       return -dateComparison;
     } else {
-      return first.currency.localeCompare(second.currency);
+      const currencyComparison = first.currency.localeCompare(second.currency);
+      if (currencyComparison !== 0) {
+        return currencyComparison;
+      }
+      return first.id - second.id;
     }
   }
 

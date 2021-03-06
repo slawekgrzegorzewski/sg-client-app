@@ -1,6 +1,15 @@
 <div class="row col-sm sg-flex-justify-center">
-  <ng-container *ngTemplateOutlet="servicePaymenstTemplate"></ng-container>
+  <div class="sg-flex-column">
+    <ng-container *ngTemplateOutlet="displayTypeSelectorTemplate"></ng-container>
+    <ng-container *ngTemplateOutlet="servicePaymenstTemplate"></ng-container>
+  </div>
 </div>
+
+<ng-template #displayTypeSelectorTemplate>
+  <div class="sg-flex-row">
+
+  </div>
+</ng-template>
 
 <ng-template #servicePaymenstTemplate>
   <div class="sg-flex-column">
