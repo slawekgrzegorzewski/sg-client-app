@@ -1,0 +1,26 @@
+<div class="sg-flex-row sg-flex-justify-flex-start">
+  <app-performed-services
+    [title]="'Wykonane usługi'"
+    [performedServices]="performedServices"
+    [services]="services"
+    [clients]="clients"
+    [clientPayments]="clientPayments"
+    [allCurrencies]="allCurrencies"
+    (createEvent)="createPSEvent.emit($event)"
+    (updateEvent)="updatePSEvent.emit($event)"
+    (createPerformedServicePaymentEvent)="createPSPaymentEvent.emit($event)"
+    style="margin-bottom: 20px; width: 450px;margin-right: 5px"
+  >
+  </app-performed-services>
+  <app-client-payments
+    [title]="'Płatności'"
+    [clientPayments]="clientPayments"
+    [clients]="clients"
+    [allCurrencies]="allCurrencies"
+    [performedServices]="performedServices"
+    (createEvent)="createCPEvent.emit($event)"
+    (updateEvent)="updateCPEvent.emit($event)"
+    style="margin-bottom: 20px; width: 400px;margin-left: 5px"
+  >
+  </app-client-payments>
+</div>

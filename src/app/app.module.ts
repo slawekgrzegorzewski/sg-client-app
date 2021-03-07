@@ -62,14 +62,15 @@ import {AccountantSettingsService} from './services/accountant/accountant-settin
 import {ServicesService} from './services/accountant/services.service';
 import {ServicesComponent} from './components/accountant/services/services.component';
 import {PerformedServicesService} from './services/accountant/performed-services.service';
-import {PerformedServicesComponent} from './components/accountant/performed-services/performed-services.component';
+import {PerformedServicesComponent} from './components/accountant/company-log/performed-services.component';
 import {DataPickerComponent} from './components/accountant/data-picker/data-picker.component';
-import {ClientPaymentComponent} from './components/accountant/client-payments/client-payments.component';
+import {ClientPaymentComponent} from './components/accountant/company-log/client-payments.component';
 import {ClientPaymentsService} from './services/accountant/client-payments.service';
 import {PerformedServicePaymentsService} from './services/accountant/performed-service-payments.service';
-import {PerformedServiceEditComponent} from './components/accountant/performed-services/performed-service-edit.component';
-import {ClientPaymentEditComponent} from './components/accountant/client-payments/client-payment-edit.component';
-import {PaymentSelectionComponent} from './components/accountant/performed-services/payment-selection.component';
+import {PerformedServiceEditComponent} from './components/accountant/company-log/performed-service-edit.component';
+import {ClientPaymentEditComponent} from './components/accountant/company-log/client-payment-edit.component';
+import {PaymentSelectionComponent} from './components/accountant/company-log/payment-selection.component';
+import {CompanyLogComponent} from './components/accountant/company-log/company-log.component';
 
 @NgModule({
   declarations: [
@@ -115,7 +116,8 @@ import {PaymentSelectionComponent} from './components/accountant/performed-servi
     ClientPaymentComponent,
     PerformedServiceEditComponent,
     ClientPaymentEditComponent,
-    PaymentSelectionComponent
+    PaymentSelectionComponent,
+    CompanyLogComponent
   ],
   imports: [
     BrowserModule,

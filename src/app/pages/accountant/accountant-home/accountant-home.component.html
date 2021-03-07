@@ -17,30 +17,19 @@
   </div>
   <div *ngIf="loginService.accountantSettings && loginService.accountantSettings.company"
        class="sg-flex-row sg-flex-justify-flex-start">
-    <app-performed-services
-      [title]="'Wykonane usługi'"
-      [performedServices]="performedServices"
+    <app-company-log
       [services]="services"
       [clients]="clients"
       [clientPayments]="clientPayments"
       [allCurrencies]="allCurrencies"
-      (createEvent)="createPerformedService($event)"
-      (updateEvent)="updatePerformedService($event)"
-      (createPerformedServicePaymentEvent)="createPerformedServicePayment($event)"
-      style="margin-bottom: 20px; width: 450px;margin-right: 5px"
-    >
-    </app-performed-services>
-    <app-client-payments
-      [title]="'Płatności'"
-      [clientPayments]="clientPayments"
-      [clients]="clients"
-      [allCurrencies]="allCurrencies"
       [performedServices]="performedServices"
-      (createEvent)="createClientPayment($event)"
-      (updateEvent)="updateClientPayment($event)"
-      style="margin-bottom: 20px; width: 400px;margin-left: 5px"
-    >
-    </app-client-payments>
+      (createPSEvent)="createPerformedService($event)"
+      (updatePSEvent)="updatePerformedService($event)"
+      (createPSPaymentEvent)="createPerformedServicePayment($event)"
+      (createCPEvent)="createClientPayment($event)"
+      (updateCPEvent)="updateClientPayment($event)">
+
+    </app-company-log>
   </div>
   <div class="billing">
     <app-browse-billing-elements

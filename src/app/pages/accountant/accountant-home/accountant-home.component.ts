@@ -41,7 +41,6 @@ export class AccountantHomeComponent implements OnInit {
 
   performedServices: PerformedService[];
   clientPayments: ClientPayment[];
-  performedServicesPayments: PerformedServicePayment[];
 
   services: Service[];
   clients: Client[];

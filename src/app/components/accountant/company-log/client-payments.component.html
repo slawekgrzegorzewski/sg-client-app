@@ -27,7 +27,7 @@
 
     <div (mouseleave)="setOverClientPayment(null, null)" *ngIf="isNonEditMode()"
          class="sg-flex-row sg-flex-justify-center">
-      <table style="width: 400px;">
+      <table style="width: 410px;">
         <ng-container *ngFor="let group of displayData">
           <tr *ngIf="group.title" (click)="setGroupToDisplay(group)"
               [ngClass]="getGroupClass(group)"
@@ -48,7 +48,7 @@
             <tr [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)">
               <td *ngIf="isGrouped()" style="width: 50px"></td>
               <td style="width: 100px">Data</td>
-              <td *ngIf="showClientColumn" style="width: 100px">Klient</td>
+              <td *ngIf="showClientColumn" style="width: 110px">Klient</td>
               <td style="width: 100px">Cena</td>
               <td style="width: 30px">P</td>
               <td style="width: 30px">PF</td>
