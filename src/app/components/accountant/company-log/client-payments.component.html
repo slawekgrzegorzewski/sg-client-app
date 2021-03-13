@@ -10,6 +10,9 @@
     <button (click)="byClients()" class="btn btn-link btn-sm">
       Według klientów
     </button>
+    <button (click)="byReceiptType()" class="btn btn-link btn-sm">
+      Według rodzaju pokwitowania
+    </button>
     <button (click)="noGrouping()" class="btn btn-link btn-sm">
       Szczegółowy
     </button>
@@ -22,7 +25,9 @@
     <div class="sg-flex-row">
       <div style="width: 20%"></div>
       <h5 *ngIf="title" style="text-align: center; width: 60%">{{title}}</h5>
-      <button style="width: 20%" (click)="prepareToCreate()" *ngIf="isNonEditMode()" class="btn btn-primary btn-sm">Stwórz</button>
+      <button style="width: 20%" (click)="prepareToCreate()" *ngIf="isNonEditMode()" class="btn btn-primary btn-sm">
+        Stwórz
+      </button>
     </div>
 
     <div (mouseleave)="setOverClientPayment(null, null)" *ngIf="isNonEditMode()"
@@ -36,7 +41,7 @@
             <td colspan="2" style="font-weight: bold">
               {{group.title}}
             </td>
-            <td colspan="5">
+            <td [colSpan]="showReceiptTypeColumns ? 5 : 2">
               <div class="sg-flex-column">
                 <div *ngFor="let pi of group.additionalFinancialData | keyvalue" style="text-align: right">
                   {{ pi.value.paid | currency: pi.key }} / {{ pi.value.of | currency: pi.key }}
@@ -50,10 +55,10 @@
               <td style="width: 100px">Data</td>
               <td *ngIf="showClientColumn" style="width: 110px">Klient</td>
               <td style="width: 100px">Cena</td>
-              <td style="width: 30px">P</td>
-              <td style="width: 30px">PF</td>
-              <td style="width: 30px">F</td>
-              <td style="width: 30px">C</td>
+              <td *ngIf="showReceiptTypeColumns" style="width: 30px; text-align: center">P</td>
+              <td *ngIf="showReceiptTypeColumns" style="width: 30px; text-align: center">PF</td>
+              <td *ngIf="showReceiptTypeColumns" style="width: 30px; text-align: center">F</td>
+              <td *ngIf="showReceiptTypeColumns" style="width: 30px; text-align: center">C</td>
             </tr>
             <ng-container *ngFor="let clientPayment of group.data">
 
@@ -66,19 +71,17 @@
                 <td>{{clientPayment.date | localizedDate }}</td>
                 <td *ngIf="showClientColumn">{{clientPayment.client.name}}</td>
                 <td style="text-align:right">{{clientPayment.price| currency: clientPayment.currency}}</td>
-                <td style="text-align:center"><input type="checkbox" [ngModel]="clientPayment.billOfSale" disabled></td>
-                <td style="text-align:center"><input type="checkbox" [ngModel]="clientPayment.billOfSaleAsInvoice"
-                                                     disabled>
-                </td>
-                <td style="text-align:center"><input type="checkbox" [ngModel]="clientPayment.invoice" disabled></td>
-                <td style="text-align:center"><input type="checkbox" [ngModel]="clientPayment.notRegistered" disabled>
+                <td *ngIf="showReceiptTypeColumns" style="text-align:center"><input type="checkbox" [ngModel]="clientPayment.billOfSale" disabled></td>
+                <td *ngIf="showReceiptTypeColumns" style="text-align:center"><input type="checkbox" [ngModel]="clientPayment.billOfSaleAsInvoice" disabled></td>
+                <td *ngIf="showReceiptTypeColumns" style="text-align:center"><input type="checkbox" [ngModel]="clientPayment.invoice" disabled></td>
+                <td *ngIf="showReceiptTypeColumns" style="text-align:center"><input type="checkbox" [ngModel]="clientPayment.notRegistered" disabled>
                 </td>
               </tr>
               <tr *ngIf="isEqualToSelectedElement(clientPayment)"
                   (click)="setClientPayment(clientPayment)"
                   [ngClass]="getClientPaymentClass(clientPayment)"
                   [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)">
-                <td colspan="7">
+                <td [colSpan]="2 + (showReceiptTypeColumns ? 5 : 2)">
                   <div class="sg-flex-column">
                     <table style="width: 100%">
                       <thead>
@@ -101,7 +104,7 @@
             </ng-container>
             <tr [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)"
                 [class.expanded-highlight-bottom]="isGrouped() && isEqualToSelectedGroup(group)">
-              <td colspan="7"></td>
+              <td [colSpan]="2 + (showReceiptTypeColumns ? 5 : 2)"></td>
             </tr>
           </ng-container>
         </ng-container>

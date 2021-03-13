@@ -55,6 +55,7 @@ export class ClientPaymentComponent implements OnInit {
   private selectedElement: ClientPayment;
 
   showClientColumn = true;
+  showReceiptTypeColumns = true;
 
   constructor() {
   }
@@ -62,10 +63,15 @@ export class ClientPaymentComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  resetColumnsVisibility(): void {
+    this.showClientColumn = true;
+    this.showReceiptTypeColumns = true;
+  }
+
   noGrouping(): void {
     this.displayData = PayableGroup.groupData(this.clientPayments, ps => null, ps => '');
     this.selectedGroup = this.displayData.length > 0 ? this.displayData[0] : null;
-    this.showClientColumn = true;
+    this.resetColumnsVisibility();
   }
 
   byClients(): void {
@@ -75,7 +81,30 @@ export class ClientPaymentComponent implements OnInit {
       cp => cp && cp.client && cp.client.name || ''
     );
     this.selectedGroup = null;
+    this.resetColumnsVisibility();
     this.showClientColumn = false;
+  }
+
+  byReceiptType(): void {
+    this.displayData = PayableGroup.groupData(
+      this.clientPayments,
+      cp => cp && this.convertReceiptTypeToId(cp),
+      cp => cp && this.convertReceiptTypeToName(cp)
+    );
+    this.selectedGroup = null;
+    this.resetColumnsVisibility();
+    this.showReceiptTypeColumns = false;
+  }
+
+  convertReceiptTypeToId(cp: ClientPayment): number {
+    return cp.invoice ? 1 : cp.billOfSale ? 2 : cp.billOfSaleAsInvoice ? 3 : cp.notRegistered ? 4 : 5;
+  }
+
+  convertReceiptTypeToName(cp: ClientPayment): string {
+    return cp.invoice ? 'faktura'
+      : cp.billOfSale ? 'paragon'
+        : cp.billOfSaleAsInvoice ? 'paragon jako faktura'
+          : cp.notRegistered ? 'na czarno' : 'brak';
   }
 
   setOverClientPayment(cp: ClientPayment, row: HTMLTableRowElement): void {
