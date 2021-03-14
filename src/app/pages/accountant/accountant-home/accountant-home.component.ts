@@ -122,9 +122,9 @@ export class AccountantHomeComponent implements OnInit {
       this.servicesService.currentDomainServices(),
       this.clientsService.currentDomainClients()
     ])
-      .subscribe(([ps, sp, services, clients]) => {
+      .subscribe(([ps, cp, services, clients]) => {
         this.performedServices = ps;
-        this.clientPayments = sp;
+        this.clientPayments = cp;
         this.services = services;
         this.clients = clients;
       });
