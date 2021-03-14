@@ -48,6 +48,7 @@ export class AccountantHomeComponent implements OnInit {
   billingPeriodInfo: BillingPeriodInfo;
   historicalSavings: Map<Date, Map<string, number>>;
   currentDomainName: string;
+  private currentComapnyDate: Date;
 
   constructor(private accountsService: AccountsService,
               private transactionsService: TransactionsService,
@@ -78,9 +79,6 @@ export class AccountantHomeComponent implements OnInit {
     this.fetchCurrencies();
     this.fetchPiggyBanks();
     this.fetchHistoricalSavings();
-    this.fetchCompanyData();
-    this.fetchServices();
-    this.fetchClients();
     this.currentDomainName = this.domainService.currentDomain?.name || '';
   }
 
@@ -116,27 +114,20 @@ export class AccountantHomeComponent implements OnInit {
     );
   }
 
-  private fetchCompanyData(): void {
+  fetchCompanyData(date: Date): void {
+    this.currentComapnyDate = date;
     forkJoin([
-      this.performedServicesService.currentDomainServices(),
-      this.clientPaymentsService.currentDomainClientPayments()
+      this.performedServicesService.currentDomainServices(this.currentComapnyDate),
+      this.clientPaymentsService.currentDomainClientPayments(this.currentComapnyDate),
+      this.servicesService.currentDomainServices(),
+      this.clientsService.currentDomainClients()
     ])
-      .subscribe(([ps, sp]) => {
+      .subscribe(([ps, sp, services, clients]) => {
         this.performedServices = ps;
         this.clientPayments = sp;
+        this.services = services;
+        this.clients = clients;
       });
-  }
-
-  private fetchServices(): void {
-    this.servicesService.currentDomainServices().subscribe(
-      data => this.services = data
-    );
-  }
-
-  private fetchClients(): void {
-    this.clientsService.currentDomainClients().subscribe(
-      data => this.clients = data
-    );
   }
 
   createElement(billingPeriod: BillingPeriod, element: Income | Expense, accountId: number): void {
@@ -175,7 +166,7 @@ export class AccountantHomeComponent implements OnInit {
   createPerformedService(performedService: PerformedService): void {
     this.performedServicesService.createService(performedService)
       .pipe(
-        switchMap(value => this.performedServicesService.currentDomainServices())
+        switchMap(value => this.performedServicesService.currentDomainServices(this.currentComapnyDate))
       )
       .subscribe(data => this.performedServices = data);
   }
@@ -183,7 +174,7 @@ export class AccountantHomeComponent implements OnInit {
   updatePerformedService(performedService: PerformedService): void {
     this.performedServicesService.updateService(performedService)
       .pipe(
-        switchMap(value => this.performedServicesService.currentDomainServices())
+        switchMap(value => this.performedServicesService.currentDomainServices(this.currentComapnyDate))
       )
       .subscribe(data => this.performedServices = data);
   }
@@ -191,7 +182,7 @@ export class AccountantHomeComponent implements OnInit {
   createClientPayment(clientPayment: ClientPayment): void {
     this.clientPaymentsService.createClientPayment(clientPayment)
       .pipe(
-        switchMap(value => this.clientPaymentsService.currentDomainClientPayments())
+        switchMap(value => this.clientPaymentsService.currentDomainClientPayments(this.currentComapnyDate))
       )
       .subscribe(data => this.clientPayments = data);
   }
@@ -199,7 +190,7 @@ export class AccountantHomeComponent implements OnInit {
   updateClientPayment(clientPayment: ClientPayment): void {
     this.clientPaymentsService.updateClientPayment(clientPayment)
       .pipe(
-        switchMap(value => this.clientPaymentsService.currentDomainClientPayments())
+        switchMap(value => this.clientPaymentsService.currentDomainClientPayments(this.currentComapnyDate))
       )
       .subscribe(data => this.clientPayments = data);
   }
@@ -207,8 +198,8 @@ export class AccountantHomeComponent implements OnInit {
   createPerformedServicePayment(performedServicePayment: PerformedServicePayment): void {
     this.performedServicePaymentsService.createPerformedServicePayments(performedServicePayment)
       .subscribe(
-        data => this.fetchCompanyData(),
-        error => this.fetchCompanyData()
+        data => this.fetchCompanyData(performedServicePayment.performedService.date),
+        error => this.fetchCompanyData(performedServicePayment.performedService.date)
       );
   }
 }

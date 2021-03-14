@@ -1,3 +1,14 @@
+<div class="sg-flex-row sg-flex-justify-space-between">
+  <div>
+    <button class="btn btn-link btn-small" (click)="previous()">Wcześniej</button>
+  </div>
+  <div>
+    <h4><span>{{monthYearString(displayingPeriod)}}</span></h4>
+  </div>
+  <div class="sg-flex-column">
+    <button class="btn btn-link btn-small" (click)="next()">Później</button>
+  </div>
+</div>
 <div class="sg-flex-row sg-flex-justify-flex-start">
   <app-performed-services
     [title]="'Wykonane usługi'"
