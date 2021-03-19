@@ -33,7 +33,6 @@ export class PerformedServicesComponent implements OnInit {
   set performedServices(value: PerformedService[]) {
     this.allPerformedServices = value;
     this.performedServicesInternal = (value || [])
-      .filter(ps => ps.isForCurrentMonth() || ps.getPaymentStatus() !== PaymentStatus.PAID)
       .sort(PerformedService.compareByDateAndClientAndServiceAndId);
     if (this.editElement) {
       this.editElement = this.performedServicesInternal.find(ps => ps.id === this.editElement.id);
