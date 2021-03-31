@@ -26,7 +26,7 @@ import {ClientPayment} from '../../../model/accountant/client-payment';
 import {ClientPaymentsService} from '../../../services/accountant/client-payments.service';
 import {forkJoin} from 'rxjs';
 import {PerformedServicePaymentsService} from '../../../services/accountant/performed-service-payments.service';
-import {PerformedServicePayment} from '../../../model/accountant/performed-service-payment';
+import {PerformedServicePayment, PerformedServicePaymentShort} from '../../../model/accountant/performed-service-payment';
 
 @Component({
   selector: 'app-accounts-home',
@@ -196,7 +196,7 @@ export class AccountantHomeComponent implements OnInit {
   }
 
   createPerformedServicePayment(performedServicePayment: PerformedServicePayment): void {
-    this.performedServicePaymentsService.createPerformedServicePayments(performedServicePayment)
+    this.performedServicePaymentsService.createPerformedServicePayments(new PerformedServicePaymentShort(performedServicePayment))
       .subscribe(
         data => this.fetchCompanyData(performedServicePayment.performedService.date),
         error => this.fetchCompanyData(performedServicePayment.performedService.date)

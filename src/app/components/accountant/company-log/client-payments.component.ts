@@ -29,10 +29,13 @@ export class ClientPaymentComponent implements OnInit {
   set clientPayments(value: ClientPayment[]) {
     this.clientPaymentsInternal = (value || [])
       .sort(ClientPayment.compareByDateAndCurrencyAndId);
+    this.totalIncomes.clear();
+    this.clientPaymentsInternal.forEach(cp => this.totalIncomes.set(cp.currency, (this.totalIncomes.get(cp.currency) || 0) + cp.price));
     this.noGrouping();
   }
 
   displayData: PayableGroup<ClientPayment>[];
+  totalIncomes = new Map<string, number>();
 
   @Input() allCurrencies: Currency[];
   @Input() clients: Client[];
@@ -220,5 +223,9 @@ export class ClientPaymentComponent implements OnInit {
 
   getPerformedService(payment: SimplePerformedServicePayment): PerformedService {
     return this.performedServices.find(cp => cp.id === payment.performedServiceId);
+  }
+
+  getDataLength(): number {
+    return this.displayData.reduce((a, b) => a + (b && b.data && b.data.length || 0), 0);
   }
 }

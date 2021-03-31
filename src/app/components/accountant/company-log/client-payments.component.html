@@ -22,12 +22,18 @@
 <ng-template #servicePaymentsTemplate>
   <div class="sg-flex-column">
 
-    <div class="sg-flex-row">
-      <div style="width: 20%"></div>
-      <h5 *ngIf="title" style="text-align: center; width: 60%">{{title}}</h5>
-      <button style="width: 20%" (click)="prepareToCreate()" *ngIf="isNonEditMode()" class="btn btn-primary btn-sm">
-        Stwórz
-      </button>
+    <div class="sg-flex-column">
+      <div class="sg-flex-row">
+        <div style="width: 20%"></div>
+        <h5 *ngIf="title" style="text-align: center; width: 60%">{{title}} ({{getDataLength()}})</h5>
+        <button style="width: 20%" (click)="prepareToCreate()" *ngIf="isNonEditMode()" class="btn btn-primary btn-sm">
+          Stwórz
+        </button>
+      </div>
+      <app-multi-currency-total
+        [title]="'Łączne dochody'"
+        [values]="totalIncomes"
+      ></app-multi-currency-total>
     </div>
 
     <div (mouseleave)="setOverClientPayment(null, null)" *ngIf="isNonEditMode()"
@@ -71,10 +77,18 @@
                 <td>{{clientPayment.date | localizedDate }}</td>
                 <td *ngIf="showClientColumn">{{clientPayment.client.name}}</td>
                 <td style="text-align:right">{{clientPayment.price| currency: clientPayment.currency}}</td>
-                <td *ngIf="showReceiptTypeColumns" style="text-align:center"><input type="checkbox" [ngModel]="clientPayment.billOfSale" disabled></td>
-                <td *ngIf="showReceiptTypeColumns" style="text-align:center"><input type="checkbox" [ngModel]="clientPayment.billOfSaleAsInvoice" disabled></td>
-                <td *ngIf="showReceiptTypeColumns" style="text-align:center"><input type="checkbox" [ngModel]="clientPayment.invoice" disabled></td>
-                <td *ngIf="showReceiptTypeColumns" style="text-align:center"><input type="checkbox" [ngModel]="clientPayment.notRegistered" disabled>
+                <td *ngIf="showReceiptTypeColumns" style="text-align:center"><input type="checkbox"
+                                                                                    [ngModel]="clientPayment.billOfSale"
+                                                                                    disabled></td>
+                <td *ngIf="showReceiptTypeColumns" style="text-align:center"><input type="checkbox"
+                                                                                    [ngModel]="clientPayment.billOfSaleAsInvoice"
+                                                                                    disabled></td>
+                <td *ngIf="showReceiptTypeColumns" style="text-align:center"><input type="checkbox"
+                                                                                    [ngModel]="clientPayment.invoice"
+                                                                                    disabled></td>
+                <td *ngIf="showReceiptTypeColumns" style="text-align:center"><input type="checkbox"
+                                                                                    [ngModel]="clientPayment.notRegistered"
+                                                                                    disabled>
                 </td>
               </tr>
               <tr *ngIf="isEqualToSelectedElement(clientPayment)"

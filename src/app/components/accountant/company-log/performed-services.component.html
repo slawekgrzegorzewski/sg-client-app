@@ -27,7 +27,7 @@
 
     <div class="sg-flex-row">
       <div style="width: 20%"></div>
-      <h5 *ngIf="title" style="text-align: center; width: 60%">{{title}}</h5>
+      <h5 *ngIf="title" style="text-align: center; width: 60%">{{title}} ({{getDataLength()}})</h5>
       <button style="width: 20%" (click)="prepareToCreate()" *ngIf="isNonEditMode()" class="btn btn-primary btn-sm">Stwórz</button>
     </div>
 
@@ -97,19 +97,19 @@
                       </tr>
                       </thead>
                       <tr *ngFor="let payment of performedService.clientPaymentsRelations">
-                        <td style="text-align:center">{{clientPayment(payment).date | localizedDate}}</td>
-                        <td style="text-align:right">{{payment.price | currency: clientPayment(payment).currency}}</td>
+                        <td style="text-align:center">{{payment.date | localizedDate}}</td>
+                        <td style="text-align:right">{{payment.price | currency: payment.currency}}</td>
                         <td style="text-align:center">
-                          <input type="checkbox" [ngModel]="clientPayment(payment).billOfSale" disabled>
+                          <input type="checkbox" [ngModel]="payment.billOfSale" disabled>
                         </td>
                         <td style="text-align:center">
-                          <input type="checkbox" [ngModel]="clientPayment(payment).billOfSaleAsInvoice" disabled>
+                          <input type="checkbox" [ngModel]="payment.billOfSaleAsInvoice" disabled>
                         </td>
                         <td style="text-align:center">
-                          <input type="checkbox" [ngModel]="clientPayment(payment).invoice" disabled>
+                          <input type="checkbox" [ngModel]="payment.invoice" disabled>
                         </td>
                         <td style="text-align:center">
-                          <input type="checkbox" [ngModel]="clientPayment(payment).notRegistered" disabled>
+                          <input type="checkbox" [ngModel]="payment.notRegistered" disabled>
                         </td>
                       </tr>
                     </table>

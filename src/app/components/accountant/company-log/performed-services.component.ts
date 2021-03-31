@@ -242,7 +242,7 @@ export class PerformedServicesComponent implements OnInit {
     this.resetEditForm();
   }
 
-  clientPayment(payment: SimplePerformedServicePayment): ClientPayment {
-    return this.clientPayments.find(cp => cp.id === payment.clientPaymentId);
+  getDataLength(): number {
+    return this.displayData.reduce((a, b) => a + (b && b.data && b.data.length || 0), 0);
   }
 }
