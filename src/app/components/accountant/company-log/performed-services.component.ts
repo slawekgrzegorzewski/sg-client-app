@@ -5,7 +5,6 @@ import {Currency} from '../../../model/accountant/currency';
 import {Client} from '../../../model/accountant/client';
 import {PerformedServicePayment} from '../../../model/accountant/performed-service-payment';
 import {ClientPayment} from '../../../model/accountant/client-payment';
-import {SimplePerformedServicePayment} from '../../../model/accountant/simple-performed-service-payment';
 import {DatePipe} from '@angular/common';
 import {Payable, PaymentStatus} from '../../../model/accountant/payable';
 import {PayableGroup} from '../../../model/accountant/payable-groupper';
@@ -14,6 +13,10 @@ const GENERAL_EDIT_MODE = 'general';
 const CREATE_EDIT_MODE = 'create';
 const PAYMENT_SELECTION_EDIT_MODE = 'payment-selection';
 const EMPTY_EDIT_MODE = '';
+
+enum Grouping {
+  LACK, BY_CLIENTS, BY_DATES, BY_SERVICES
+}
 
 @Component({
   selector: 'app-performed-services',
@@ -25,6 +28,7 @@ export class PerformedServicesComponent implements OnInit {
 
   allPerformedServices: PerformedService[];
   performedServicesInternal: PerformedService[];
+  groupingMode = Grouping.LACK;
 
   @Input() get performedServices(): PerformedService[] {
     return this.performedServicesInternal;
@@ -40,7 +44,7 @@ export class PerformedServicesComponent implements OnInit {
     if (this.selectedElement) {
       this.selectedElement = this.performedServicesInternal.find(ps => ps.id === this.selectedElement.id);
     }
-    this.noGrouping();
+    this.group();
   }
 
   displayData: PayableGroup<PerformedService>[];
@@ -70,43 +74,86 @@ export class PerformedServicesComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  group(): void {
+    switch (this.groupingMode) {
+      case Grouping.LACK:
+        this.disableGrouping();
+        break;
+      case Grouping.BY_CLIENTS:
+        this.groupByClients();
+        break;
+      case Grouping.BY_DATES:
+        this.groupByDates();
+        break;
+      case Grouping.BY_SERVICES:
+        this.groupByServices();
+        break;
+    }
+  }
+
   noGrouping(): void {
+    this.groupingMode = Grouping.LACK;
+    this.group();
+  }
+
+  byClients(): void {
+    this.groupingMode = Grouping.BY_CLIENTS;
+    this.group();
+  }
+
+  byDates(): void {
+    this.groupingMode = Grouping.BY_DATES;
+    this.group();
+  }
+
+  byServices(): void {
+    this.groupingMode = Grouping.BY_SERVICES;
+    this.group();
+  }
+
+  disableGrouping(): void {
     this.displayData = PayableGroup.groupData(this.performedServices, ps => null, ps => '');
     this.selectedGroup = this.displayData.length > 0 ? this.displayData[0] : null;
     this.enableAllColumns();
   }
 
-  byClients(): void {
+  groupByClients(): void {
     this.displayData = PayableGroup.groupData(
       this.performedServices,
       ps => ps && ps.client && ps.client.id || null,
       ps => ps && ps.client && ps.client.name || ''
     );
-    this.selectedGroup = null;
+    this.selectGroup();
     this.enableAllColumns();
     this.showClientColumn = false;
   }
 
-  byDates(): void {
+  groupByDates(): void {
     this.displayData = PayableGroup.groupData(
       this.performedServices,
       ps => ps && ps.date && ps.date.getTime() || null,
       ps => ps && ps.date && this.datePipe.transform(ps.date, 'dd MMMM yyyy') || ''
     );
-    this.selectedGroup = null;
+    this.selectGroup();
     this.enableAllColumns();
     this.showDateColumn = false;
   }
 
-  byServices(): void {
+  groupByServices(): void {
     this.displayData = PayableGroup.groupData(
       this.performedServices,
       ps => ps && ps.service && ps.service.id || null,
       ps => ps && ps.service && ps.service.name || ''
     );
-    this.selectedGroup = null;
+    this.selectGroup();
     this.enableAllColumns();
     this.showServiceColumn = false;
+  }
+
+  private selectGroup(): void {
+    if (this.selectedGroup !== null) {
+      this.selectedGroup = (this.displayData || []).find(g => g.title === this.selectedGroup.title);
+    }
   }
 
   private enableAllColumns(): void {

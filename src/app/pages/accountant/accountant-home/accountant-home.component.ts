@@ -198,8 +198,8 @@ export class AccountantHomeComponent implements OnInit {
   createPerformedServicePayment(performedServicePayment: PerformedServicePayment): void {
     this.performedServicePaymentsService.createPerformedServicePayments(new PerformedServicePaymentShort(performedServicePayment))
       .subscribe(
-        data => this.fetchCompanyData(performedServicePayment.performedService.date),
-        error => this.fetchCompanyData(performedServicePayment.performedService.date)
+        data => this.fetchCompanyData(this.currentComapnyDate),
+        error => this.fetchCompanyData(this.currentComapnyDate)
       );
   }
 }

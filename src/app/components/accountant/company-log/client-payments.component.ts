@@ -11,6 +11,10 @@ const GENERAL_EDIT_MODE = 'general';
 const CREATE_EDIT_MODE = 'create';
 const EMPTY_EDIT_MODE = '';
 
+enum Grouping {
+  LACK, BY_CLIENTS, BY_RECEIPT_TYPE
+}
+
 @Component({
   selector: 'app-client-payments',
   templateUrl: './client-payments.component.html',
@@ -21,6 +25,7 @@ export class ClientPaymentComponent implements OnInit {
   @Input() title: string;
 
   clientPaymentsInternal: ClientPayment[];
+  groupingMode = Grouping.LACK;
 
   @Input() get clientPayments(): ClientPayment[] {
     return this.clientPaymentsInternal;
@@ -31,7 +36,7 @@ export class ClientPaymentComponent implements OnInit {
       .sort(ClientPayment.compareByDateAndCurrencyAndId);
     this.totalIncomes.clear();
     this.clientPaymentsInternal.forEach(cp => this.totalIncomes.set(cp.currency, (this.totalIncomes.get(cp.currency) || 0) + cp.price));
-    this.noGrouping();
+    this.group();
   }
 
   displayData: PayableGroup<ClientPayment>[];
@@ -70,32 +75,67 @@ export class ClientPaymentComponent implements OnInit {
     this.showReceiptTypeColumns = true;
   }
 
+  group(): void {
+    switch (this.groupingMode) {
+      case Grouping.LACK:
+        this.disableGrouping();
+        break;
+      case Grouping.BY_CLIENTS:
+        this.groupByClients();
+        break;
+      case Grouping.BY_RECEIPT_TYPE:
+        this.groupByReceiptType();
+        break;
+    }
+  }
+
   noGrouping(): void {
+    this.groupingMode = Grouping.LACK;
+    this.disableGrouping();
+  }
+
+  byClients(): void {
+    this.groupingMode = Grouping.BY_CLIENTS;
+    this.groupByClients();
+  }
+
+  byReceiptType(): void {
+    this.groupingMode = Grouping.BY_RECEIPT_TYPE;
+    this.groupByReceiptType();
+  }
+
+  disableGrouping(): void {
     this.displayData = PayableGroup.groupData(this.clientPayments, ps => null, ps => '');
     this.selectedGroup = this.displayData.length > 0 ? this.displayData[0] : null;
     this.resetColumnsVisibility();
   }
 
-  byClients(): void {
+  groupByClients(): void {
     this.displayData = PayableGroup.groupData(
       this.clientPayments,
       cp => cp && cp.client && cp.client.id || null,
       cp => cp && cp.client && cp.client.name || ''
     );
-    this.selectedGroup = null;
+    this.selectGroup();
     this.resetColumnsVisibility();
     this.showClientColumn = false;
   }
 
-  byReceiptType(): void {
+  groupByReceiptType(): void {
     this.displayData = PayableGroup.groupData(
       this.clientPayments,
       cp => cp && this.convertReceiptTypeToId(cp),
       cp => cp && this.convertReceiptTypeToName(cp)
     );
-    this.selectedGroup = null;
+    this.selectGroup();
     this.resetColumnsVisibility();
     this.showReceiptTypeColumns = false;
+  }
+
+  private selectGroup(): void {
+    if (this.selectedGroup !== null) {
+      this.selectedGroup = (this.displayData || []).find(g => g.title === this.selectedGroup.title);
+    }
   }
 
   convertReceiptTypeToId(cp: ClientPayment): number {
