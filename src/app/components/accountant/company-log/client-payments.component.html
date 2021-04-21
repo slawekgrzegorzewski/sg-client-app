@@ -105,11 +105,11 @@
                         <td>Cena</td>
                       </tr>
                       </thead>
-                      <tr *ngFor="let payment of clientPayment.serviceRelations">
-                        <td style="text-align:center">{{getPerformedService(payment).date | localizedDate}}</td>
-                        <td style="text-align:center">{{getPerformedService(payment).service.name}}</td>
+                      <tr *ngFor="let servicePaymentRelation of getServiceRelations(clientPayment)">
+                        <td style="text-align:center">{{servicePaymentRelation.date | localizedDate}}</td>
+                        <td style="text-align:center">{{servicePaymentRelation.service}}</td>
                         <td
-                          style="text-align:right">{{payment.price | currency: getPerformedService(payment).currency}}</td>
+                          style="text-align:right">{{servicePaymentRelation.price | currency: servicePaymentRelation.currency}}</td>
                       </tr>
                     </table>
                   </div>

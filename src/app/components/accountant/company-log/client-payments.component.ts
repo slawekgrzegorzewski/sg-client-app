@@ -6,6 +6,7 @@ import {SimplePerformedServicePayment} from '../../../model/accountant/simple-pe
 import {PerformedService} from '../../../model/accountant/performed-service';
 import {PaymentStatus} from '../../../model/accountant/payable';
 import {PayableGroup} from '../../../model/accountant/payable-groupper';
+import {ComparatorBuilder} from '../../../../utils/comparator-builder';
 
 const GENERAL_EDIT_MODE = 'general';
 const CREATE_EDIT_MODE = 'create';
@@ -105,7 +106,15 @@ export class ClientPaymentComponent implements OnInit {
   }
 
   disableGrouping(): void {
-    this.displayData = PayableGroup.groupData(this.clientPayments, ps => null, ps => '');
+    this.displayData = PayableGroup.groupData(
+      this.clientPayments,
+      ps => null,
+      ps => '',
+      ComparatorBuilder.comparing<ClientPayment>(cp => Math.floor(cp?.date?.getTime()) || 0).desc()
+        .thenComparing(cp => cp?.client?.name || '')
+        .thenComparing(cp => cp?.price || 0)
+        .build()
+    );
     this.selectedGroup = this.displayData.length > 0 ? this.displayData[0] : null;
     this.resetColumnsVisibility();
   }
@@ -114,7 +123,10 @@ export class ClientPaymentComponent implements OnInit {
     this.displayData = PayableGroup.groupData(
       this.clientPayments,
       cp => cp && cp.client && cp.client.id || null,
-      cp => cp && cp.client && cp.client.name || ''
+      cp => cp && cp.client && cp.client.name || '',
+      ComparatorBuilder.comparing<ClientPayment>(cp => Math.floor(cp?.date?.getTime()) || 0)
+        .thenComparing(cp => cp?.price || 0)
+        .build()
     );
     this.selectGroup();
     this.resetColumnsVisibility();
@@ -125,7 +137,11 @@ export class ClientPaymentComponent implements OnInit {
     this.displayData = PayableGroup.groupData(
       this.clientPayments,
       cp => cp && this.convertReceiptTypeToId(cp),
-      cp => cp && this.convertReceiptTypeToName(cp)
+      cp => cp && this.convertReceiptTypeToName(cp),
+      ComparatorBuilder.comparing<ClientPayment>(cp => Math.floor(cp?.date?.getTime()) || 0)
+        .thenComparing(cp => cp?.client?.name || '')
+        .thenComparing(cp => cp?.price || 0)
+        .build()
     );
     this.selectGroup();
     this.resetColumnsVisibility();
@@ -267,5 +283,24 @@ export class ClientPaymentComponent implements OnInit {
 
   getDataLength(): number {
     return this.displayData.reduce((a, b) => a + (b && b.data && b.data.length || 0), 0);
+  }
+
+  getServiceRelations(clientPayment: ClientPayment): { date: Date, service: string, price: number, currency: string }[] {
+    return clientPayment.serviceRelations
+      .map(p => {
+        const ps = this.getPerformedService(p);
+        return {
+          date: ps.date,
+          service: ps.service?.name || '',
+          price: p.price,
+          currency: p.currency
+        };
+      })
+      .sort(
+        ComparatorBuilder.comparing<{ date: Date, service: string, price: number, currency: string }>(ps => ps.date?.getTime() || 0)
+          .thenComparing(ps => ps.service)
+          .thenComparing(ps => ps.price || 0)
+          .build()
+      );
   }
 }

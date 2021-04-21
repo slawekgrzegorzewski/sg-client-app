@@ -8,6 +8,8 @@ import {ClientPayment} from '../../../model/accountant/client-payment';
 import {DatePipe} from '@angular/common';
 import {Payable, PaymentStatus} from '../../../model/accountant/payable';
 import {PayableGroup} from '../../../model/accountant/payable-groupper';
+import {ComparatorBuilder} from '../../../../utils/comparator-builder';
+import {SimplePerformedServicePayment} from '../../../model/accountant/simple-performed-service-payment';
 
 const GENERAL_EDIT_MODE = 'general';
 const CREATE_EDIT_MODE = 'create';
@@ -112,7 +114,15 @@ export class PerformedServicesComponent implements OnInit {
   }
 
   disableGrouping(): void {
-    this.displayData = PayableGroup.groupData(this.performedServices, ps => null, ps => '');
+    this.displayData = PayableGroup.groupData(this.performedServices,
+      ps => null,
+      ps => '',
+      ComparatorBuilder.comparing<PerformedService>(ps => ps.date.getTime()).desc()
+        .thenComparing(ps => ps.client?.name || '')
+        .thenComparing(ps => ps.service?.name || '')
+        .thenComparing(ps => ps.price || 0)
+        .build()
+    );
     this.selectedGroup = this.displayData.length > 0 ? this.displayData[0] : null;
     this.enableAllColumns();
   }
@@ -121,7 +131,11 @@ export class PerformedServicesComponent implements OnInit {
     this.displayData = PayableGroup.groupData(
       this.performedServices,
       ps => ps && ps.client && ps.client.id || null,
-      ps => ps && ps.client && ps.client.name || ''
+      ps => ps && ps.client && ps.client.name || '',
+      ComparatorBuilder.comparing<PerformedService>(ps => ps.date.getTime()).desc()
+        .thenComparing(ps => ps.service?.name || '')
+        .thenComparing(ps => ps.price || 0)
+        .build()
     );
     this.selectGroup();
     this.enableAllColumns();
@@ -132,7 +146,11 @@ export class PerformedServicesComponent implements OnInit {
     this.displayData = PayableGroup.groupData(
       this.performedServices,
       ps => ps && ps.date && ps.date.getTime() || null,
-      ps => ps && ps.date && this.datePipe.transform(ps.date, 'dd MMMM yyyy') || ''
+      ps => ps && ps.date && this.datePipe.transform(ps.date, 'dd MMMM yyyy') || '',
+      ComparatorBuilder.comparing<PerformedService>(ps => ps.client?.name || '')
+        .thenComparing(ps => ps.service?.name || '')
+        .thenComparing(ps => ps.price || 0)
+        .build()
     );
     this.selectGroup();
     this.enableAllColumns();
@@ -143,7 +161,11 @@ export class PerformedServicesComponent implements OnInit {
     this.displayData = PayableGroup.groupData(
       this.performedServices,
       ps => ps && ps.service && ps.service.id || null,
-      ps => ps && ps.service && ps.service.name || ''
+      ps => ps && ps.service && ps.service.name || '',
+      ComparatorBuilder.comparing<PerformedService>(ps => ps.date.getTime()).desc()
+        .thenComparing(ps => ps.client?.name || '')
+        .thenComparing(ps => ps.price || 0)
+        .build()
     );
     this.selectGroup();
     this.enableAllColumns();
@@ -291,5 +313,13 @@ export class PerformedServicesComponent implements OnInit {
 
   getDataLength(): number {
     return this.displayData.reduce((a, b) => a + (b && b.data && b.data.length || 0), 0);
+  }
+
+  getClientPaymentsRelations(performedService: PerformedService): SimplePerformedServicePayment[] {
+    return performedService.clientPaymentsRelations.sort(
+      ComparatorBuilder.comparing<SimplePerformedServicePayment>(p => p.date?.getTime() || 0)
+        .thenComparing(p => p.price)
+        .build()
+    );
   }
 }

@@ -1,5 +1,4 @@
 import {Payable, PaymentStatus} from './payable';
-import {PerformedService} from './performed-service';
 
 export class PayableGroup<T extends Payable> {
   private static generatedGroups = 0;
@@ -26,7 +25,9 @@ export class PayableGroup<T extends Payable> {
     return this.statusInternal;
   }
 
-  public static groupData<P extends Payable>(input: P[], idGetter: (p: P) => number, titleGetter: (p: P) => string): PayableGroup<P>[] {
+  public static groupData<P extends Payable>(input: P[], idGetter: (p: P) => number,
+                                             titleGetter: (p: P) => string,
+                                             comparator: (p1: P, p2: P) => number): PayableGroup<P>[] {
     const data = new Map<number, PayableGroup<P>>();
     for (const p of input) {
       const key = idGetter(p);
@@ -39,7 +40,9 @@ export class PayableGroup<T extends Payable> {
       group.additionalFinancialData.set(p.getCurrency(), toPay);
       data.set(key, group);
     }
-    return Array.from(data.values());
+    const toReturn = Array.from(data.values());
+    toReturn.forEach(group => group.data = group.data.sort(comparator));
+    return toReturn;
   }
 
   private static createGroup<P extends Payable>(data: P[], order: number): PayableGroup<P> {

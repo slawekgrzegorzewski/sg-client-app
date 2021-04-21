@@ -96,7 +96,7 @@
                         <td style="width: 30px">C</td>
                       </tr>
                       </thead>
-                      <tr *ngFor="let payment of performedService.clientPaymentsRelations">
+                      <tr *ngFor="let payment of getClientPaymentsRelations(performedService)">
                         <td style="text-align:center">{{payment.date | localizedDate}}</td>
                         <td style="text-align:right">{{payment.price | currency: payment.currency}}</td>
                         <td style="text-align:center">
