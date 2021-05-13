@@ -117,7 +117,7 @@ export class PerformedServicesComponent implements OnInit {
     this.displayData = PayableGroup.groupData(this.performedServices,
       ps => null,
       ps => '',
-      ComparatorBuilder.comparing<PerformedService>(ps => ps.date.getTime()).desc()
+      ComparatorBuilder.comparingByDate<PerformedService>(ps => ps?.date || new Date(0)).desc()
         .thenComparing(ps => ps.client?.name || '')
         .thenComparing(ps => ps.service?.name || '')
         .thenComparing(ps => ps.price || 0)
@@ -132,7 +132,7 @@ export class PerformedServicesComponent implements OnInit {
       this.performedServices,
       ps => ps && ps.client && ps.client.id || null,
       ps => ps && ps.client && ps.client.name || '',
-      ComparatorBuilder.comparing<PerformedService>(ps => ps.date.getTime()).desc()
+      ComparatorBuilder.comparingByDate<PerformedService>(ps => ps?.date || new Date(0)).desc()
         .thenComparing(ps => ps.service?.name || '')
         .thenComparing(ps => ps.price || 0)
         .build()
@@ -162,7 +162,7 @@ export class PerformedServicesComponent implements OnInit {
       this.performedServices,
       ps => ps && ps.service && ps.service.id || null,
       ps => ps && ps.service && ps.service.name || '',
-      ComparatorBuilder.comparing<PerformedService>(ps => ps.date.getTime()).desc()
+      ComparatorBuilder.comparingByDate<PerformedService>(ps => ps?.date || new Date(0)).desc()
         .thenComparing(ps => ps.client?.name || '')
         .thenComparing(ps => ps.price || 0)
         .build()
@@ -317,7 +317,7 @@ export class PerformedServicesComponent implements OnInit {
 
   getClientPaymentsRelations(performedService: PerformedService): SimplePerformedServicePayment[] {
     return performedService.clientPaymentsRelations.sort(
-      ComparatorBuilder.comparing<SimplePerformedServicePayment>(p => p.date?.getTime() || 0)
+      ComparatorBuilder.comparingByDate<SimplePerformedServicePayment>(p => p?.date || new Date(0))
         .thenComparing(p => p.price)
         .build()
     );

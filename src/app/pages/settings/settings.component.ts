@@ -225,12 +225,16 @@ export class SettingsComponent implements OnInit {
 
   createPiggyBank(piggyBank: PiggyBank): void {
     this.piggyBanksService.create(piggyBank).subscribe(
-      data => this.fetchPiggyBanks()
+      data => this.fetchPiggyBanks(),
+      error => this.toastService.showWarning('Błąd w czasie tworzenia skarbonki')
     );
   }
 
   updatePiggyBank(piggyBank: PiggyBank): void {
-    this.piggyBanksService.update(piggyBank).subscribe();
+    this.piggyBanksService.update(piggyBank).subscribe(
+      data => {},
+      error => this.toastService.showWarning('Błąd w czasie aktualizowania skarbonki')
+    );
   }
 
   createCategory(category: Category): void {

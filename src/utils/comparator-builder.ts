@@ -2,6 +2,8 @@ export type TBasicComparable = string | number | boolean | undefined | null;
 
 export type TKeyExtractor<T> = (t: T) => TBasicComparable;
 
+export type TKeyDateExtractor<T> = (t: T) => Date;
+
 export enum Order {
   DESC = -1,
   ASC = 1
@@ -88,20 +90,36 @@ export class ComparatorBuilder<T> {
     return new ComparatorBuilder<T>(keyExtractor);
   }
 
+  public static comparingByDate<T>(keyExtractor: TKeyDateExtractor<T>): ComparatorBuilder<T> {
+    return new ComparatorBuilder<T>(ComparatorBuilder.convertToNumberExtractor(keyExtractor));
+  }
+
+  private static convertToNumberExtractor<T>(keyExtractor: TKeyDateExtractor<T>): TKeyExtractor<T> {
+    return t => {
+      if (t) {
+        const date = keyExtractor(t);
+        if (date) {
+          return Math.floor(date.getTime() / 1000 / 3600 / 24);
+        }
+      }
+      return null;
+    };
+  }
+
   /**
    * Reverses the whole comparison result. Reversion is done on the FINAL comparison result, not on the individual ones.
    */
   public inverse = (): ComparatorBuilder<T> => {
     this.inverseFlag = true;
     return this;
-  };
+  }
 
   public desc = (): ComparatorBuilder<T> => {
     if (this.lastExtractor) {
       this.lastExtractor.order = Order.DESC;
     }
     return this;
-  };
+  }
 
   /**
    * See {@link NullMode}. </br>
@@ -112,14 +130,18 @@ export class ComparatorBuilder<T> {
   public definingNullAs = (nullMode: NullMode): ComparatorBuilder<T> => {
     this.nullMode = nullMode;
     return this;
-  };
+  }
 
   public thenComparing = (nextExtractor: TKeyExtractor<T>): ComparatorBuilder<T> => {
     const keyExtractor = new KeyExtractor<T>(nextExtractor);
     this.extractors.push(keyExtractor);
     this.lastExtractor = keyExtractor;
     return this;
-  };
+  }
+
+  public thenComparingByDate = (nextExtractor: TKeyDateExtractor<T>): ComparatorBuilder<T> => {
+    return this.thenComparing(ComparatorBuilder.convertToNumberExtractor(nextExtractor));
+  }
 
   public build(): CompareFunction<T> {
     if (this.extractors.length === 0) {
