@@ -71,6 +71,9 @@ import {PerformedServiceEditComponent} from './components/accountant/company-log
 import {ClientPaymentEditComponent} from './components/accountant/company-log/client-payment-edit.component';
 import {PaymentSelectionComponent} from './components/accountant/company-log/payment-selection.component';
 import {CompanyLogComponent} from './components/accountant/company-log/company-log.component';
+import {TimerComponent} from './components/general/timer/timer.component';
+import {CubesHomeComponent} from './pages/cubes/home/cubes-home.component';
+import {CubeRecordsService} from './services/accountant/cube-records.service';
 
 @NgModule({
   declarations: [
@@ -117,7 +120,9 @@ import {CompanyLogComponent} from './components/accountant/company-log/company-l
     PerformedServiceEditComponent,
     ClientPaymentEditComponent,
     PaymentSelectionComponent,
-    CompanyLogComponent
+    CompanyLogComponent,
+    TimerComponent,
+    CubesHomeComponent
   ],
   imports: [
     BrowserModule,
@@ -154,7 +159,8 @@ import {CompanyLogComponent} from './components/accountant/company-log/company-l
     ServicesService,
     PerformedServicesService,
     ClientPaymentsService,
-    PerformedServicePaymentsService
+    PerformedServicePaymentsService,
+    CubeRecordsService
   ],
   bootstrap: [AppComponent]
 })

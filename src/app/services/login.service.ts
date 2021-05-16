@@ -10,6 +10,7 @@ import {AccountantSettingsService} from './accountant/accountant-settings.servic
 export const ACCOUNTANT_APP = 'Accountant';
 export const CHECKER_APP = 'Checker';
 export const SYR_APP = 'SYR';
+export const CUBES_APP = 'Cubes';
 
 class TokenData {
   sub: string;
@@ -159,6 +160,9 @@ export class LoginService {
       if (roles.includes('SYR_ADMIN') || roles.includes('SYR_USER')) {
         apps.set(SYR_APP, 'syr-home');
       }
+      if (roles.includes('CUBES')) {
+        apps.set(CUBES_APP, 'cubes-home');
+      }
     }
     return apps;
   }
@@ -188,6 +192,10 @@ export class LoginService {
 
   isSYRAdmin(app: string): boolean {
     return this.isSYR(app) && this.containsRole('SYR_ADMIN');
+  }
+
+  isCubesApp(app: string): boolean {
+    return app === CUBES_APP;
   }
 
   get currentDomainId(): number {

@@ -58,6 +58,9 @@
       <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn && isSYRAdmin()">
         <a class="nav-link" [routerLink]="['/syr-admin']">Zarządzanie</a>
       </li>
+      <li class="nav-item" [routerLinkActive]="['cubes-home']" *ngIf="isLoggedIn && isCubesApp()">
+        <a class="nav-link" [routerLink]="['/cubes-home']">Kostki</a>
+      </li>
       <li class="nav-item menu-element-small" *ngIf="isLoggedIn">
         <div class="nav-link">--------</div>
       </li>

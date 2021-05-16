@@ -3,9 +3,9 @@ import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
 import {Account} from '../../model/accountant/account';
 import {Observable, of, throwError} from 'rxjs';
+import {map} from 'rxjs/operators';
 import {Currency} from '../../model/accountant/currency';
 import {SettingsService} from './settings.service';
-import {map} from 'rxjs/internal/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -24,11 +24,13 @@ export class AccountsService {
 
   private fetchCurrencies(): Observable<Currency[]> {
     return this.http.get<Currency[]>(`${this.currenciesEndpoint}/${this.settingsService.getUsersLocale()}`)
-      .pipe(map(data => data.map(d => Currency.fromData(d))))
-      .pipe(map(data => {
-        this.currencies = data;
-        return data;
-      }));
+      .pipe(
+        map(data => data.map(d => Currency.fromData(d))),
+        map(data => {
+          this.currencies = data;
+          return data;
+        })
+      );
   }
 
 

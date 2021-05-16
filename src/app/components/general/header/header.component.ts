@@ -87,6 +87,10 @@ export class HeaderComponent implements OnInit {
     return this.loginService.isSYRAdmin(this.selectedApp);
   }
 
+  isCubesApp(): boolean {
+    return this.loginService.isCubesApp(this.selectedApp);
+  }
+
   acceptInvitation(domain: Domain): void {
     this.domainService.acceptInvitation(domain.id).subscribe(data => {
     });

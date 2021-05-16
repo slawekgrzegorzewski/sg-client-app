@@ -14,6 +14,7 @@ import {ChartsComponent} from './pages/accountant/charts/charts.component';
 import {CheckerHomeComponent} from './pages/checker/checker-home/checker-home.component';
 import {SyrHomeComponent} from './pages/syr/syr-home.component';
 import {SyrAdminComponent} from './pages/syr/syr-admin.component';
+import {CubesHomeComponent} from './pages/cubes/home/cubes-home.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/login', pathMatch: 'full'},
@@ -28,10 +29,12 @@ const routes: Routes = [
   {path: 'register/:type', component: RegisterComponent, canActivate: [LoginGuard]},
   {path: 'change-password/:type', component: RegisterComponent},
 
-  {path: 'checker-home', component: CheckerHomeComponent},
+  {path: 'checker-home', component: CheckerHomeComponent, canActivate: [AuthGuardGuard]},
 
-  {path: 'syr-home', component: SyrHomeComponent},
-  {path: 'syr-admin', component: SyrAdminComponent},
+  {path: 'syr-home', component: SyrHomeComponent, canActivate: [AuthGuardGuard]},
+  {path: 'syr-admin', component: SyrAdminComponent, canActivate: [AuthGuardGuard]},
+
+  {path: 'cubes-home', component: CubesHomeComponent, canActivate: [AuthGuardGuard]},
 
   {path: '**', redirectTo: '/home', pathMatch: 'full'}
 ];

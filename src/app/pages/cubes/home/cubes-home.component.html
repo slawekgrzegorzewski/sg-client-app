@@ -1,0 +1,9 @@
+<div>
+  <canvas #rubiks width="600"></canvas>
+</div>
+
+<div *ngIf="turns">{{turns}}</div>
+
+<button (click)="scramble()">Scramble</button>
+
+<sg-timer #timer></sg-timer>
