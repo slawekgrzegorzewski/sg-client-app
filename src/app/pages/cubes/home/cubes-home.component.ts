@@ -1,9 +1,10 @@
 import {AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
 import {TimerComponent} from '../../../components/general/timer/timer.component';
-import RubiksCube, {materials} from '@curtishughes/rubiks-cube';
 import {CubeRecordsService} from '../../../services/accountant/cube-records.service';
-import {CubeRecord} from '../../../model/cubes/cube-record';
+import {CubeRecord, CubeType, cubeTypeDescriptions} from '../../../model/cubes/cube-record';
 import scramble from '../../../model/cubes/cube-scrambler';
+import {RubiksCube} from '../../../components/general/rubiks-cube/RubiksCube';
+import {classicMaterials} from '../../../components/general/rubiks-cube/types';
 
 @Component({
   selector: 'app-cubes-home',
@@ -17,9 +18,44 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   cube: RubiksCube;
   reverseAlgorithm = [];
 
+  max: Date;
+  min: Date;
+  avg: Date;
+
+  private _records: CubeRecord[];
+  get records(): CubeRecord[] {
+    return this._records;
+  }
+
+  set records(value: CubeRecord[]) {
+    this._records = value;
+    this.refreshStatsForSelectedCube();
+  }
+
+  recordsForSelectedCube: CubeRecord[];
+
+  _selectedCube: CubeType = 'THREE';
+
+  get selectedCube(): CubeType {
+    return this._selectedCube;
+  }
+
+  set selectedCube(value: CubeType) {
+    this._selectedCube = value;
+    this.refreshStatsForSelectedCube();
+    if (this.isThreeByThree()) {
+      this.visible = true;
+    } else {
+      this.visible = false;
+    }
+  }
+
+  cubeTypes = cubeTypeDescriptions;
+
   @ViewChild('timer') timer: TimerComponent;
   private firstRun = true;
   turns: string;
+  visible = true;
 
   constructor(private cubeRecordsService: CubeRecordsService) {
   }
@@ -28,8 +64,25 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.cube = new RubiksCube(this.canvas.nativeElement, materials.classic, 100);
-    this.cubeRecordsService.currentDomainRecords().subscribe(r => console.log(JSON.stringify(r)));
+    this.cube = new RubiksCube(this.canvas.nativeElement, classicMaterials, 100);
+    this.refreshStats();
+  }
+
+  private refreshStats(): void {
+    this.cubeRecordsService.currentDomainRecords().subscribe(r => this.records = r);
+  }
+
+  isThreeByThree(): boolean {
+    return this.selectedCube === 'THREE';
+  }
+
+  private refreshStatsForSelectedCube(): void {
+    this.recordsForSelectedCube = this.records.filter(r => r.cubesType === this.selectedCube);
+    const values = this.recordsForSelectedCube.map(r => r.time * 1_000);
+    console.log(values);
+    this.max = (values && values.length > 0) ? new Date(Math.max(...values)) : new Date(0);
+    this.min = (values && values.length > 0) ? new Date(Math.min(...values)) : new Date(0);
+    this.avg = (values && values.length > 0) ? new Date(values.reduce((a, b) => a + b, 0) / values.length) : new Date(0);
   }
 
   @HostListener('window:keyup', ['$event'])
@@ -50,11 +103,11 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
     } else if (event.code === 'Enter') {
       if (!this.timer.isRunning()) {
         const cubeRecord = new CubeRecord();
-        cubeRecord.cubesType = 'THREE';
+        cubeRecord.cubesType = this.selectedCube;
         cubeRecord.recordTime = new Date();
         cubeRecord.scramble = this.turns;
         cubeRecord.time = this.timer.committedTime / 1000;
-        this.cubeRecordsService.createService(cubeRecord).subscribe();
+        this.cubeRecordsService.createService(cubeRecord).subscribe(r => this.refreshStats());
       }
     }
   }
@@ -165,6 +218,10 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
           return this.cube.z(clockwise, d);
         };
     }
+  }
+
+  date(time: number): Date {
+    return new Date(time * 1000);
   }
 }
 

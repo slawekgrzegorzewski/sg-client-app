@@ -1,8 +1,21 @@
 import {Domain} from '../domain';
 
+export type CubeType = 'TWO' | 'THREE' | 'FOUR' | 'FIVE' | 'SIX' | 'SEVEN' | 'MEGAMINX';
+export const cubeTypeDescriptions = new Map(
+  [
+    ['TWO', '2x2'],
+    ['THREE', '3x3'],
+    ['FOUR', '4x4'],
+    ['FIVE', '5x5'],
+    ['SIX', '6x6'],
+    ['SEVEN', '7x7'],
+    ['MEGAMINX', 'megaminx']
+  ]
+);
+
 export class CubeRecord {
   public id: number;
-  public cubesType: 'TWO' | 'THREE' | 'FOUR' | 'FIVE' | 'SIX' | 'SEVEN' | 'MEGAMINX';
+  public cubesType: CubeType;
   public time: number;
   public scramble: string;
   public recordTime: Date;

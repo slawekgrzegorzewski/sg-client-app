@@ -1,9 +1,36 @@
-<div>
-  <canvas #rubiks width="600"></canvas>
+<div class="sg-flex-row">
+
+  <div style="width: 50%;">
+    <select [(ngModel)]="selectedCube">
+      <option *ngFor=" let type of cubeTypes | keyvalue" [value]="type.key">{{type.value}}</option>
+    </select>
+
+    <div [hidden]="!visible">
+      <canvas #rubiks width="1000"></canvas>
+    </div>
+
+    <div *ngIf="isThreeByThree() && turns">{{turns}}</div>
+
+    <button *ngIf="isThreeByThree()" (click)="scramble()">Scramble</button>
+
+    <sg-timer #timer></sg-timer>
+  </div>
+
+  <div style="width: 50%;">
+    <div>
+      Najszybsze ułożenie {{min | date: 'mm:ss'}}
+    </div>
+    <div>
+      Najwolniejsze ułożenie {{max | date: 'mm:ss'}}
+    </div>
+    <div>
+      Średnia {{avg | date: 'mm:ss'}}
+    </div>
+    <table>
+      <tr *ngFor="let record of recordsForSelectedCube | slice:-10">
+        <td>{{ date(record.time) | date: 'mm:ss'}}</td>
+      </tr>
+    </table>
+  </div>
+
 </div>
-
-<div *ngIf="turns">{{turns}}</div>
-
-<button (click)="scramble()">Scramble</button>
-
-<sg-timer #timer></sg-timer>
