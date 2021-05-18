@@ -5,6 +5,7 @@ import {CubeRecord, CubeType, cubeTypeDescriptions} from '../../../model/cubes/c
 import scramble from '../../../model/cubes/cube-scrambler';
 import {RubiksCube} from '../../../components/general/rubiks-cube/RubiksCube';
 import {classicMaterials} from '../../../components/general/rubiks-cube/types';
+import {CubeRecordsLineChart} from '../../../model/accountant/charts/CubeRecordsLineChart';
 
 @Component({
   selector: 'app-cubes-home',
@@ -17,6 +18,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   canvas: ElementRef<HTMLCanvasElement>;
   cube: RubiksCube;
   reverseAlgorithm = [];
+  cubeRecordsLineChart: CubeRecordsLineChart = new CubeRecordsLineChart([]);
 
   max: Date;
   min: Date;
@@ -78,8 +80,8 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
 
   private refreshStatsForSelectedCube(): void {
     this.recordsForSelectedCube = this.records.filter(r => r.cubesType === this.selectedCube);
+    this.cubeRecordsLineChart = new CubeRecordsLineChart(this.recordsForSelectedCube);
     const values = this.recordsForSelectedCube.map(r => r.time * 1_000);
-    console.log(values);
     this.max = (values && values.length > 0) ? new Date(Math.max(...values)) : new Date(0);
     this.min = (values && values.length > 0) ? new Date(Math.min(...values)) : new Date(0);
     this.avg = (values && values.length > 0) ? new Date(values.reduce((a, b) => a + b, 0) / values.length) : new Date(0);
@@ -89,17 +91,12 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   onKeyUp(event: KeyboardEvent): void {
     if (event.code === 'Space') {
       if (this.timer.isRunning()) {
-        this.timer.stop();
+        this.stop();
       } else {
-        if (this.firstRun) {
-          this.firstRun = false;
-        }
-        this.timer.start();
+        this.start();
       }
     } else if (event.code === 'KeyR') {
-      if (!this.timer.isRunning() && !this.firstRun) {
-        this.timer.resume();
-      }
+      this.resume();
     } else if (event.code === 'Enter') {
       if (!this.timer.isRunning()) {
         const cubeRecord = new CubeRecord();
@@ -153,6 +150,23 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
       }
     }
     return promise;
+  }
+
+  start(): void {
+    if (this.firstRun) {
+      this.firstRun = false;
+    }
+    this.timer.start();
+  }
+
+  resume(): void {
+    if (!this.timer.isRunning() && !this.firstRun) {
+      this.timer.resume();
+    }
+  }
+
+  stop(): void {
+    this.timer.stop();
   }
 
   turnToMethod(turn: string, clockwise: boolean): (duration?: number) => Promise<void> {

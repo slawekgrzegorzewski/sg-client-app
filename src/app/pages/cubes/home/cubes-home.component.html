@@ -14,6 +14,9 @@
     <button *ngIf="isThreeByThree()" (click)="scramble()">Scramble</button>
 
     <sg-timer #timer></sg-timer>
+    <button *ngIf="!timer.isRunning()" (click)="start()">Start</button>
+    <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="resume()">Resume</button>
+    <button *ngIf="timer.isRunning()" (click)="stop()">Stop</button>
   </div>
 
   <div style="width: 50%;">
@@ -26,11 +29,17 @@
     <div>
       Średnia {{avg | date: 'mm:ss'}}
     </div>
-    <table>
-      <tr *ngFor="let record of recordsForSelectedCube | slice:-10">
-        <td>{{ date(record.time) | date: 'mm:ss'}}</td>
-      </tr>
-    </table>
-  </div>
+    <div style="width: 50%">
+      <canvas baseChart #savingsChart='base-chart'
+              [datasets]="cubeRecordsLineChart.lineChartData"
+              [labels]="cubeRecordsLineChart.lineChartLabels"
+              [options]="cubeRecordsLineChart.lineChartOptions"
+              [colors]="cubeRecordsLineChart.lineChartColors"
+              [legend]="cubeRecordsLineChart.lineChartLegend"
+              [chartType]="cubeRecordsLineChart.lineChartType"
+              [plugins]="cubeRecordsLineChart.lineChartPlugins">
 
+      </canvas>
+    </div>
+  </div>
 </div>
