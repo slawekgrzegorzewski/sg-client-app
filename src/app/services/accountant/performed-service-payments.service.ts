@@ -20,7 +20,7 @@ export class PerformedServicePaymentsService {
   currentDomainPerformedServicePayments(date: Date): Observable<PerformedServicePayment[]> {
     const dateString = this.datePipe.transform(date, 'yyyy-MM');
     return this.http.get<PerformedService[]>(`${this.endpoint}/${dateString}`)
-      .pipe(map(data => (data.map(d => new PerformedServicePayment(d)))));
+      .pipe(map((data: []) => (data.map(d => new PerformedServicePayment(d)))));
   }
 
   updatePerformedServicePayments(payment: PerformedServicePaymentShort): Observable<PerformedServicePayment> {

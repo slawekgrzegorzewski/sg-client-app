@@ -19,7 +19,7 @@ export class PageVersionsService {
   }
 
   public getAllPageVersions(): Observable<PageVersion[]> {
-    return this.http.get<PageVersion[]>(this.endpoint).pipe(map(data => data.map(d => new PageVersion(d))));
+    return this.http.get<PageVersion[]>(this.endpoint).pipe(map((data: []) => data.map(d => new PageVersion(d))));
   }
 
 }

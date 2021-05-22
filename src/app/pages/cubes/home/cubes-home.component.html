@@ -17,6 +17,9 @@
     <button *ngIf="!timer.isRunning()" (click)="start()">Start</button>
     <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="resume()">Resume</button>
     <button *ngIf="timer.isRunning()" (click)="stop()">Stop</button>
+    <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="save()">Zapisz</button>
+    <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="saveWithoutScramble()">Zapisz bez scrambla
+    </button>
   </div>
 
   <div style="width: 50%;">
@@ -29,17 +32,23 @@
     <div>
       Średnia {{avg | date: 'mm:ss'}}
     </div>
-    <div style="width: 50%">
-      <canvas baseChart #savingsChart='base-chart'
-              [datasets]="cubeRecordsLineChart.lineChartData"
-              [labels]="cubeRecordsLineChart.lineChartLabels"
-              [options]="cubeRecordsLineChart.lineChartOptions"
-              [colors]="cubeRecordsLineChart.lineChartColors"
-              [legend]="cubeRecordsLineChart.lineChartLegend"
-              [chartType]="cubeRecordsLineChart.lineChartType"
-              [plugins]="cubeRecordsLineChart.lineChartPlugins">
+    <div class="flex-column">
+      <div class="flex-row">
+        <button (click)="cubeRecordsChartType = 'RAW'">Zwykły</button>
+        <button (click)="cubeRecordsChartType = 'MOVING_AVERAGE'">Średnia ruchoma</button>
+      </div>
+      <div style="width: 50%">
+        <canvas baseChart #cubesRecordsChart='base-chart'
+                [datasets]="cubeRecordsLineChart.lineChartData"
+                [labels]="cubeRecordsLineChart.lineChartLabels"
+                [options]="cubeRecordsLineChart.lineChartOptions"
+                [colors]="cubeRecordsLineChart.lineChartColors"
+                [legend]="cubeRecordsLineChart.lineChartLegend"
+                [chartType]="cubeRecordsLineChart.lineChartType"
+                [plugins]="cubeRecordsLineChart.lineChartPlugins">
 
-      </canvas>
+        </canvas>
+      </div>
     </div>
   </div>
 </div>

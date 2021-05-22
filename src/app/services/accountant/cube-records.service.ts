@@ -16,7 +16,7 @@ export class CubeRecordsService {
   }
 
   currentDomainRecords(): Observable<CubeRecord[]> {
-    return this.http.get<CubeRecord[]>(this.endpoint).pipe(map(data => (data.map(d => new CubeRecord(d)))));
+    return this.http.get<CubeRecord[]>(this.endpoint).pipe(map((data: []) => (data.map(d => new CubeRecord(d)))));
   }
 
   createService(cubeRecord: CubeRecord): Observable<CubeRecord> {

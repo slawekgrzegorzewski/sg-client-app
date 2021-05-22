@@ -5,7 +5,8 @@ import {CubeRecord, CubeType, cubeTypeDescriptions} from '../../../model/cubes/c
 import scramble from '../../../model/cubes/cube-scrambler';
 import {RubiksCube} from '../../../components/general/rubiks-cube/RubiksCube';
 import {classicMaterials} from '../../../components/general/rubiks-cube/types';
-import {CubeRecordsLineChart} from '../../../model/accountant/charts/CubeRecordsLineChart';
+import {ChartMode, CubeRecordsLineChart} from '../../../model/cubes/CubeRecordsLineChart';
+import {BaseChartDirective} from 'ng2-charts';
 
 @Component({
   selector: 'app-cubes-home',
@@ -18,7 +19,20 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   canvas: ElementRef<HTMLCanvasElement>;
   cube: RubiksCube;
   reverseAlgorithm = [];
-  cubeRecordsLineChart: CubeRecordsLineChart = new CubeRecordsLineChart([]);
+  _cubeRecordsChartType: ChartMode = 'RAW';
+
+  get cubeRecordsChartType(): ChartMode {
+    return this._cubeRecordsChartType;
+  }
+
+  set cubeRecordsChartType(value: ChartMode) {
+    this._cubeRecordsChartType = value;
+    this.refreshStatsForSelectedCube();
+  }
+
+  cubeRecordsLineChart: CubeRecordsLineChart = new CubeRecordsLineChart([], this.cubeRecordsChartType);
+  @ViewChild('piggyBanksChart')
+  public cubesRecordsChart: BaseChartDirective;
 
   max: Date;
   min: Date;
@@ -80,7 +94,8 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
 
   private refreshStatsForSelectedCube(): void {
     this.recordsForSelectedCube = this.records.filter(r => r.cubesType === this.selectedCube);
-    this.cubeRecordsLineChart = new CubeRecordsLineChart(this.recordsForSelectedCube);
+    this.cubeRecordsLineChart = new CubeRecordsLineChart(this.recordsForSelectedCube, this.cubeRecordsChartType);
+    this.cubeRecordsLineChart.updateChart.subscribe(d => this.cubesRecordsChart.chart.update());
     const values = this.recordsForSelectedCube.map(r => r.time * 1_000);
     this.max = (values && values.length > 0) ? new Date(Math.max(...values)) : new Date(0);
     this.min = (values && values.length > 0) ? new Date(Math.min(...values)) : new Date(0);
@@ -98,13 +113,10 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
     } else if (event.code === 'KeyR') {
       this.resume();
     } else if (event.code === 'Enter') {
-      if (!this.timer.isRunning()) {
-        const cubeRecord = new CubeRecord();
-        cubeRecord.cubesType = this.selectedCube;
-        cubeRecord.recordTime = new Date();
-        cubeRecord.scramble = this.turns;
-        cubeRecord.time = this.timer.committedTime / 1000;
-        this.cubeRecordsService.createService(cubeRecord).subscribe(r => this.refreshStats());
+      if (event.shiftKey) {
+        this.saveWithoutScramble();
+      } else {
+        this.save();
       }
     }
   }
@@ -167,6 +179,29 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
 
   stop(): void {
     this.timer.stop();
+  }
+
+  save(): void {
+    if (!this.timer.isRunning()) {
+      const cubeRecord = this.createCubeRecordEntity(this.turns);
+      this.cubeRecordsService.createService(cubeRecord).subscribe(r => this.refreshStats());
+    }
+  }
+
+  saveWithoutScramble(): void {
+    if (!this.timer.isRunning()) {
+      const cubeRecord = this.createCubeRecordEntity('');
+      this.cubeRecordsService.createService(cubeRecord).subscribe(r => this.refreshStats());
+    }
+  }
+
+  private createCubeRecordEntity(scrambleToSave: string): CubeRecord {
+    const cubeRecord = new CubeRecord();
+    cubeRecord.cubesType = this.selectedCube;
+    cubeRecord.recordTime = new Date();
+    cubeRecord.scramble = scrambleToSave;
+    cubeRecord.time = this.timer.committedTime / 1000;
+    return cubeRecord;
   }
 
   turnToMethod(turn: string, clockwise: boolean): (duration?: number) => Promise<void> {

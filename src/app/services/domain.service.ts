@@ -50,7 +50,7 @@ export class DomainService {
 
   getAllDomains(): Observable<DetailedDomain[]> {
     return this.http.get<DetailedDomain[]>(this.endpoint, {responseType: 'json'})
-      .pipe(map(r => r.map(r1 => new DetailedDomain(r1))));
+      .pipe(map((r: []) => r.map(r1 => new DetailedDomain(r1))));
   }
 
   create(name: string): Observable<Domain> {
@@ -87,7 +87,7 @@ export class DomainService {
 
   getInvitations(): Observable<Domain[]> {
     return this.http.get<Domain[]>(`${this.endpoint}/invitations`, {responseType: 'json'})
-      .pipe(map(data => data.map(d => new Domain(d))));
+      .pipe(map((data: []) => data.map(d => new Domain(d))));
   }
 
   removeUserFromDomain(domainId: number, userLogin: string): Observable<DetailedDomain> {

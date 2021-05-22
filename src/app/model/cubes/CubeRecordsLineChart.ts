@@ -2,8 +2,10 @@ import {ChartDataSets, ChartOptions, ChartType} from 'chart.js';
 import {Color, Label} from 'ng2-charts';
 import * as pluginAnnotations from 'chartjs-plugin-annotation';
 import {EventEmitter} from '@angular/core';
-import {CubeRecord} from '../../cubes/cube-record';
-import {ComparatorBuilder} from '../../../../utils/comparator-builder';
+import {CubeRecord} from './cube-record';
+import {ComparatorBuilder} from '../../../utils/comparator-builder';
+
+export type ChartMode = 'RAW' | 'MOVING_AVERAGE'
 
 export class CubeRecordsLineChart {
 
@@ -66,14 +68,6 @@ export class CubeRecordsLineChart {
       pointHoverBackgroundColor: '#fff',
       pointHoverBorderColor: 'rgba(148,159,177,0.8)'
     },
-    { // dark grey
-      backgroundColor: 'rgba(77,83,96,0.2)',
-      borderColor: 'rgba(77,83,96,1)',
-      pointBackgroundColor: 'rgba(77,83,96,1)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(77,83,96,1)'
-    },
     { // red
       backgroundColor: 'rgba(255,0,0,0.3)',
       borderColor: 'red',
@@ -84,12 +78,32 @@ export class CubeRecordsLineChart {
     }
   ];
 
-  constructor(data: CubeRecord[]) {
+  constructor(data: CubeRecord[], mode: ChartMode) {
     const records = data.sort(
       ComparatorBuilder.comparingByDate<CubeRecord>(cr => cr?.recordTime || new Date(0)).build()
     ).map(d => d.time);
-    this.lineChartData = [{data: records, label: 'Results'}];
+    switch (mode) {
+      case 'RAW':
+        this.lineChartData = [{data: records, label: 'Results'}];
+        break;
+      case 'MOVING_AVERAGE':
+        this.lineChartData = [{data: this.movingAverageOfSeven(records), label: 'Moving average'}];
+        break;
+    }
     this.lineChartLabels = records.map(r => '');
+  }
+
+  private movingAverageOfSeven(records: number[]): number[] {
+    const movingAverage = [];
+    const lastSevenRecords = [];
+    for (const d of records) {
+      lastSevenRecords.push(d);
+      if (lastSevenRecords.length > 7) {
+        lastSevenRecords.shift();
+      }
+      movingAverage.push(lastSevenRecords.reduce((a, b) => a + b, 0) / lastSevenRecords.length);
+    }
+    return movingAverage;
   }
 
   hideAllDataSets(): void {

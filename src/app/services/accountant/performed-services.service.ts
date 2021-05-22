@@ -18,7 +18,8 @@ export class PerformedServicesService {
 
   currentDomainServices(date: Date): Observable<PerformedService[]> {
     const dateString = this.datePipe.transform(date, 'yyyy-MM');
-    return this.http.get<PerformedService[]>(`${this.endpoint}/${dateString}`).pipe(map(data => (data.map(d => new PerformedService(d)))));
+    return this.http.get<PerformedService[]>(`${this.endpoint}/${dateString}`)
+      .pipe(map((data: []) => (data.map(d => new PerformedService(d)))));
   }
 
   updateService(service: PerformedService): Observable<PerformedService> {

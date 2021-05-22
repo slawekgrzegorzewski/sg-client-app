@@ -16,7 +16,7 @@ export class ServicesService {
   }
 
   currentDomainServices(): Observable<Service[]> {
-    return this.http.get<Service[]>(this.endpoint).pipe(map(data => (data.map(d => new Service(d)))));
+    return this.http.get<Service[]>(this.endpoint).pipe(map((data: []) => (data.map(d => new Service(d)))));
   }
 
   updateService(service: Service): Observable<Service> {

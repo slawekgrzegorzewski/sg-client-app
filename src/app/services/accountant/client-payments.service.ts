@@ -18,7 +18,7 @@ export class ClientPaymentsService {
 
   currentDomainClientPayments(date: Date): Observable<ClientPayment[]> {
     const dateString = this.datePipe.transform(date, 'yyyy-MM');
-    return this.http.get<ClientPayment[]>(`${this.endpoint}/${dateString}`).pipe(map(data => (data.map(d => new ClientPayment(d)))));
+    return this.http.get<ClientPayment[]>(`${this.endpoint}/${dateString}`).pipe(map((data: []) => (data.map(d => new ClientPayment(d)))));
   }
 
   updateClientPayment(clientPayment: ClientPayment): Observable<ClientPayment> {

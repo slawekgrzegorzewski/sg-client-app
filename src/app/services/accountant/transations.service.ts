@@ -18,7 +18,7 @@ export class TransactionsService {
 
   domainTransactions(): Observable<Transaction[]> {
     return this.http.get<Transaction[]>(this.endpoint, {responseType: 'json'})
-      .pipe(map(data => (data.map(d => new Transaction(d)))));
+      .pipe(map((data: []) => (data.map(d => new Transaction(d)))));
   }
 
   credit(account: Account, amount: number, description: string): Observable<Transaction> {

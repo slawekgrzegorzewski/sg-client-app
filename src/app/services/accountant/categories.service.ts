@@ -16,7 +16,7 @@ export class CategoriesService {
   }
 
   currentDomainCategories(): Observable<Category[]> {
-    return this.http.get<Category[]>(this.endpoint).pipe(map(data => (data.map(d => new Category(d)))));
+    return this.http.get<Category[]>(this.endpoint).pipe(map((data: []) => (data.map(d => new Category(d)))));
   }
 
   updateCategory(category: Category): Observable<Category> {

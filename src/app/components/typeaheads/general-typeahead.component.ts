@@ -6,6 +6,7 @@ import {NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
 import {debounceTime, distinctUntilChanged, filter, map} from 'rxjs/operators';
 import {BillingPeriodsService} from '../../services/accountant/billing-periods.service';
 import {ForTypeahead} from '../../model/accountant/for-typeahead';
+import {OperatorFunction} from 'rxjs/dist/types';
 
 @Component({
   selector: 'app-general-typeahead',
@@ -126,16 +127,28 @@ export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit
     );
   }
 
-  searchClosure(that: GeneralTypeaheadComponent<T>): (text$: Observable<string>) => Observable<T[]> {
+  searchClosure(that: GeneralTypeaheadComponent<T>): OperatorFunction<string, readonly string[]> {
     return (text$: Observable<string>) => {
-      const debouncedText = text$.pipe(debounceTime(200), distinctUntilChanged());
+      const debouncedText = text$.pipe(
+        map(a => {
+          console.log(JSON.stringify(a));
+          return a;
+        }),
+        debounceTime(200),
+        distinctUntilChanged()
+      );
       const clicksWithClosedPopup = that.click.pipe(filter(() => !that.tTypeAhead || !that.tTypeAhead.isPopupOpen()));
       const inputFocus = that.focus;
 
       return merge(debouncedText, inputFocus, clicksWithClosedPopup).pipe(
-        map(term => (
-          term === '' ? that.values : that.values.filter(c => this.getElementDescription(c).toLowerCase().indexOf(term.toLowerCase()) > -1)
-        ).slice(0, 10))
+        map((term: string) => {
+          const ts = term === ''
+            ? that.values
+            : that.values.filter(c => this.getElementDescription(c).toLowerCase().indexOf(term.toLowerCase()) > -1);
+          const ts1 = ts.slice(0, 10);
+          console.log(ts1);
+          return ts1;
+        })
       );
     };
   }
