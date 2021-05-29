@@ -1,12 +1,11 @@
 import {Component, forwardRef, Input, OnInit, ViewChild} from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
 import {ToastService} from '../../services/toast.service';
-import {merge, Observable, Subject} from 'rxjs';
+import {merge, Observable, OperatorFunction, Subject} from 'rxjs';
 import {NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
 import {debounceTime, distinctUntilChanged, filter, map} from 'rxjs/operators';
 import {BillingPeriodsService} from '../../services/accountant/billing-periods.service';
 import {ForTypeahead} from '../../model/accountant/for-typeahead';
-import {OperatorFunction} from 'rxjs/dist/types';
 
 @Component({
   selector: 'app-general-typeahead',
@@ -29,20 +28,15 @@ export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit
   set value(value: T) {
     if (typeof value === 'string' || value instanceof String
       || typeof value === 'number' || value instanceof Number) {
+      this.internalValue = null;
       return;
     }
     this.internalValue = value;
-    const id = this.getElementId(value);
     this.propagateChange(value);
-    this.propagateTouch(value);
   }
 
   get readonlyValue(): string {
-    if (!this.value) {
-      return '';
-    } else {
-      return this.getElementDescription(this.value);
-    }
+    return this.getElementDescription(this.value);
   }
 
   private availableDataInternal: string[] = null;
@@ -67,6 +61,28 @@ export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit
   propagateChange: (T) => void;
   propagateTouch: (T) => void;
 
+  search: OperatorFunction<string, readonly T[]> = (text$: Observable<string>) => {
+    const debouncedText: Observable<string> = text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged()
+    );
+    const clicksWithClosedPopup: Observable<string> = this.click.pipe(
+      filter(() => !this.tTypeAhead || !this.tTypeAhead.isPopupOpen())
+    );
+    const inputFocus: Observable<string> = this.focus;
+
+    return merge(debouncedText, inputFocus, clicksWithClosedPopup).pipe(
+      map((term: string) => {
+        return (term === ''
+          ? this.values
+          : this.values.filter(c => c.getTypeaheadDescription().toLowerCase().indexOf(term.toLowerCase()) > -1))
+          .slice(0, 10);
+      })
+    );
+  };
+
+  formatter: (t: T) => string = (t: T) => this.getElementDescription(t);
+
   constructor(private billingPeriodsService: BillingPeriodsService, private toastService: ToastService) {
   }
 
@@ -81,14 +97,6 @@ export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit
   public getElementId(element: T): any {
     if (element) {
       return element.getTypeaheadId();
-    } else {
-      return '';
-    }
-  }
-
-  private getElementDescription(element: T): any {
-    if (element) {
-      return element.getTypeaheadDescription();
     } else {
       return '';
     }
@@ -127,39 +135,11 @@ export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit
     );
   }
 
-  searchClosure(that: GeneralTypeaheadComponent<T>): OperatorFunction<string, readonly string[]> {
-    return (text$: Observable<string>) => {
-      const debouncedText = text$.pipe(
-        map(a => {
-          console.log(JSON.stringify(a));
-          return a;
-        }),
-        debounceTime(200),
-        distinctUntilChanged()
-      );
-      const clicksWithClosedPopup = that.click.pipe(filter(() => !that.tTypeAhead || !that.tTypeAhead.isPopupOpen()));
-      const inputFocus = that.focus;
-
-      return merge(debouncedText, inputFocus, clicksWithClosedPopup).pipe(
-        map((term: string) => {
-          const ts = term === ''
-            ? that.values
-            : that.values.filter(c => this.getElementDescription(c).toLowerCase().indexOf(term.toLowerCase()) > -1);
-          const ts1 = ts.slice(0, 10);
-          console.log(ts1);
-          return ts1;
-        })
-      );
-    };
-  }
-
-  formatter(): (t: T) => string {
-    return (t: T) => {
-      if (!t) {
-        return '';
-      } else {
-        return this.getElementDescription(t);
-      }
-    };
+  getElementDescription(element: T): string {
+    if (element) {
+      return element.getTypeaheadDescription();
+    } else {
+      return '';
+    }
   }
 }

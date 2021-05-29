@@ -75,3 +75,6 @@ app-general-typeahead, app-date-picker {
   border: 0 !important;
 }
 
+.sr-only {
+  display: none;
+}

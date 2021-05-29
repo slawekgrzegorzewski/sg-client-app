@@ -4,18 +4,19 @@
        [ngModel]="readonlyValue"
        readonly
 >
-<input *ngIf="!readonly" type="text"
+<input *ngIf="!readonly"
        [id]="id"
+       type="text"
        [class]="inputClass"
        [(ngModel)]="value"
-       #tTypeAhead="ngbTypeahead"
-       [ngbTypeahead]="searchClosure(this)"
-       [resultTemplate]="categoryLabel"
-       [inputFormatter]="formatter()"
+       [ngbTypeahead]="search"
        (focus)="focus.next($any($event).target.value)"
        (click)="click.next($any($event).target.value)"
        (blur)="propagateTouch(getElementId(value))"
+       #tTypeAhead="ngbTypeahead"
+       [resultTemplate]="categoryLabel"
+       [inputFormatter]="formatter"
 />
 <ng-template #categoryLabel let-r="result" let-t="term">
-  <ngb-highlight [result]="formatter()(r)" [term]="t"></ngb-highlight>
+  <ngb-highlight [result]="formatter(r)" [term]="t"></ngb-highlight>
 </ng-template>
