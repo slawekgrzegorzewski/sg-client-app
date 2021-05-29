@@ -30,17 +30,17 @@
     "body-parser": "~1.19.0",
     "chart.js": "~2.9.4",
     "chartjs-plugin-annotation": "~0.5.7",
-    "ng2-charts": "~2.4.2",
     "cors": "~2.8.5",
     "jwt-decode": "~3.1.2",
     "ng-event-bus": "~2.0.0",
+    "ng2-charts": "~2.4.2",
     "qrcode": "~1.4.4",
     "rxjs": "~7.1.0",
     "rxjs-compat": "~6.6.7",
     "speakeasy": "~2.0.0",
+    "three": "~0.128.0",
     "tslib": "~2.2.0",
-    "zone.js": "~0.11.4",
-    "three": "~0.128.0"
+    "zone.js": "~0.11.4"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~12.0.2",
