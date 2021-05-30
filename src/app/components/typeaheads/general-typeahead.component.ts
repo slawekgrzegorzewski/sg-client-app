@@ -17,22 +17,24 @@ import {ForTypeahead} from '../../model/accountant/for-typeahead';
 })
 export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit, ControlValueAccessor {
 
-  @Input() id: string | undefined;
-  @Input() dataProvider: (() => Observable<T[]>) | undefined;
-  private internalValue: T | undefined;
+  @Input() id: string | null = null;
+  @Input() dataProvider: (() => Observable<T[]>) | null = null;
+  private internalValue: T | null = null;
 
-  get value(): T | undefined {
+  get value(): T | null {
     return this.internalValue;
   }
 
-  set value(value: T | undefined) {
+  set value(value: T | null) {
     if (typeof value === 'string' || value instanceof String
       || typeof value === 'number' || value instanceof Number) {
-      this.internalValue = undefined;
+      this.internalValue = null;
       return;
     }
     this.internalValue = value;
-    this.propagateChange(value);
+    if (this.propagateChange) {
+      this.propagateChange(value);
+    }
   }
 
   get readonlyValue(): string {
@@ -53,16 +55,16 @@ export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit
   allValues: T[] = [];
   values: T[] = [];
   @Input() readonly = false;
-  @Input() inputClass: string | undefined;
+  @Input() inputClass: string = '';
 
-  @ViewChild('tTypeAhead', {static: true}) tTypeAhead: NgbTypeahead | undefined;
+  @ViewChild('tTypeAhead', {static: true}) tTypeAhead: NgbTypeahead | null = null;
   focus = new Subject<string>();
   click = new Subject<string>();
-  propagateChange: ((T) => void) | undefined;
-  propagateTouch: ((T) => void) | undefined;
+  propagateChange: ((t: T | null) => void) | null = null;
+  propagateTouch: ((t: T | null) => void) | null = null;
 
-  search: OperatorFunction<string, readonly T[]> = (text$: Observable<string>) => {
-    const debouncedText: Observable<string> = text$.pipe(
+  search: OperatorFunction<string, readonly T[]> = (text: Observable<string>) => {
+    const debouncedText: Observable<string> = text.pipe(
       debounceTime(200),
       distinctUntilChanged()
     );
@@ -102,18 +104,17 @@ export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit
     }
   }
 
-  registerOnChange(fn: (_: T) => void): void {
+  registerOnChange(fn: (t: T | null) => void): void {
     this.propagateChange = fn;
   }
 
-  registerOnTouched(fn: (_: T) => void): void {
+  registerOnTouched(fn: (t: T | null) => void): void {
     this.propagateTouch = fn;
   }
 
   writeValue(obj: T): void {
     const id = typeof obj === 'string' ? obj : this.getElementId(obj);
-    const value = this.findValue(id);
-    this.internalValue = value;
+    this.internalValue = this.findValue(id) || null;
   }
 
   private loadData(): void {
@@ -138,7 +139,7 @@ export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit
     );
   }
 
-  getElementDescription(element: T): string {
+  getElementDescription(element: T | null): string {
     if (element) {
       return element.getTypeaheadDescription();
     } else {

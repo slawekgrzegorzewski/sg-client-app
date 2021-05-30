@@ -10,7 +10,7 @@ export class Account implements WithBalance {
   public balanceIndex: number;
   public domain: Domain;
 
-  constructor(data?: any) {
+  constructor(data: any) {
     this.id = data && data.id;
     this.name = data && data.name || '';
     this.currency = data && data.currency || '';

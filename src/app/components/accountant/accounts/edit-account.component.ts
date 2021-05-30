@@ -11,20 +11,20 @@ export enum Mode {EDIT, CREATE}
   styleUrls: ['./edit-account.component.css']
 })
 export class EditAccountComponent implements OnInit {
+
   @Input() mode: Mode = Mode.CREATE;
+  @Input() currencies: Currency[] = [];
 
-  internalEntity: Account;
+  internalEntity: Account | null = null;
 
-  @Input() currencies: Currency[];
-
-  @Input() set entity(account: Account) {
+  @Input() set entity(account: Account | null) {
     this.internalEntity = account;
     this.newAccount = {name: '', currency: ''};
     this.newAccount.name = account?.name || '';
     this.newAccount.currency = account?.currency || '';
   }
 
-  get entity(): Account {
+  get entity(): Account | null {
     return this.internalEntity;
   }
 
@@ -32,10 +32,7 @@ export class EditAccountComponent implements OnInit {
   @Output() updateSubject = new Subject<Account>();
   @Output() cancelSubject = new Subject<string>();
 
-  newAccount: {
-    name: string,
-    currency: string
-  };
+  newAccount: { name: string, currency: string } | null = null;
 
   constructor() {
     this.entity = null;
@@ -45,17 +42,21 @@ export class EditAccountComponent implements OnInit {
   }
 
   createAccount(): void {
-    this.entity = new Account(this.newAccount);
-    this.entity.correctCurrencyToString();
-    this.createSubject.next(this.entity);
-    this.entity = null;
+    if (this.newAccount) {
+      this.entity = new Account(this.newAccount);
+      this.entity.correctCurrencyToString();
+      this.createSubject.next(this.entity);
+      this.entity = null;
+    }
   }
 
   updateAccount(): void {
-    this.entity.name = this.newAccount.name;
-    this.entity.correctCurrencyToString();
-    this.updateSubject.next(this.entity);
-    this.entity = null;
+    if (this.newAccount && this.entity) {
+      this.entity.name = this.newAccount.name;
+      this.entity.correctCurrencyToString();
+      this.updateSubject.next(this.entity);
+      this.entity = null;
+    }
   }
 
   cancel(): void {

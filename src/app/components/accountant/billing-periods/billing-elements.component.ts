@@ -7,8 +7,7 @@ import {Category} from '../../../model/accountant/billings/category';
 import {PiggyBank} from '../../../model/accountant/piggy-bank';
 import {Account} from '../../../model/accountant/account';
 
-export const INCOME = 'income';
-export const EXPENSE = 'expense';
+export type ElementType = 'income' | 'expense' | null;
 
 @Component({
   selector: 'app-billing-elements',
@@ -22,21 +21,17 @@ export class BillingElementsComponent implements OnInit {
   readonly EDIT_VIEW = 'edit';
 
   mode: string = this.GENERAL_VIEW;
-  private previousMode: string;
+  private previousMode: string | null = null;
 
-  private elementTypeInternal: string;
+  private elementTypeInternal: ElementType = null;
 
-  get elementType(): string {
+  get elementType(): ElementType {
     return this.elementTypeInternal;
   }
 
-  @Input() set elementType(value: string) {
-    if (value === INCOME || value === EXPENSE) {
-      this.elementTypeInternal = value;
-      this.selectElementsToShow();
-    } else {
-      throwError('incorrect value for display');
-    }
+  @Input() set elementType(value: ElementType) {
+    this.elementTypeInternal = value;
+    this.selectElementsToShow();
   }
 
   public billingPeriodInternal: BillingPeriod;

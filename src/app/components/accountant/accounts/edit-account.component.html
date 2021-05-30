@@ -1,4 +1,4 @@
-<div class="creating-account-main">
+<div *ngIf="newAccount" class="creating-account-main">
   <h5>Wprowadź dane nowego konta</h5>
   <form #createAccountForm="ngForm">
     <div class="form-group row">
@@ -15,7 +15,7 @@
           [id]="'accountCurrency'"
           name="accountCurrency"
           [inputClass]="'form-control'"
-          [readonly]="isEditMode() ? 'readonly' : null" [class.form-control-plaintext]="isEditMode()"
+          [readonly]="isEditMode()" [class.form-control-plaintext]="isEditMode()"
           [(ngModel)]="newAccount.currency"
           [dataProvider]="currenciesForTypeAhead()"
           #accountCurrency="ngModel"
