@@ -12,6 +12,7 @@ import {Income} from '../../../model/accountant/billings/income';
 import {CategoriesService} from '../../../services/accountant/categories.service';
 import {DomainService} from '../../../services/domain.service';
 import {forkJoin, Observable} from 'rxjs';
+import {ComparatorBuilder} from '../../../../utils/comparator-builder';
 
 
 @Component({
@@ -59,7 +60,9 @@ export class AccountantHomeSmallComponent implements OnInit {
 
   fetchAccounts(): void {
     this.accountsService.currentDomainAccounts().subscribe(
-      data => this.accounts = data.sort(Account.compareByCurrencyAndName),
+      data => this.accounts = data.sort(
+        ComparatorBuilder.comparing<Account>(a => a.currency).thenComparing(a => a.name).build()
+      ),
       error => this.accounts = []
     );
   }

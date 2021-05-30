@@ -1,6 +1,7 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {Account} from '../../../model/accountant/account';
 import {Button} from '../../general/hoverable-buttons.component';
+import {ComparatorBuilder} from '../../../../utils/comparator-builder';
 
 @Component({
   selector: 'app-domain-accounts',
@@ -9,16 +10,18 @@ import {Button} from '../../general/hoverable-buttons.component';
 })
 export class DomainAccountsComponent implements OnInit {
   @Input() showTitle = true;
-  @Input() domain: string;
-  @Input() buttons: Button<Account>[];
+  @Input() domain: string | null = null;
+  @Input() buttons: Button<Account>[] = [];
   @Input() selectable = true;
-  @Output() selectionChanged = new EventEmitter<Account>();
+  @Output() selectionChanged = new EventEmitter<Account | null>();
 
-  private internalAccounts: Account[];
-  selectedAccount: Account;
+  private internalAccounts: Account[] = [];
+  selectedAccount: Account | null = null;
 
   @Input() set accounts(value: Account[]) {
-    this.internalAccounts = (value || []).sort(Account.compareByCurrencyAndName);
+    this.internalAccounts = value.sort(
+      ComparatorBuilder.comparing<Account>(a => a.currency).thenComparing(a => a.name).build()
+    );
     this.selectAccount();
     this.recalculateSubtotals();
   }
@@ -29,10 +32,10 @@ export class DomainAccountsComponent implements OnInit {
 
   totalBalancesPerCurrency: Map<string, number> = new Map<string, number>();
 
-  @ViewChild('utilBox') utilBox: ElementRef;
-  overElement: Account;
-  utilBoxTop: number;
-  utilBoxLeft: number;
+  @ViewChild('utilBox') utilBox: ElementRef | null = null;
+  overElement: Account | null = null;
+  utilBoxTop: number = 0;
+  utilBoxLeft: number = 0;
   utilBoxVisibility = 'hidden';
 
   constructor() {
@@ -59,7 +62,7 @@ export class DomainAccountsComponent implements OnInit {
     }
     if (this.accounts && this.accounts.length > 0) {
       if (this.selectedAccount) {
-        this.selectedAccount = this.accounts.find(a => a.id === this.selectedAccount.id);
+        this.selectedAccount = this.accounts.find(a => a.id === this.selectedAccount?.id) || null;
       } else {
         this.selectedAccount = this.accounts[0];
       }
@@ -69,15 +72,16 @@ export class DomainAccountsComponent implements OnInit {
     this.selectionChanged.emit(this.selectedAccount);
   }
 
-  setOverAccount(value: Account, accountRow: HTMLTableRowElement): void {
-    this.overElement = value;
-    if (value) {
-      const adjustment = (accountRow.offsetHeight - this.utilBox.nativeElement.offsetHeight) / 2;
-      this.utilBoxTop = accountRow.getBoundingClientRect().top + adjustment;
-      this.utilBoxLeft = accountRow.getBoundingClientRect().left + accountRow.clientWidth;
-      this.utilBoxVisibility = 'visible';
-    } else {
+  setOverAccount(selectionInfo?: { account: Account, row: HTMLTableRowElement }): void {
+    if (!selectionInfo) {
+      this.overElement = null;
       this.utilBoxVisibility = 'hidden';
+    } else {
+      this.overElement = selectionInfo.account;
+      const adjustment = (selectionInfo.row.offsetHeight - this.utilBox?.nativeElement.offsetHeight) / 2;
+      this.utilBoxTop = selectionInfo.row.getBoundingClientRect().top + adjustment;
+      this.utilBoxLeft = selectionInfo.row.getBoundingClientRect().left + selectionInfo.row.clientWidth;
+      this.utilBoxVisibility = 'visible';
     }
   }
 
@@ -90,8 +94,8 @@ export class DomainAccountsComponent implements OnInit {
   }
 
   buttonClicked(): Account {
-    const acc = this.overElement;
-    this.setOverAccount(null, null);
+    const acc = this.overElement!;
+    this.setOverAccount();
     return acc;
   }
 }

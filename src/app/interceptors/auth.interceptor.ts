@@ -32,8 +32,8 @@ export class AuthInterceptor implements HttpInterceptor {
               body: 'Login successfull'
             });
           }
-          return evt;
         }
+        return evt;
       }),
       catchError(err => {
         if (err instanceof HttpErrorResponse && err.status === 401) {

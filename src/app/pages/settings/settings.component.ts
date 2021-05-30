@@ -20,6 +20,7 @@ import {AccountantSettingsService} from '../../services/accountant/accountant-se
 import {AccountantSettings} from '../../model/accountant/accountant-settings';
 import {Service} from '../../model/accountant/service';
 import {ServicesService} from '../../services/accountant/services.service';
+import {ComparatorBuilder} from '../../../utils/comparator-builder';
 
 @Component({
   selector: 'app-accounts',
@@ -102,13 +103,17 @@ export class SettingsComponent implements OnInit {
     accounts.subscribe(
       data => {
         const accountsFromData = data.map(d => new Account(d));
-        this.accountsInCurrentDomain = data.filter(a => a.domain.id === currentDomain).sort(Account.compareByCurrencyAndName);
+        this.accountsInCurrentDomain = data.filter(a => a.domain.id === currentDomain).sort(
+          ComparatorBuilder.comparing<Account>(a => a.currency).thenComparing(a => a.name).build()
+        );
         this.otherDomainsAccounts = data.filter(a => a.domain.id !== currentDomain).reduce(
           (map, acc) => map.set(acc.domain.name, [...map.get(acc.domain.name) || [], acc]),
           new Map<string, Account[]>()
         );
         for (const domainName of this.otherDomainsAccounts.keys()) {
-          this.otherDomainsAccounts[domainName] = (this.otherDomainsAccounts[domainName] || []).sort(Account.compareByCurrencyAndName);
+          this.otherDomainsAccounts[domainName] = (this.otherDomainsAccounts[domainName] || []).sort(
+            ComparatorBuilder.comparing<Account>(a => a.currency).thenComparing(a => a.name).build()
+          );
         }
       },
       err => {

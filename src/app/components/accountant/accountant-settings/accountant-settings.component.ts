@@ -8,10 +8,9 @@ import {AccountantSettings} from '../../../model/accountant/accountant-settings'
 })
 export class AccountantSettingsComponent implements OnInit {
 
-  @Input() accountantSettings: AccountantSettings;
+  @Input() accountantSettings: AccountantSettings | null = null;
 
   @Output() isCompanyUpdateEvent = new EventEmitter<AccountantSettings>();
-
 
   constructor() {
   }
@@ -20,7 +19,9 @@ export class AccountantSettingsComponent implements OnInit {
   }
 
   changeIsCompany(): void {
-    this.accountantSettings.company = !this.accountantSettings.company;
-    this.isCompanyUpdateEvent.emit(this.accountantSettings);
+    if (this.accountantSettings) {
+      this.accountantSettings.company = !this.accountantSettings.company;
+      this.isCompanyUpdateEvent.emit(this.accountantSettings);
+    }
   }
 }

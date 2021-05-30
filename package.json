@@ -3,14 +3,12 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --host 0.0.0.0 --source-map",
-    "startProd": "ng serve --configuration=production",
-    "startProdHttps": "ng serve --host grzegorzewski.org --port 443 --configuration=production --ssl true --ssl-cert /home/slag/sg-application/certs/sgapplication.crt --ssl-key /home/slag/sg-application/certs/sgapplication.key",
+    "start": "ng serve",
     "build": "ng build",
     "buildProd": "ng build --configuration=production",
-    "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e"
+    "buildDev": "ng build --configuration=development",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
   },
   "private": true,
   "dependencies": {
@@ -21,7 +19,6 @@
     "@angular/core": "~12.0.2",
     "@angular/forms": "~12.0.2",
     "@angular/localize": "~12.0.2",
-    "@angular/material": "~12.0.2",
     "@angular/platform-browser": "~12.0.2",
     "@angular/platform-browser-dynamic": "~12.0.2",
     "@angular/router": "~12.0.2",
@@ -55,6 +52,7 @@
     "jasmine-spec-reporter": "~7.0.0",
     "karma": "~6.3.2",
     "karma-chrome-launcher": "~3.1.0",
+    "karma-coverage": "~2.0.3",
     "karma-coverage-istanbul-reporter": "~3.0.3",
     "karma-jasmine": "~4.0.1",
     "karma-jasmine-html-reporter": "~1.6.0",

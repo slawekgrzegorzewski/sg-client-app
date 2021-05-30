@@ -9,6 +9,7 @@ import {BillingPeriodsService} from '../../../services/accountant/billing-period
 import {Income} from '../../../model/accountant/billings/income';
 import {Expense} from '../../../model/accountant/billings/expense';
 import {CategoriesService} from '../../../services/accountant/categories.service';
+import {ComparatorBuilder} from '../../../../utils/comparator-builder';
 
 @Component({
   selector: 'app-billing-small',
@@ -41,7 +42,9 @@ export class BillingSmallComponent implements OnInit {
 
   fetchAccounts(): void {
     this.accountsService.currentDomainAccounts().subscribe(
-      data => this.accounts = data.sort(Account.compareByCurrencyAndName),
+      data => this.accounts = data.sort(
+        ComparatorBuilder.comparing<Account>(a => a.currency).thenComparing(a => a.name).build()
+      ),
       error => this.accounts = []
     );
   }

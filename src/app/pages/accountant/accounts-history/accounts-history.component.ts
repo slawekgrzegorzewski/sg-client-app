@@ -7,6 +7,7 @@ import {TransactionsService} from '../../../services/accountant/transations.serv
 import {Transaction} from '../../../model/accountant/transaction';
 import {take} from 'rxjs/operators';
 import {DomainService} from '../../../services/domain.service';
+import {ComparatorBuilder} from '../../../../utils/comparator-builder';
 
 @Component({
   selector: 'app-accounts-history',
@@ -46,7 +47,9 @@ export class AccountsHistoryComponent implements OnInit {
 
   fetchAccounts(): void {
     this.accountsService.currentDomainAccounts().subscribe(
-      data => this.accounts = data.sort(Account.compareByCurrencyAndName),
+      data => this.accounts = data.sort(
+        ComparatorBuilder.comparing<Account>(a => a.currency).thenComparing(a => a.name).build()
+      ),
       error => this.accounts = []
     );
   }

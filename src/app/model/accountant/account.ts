@@ -19,15 +19,6 @@ export class Account implements WithBalance {
     this.domain = data && new Domain(data.domain) || null;
   }
 
-  public static compareByCurrencyAndName(first: Account, second: Account): number {
-    const currencyComparison = first.currency.localeCompare(second.currency);
-    if (currencyComparison !== 0) {
-      return currencyComparison;
-    } else {
-      return first.name.localeCompare(second.name);
-    }
-  }
-
   getBalance(): Balance {
     return new Balance(this.currentBalance, this.currency);
   }

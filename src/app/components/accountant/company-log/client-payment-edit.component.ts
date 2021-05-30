@@ -25,6 +25,7 @@ export class ClientPaymentEditComponent implements OnInit {
     if (this.clientPayment.notRegistered) {
       return 'NR';
     }
+    throw new Error('Not matchable receipt');
   }
 
   set receiptType(value: string) {

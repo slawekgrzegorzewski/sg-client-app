@@ -17,18 +17,18 @@ import {ForTypeahead} from '../../model/accountant/for-typeahead';
 })
 export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit, ControlValueAccessor {
 
-  @Input() id: string;
-  @Input() dataProvider: () => Observable<T[]>;
-  private internalValue: T;
+  @Input() id: string | undefined;
+  @Input() dataProvider: (() => Observable<T[]>) | undefined;
+  private internalValue: T | undefined;
 
-  get value(): T {
+  get value(): T | undefined {
     return this.internalValue;
   }
 
-  set value(value: T) {
+  set value(value: T | undefined) {
     if (typeof value === 'string' || value instanceof String
       || typeof value === 'number' || value instanceof Number) {
-      this.internalValue = null;
+      this.internalValue = undefined;
       return;
     }
     this.internalValue = value;
@@ -39,7 +39,7 @@ export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit
     return this.getElementDescription(this.value);
   }
 
-  private availableDataInternal: string[] = null;
+  private availableDataInternal: string[] = [];
 
   @Input() get availableData(): string[] {
     return this.availableDataInternal;
@@ -50,16 +50,16 @@ export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit
     this.filterData();
   }
 
-  allValues: T[];
-  values: T[];
+  allValues: T[] = [];
+  values: T[] = [];
   @Input() readonly = false;
-  @Input() inputClass: string;
+  @Input() inputClass: string | undefined;
 
-  @ViewChild('tTypeAhead', {static: true}) tTypeAhead: NgbTypeahead;
+  @ViewChild('tTypeAhead', {static: true}) tTypeAhead: NgbTypeahead | undefined;
   focus = new Subject<string>();
   click = new Subject<string>();
-  propagateChange: (T) => void;
-  propagateTouch: (T) => void;
+  propagateChange: ((T) => void) | undefined;
+  propagateTouch: ((T) => void) | undefined;
 
   search: OperatorFunction<string, readonly T[]> = (text$: Observable<string>) => {
     const debouncedText: Observable<string> = text$.pipe(
@@ -90,7 +90,7 @@ export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit
     this.loadData();
   }
 
-  private findValue(elementId: string): T {
+  private findValue(elementId: string): T | undefined {
     return (this.values || []).find(t => this.getElementId(t) === elementId);
   }
 
@@ -117,16 +117,19 @@ export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit
   }
 
   private loadData(): void {
-    this.dataProvider().subscribe(
-      data => {
-        this.allValues = data;
-        this.filterData();
-      },
-      err => {
-        this.values = [];
-        this.toastService.showWarning('No values available.', 'Can not obtain available values!');
-      }
-    );
+    if (this.dataProvider) {
+      this.dataProvider().subscribe({
+          next: data => {
+            this.allValues = data;
+            this.filterData();
+          },
+          error: err => {
+            this.values = [];
+            this.toastService.showWarning('No values available.', 'Can not obtain available values!');
+          }
+        }
+      );
+    }
   }
 
   private filterData(): void {

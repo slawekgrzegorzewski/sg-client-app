@@ -27,6 +27,7 @@ import {ClientPaymentsService} from '../../../services/accountant/client-payment
 import {forkJoin} from 'rxjs';
 import {PerformedServicePaymentsService} from '../../../services/accountant/performed-service-payments.service';
 import {PerformedServicePayment, PerformedServicePaymentShort} from '../../../model/accountant/performed-service-payment';
+import {ComparatorBuilder} from '../../../../utils/comparator-builder';
 
 @Component({
   selector: 'app-accounts-home',
@@ -35,20 +36,20 @@ import {PerformedServicePayment, PerformedServicePaymentShort} from '../../../mo
 })
 export class AccountantHomeComponent implements OnInit {
 
-  accounts: Account[];
-  piggyBanks: PiggyBank[];
-  categories: Category[];
+  accounts: Account[] = [];
+  piggyBanks: PiggyBank[] = [];
+  categories: Category[] = [];
 
-  performedServices: PerformedService[];
-  clientPayments: ClientPayment[];
+  performedServices: PerformedService[] = [];
+  clientPayments: ClientPayment[] = [];
 
-  services: Service[];
-  clients: Client[];
-  allCurrencies: Currency[];
-  billingPeriodInfo: BillingPeriodInfo;
-  historicalSavings: Map<Date, Map<string, number>>;
-  currentDomainName: string;
-  private currentComapnyDate: Date;
+  services: Service[] = [];
+  clients: Client[] = [];
+  allCurrencies: Currency[] = [];
+  billingPeriodInfo: BillingPeriodInfo | null = null;
+  historicalSavings: Map<Date, Map<string, number>> = new Map();
+  currentDomainName: string | null = null;
+  private currentComapnyDate: Date | null = null;
 
   constructor(private accountsService: AccountsService,
               private transactionsService: TransactionsService,
@@ -84,7 +85,9 @@ export class AccountantHomeComponent implements OnInit {
 
   fetchAccounts(): void {
     this.accountsService.currentDomainAccounts().subscribe(
-      data => this.accounts = data.sort(Account.compareByCurrencyAndName),
+      data => this.accounts = data.sort(
+        ComparatorBuilder.comparing<Account>(a => a.currency).thenComparing(a => a.name).build()
+      ),
       error => this.accounts = []
     );
   }

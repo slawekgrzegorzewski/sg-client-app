@@ -289,6 +289,7 @@ export class PerformedServicesComponent implements OnInit {
     if (paymentStatus === PaymentStatus.UNDERPAID) {
       return 'underpaid-ps';
     }
+    return '';
   }
 
   serviceNeedsPayment(): boolean {

@@ -266,6 +266,8 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
         return (d) => {
           return this.cube.z(clockwise, d);
         };
+      default:
+        return (d) => Promise.resolve();
     }
   }
 

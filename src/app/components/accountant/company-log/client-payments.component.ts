@@ -275,6 +275,7 @@ export class ClientPaymentComponent implements OnInit {
     if (paymentStatus === PaymentStatus.UNDERPAID) {
       return 'underpaid-ps';
     }
+    return '';
   }
 
   getPerformedService(payment: SimplePerformedServicePayment): PerformedService {

@@ -9,10 +9,10 @@
 
       </app-multi-currency-total>
     </div>
-    <div (mouseleave)="setOverAccount(null, null)">
+    <div (mouseleave)="setOverAccount()">
       <table #table style="width: 100%">
         <tr #row *ngFor="let account of accounts"
-            (mouseenter)="setOverAccount(account, row)"
+            (mouseenter)="setOverAccount({account: account, row: row})"
             (click)="select(account);"
             class="domain-row sg-row-hoverable" [class.selected]="account === selectedAccount">
           <td>{{account.name}}</td>
