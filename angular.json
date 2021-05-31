@@ -76,7 +76,7 @@
               "browserTarget": "accountant-client:build:production"
             },
             "development": {
-              "browserTarget": "test:build:development"
+              "browserTarget": "accountant-client:build:development"
             }
           },
           "defaultConfiguration": "development"

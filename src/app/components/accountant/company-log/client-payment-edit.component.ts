@@ -12,7 +12,7 @@ import {PerformedService} from '../../../model/accountant/performed-service';
 })
 export class ClientPaymentEditComponent implements OnInit {
 
-  get receiptType(): string {
+  get receiptType(): string | null {
     if (this.clientPayment.billOfSale) {
       return 'BOS';
     }
@@ -25,10 +25,10 @@ export class ClientPaymentEditComponent implements OnInit {
     if (this.clientPayment.notRegistered) {
       return 'NR';
     }
-    throw new Error('Not matchable receipt');
+    return null;
   }
 
-  set receiptType(value: string) {
+  set receiptType(value: string | null) {
     if (value === 'BOS') {
       this.setBillOfSale();
     } else if (value === 'BOSAI') {
