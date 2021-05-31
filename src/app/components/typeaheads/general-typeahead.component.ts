@@ -39,10 +39,10 @@ export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit
     return this.getElementDescription(this.value);
   }
 
-  private availableDataInternal: string[] = [];
+  private availableDataInternal: string[] | null = null;
 
   @Input() get availableData(): string[] {
-    return this.availableDataInternal;
+    return this.availableDataInternal || [];
   }
 
   set availableData(value: string[]) {
@@ -134,7 +134,7 @@ export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit
 
   private filterData(): void {
     this.values = (this.allValues || []).filter(c =>
-      this.availableData === null ? true : this.availableData.includes(this.getElementId(c))
+      this.availableDataInternal === null ? true : this.availableData.includes(this.getElementId(c))
     );
   }
 
