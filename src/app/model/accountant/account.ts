@@ -10,13 +10,16 @@ export class Account implements WithBalance {
   public balanceIndex: number;
   public domain: Domain;
 
-  constructor(data: any) {
-    this.id = data && data.id;
-    this.name = data && data.name || '';
-    this.currency = data && data.currency || '';
-    this.currentBalance = data && data.currentBalance || 0;
-    this.balanceIndex = data && data.balanceIndex || 0;
-    this.domain = data && new Domain(data.domain) || null;
+  constructor(data?: Partial<Account>) {
+    if (!data) {
+      data = {};
+    }
+    this.id = data.id || 0;
+    this.name = data.name || '';
+    this.currency = data.currency || '';
+    this.currentBalance = data.currentBalance || 0;
+    this.balanceIndex = data.balanceIndex || 0;
+    this.domain = new Domain(data.domain);
   }
 
   getBalance(): Balance {

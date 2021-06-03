@@ -7,7 +7,7 @@ import {Category} from '../../../model/accountant/billings/category';
 import {PiggyBank} from '../../../model/accountant/piggy-bank';
 import {Account} from '../../../model/accountant/account';
 
-export type ElementType = 'income' | 'expense' | null;
+export type ElementType = 'income' | 'expense';
 
 @Component({
   selector: 'app-billing-elements',
@@ -23,7 +23,7 @@ export class BillingElementsComponent implements OnInit {
   mode: string = this.GENERAL_VIEW;
   private previousMode: string | null = null;
 
-  private elementTypeInternal: ElementType = null;
+  private elementTypeInternal: ElementType = 'income';
 
   get elementType(): ElementType {
     return this.elementTypeInternal;
@@ -34,7 +34,7 @@ export class BillingElementsComponent implements OnInit {
     this.selectElementsToShow();
   }
 
-  public billingPeriodInternal: BillingPeriod;
+  public billingPeriodInternal!: BillingPeriod;
 
   @Input() get billingPeriod(): BillingPeriod {
     return this.billingPeriodInternal;
@@ -67,7 +67,7 @@ export class BillingElementsComponent implements OnInit {
   }
 
   private selectElementsToShow(): void {
-    const elements = this.elementTypeInternal === INCOME ? this.billingPeriod.incomes.sort((a, b) => this.sortIncomes(a, b)) :
+    const elements = this.elementTypeInternal === 'income' ? this.billingPeriod.incomes.sort((a, b) => this.sortIncomes(a, b)) :
       this.billingPeriod.expenses.sort((a, b) => this.sortExpenses(a, b));
     this.elements = elements || [];
     this.categoryBreakdown.clear();
@@ -120,7 +120,7 @@ export class BillingElementsComponent implements OnInit {
   }
 
   nameOfType(): string {
-    return this.elementType === INCOME ? 'incomes' : 'expenses';
+    return this.elementType === 'income' ? 'incomes' : 'expenses';
   }
 
   setCategory(key: string): void {

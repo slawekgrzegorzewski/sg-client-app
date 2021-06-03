@@ -41,7 +41,7 @@
   <button *ngIf="editable" (click)="add()" class="btn btn-outline-primary">Wprowadź</button>
 </div>
 <app-create-billing-element *ngIf="mode === EDIT_VIEW" class="sg-flex-column"
-                            [elementType]="elementType"
+                            [elementType]="elementType!"
                             [categories]="categories"
                             [userAccounts]="userAccounts"
                             [billingPeriod]="billingPeriod"

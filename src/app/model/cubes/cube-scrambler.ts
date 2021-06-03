@@ -15,7 +15,7 @@ export default function scramble(options: Partial<ScrambleOptions> = {turns: 20}
   const result: string[] = [];
   let lastMoveType: number | null = null;
 
-  for (let i = 0; i < options.turns; i++) {
+  for (let i = 0; i < (options.turns || 0); i++) {
     let moveType = Math.floor(Math.random() * 6);
     moveType = moveType === lastMoveType ? (moveType + 1) % 6 : moveType;
     const move = Math.floor(Math.random() * 3);

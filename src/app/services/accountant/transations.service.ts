@@ -3,7 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
 import {Account} from '../../model/accountant/account';
 import {Observable} from 'rxjs';
-import {Transaction} from '../../model/accountant/transaction';
+import {Transaction, TransactionDTO} from '../../model/accountant/transaction';
 import {map} from 'rxjs/operators';
 
 @Injectable({
@@ -17,22 +17,22 @@ export class TransactionsService {
   }
 
   domainTransactions(): Observable<Transaction[]> {
-    return this.http.get<Transaction[]>(this.endpoint, {responseType: 'json'})
+    return this.http.get<TransactionDTO[]>(this.endpoint, {responseType: 'json'})
       .pipe(map((data: []) => (data.map(d => new Transaction(d)))));
   }
 
   credit(account: Account, amount: number, description: string): Observable<Transaction> {
-    return this.http.post<Transaction>(`${this.endpoint}/credit/${account.id}/${amount}`, description, {responseType: 'json'})
+    return this.http.post<TransactionDTO>(`${this.endpoint}/credit/${account.id}/${amount}`, description, {responseType: 'json'})
       .pipe(map(d => new Transaction(d)));
   }
 
   debit(account: Account, amount: number, description: string): Observable<Transaction> {
-    return this.http.post<Transaction>(`${this.endpoint}/debit/${account.id}/${amount}`, description, {responseType: 'json'})
+    return this.http.post<TransactionDTO>(`${this.endpoint}/debit/${account.id}/${amount}`, description, {responseType: 'json'})
       .pipe(map(d => new Transaction(d)));
   }
 
   transfer(account: Account, targetAccount: Account, amount: number, description: string): Observable<Transaction> {
-    return this.http.post<Transaction>(
+    return this.http.post<TransactionDTO>(
       `${this.endpoint}/transfer/${account.id}/${targetAccount.id}/${amount}`,
       description,
       {responseType: 'json'})
@@ -41,7 +41,7 @@ export class TransactionsService {
 
   transferWithConversion(account: Account, targetAccount: Account, amount: number, targetAmount: number, description: string,
                          rate: number): Observable<Transaction> {
-    return this.http.post<Transaction>(
+    return this.http.post<TransactionDTO>(
       `${this.endpoint}/transfer_with_conversion/${account.id}/${targetAccount.id}/${amount}/${targetAmount}/${rate}`,
       description,
       {responseType: 'json'}

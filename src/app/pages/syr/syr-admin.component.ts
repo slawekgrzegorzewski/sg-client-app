@@ -45,7 +45,7 @@ export class SyrAdminComponent implements OnInit {
         if (result.notMatchedCountries) {
           this.countriesToMatch = [];
           result.notMatchedCountries.forEach(c => this.countriesToMatch.push({name: c, country: null}));
-          this.allCountries = result.allCountries;
+          this.allCountries = result.knownCountries;
         } else {
           this.countriesToMatch = [];
           this.allCountries = [];

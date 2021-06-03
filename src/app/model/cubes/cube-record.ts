@@ -13,6 +13,8 @@ export const cubeTypeDescriptions = new Map(
   ]
 );
 
+type CubeRecordDTO = Omit<Partial<CubeRecord>, 'recordTime'> & { recordTime?: string };
+
 export class CubeRecord {
   public id: number;
   public cubesType: CubeType;
@@ -21,13 +23,16 @@ export class CubeRecord {
   public recordTime: Date;
   public domain: Domain;
 
-  constructor(data?: any) {
-    this.id = data && data.id;
-    this.cubesType = data && data.cubesType || '';
-    this.time = data && data.time || 0;
-    this.scramble = data && data.scramble || '';
-    this.recordTime = data && new Date(data.recordTime) || null;
-    this.domain = data && new Domain(data.domain) || null;
+  constructor(data?: CubeRecordDTO) {
+    if (!data) {
+      data = {};
+    }
+    this.id = data.id || 0;
+    this.cubesType = data.cubesType || 'THREE';
+    this.time = data.time || 0;
+    this.scramble = data.scramble || '';
+    this.recordTime = data.recordTime && new Date(data.recordTime) || new Date();
+    this.domain = new Domain(data.domain);
   }
 
 }

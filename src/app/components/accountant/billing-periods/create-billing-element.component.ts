@@ -65,7 +65,7 @@ export class CreateBillingElementComponent implements OnInit {
   selectedAccountInternal: Account;
 
   get selectedAccount(): Account {
-    return this.selectedAccountInternal || new Account();
+    return this.selectedAccountInternal || new Account({});
   }
 
   set selectedAccount(value: Account) {

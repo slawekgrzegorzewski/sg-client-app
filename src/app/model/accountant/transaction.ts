@@ -1,5 +1,12 @@
 import {Account} from './account';
 
+export type TransactionDTO = Omit<Partial<Transaction>, 'source' | 'desitnation' | 'timeOfTransaction'>
+  & {
+  source?: Partial<Account>,
+  destination?: Partial<Account>,
+  timeOfTransaction?: string
+}
+
 export class Transaction {
   public id: number;
   public description: string;
@@ -9,13 +16,16 @@ export class Transaction {
   public credit: number;
   public timeOfTransaction: Date;
 
-  constructor(data?: any) {
-    this.id = data && data.id;
-    this.description = data && data.description || '';
-    this.source = data && new Account(data.source) || null;
-    this.destination = data && new Account(data.destination) || null;
-    this.debit = data && data.debit || 0;
-    this.credit = data && data.credit || 0;
-    this.timeOfTransaction = data && new Date(data.timeOfTransaction) || null;
+  constructor(data?: TransactionDTO) {
+    if (!data) {
+      data = {};
+    }
+    this.id = data.id || 0;
+    this.description = data.description || '';
+    this.source = new Account(data.source);
+    this.destination = new Account(data.destination);
+    this.debit = data.debit || 0;
+    this.credit = data.credit || 0;
+    this.timeOfTransaction = data.timeOfTransaction && new Date(data.timeOfTransaction) || new Date();
   }
 }

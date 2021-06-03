@@ -50,9 +50,11 @@ export class CubeRecordsLineChart {
       position: 'bottom',
       align: 'start',
       onClick: (event, legendItem) => {
-        const hidden = this.lineChartData[legendItem.datasetIndex].hidden;
-        this.lineChartData[legendItem.datasetIndex].hidden = !hidden;
-        this.updateChart.emit();
+        if (legendItem.datasetIndex) {
+          const hidden = this.lineChartData[legendItem.datasetIndex].hidden;
+          this.lineChartData[legendItem.datasetIndex].hidden = !hidden;
+          this.updateChart.emit();
+        }
       }
     }
   };

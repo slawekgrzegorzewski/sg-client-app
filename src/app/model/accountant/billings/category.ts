@@ -7,11 +7,14 @@ export class Category implements ForTypeahead {
   public description: string;
   public domain: Domain;
 
-  constructor(data?: any) {
-    this.id = data && data.id;
-    this.name = data && data.name || '';
-    this.description = data && data.description || '';
-    this.domain = data && new Domain(data.domain) || null;
+  constructor(data?: Partial<Category>) {
+    if (!data) {
+      data = {};
+    }
+    this.id = data.id || 0;
+    this.name = data.name || '';
+    this.description = data.description || '';
+    this.domain = new Domain(data.domain);
   }
 
   public fullName(): string {

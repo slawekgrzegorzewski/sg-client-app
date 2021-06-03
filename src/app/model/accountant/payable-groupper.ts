@@ -8,7 +8,15 @@ export class PayableGroup<T extends Payable> {
   additionalFinancialData = new Map<string, { paid: number, of: number }>();
   data: T[];
   order: number;
-  statusInternal: PaymentStatus;
+  statusInternal: PaymentStatus | null = null;
+
+  constructor(id: number, title: string, additionalFinancialData: Map<string, { paid: number; of: number }>, data: T[], order: number) {
+    this.id = id;
+    this.title = title;
+    this.additionalFinancialData = additionalFinancialData;
+    this.data = data;
+    this.order = order;
+  }
 
   get status(): PaymentStatus {
     if (!this.statusInternal) {
@@ -31,7 +39,7 @@ export class PayableGroup<T extends Payable> {
     const data = new Map<number, PayableGroup<P>>();
     for (const p of input) {
       const key = idGetter(p);
-      const group = data.get(key) || PayableGroup.createGroup([], data.size);
+      const group = data.get(key) || new PayableGroup<P>(PayableGroup.generatedGroups++, '', new Map(), [], data.size);
       group.data.push(p);
       group.title = titleGetter(p);
       const toPay = group.additionalFinancialData.get(p.getCurrency()) || {paid: 0, of: 0};
@@ -43,14 +51,6 @@ export class PayableGroup<T extends Payable> {
     const toReturn = Array.from(data.values());
     toReturn.forEach(group => group.data = group.data.sort(comparator));
     return toReturn;
-  }
-
-  private static createGroup<P extends Payable>(data: P[], order: number): PayableGroup<P> {
-    const group = new PayableGroup<P>();
-    group.id = PayableGroup.generatedGroups++;
-    group.data = data;
-    group.order = order;
-    return group;
   }
 
   public isEqual(payableGroup: PayableGroup<any>): boolean {

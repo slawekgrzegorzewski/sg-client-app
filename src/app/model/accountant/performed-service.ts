@@ -4,6 +4,14 @@ import {Client} from './client';
 import {SimplePerformedServicePayment} from './simple-performed-service-payment';
 import {Payable, PaymentStatus} from './payable';
 
+export type PerformedServiceDTO = Omit<Partial<PerformedService>, 'date' | 'service' | 'client' | 'clientPaymentsRelations'>
+  & {
+  date?: string,
+  client?: Partial<Client>,
+  service?: Partial<Service>,
+  clientPaymentsRelations?: (Omit<SimplePerformedServicePayment, 'date'> & { date: string }) []
+}
+
 export class PerformedService implements Payable {
 
   public id: number;
@@ -15,17 +23,18 @@ export class PerformedService implements Payable {
   public clientPaymentsRelations: SimplePerformedServicePayment[];
   public domain: Domain;
 
-  constructor(data?: any) {
-    this.id = data && data.id;
-    this.date = data && new Date(data.date) || null;
-    this.service = data && new Service(data.service) || null;
-    this.client = data && new Client(data.client) || null;
-    this.price = data && data.price || 0;
-    this.currency = data && data.currency || '';
-    this.clientPaymentsRelations = data
-      && data.clientPaymentsRelations
-      && data.clientPaymentsRelations.map(sr => new SimplePerformedServicePayment(sr)) || [];
-    this.domain = data && new Domain(data.domain) || null;
+  constructor(data?: PerformedServiceDTO) {
+    if (!data) {
+      data = {};
+    }
+    this.id = data.id || 0;
+    this.date = data.date && new Date(data.date) || new Date();
+    this.service = new Service(data.service);
+    this.client = new Client(data.client);
+    this.price = data.price || 0;
+    this.currency = data.currency || '';
+    this.clientPaymentsRelations = data.clientPaymentsRelations && data.clientPaymentsRelations.map(sr => new SimplePerformedServicePayment(sr)) || [];
+    this.domain = new Domain(data.domain);
   }
 
   public static compareByDateAndClientAndServiceAndId(first: PerformedService, second: PerformedService): number {

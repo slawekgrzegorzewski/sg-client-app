@@ -1,15 +1,20 @@
+type PageVersionDTO = Omit<Partial<PageVersion>, 'versionTime'> & { versionTime?: string }
+
 export class PageVersion {
   public id: number;
   public content: string;
   public versionTime: Date;
-  public added: string[];
-  public removed: string[];
+  public elementsAdded: string[];
+  public elementsRemoved: string[];
 
-  constructor(data?: any) {
-    this.id = data && data.id;
-    this.content = data && data.content || '';
-    this.versionTime = data && new Date(data.versionTime) || null;
-    this.added = data && data.elementsAdded || [];
-    this.removed = data && data.elementsRemoved || [];
+  constructor(data?: PageVersionDTO) {
+    if (!data) {
+      data = {};
+    }
+    this.id = data.id || 0;
+    this.content = data.content || '';
+    this.versionTime = data.versionTime && new Date(data.versionTime) || new Date();
+    this.elementsAdded = data.elementsAdded || [];
+    this.elementsRemoved = data.elementsRemoved || [];
   }
 }

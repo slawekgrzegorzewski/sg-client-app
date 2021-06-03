@@ -5,9 +5,12 @@ export class AccountantSettings {
   public company: boolean;
   public domain: Domain;
 
-  constructor(data?: any) {
-    this.id = data && data.id;
-    this.company = data && data.company || false;
-    this.domain = data && new Domain(data.domain) || null;
+  constructor(data?: Partial<AccountantSettings>) {
+    if (!data) {
+      data = {};
+    }
+    this.id = data.id || 0;
+    this.company = data.company || false;
+    this.domain = new Domain(data.domain);
   }
 }

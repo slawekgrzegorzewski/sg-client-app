@@ -1,4 +1,7 @@
 import {Category} from './category';
+import {ExpenseDTO} from './expense';
+
+export type IncomeDTO = Omit<Partial<Income>, 'category' | 'incomeDate'> & { category?: Partial<Category>, incomeDate?: string }
 
 export class Income {
   public id: number;
@@ -8,13 +11,16 @@ export class Income {
   public category: Category;
   public incomeDate: Date;
 
-  constructor(data?: any) {
-    this.id = data && data.id;
-    this.description = data && data.description || '';
-    this.amount = data && data.amount || 0;
-    this.currency = data && data.currency || '';
-    this.category = data && new Category(data.category) || null;
-    this.incomeDate = data && new Date(data.incomeDate) || null;
+  constructor(data?: IncomeDTO) {
+    if (!data) {
+      data = {};
+    }
+    this.id = data.id || 0;
+    this.description = data.description || '';
+    this.amount = data.amount || 0;
+    this.currency = data.currency || '';
+    this.category = new Category(data.category);
+    this.incomeDate = data.incomeDate && new Date(data.incomeDate) || new Date();
   }
 
   dateString(): string {

@@ -1,3 +1,5 @@
+type SimplePerformedServicePaymentDTO = Omit<Partial<SimplePerformedServicePayment>, 'date'> & { date?: string };
+
 export class SimplePerformedServicePayment {
 
   public id: number;
@@ -11,16 +13,19 @@ export class SimplePerformedServicePayment {
   public invoice: boolean;
   public notRegistered: boolean;
 
-  constructor(data?: any) {
-    this.id = data && data.id;
-    this.performedServiceId = data && data.performedServiceId || 0;
-    this.clientPaymentId = data && data.clientPaymentId || 0;
-    this.date = data && new Date(data.date) || null;
-    this.currency = data && data.currency || '';
-    this.price = data && data.price || 0;
-    this.billOfSale = data && data.billOfSale || false;
-    this.billOfSaleAsInvoice = data && data.billOfSaleAsInvoice || false;
-    this.invoice = data && data.invoice || false;
-    this.notRegistered = data && data.notRegistered || false;
+  constructor(data?: SimplePerformedServicePaymentDTO) {
+    if (!data) {
+      data = {};
+    }
+    this.id = data.id || 0;
+    this.performedServiceId = data.performedServiceId || 0;
+    this.clientPaymentId = data.clientPaymentId || 0;
+    this.date = data.date && new Date(data.date) || new Date();
+    this.currency = data.currency || '';
+    this.price = data.price || 0;
+    this.billOfSale = data.billOfSale || false;
+    this.billOfSaleAsInvoice = data.billOfSaleAsInvoice || false;
+    this.invoice = data.invoice || false;
+    this.notRegistered = data.notRegistered || false;
   }
 }

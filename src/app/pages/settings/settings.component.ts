@@ -2,7 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {LoginService} from 'src/app/services/login.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Account} from '../../model/accountant/account';
-import {Mode} from '../../components/accountant/accounts/edit-account.component';
 import {ToastService} from '../../services/toast.service';
 import {AccountsService} from '../../services/accountant/accounts.service';
 import {Observable} from 'rxjs';
@@ -30,7 +29,6 @@ import {ComparatorBuilder} from '../../../utils/comparator-builder';
 export class SettingsComponent implements OnInit {
 
   private isLoggedIn = false;
-  mode: Mode = Mode.CREATE;
   accountsInCurrentDomain: Account[];
   otherDomainsAccounts: Map<string, Account[]>;
   isEditAccount = false;
@@ -167,13 +165,11 @@ export class SettingsComponent implements OnInit {
   }
 
   editAccount(account: Account): void {
-    this.mode = Mode.EDIT;
     this.accountToEdit = account;
     this.isEditAccount = true;
   }
 
   createAccount(): void {
-    this.mode = Mode.CREATE;
     this.accountToEdit = null;
     this.isEditAccount = true;
   }
@@ -186,12 +182,13 @@ export class SettingsComponent implements OnInit {
     };
   }
 
-  createAccountMethod(account: Account): void {
-    this.callAccountsService(this.accountsService.create(account));
-  }
-
-  updateAccountMethod(account: Account): void {
-    this.callAccountsService(this.accountsService.update(account));
+  saveAccount(account: Account): void {
+    if (this.accountToEdit) {
+      this.accountToEdit.name = account.name;
+      this.callAccountsService(this.accountsService.update(this.accountToEdit));
+    } else {
+      this.callAccountsService(this.accountsService.create(new Account(account)));
+    }
   }
 
   deleteAccountMethod(): void {
@@ -237,7 +234,8 @@ export class SettingsComponent implements OnInit {
 
   updatePiggyBank(piggyBank: PiggyBank): void {
     this.piggyBanksService.update(piggyBank).subscribe(
-      data => {},
+      data => {
+      },
       error => this.toastService.showWarning('Błąd w czasie aktualizowania skarbonki')
     );
   }

@@ -2,7 +2,7 @@ import {Inject, Injectable, LOCALE_ID} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
 import {Observable} from 'rxjs';
-import {BillingPeriod, BillingPeriodInfo} from '../../model/accountant/billings/billing-period';
+import {BillingPeriod, BillingPeriodInfo, BillingPeriodInfoDTO} from '../../model/accountant/billings/billing-period';
 import {CurrencyPipe, DatePipe} from '@angular/common';
 import {map} from 'rxjs/operators';
 import {Expense} from '../../model/accountant/billings/expense';
@@ -46,12 +46,12 @@ export class BillingPeriodsService {
 
 
   currentBillingPeriod(): Observable<BillingPeriodInfo> {
-    return this.http.get<BillingPeriodInfo>(this.billingEndpoint)
+    return this.http.get<BillingPeriodInfoDTO>(this.billingEndpoint)
       .pipe(map(d => new BillingPeriodInfo(d)));
   }
 
   billingPeriodFor(date: Date): Observable<BillingPeriodInfo> {
-    return this.http.get<BillingPeriodInfo>(
+    return this.http.get<BillingPeriodInfoDTO>(
       `${this.billingEndpoint}/${this.datePipe.transform(date, 'yyyy-MM')}`)
       .pipe(map(d => new BillingPeriodInfo(d)));
   }
@@ -65,7 +65,7 @@ export class BillingPeriodsService {
   }
 
   private createBillingPeriod(url: string): Observable<BillingPeriodInfo> {
-    return this.http.put<BillingPeriodInfo>(url, null).pipe(map(d => new BillingPeriodInfo(d)));
+    return this.http.put<BillingPeriodInfoDTO>(url, null).pipe(map(d => new BillingPeriodInfo(d)));
   }
 
   finishBillingPeriod(period: BillingPeriod): Observable<BillingPeriodInfo> {
@@ -75,7 +75,7 @@ export class BillingPeriodsService {
   finishBillingPeriodOf(date: Date): Observable<BillingPeriodInfo> {
     const dateString = this.datePipe.transform(date, 'yyyy-MM');
     const url = `${this.billingEndpoint}/${dateString}/finish`;
-    return this.http.patch<BillingPeriodInfo>(url, {responseType: 'json'}).pipe(map(d => new BillingPeriodInfo(d)));
+    return this.http.patch<BillingPeriodInfoDTO>(url, {responseType: 'json'}).pipe(map(d => new BillingPeriodInfo(d)));
   }
 
   createBillingElement(element: Income | Expense, accountId: number): Observable<string> {

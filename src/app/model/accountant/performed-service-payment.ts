@@ -1,5 +1,12 @@
-import {ClientPayment} from './client-payment';
-import {PerformedService} from './performed-service';
+import {ClientPayment, ClientPaymentDTO} from './client-payment';
+import {PerformedService, PerformedServiceDTO} from './performed-service';
+
+type PerformedServicePaymentDTO = Omit<Partial<PerformedServicePayment>, 'performedService' | 'clientPayment' | 'date'>
+  & {
+  performedService?: Partial<PerformedServiceDTO>,
+  clientPayment?: Partial<ClientPaymentDTO>,
+  date?: string,
+}
 
 export class PerformedServicePayment {
 
@@ -14,17 +21,20 @@ export class PerformedServicePayment {
   public invoice: boolean;
   public notRegistered: boolean;
 
-  constructor(data?: any) {
-    this.id = data && data.id;
-    this.performedService = data && new PerformedService(data.performedService) || null;
-    this.clientPayment = data && new ClientPayment(data.clientPayment) || null;
-    this.date = data && new Date(data.date) || null;
-    this.currency = data && data.currency || '';
-    this.price = data && data.price || 0;
-    this.billOfSale = data && data.billOfSale || false;
-    this.billOfSaleAsInvoice = data && data.billOfSaleAsInvoice || false;
-    this.invoice = data && data.invoice || false;
-    this.notRegistered = data && data.notRegistered || false;
+  constructor(data?: PerformedServicePaymentDTO) {
+    if (!data) {
+      data = {};
+    }
+    this.id = data.id || 0;
+    this.performedService = new PerformedService(data.performedService);
+    this.clientPayment = new ClientPayment(data.clientPayment);
+    this.date = data.date && new Date(data.date) || new Date();
+    this.currency = data.currency || '';
+    this.price = data.price || 0;
+    this.billOfSale = data.billOfSale || false;
+    this.billOfSaleAsInvoice = data.billOfSaleAsInvoice || false;
+    this.invoice = data.invoice || false;
+    this.notRegistered = data.notRegistered || false;
   }
 }
 
@@ -35,10 +45,10 @@ export class PerformedServicePaymentShort {
   public clientPayment: ClientPayment;
   public price: number;
 
-  constructor(data?: PerformedServicePayment) {
-    this.id = data && data.id;
-    this.performedService = data && new PerformedService(data.performedService) || null;
-    this.clientPayment = data && new ClientPayment(data.clientPayment) || null;
-    this.price = data && data.price || 0;
+  constructor(data: PerformedServicePayment) {
+    this.id = data.id || 0;
+    this.performedService = data.performedService;
+    this.clientPayment = data.clientPayment;
+    this.price = data.price || 0;
   }
 }

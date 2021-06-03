@@ -4,9 +4,12 @@ export class Country implements ForTypeahead {
   public id: number;
   public names: string[];
 
-  constructor(data?: any) {
-    this.id = data && data.id;
-    this.names = data && data.names || [];
+  constructor(data?: Partial<Country>) {
+    if (!data) {
+      data = {};
+    }
+    this.id = data.id || 0;
+    this.names = data.names || [];
   }
 
   getTypeaheadId(): string {

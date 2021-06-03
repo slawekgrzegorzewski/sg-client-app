@@ -84,13 +84,14 @@ export class SavingsLineChart {
       dates.push(key);
     }
     dates = dates.sort(Dates.compareDates);
-    const dataPerCurrency = new Map<string, number[]>();
+    const dataPerCurrency = new Map<string, (number | null)[]>();
     dates.forEach(d => {
-      this.lineChartLabels.push(datePipe.transform(d, 'yyyy-MM'));
-      const dateData = data.get(d);
+      let dateLabel = datePipe.transform(d, 'yyyy-MM') || '';
+      this.lineChartLabels.push(dateLabel);
+      const dateData = data.get(d) || new Map<string, number>();
       for (const currency of dateData.keys()) {
         const values = dataPerCurrency.get(currency) || [];
-        values.push(dateData.get(currency));
+        values.push(dateData.get(currency) || null);
         dataPerCurrency.set(currency, values);
       }
     });

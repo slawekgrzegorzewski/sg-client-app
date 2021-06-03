@@ -3,6 +3,14 @@ import {Client} from './client';
 import {SimplePerformedServicePayment} from './simple-performed-service-payment';
 import {Payable, PaymentStatus} from './payable';
 
+
+export type ClientPaymentDTO = Omit<Partial<ClientPayment>, 'date' | 'client' | 'serviceRelations'>
+  & {
+  client?: Partial<Client>,
+  date?: string,
+  serviceRelations?: (Omit<SimplePerformedServicePayment, 'date'> & { date: string }) []
+}
+
 export class ClientPayment implements Payable {
   public id: number;
   public date: Date;
@@ -16,20 +24,21 @@ export class ClientPayment implements Payable {
   public serviceRelations: SimplePerformedServicePayment[];
   public domain: Domain;
 
-  constructor(data?: any) {
-    this.id = data && data.id;
-    this.date = data && new Date(data.date) || null;
-    this.client = data && new Client(data.client) || null;
-    this.price = data && data.price || 0;
-    this.currency = data && data.currency || '';
-    this.billOfSale = data && data.billOfSale || false;
-    this.billOfSaleAsInvoice = data && data.billOfSaleAsInvoice || false;
-    this.invoice = data && data.invoice || false;
-    this.notRegistered = data && data.notRegistered || false;
-    this.serviceRelations = data
-      && data.serviceRelations
-      && data.serviceRelations.map(sr => new SimplePerformedServicePayment(sr)) || [];
-    this.domain = data && new Domain(data.domain) || null;
+  constructor(data?: ClientPaymentDTO) {
+    if (!data) {
+      data = {};
+    }
+    this.id = data.id || 0;
+    this.date = data.date && new Date(data.date) || new Date();
+    this.client = new Client(data.client);
+    this.price = data.price || 0;
+    this.currency = data.currency || '';
+    this.billOfSale = data.billOfSale || false;
+    this.billOfSaleAsInvoice = data.billOfSaleAsInvoice || false;
+    this.invoice = data.invoice || false;
+    this.notRegistered = data.notRegistered || false;
+    this.serviceRelations = (data.serviceRelations || []).map(sr => new SimplePerformedServicePayment(sr));
+    this.domain = new Domain(data.domain);
   }
 
   public static compareByDateAndCurrencyAndId(first: ClientPayment, second: ClientPayment): number {

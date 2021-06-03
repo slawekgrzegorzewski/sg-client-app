@@ -15,16 +15,19 @@ export class PiggyBank implements WithBalance, ForTypeahead {
   public userId: number;
   public domain: Domain;
 
-  constructor(private currencyPipe: CurrencyPipe, data?: any) {
-    this.id = data && data.id;
-    this.name = data && data.name || '';
-    this.description = data && data.description || '';
-    this.balance = data && data.balance || 0;
-    this.currency = data && data.currency || '';
-    this.savings = data && data.savings || false;
-    this.monthlyTopUp = data && data.monthlyTopUp || 0;
-    this.userId = data && data.userId || 0;
-    this.domain = data && new Domain(data.domain) || null;
+  constructor(private currencyPipe: CurrencyPipe, data?: Partial<PiggyBank>) {
+    if (!data) {
+      data = {};
+    }
+    this.id = data.id || 0;
+    this.name = data.name || '';
+    this.description = data.description || '';
+    this.balance = data.balance || 0;
+    this.currency = data.currency || '';
+    this.savings = data.savings || false;
+    this.monthlyTopUp = data.monthlyTopUp || 0;
+    this.userId = data.userId || 0;
+    this.domain = new Domain(data.domain);
   }
 
   getBalance(): Balance {

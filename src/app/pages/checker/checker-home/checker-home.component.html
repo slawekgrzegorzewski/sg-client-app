@@ -1,13 +1,14 @@
 Oto lista wersji strony www.szkockiewrzosowisko.pl
 
 <div *ngFor="let version of versions" class="sg-row-hoverable" (click)="switchSelection(version)">
-  {{version.versionTime | localizedDate:'y-MM-d H:mm:ss'}} ({{version.added.length}} dodano; {{version.removed.length}} usunięto)
+  {{version.versionTime | localizedDate:'y-MM-d H:mm:ss'}} ({{version.elementsAdded.length}}
+  dodano; {{version.elementsRemoved.length}} usunięto)
   <div *ngIf="shouldShow(version)">
     <div style="background-color: #b7e1cd; margin-left: 50px; width: 400px">
-      <p *ngFor="let added of version.added" [innerHTML]="added"></p>
+      <p *ngFor="let added of version.elementsAdded" [innerHTML]="added"></p>
     </div>
     <div style="background-color: #f4c7c3; margin-left: 50px; width: 400px">
-      <p *ngFor="let removed of version.removed" [innerHTML]="removed"></p>
+      <p *ngFor="let removed of version.elementsRemoved" [innerHTML]="removed"></p>
     </div>
   </div>
 </div>

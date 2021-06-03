@@ -3,8 +3,6 @@ import {Observable, of, Subject} from 'rxjs';
 import {Currency} from '../../../model/accountant/currency';
 import {Account} from '../../../model/accountant/account';
 
-export enum Mode {EDIT, CREATE}
-
 @Component({
   selector: 'app-account-creator',
   templateUrl: './edit-account.component.html',
@@ -12,27 +10,36 @@ export enum Mode {EDIT, CREATE}
 })
 export class EditAccountComponent implements OnInit {
 
-  @Input() mode: Mode = Mode.CREATE;
   @Input() currencies: Currency[] = [];
 
-  internalEntity: Account | null = null;
+  private _entity: Account | null = null;
 
   @Input() set entity(account: Account | null) {
-    this.internalEntity = account;
-    this.newAccount = {name: '', currency: ''};
-    this.newAccount.name = account?.name || '';
-    this.newAccount.currency = account?.currency || '';
+    this._entity = account ? account : new Account({});
   }
 
   get entity(): Account | null {
-    return this.internalEntity;
+    return this._entity;
   }
 
-  @Output() createSubject = new Subject<Account>();
-  @Output() updateSubject = new Subject<Account>();
-  @Output() cancelSubject = new Subject<string>();
+  get currency(): Currency | null {
+    if (this.entity) {
+      const currencyToFind = this.entity.currency;
+      return this.currencies.find(c => c.code === currencyToFind) || null;
+    } else {
+      return null;
+    }
+  }
 
-  newAccount: { name: string, currency: string } | null = null;
+  set currency(value: Currency | null) {
+    if (this.entity) {
+      this.entity.currency = value?.code || '';
+    }
+  }
+
+
+  @Output() saveSubject = new Subject<Account>();
+  @Output() cancelSubject = new Subject<string>();
 
   constructor() {
     this.entity = null;
@@ -41,22 +48,9 @@ export class EditAccountComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  createAccount(): void {
-    if (this.newAccount) {
-      this.entity = new Account(this.newAccount);
-      this.entity.correctCurrencyToString();
-      this.createSubject.next(this.entity);
-      this.entity = null;
-    }
-  }
-
-  updateAccount(): void {
-    if (this.newAccount && this.entity) {
-      this.entity.name = this.newAccount.name;
-      this.entity.correctCurrencyToString();
-      this.updateSubject.next(this.entity);
-      this.entity = null;
-    }
+  saveAccount(): void {
+    this.saveSubject.next(this.entity!);
+    this.entity = null;
   }
 
   cancel(): void {
@@ -64,7 +58,7 @@ export class EditAccountComponent implements OnInit {
   }
 
   isEditMode(): boolean {
-    return this.mode === Mode.EDIT;
+    return this.entity !== null && this.entity.id > 0;
   }
 
   currenciesForTypeAhead(): () => Observable<Currency[]> {

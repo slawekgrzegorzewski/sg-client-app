@@ -6,10 +6,13 @@ export class Service implements ForTypeahead {
   public name: string;
   public domain: Domain;
 
-  constructor(data?: any) {
-    this.id = data && data.id;
-    this.name = data && data.name || '';
-    this.domain = data && new Domain(data.domain) || null;
+  constructor(data?: Partial<Service>) {
+    if (!data) {
+      data = {};
+    }
+    this.id = data.id || 0;
+    this.name = data.name || '';
+    this.domain = new Domain(data.domain);
   }
 
   getTypeaheadId(): string {

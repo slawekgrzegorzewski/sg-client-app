@@ -14,11 +14,9 @@
             <button type="button" class="btn btn-primary" (click)="createAccount()">Nowe konto</button>
           </div>
           <div *ngIf="isEditAccount">
-            <app-account-creator [mode]="mode"
-                                 [entity]="accountToEdit"
+            <app-account-creator [entity]="accountToEdit"
                                  [currencies]="allCurrencies"
-                                 (createSubject)="createAccountMethod($event)"
-                                 (updateSubject)="updateAccountMethod($event)"
+                                 (saveSubject)="saveAccount($event)"
                                  (cancelSubject)="closeEdit()">
             </app-account-creator>
           </div>

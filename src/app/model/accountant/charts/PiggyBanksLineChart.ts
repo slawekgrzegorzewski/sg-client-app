@@ -49,9 +49,11 @@ export class PiggyBanksLineChart {
       position: 'bottom',
       align: 'start',
       onClick: (event, legendItem) => {
-        const hidden = this.lineChartData[legendItem.datasetIndex].hidden;
-        this.lineChartData[legendItem.datasetIndex].hidden = !hidden;
-        this.updateChart.emit();
+        if (legendItem.datasetIndex) {
+          const hidden = this.lineChartData[legendItem.datasetIndex].hidden;
+          this.lineChartData[legendItem.datasetIndex].hidden = !hidden;
+          this.updateChart.emit();
+        }
       }
     }
   };
@@ -98,10 +100,11 @@ export class PiggyBanksLineChart {
     }
     dates = dates.sort(Dates.compareDates);
 
-    const dataPerPiggyName = new Map<string, number[]>();
+    const dataPerPiggyName = new Map<string, (number | null)[]>();
     dates.forEach(d => {
-      this.lineChartLabels.push(datePipe.transform(d, 'yyyy-MM'));
-      const dateData = data.get(d);
+      let dateLabel = datePipe.transform(d, 'yyyy-MM') || '';
+      this.lineChartLabels.push(dateLabel);
+      const dateData = data.get(d) || [];
       for (const piggyBank of dateData) {
         const key = this.descriptionOfPiggyBank(piggyBank);
         const values = dataPerPiggyName.get(key) || [];

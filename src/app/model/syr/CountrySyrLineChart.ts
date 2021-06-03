@@ -106,7 +106,7 @@ export class CountrySyrLineChart {
     });
     years = years.sort();
 
-    const lines = new Map<string, number[]>();
+    const lines = new Map<string, (number | null)[]>();
     years.forEach(year => {
       this.lineChartLabels.push('' + year);
       data.forEach((countryData, countryName) => {
