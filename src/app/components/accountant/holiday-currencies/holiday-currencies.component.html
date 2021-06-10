@@ -1,0 +1,67 @@
+<div class="sg-flex-row sg-flex-justify-center">
+  <div style="margin-right: 20px">
+    <form
+      *ngIf="holidayCurrencies && holidayCurrencies.kunaConversionRate > 0 && holidayCurrencies.euroConversionRate > 0">
+      <div class="form-group row">
+        <label for="eurPrice" class="col-2 col-form-label">EUR</label>
+        <div class="col-3">
+          <input id="eurPrice" name="eurPrice" type="number" min=0 class="form-control"
+                 [(ngModel)]="eurPrice"/>
+        </div>
+        <div class="col-7">
+          <span class="form-control"> = {{eurInPln | number: '0.0-2'}} PLN</span>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="kunPrice" class="col-2 col-form-label">KUN</label>
+        <div class="col-3">
+          <input id="kunPrice" name="kunPrice" type="number" min=0 class="form-control"
+                 [(ngModel)]="kunPrice"/>
+        </div>
+        <div class="col-7">
+          <span class="form-control"> = {{kunInPln | number: '0.0-2'}} PLN</span>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="plnPrice" class="col-2 col-form-label">PLN</label>
+        <div class="col-3">
+          <input id="plnPrice" name="plnPrice" type="number" min=0 class="form-control"
+                 [(ngModel)]="plnPrice"/>
+        </div>
+        <div class="col-7">
+          <span class="form-control"> = {{plnInKun | number: '0.0-2'}} KUN | {{plnInEur | number: '0.0-2'}} EUR</span>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div>
+    <form>
+      <div class="form-group row">
+        <label for="eurCurrencyRate" class="col-4 col-form-label">EUR</label>
+        <div class="col-8">
+          <input id="eurCurrencyRate" name="eurCurrencyRate" type="number" min=0 *ngIf="edit"
+                 class="form-control" [(ngModel)]="holidayCurrencies.euroConversionRate" required/>
+          <span *ngIf="!edit" class="form-control">{{holidayCurrencies.euroConversionRate | number: '0.0-2'}}</span>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="kunCurrencyRate" class="col-4 col-form-label">KUN</label>
+        <div class="col-8">
+          <input id="kunCurrencyRate" name="kunCurrencyRate" type="number" min=0 *ngIf="edit"
+                 class="form-control" [(ngModel)]="holidayCurrencies.kunaConversionRate" required/>
+          <span *ngIf="!edit" class="form-control">{{holidayCurrencies.kunaConversionRate | number: '0.0-2'}}</span>
+        </div>
+      </div>
+      <div class="sg-flex-row sg-flex-justify-flex-end">
+        <button type="button" class="btn btn-outline-dark" *ngIf="!edit" (click)="setEditMode()">
+          Edytuj
+        </button>
+        <button type="button" class="btn btn-outline-dark" *ngIf="edit" (click)="save()">
+          Zapisz
+        </button>
+        <button type="button" class="btn btn-outline-dark" *ngIf="edit" (click)="cancel()">Anuluj</button>
+      </div>
+    </form>
+  </div>
+</div>
+
