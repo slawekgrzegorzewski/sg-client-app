@@ -41,7 +41,7 @@
         <div class="col-8">
           <input id="eurCurrencyRate" name="eurCurrencyRate" type="number" min=0 *ngIf="edit"
                  class="form-control" [(ngModel)]="holidayCurrencies.euroConversionRate" required/>
-          <span *ngIf="!edit" class="form-control">{{holidayCurrencies.euroConversionRate | number: '0.0-2'}}</span>
+          <span *ngIf="!edit" class="form-control">{{holidayCurrencies.euroConversionRate | number: '0.0-6'}}</span>
         </div>
       </div>
       <div class="form-group row">
@@ -49,7 +49,7 @@
         <div class="col-8">
           <input id="kunCurrencyRate" name="kunCurrencyRate" type="number" min=0 *ngIf="edit"
                  class="form-control" [(ngModel)]="holidayCurrencies.kunaConversionRate" required/>
-          <span *ngIf="!edit" class="form-control">{{holidayCurrencies.kunaConversionRate | number: '0.0-2'}}</span>
+          <span *ngIf="!edit" class="form-control">{{holidayCurrencies.kunaConversionRate | number: '0.0-6'}}</span>
         </div>
       </div>
       <div class="sg-flex-row sg-flex-justify-flex-end">
