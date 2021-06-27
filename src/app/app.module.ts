@@ -17,7 +17,6 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {EditAccountComponent} from './components/accountant/accounts/edit-account.component';
 import {ToastService} from './services/toast.service';
 import {ToastsContainer} from './components/general/toast/toast-container.component';
-import {HoverableButtonsComponent} from './components/general/hoverable-buttons.component';
 import {DomainAccountsComponent} from './components/accountant/accounts/domain-accounts.component';
 import {CreateTransactionsComponent} from './components/accountant/transactions/create-transactions.component';
 import {TransactionsService} from './services/accountant/transations.service';
@@ -74,6 +73,8 @@ import {CompanyLogComponent} from './components/accountant/company-log/company-l
 import {TimerComponent} from './components/general/timer/timer.component';
 import {CubesHomeComponent} from './pages/cubes/home/cubes-home.component';
 import {CubeRecordsService} from './services/accountant/cube-records.service';
+import {HolidayCurrenciesService} from './services/accountant/holiday-currencies.service';
+import {HolidayCurrenciesComponent} from './components/accountant/holiday-currencies/holiday-currencies.component';
 
 @NgModule({
   declarations: [
@@ -85,7 +86,6 @@ import {CubeRecordsService} from './services/accountant/cube-records.service';
     AccountantHomeComponent,
     EditAccountComponent,
     ToastsContainer,
-    HoverableButtonsComponent,
     DomainAccountsComponent,
     CreateTransactionsComponent,
     LocalizedDatePipe,
@@ -122,7 +122,8 @@ import {CubeRecordsService} from './services/accountant/cube-records.service';
     PaymentSelectionComponent,
     CompanyLogComponent,
     TimerComponent,
-    CubesHomeComponent
+    CubesHomeComponent,
+    HolidayCurrenciesComponent
   ],
   imports: [
     BrowserModule,
@@ -138,6 +139,7 @@ import {CubeRecordsService} from './services/accountant/cube-records.service';
     httpInterceptorProviders,
     ToastService,
     AccountsService,
+    HolidayCurrenciesService,
     PageVersionsService,
     TransactionsService,
     SettingsService,

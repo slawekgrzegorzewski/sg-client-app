@@ -15,6 +15,8 @@ import {CheckerHomeComponent} from './pages/checker/checker-home/checker-home.co
 import {SyrHomeComponent} from './pages/syr/syr-home.component';
 import {SyrAdminComponent} from './pages/syr/syr-admin.component';
 import {CubesHomeComponent} from './pages/cubes/home/cubes-home.component';
+import {HolidayCurrencies} from './model/accountant/holiday-currencies';
+import {HolidayCurrenciesComponent} from './components/accountant/holiday-currencies/holiday-currencies.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/login', pathMatch: 'full'},
@@ -22,6 +24,7 @@ const routes: Routes = [
   {path: 'settings', component: SettingsComponent, canActivate: [AuthGuardGuard]},
   {path: 'accountant-home', component: AccountantHomeComponent, canActivate: [AuthGuardGuard]},
   {path: 'accountant-home-small', component: AccountantHomeSmallComponent, canActivate: [AuthGuardGuard]},
+  {path: 'holiday-currencies', component: HolidayCurrenciesComponent, canActivate: [AuthGuardGuard]},
   {path: 'billing-small', component: BillingSmallComponent, canActivate: [AuthGuardGuard]},
   {path: 'piggy-banks-small', component: PiggyBanksSmallComponent, canActivate: [AuthGuardGuard]},
   {path: 'charts', component: ChartsComponent, canActivate: [AuthGuardGuard]},

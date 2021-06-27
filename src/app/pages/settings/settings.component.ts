@@ -20,6 +20,7 @@ import {AccountantSettings} from '../../model/accountant/accountant-settings';
 import {Service} from '../../model/accountant/service';
 import {ServicesService} from '../../services/accountant/services.service';
 import {ComparatorBuilder} from '../../../utils/comparator-builder';
+import {Button} from '../../components/general/hoverable-buttons.component';
 
 @Component({
   selector: 'app-accounts',
@@ -43,7 +44,12 @@ export class SettingsComponent implements OnInit {
   clients: Client[];
   services: Service[];
   userDomains: DetailedDomain[];
-
+  buttons = [
+    new Button({name: 'usuń', action: this.deleteAccount(this)}),
+    new Button({name: 'zmień nazwę', action: this.rename(this)}),
+    new Button({name: 'pokaż', action: this.showAccount(this), show: (account: Account) => account && !account.visible || false}),
+    new Button({name: 'ukryj', action: this.hideAccount(this), show: (account: Account) => account && account.visible || false})
+  ];
 
   constructor(
     private accountsService: AccountsService,
@@ -161,6 +167,22 @@ export class SettingsComponent implements OnInit {
   rename(that): (a: Account) => void {
     return (a: Account) => {
       that.editAccount(a);
+    };
+  }
+
+  showAccount(that): (a: Account) => void {
+    return (a: Account) => {
+      a.visible = true;
+      this.accountsService.update(a).subscribe(a => {
+      });
+    };
+  }
+
+  hideAccount(that): (a: Account) => void {
+    return (a: Account) => {
+      a.visible = false;
+      this.accountsService.update(a).subscribe(a => {
+      });
     };
   }
 

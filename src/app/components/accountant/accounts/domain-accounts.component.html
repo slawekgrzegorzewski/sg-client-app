@@ -11,19 +11,30 @@
     </div>
     <div (mouseleave)="setOverAccount()">
       <table #table style="width: 100%">
+        <tr *ngIf="adminMode">
+          <td><b>Nazwa</b></td>
+          <td><b>Widoczne</b></td>
+          <td><b>Stan</b></td>
+        </tr>
         <tr #row *ngFor="let account of accounts"
             (mouseenter)="setOverAccount({account: account, row: row})"
             (click)="select(account);"
             class="domain-row sg-row-hoverable" [class.selected]="account === selectedAccount">
           <td>{{account.name}}</td>
+          <td *ngIf="adminMode">
+            <input type="checkbox" [ngModel]="account.visible" disabled>
+          </td>
           <td style="text-align: right">{{account.currentBalance | currency: account.currency :undefined:'1.2-2' }}</td>
         </tr>
       </table>
       <div #utilBox style="position: fixed;"
            [ngStyle]="{'top.px': utilBoxTop, 'left.px': utilBoxLeft, 'visibility': utilBoxVisibility}">
-        <button class="btn btn-primary btn-sm" *ngFor="let button of buttons" (click)="button.action(buttonClicked());">
-          {{button.name}}
-        </button>
+        <span *ngFor="let button of buttons">
+          <button *ngIf="button.show(this.overElement)" class="btn btn-primary btn-sm"
+                  (click)="button.action(buttonClicked());">
+            {{button.name}}
+          </button>
+        </span>
       </div>
     </div>
   </div>

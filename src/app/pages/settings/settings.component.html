@@ -7,7 +7,8 @@
           <div *ngIf="!isEditAccount && !showAccountDeletionConfirmation">
             <app-domain-accounts [domain]="currentDomainName"
                                  [accounts]="accountsInCurrentDomain"
-                                 [buttons]="[{name: 'delete', action:deleteAccount(this)}, {name: 'rename', action:rename(this)}]">
+                                 [buttons]="buttons"
+                                 [adminMode]="true">
             </app-domain-accounts>
 
             <button type="button" class="btn btn-primary" (click)="fetchData()">Odśwież</button>
@@ -36,7 +37,8 @@
           <div class="sg-flex-column" *ngIf="otherDomainsAccounts.size > 0">
             <app-domain-accounts *ngFor="let user of otherDomainsAccounts | keyvalue"
                                  [domain]="user.key"
-                                 [accounts]="user.value">
+                                 [accounts]="user.value"
+                                 [adminMode]="true">
             </app-domain-accounts>
             <button type="button" class="btn btn-primary" (click)="fetchData()">Odśwież</button>
           </div>

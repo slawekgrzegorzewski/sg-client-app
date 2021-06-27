@@ -60,7 +60,7 @@ export class AccountantHomeSmallComponent implements OnInit {
 
   fetchAccounts(): void {
     this.accountsService.currentDomainAccounts().subscribe(
-      data => this.accounts = data.sort(
+      data => this.accounts = data.filter(a => a.visible).sort(
         ComparatorBuilder.comparing<Account>(a => a.currency).thenComparing(a => a.name).build()
       ),
       error => this.accounts = []

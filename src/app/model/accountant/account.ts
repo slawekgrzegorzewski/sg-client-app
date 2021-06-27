@@ -8,6 +8,7 @@ export class Account implements WithBalance {
   public currency: string;
   public currentBalance: number;
   public balanceIndex: number;
+  public visible: boolean;
   public domain: Domain;
 
   constructor(data?: Partial<Account>) {
@@ -19,6 +20,7 @@ export class Account implements WithBalance {
     this.currency = data.currency || '';
     this.currentBalance = data.currentBalance || 0;
     this.balanceIndex = data.balanceIndex || 0;
+    this.visible = data.visible || false;
     this.domain = new Domain(data.domain);
   }
 
