@@ -11,8 +11,7 @@
     </app-accounts-grand-total>
     <app-domain-accounts *ngIf="accounts && accounts.length > 0"
                          [domain]="currentDomainName"
-                         [accounts]="accounts"
-                         [selectable]="false">
+                         [accounts]="accounts">
     </app-domain-accounts>
   </div>
   <div *ngIf="loginService.accountantSettings && loginService.accountantSettings.company"

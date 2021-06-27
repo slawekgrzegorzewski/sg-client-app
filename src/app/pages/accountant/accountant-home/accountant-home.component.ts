@@ -85,9 +85,11 @@ export class AccountantHomeComponent implements OnInit {
 
   fetchAccounts(): void {
     this.accountsService.currentDomainAccounts().subscribe(
-      data => this.accounts = data.sort(
-        ComparatorBuilder.comparing<Account>(a => a.currency).thenComparing(a => a.name).build()
-      ),
+      data => this.accounts = data
+        .filter(a => a.visible)
+        .sort(
+          ComparatorBuilder.comparing<Account>(a => a.currency).thenComparing(a => a.name).build()
+        ),
       error => this.accounts = []
     );
   }

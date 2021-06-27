@@ -17,7 +17,6 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {EditAccountComponent} from './components/accountant/accounts/edit-account.component';
 import {ToastService} from './services/toast.service';
 import {ToastsContainer} from './components/general/toast/toast-container.component';
-import {HoverableButtonsComponent} from './components/general/hoverable-buttons.component';
 import {DomainAccountsComponent} from './components/accountant/accounts/domain-accounts.component';
 import {CreateTransactionsComponent} from './components/accountant/transactions/create-transactions.component';
 import {TransactionsService} from './services/accountant/transations.service';
@@ -87,7 +86,6 @@ import {HolidayCurrenciesComponent} from './components/accountant/holiday-curren
     AccountantHomeComponent,
     EditAccountComponent,
     ToastsContainer,
-    HoverableButtonsComponent,
     DomainAccountsComponent,
     CreateTransactionsComponent,
     LocalizedDatePipe,

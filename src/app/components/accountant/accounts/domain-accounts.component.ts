@@ -12,14 +12,14 @@ export class DomainAccountsComponent implements OnInit {
   @Input() showTitle = true;
   @Input() domain: string | null = null;
   @Input() buttons: Button<Account>[] = [];
-  @Input() selectable = true;
+  @Input() adminMode = false;
   @Output() selectionChanged = new EventEmitter<Account | null>();
 
   private internalAccounts: Account[] = [];
   selectedAccount: Account | null = null;
 
   @Input() set accounts(value: Account[]) {
-    this.internalAccounts = value.sort(
+    this.internalAccounts = (value || []).sort(
       ComparatorBuilder.comparing<Account>(a => a.currency).thenComparing(a => a.name).build()
     );
     this.selectAccount();
@@ -57,9 +57,6 @@ export class DomainAccountsComponent implements OnInit {
   }
 
   private selectAccount(): void {
-    if (!this.selectable) {
-      return;
-    }
     if (this.accounts && this.accounts.length > 0) {
       if (this.selectedAccount) {
         this.selectedAccount = this.accounts.find(a => a.id === this.selectedAccount?.id) || null;
@@ -86,9 +83,6 @@ export class DomainAccountsComponent implements OnInit {
   }
 
   select(account: Account): void {
-    if (!this.selectable) {
-      return;
-    }
     this.selectedAccount = account;
     this.selectionChanged.emit(account);
   }

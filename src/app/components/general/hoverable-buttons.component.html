@@ -1,9 +1,0 @@
-<div *ngFor="let element of data" (mouseenter)="mouseOver=element" (mouseleave)="mouseOver=null"
-     class="sg-flex-row sg-row-hoverable">
-  <div>{{ converter(element) }}</div>
-  <div>
-    <div *ngIf="mouseIsOver(element)">
-      <button *ngFor="let button of buttons" (click)="button.action(element)">{{button.name}}</button>
-    </div>
-  </div>
-</div>
