@@ -129,10 +129,21 @@ export class AccountantHomeComponent implements OnInit {
     ])
       .subscribe(([ps, cp, services, clients]) => {
         this.performedServices = ps;
-        this.clientPayments = cp;
+        this.clientPayments = this.filterClientPaymentByDate(cp, date);
         this.services = services;
         this.clients = clients;
       });
+  }
+
+  private filterClientPaymentByDate(clientPayments1: ClientPayment[], date: Date): ClientPayment[] {
+    const currentMonth = new Date().getMonth();
+    return (clientPayments1 || []).filter(cp => {
+      const clientPaymentMonth = cp.date.getMonth();
+      const displayingMonth = date.getMonth();
+      return displayingMonth === currentMonth
+        || clientPaymentMonth === displayingMonth
+        || cp.serviceRelations.find(sr => sr.date.getMonth() === displayingMonth);
+    });
   }
 
   createElement(billingPeriod: BillingPeriod, element: Income | Expense, accountId: number): void {
@@ -189,7 +200,7 @@ export class AccountantHomeComponent implements OnInit {
       .pipe(
         switchMap(value => this.clientPaymentsService.currentDomainClientPayments(this.currentComapnyDate))
       )
-      .subscribe(data => this.clientPayments = data);
+      .subscribe(data => this.clientPayments = this.filterClientPaymentByDate(data, this.currentComapnyDate));
   }
 
   updateClientPayment(clientPayment: ClientPayment): void {
@@ -197,7 +208,7 @@ export class AccountantHomeComponent implements OnInit {
       .pipe(
         switchMap(value => this.clientPaymentsService.currentDomainClientPayments(this.currentComapnyDate))
       )
-      .subscribe(data => this.clientPayments = data);
+      .subscribe(data => this.clientPayments = this.filterClientPaymentByDate(data, this.currentComapnyDate));
   }
 
   createPerformedServicePayment(performedServicePayment: PerformedServicePayment): void {
