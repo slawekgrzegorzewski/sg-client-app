@@ -47,8 +47,8 @@ export class SettingsComponent implements OnInit {
   buttons = [
     new Button({name: 'usuń', action: this.deleteAccount(this)}),
     new Button({name: 'zmień nazwę', action: this.rename(this)}),
-    new Button({name: 'pokaż', action: this.showAccount(this), show: (account: Account) => account && !account.visible || false}),
-    new Button({name: 'ukryj', action: this.hideAccount(this), show: (account: Account) => account && account.visible || false})
+    new Button({name: 'pokaż', action: this.showAccount(this), show: (account: Account | null) => account && !account.visible || false}),
+    new Button({name: 'ukryj', action: this.hideAccount(this), show: (account: Account | null) => account && account.visible || false})
   ];
 
   constructor(
@@ -263,15 +263,13 @@ export class SettingsComponent implements OnInit {
   }
 
   createCategory(category: Category): void {
-    this.categoriesService.createCategory(category).subscribe(
-      data => this.fetchCategories()
-    );
+    this.categoriesService.createCategory(category)
+      .subscribe(data => this.fetchCategories());
   }
 
   updateCategory(category: Category): void {
-    this.categoriesService.updateCategory(category).subscribe(
-      data => this.fetchCategories()
-    );
+    this.categoriesService.updateCategory(category)
+      .subscribe(data => this.fetchCategories());
   }
 
   createClient(client: Client): void {

@@ -19,7 +19,7 @@ export const EXPENSE = 'expense';
 })
 export class CreateBillingElementComponent implements OnInit {
 
-  @Input() billingPeriod: BillingPeriod;
+  @Input() billingPeriod: BillingPeriod | null = null;
 
   @Input() categories: Category[] = [];
 
@@ -157,7 +157,7 @@ export class CreateBillingElementComponent implements OnInit {
   }
 
   public elements(): any[] {
-    return (this.elementType === INCOME ? this.billingPeriod.incomes : this.billingPeriod.expenses) || [];
+    return (this.elementType === INCOME ? this.billingPeriod?.incomes : this.billingPeriod?.expenses) || [];
   }
 
   add(): void {

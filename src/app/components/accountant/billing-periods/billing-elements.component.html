@@ -7,12 +7,12 @@
   </div>
   <div *ngIf="elements.length > 0 && mode === DETAILED_VIEW">
     <ng-template [ngTemplateOutlet]="detailedRows"
-                 [ngTemplateOutletContext]="{rows:elements, showcategory: true, minheight: minRowHeight || 0}"
+                 [ngTemplateOutletContext]="{rows:elements, showcategory: true, minheight: minRowHeight}"
     ></ng-template>
   </div>
   <div *ngIf="elements.length > 0 && mode === GENERAL_VIEW">
     <div *ngFor="let perCategory of categoryBreakdown | keyvalue" class="sg-flex-row sg-flex-wrap billing-element sg-row-hoverable"
-         (click)="setCategory(perCategory.key)" [ngStyle]="{'min-height.px':minRowHeight || 0}">
+         (click)="setCategory(perCategory.key)" [ngStyle]="{'min-height.px':minRowHeight}">
       <div class="sg-flex-align-center" style="padding-right: 10px;width: 200px">{{perCategory.key}}</div>
       <div class="sg-flex-align-center sg-flex-column sg-flex-align-flex-end" style="padding-left: 10px;width: 100px">
         <span *ngFor="let perCurrency of perCategory.value | keyvalue">
@@ -40,7 +40,7 @@
   </div>
   <button *ngIf="editable" (click)="add()" class="btn btn-outline-primary">Wprowadź</button>
 </div>
-<app-create-billing-element *ngIf="mode === EDIT_VIEW" class="sg-flex-column"
+<app-create-billing-element *ngIf="billingPeriod && mode === EDIT_VIEW" class="sg-flex-column"
                             [elementType]="elementType!"
                             [categories]="categories"
                             [userAccounts]="userAccounts"

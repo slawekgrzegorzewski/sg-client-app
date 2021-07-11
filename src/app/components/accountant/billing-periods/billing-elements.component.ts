@@ -34,31 +34,31 @@ export class BillingElementsComponent implements OnInit {
     this.selectElementsToShow();
   }
 
-  public billingPeriodInternal!: BillingPeriod;
+  public billingPeriodInternal: BillingPeriod  | null = null;
 
-  @Input() get billingPeriod(): BillingPeriod {
+  @Input() get billingPeriod(): BillingPeriod | null {
     return this.billingPeriodInternal;
   }
 
-  set billingPeriod(value: BillingPeriod) {
+  set billingPeriod(value: BillingPeriod | null) {
     this.billingPeriodInternal = value;
     this.selectElementsToShow();
   }
 
-  elements: (Income | Expense)[];
+  elements: (Income | Expense)[] = [];
   categoryBreakdown: Map<string, Map<string, number>> = new Map<string, Map<string, number>>();
   summary: Map<string, number> = new Map<string, number>();
 
-  @Input() title: string;
+  @Input() title = '';
 
-  @Input() userAccounts: Account[];
-  @Input() categories: Category[];
-  @Input() piggyBanks: PiggyBank[];
+  @Input() userAccounts: Account[] = [];
+  @Input() categories: Category[] = [];
+  @Input() piggyBanks: PiggyBank[] = [];
   @Input() editable = false;
-  @Input() minRowHeight: number;
+  @Input() minRowHeight = 0;
   @Output() createElementEvent = new EventEmitter<[Income | Expense, number]>();
   @Output() updatePiggyBankEvent = new EventEmitter<PiggyBank>();
-  showCategory: string;
+  showCategory: string | null = null;
 
   constructor() {
   }
@@ -67,8 +67,9 @@ export class BillingElementsComponent implements OnInit {
   }
 
   private selectElementsToShow(): void {
-    const elements = this.elementTypeInternal === 'income' ? this.billingPeriod.incomes.sort((a, b) => this.sortIncomes(a, b)) :
-      this.billingPeriod.expenses.sort((a, b) => this.sortExpenses(a, b));
+    const elements = this.elementTypeInternal === 'income'
+      ? (this.billingPeriod?.incomes || []).sort((a, b) => this.sortIncomes(a, b))
+      : (this.billingPeriod?.expenses || []).sort((a, b) => this.sortExpenses(a, b));
     this.elements = elements || [];
     this.categoryBreakdown.clear();
     this.summary.clear();

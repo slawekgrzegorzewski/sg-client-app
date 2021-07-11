@@ -14,12 +14,12 @@ export class CategoriesComponent implements OnInit {
   @Input() categories: Category[] = [];
   @Output() createEvent = new EventEmitter<Category>();
   @Output() updateEvent = new EventEmitter<Category>();
-  editElement: Category;
+  categoryToEdit: Category | null = null;
 
-  @ViewChild('utilBox') utilBox: ElementRef;
-  overElement: Category;
-  utilBoxTop: number;
-  utilBoxLeft: number;
+  @ViewChild('utilBox') utilBox!: ElementRef;
+  categoryWithMouseCursorOnIt: Category | null = null;
+  utilBoxTop = 0;
+  utilBoxLeft = 0;
   utilBoxVisibility = 'hidden';
 
   constructor() {
@@ -28,9 +28,9 @@ export class CategoriesComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  setOverAccount(category: Category, row: HTMLDivElement): void {
-    this.overElement = category;
-    if (category) {
+  setOverAccount(category: Category | null, row: HTMLDivElement | null): void {
+    this.categoryWithMouseCursorOnIt = category;
+    if (this.categoryWithMouseCursorOnIt && row) {
       const adjustment = (row.offsetHeight - this.utilBox.nativeElement.offsetHeight) / 2;
       this.utilBoxTop = row.getBoundingClientRect().top + adjustment;
       this.utilBoxLeft = row.getBoundingClientRect().left + row.clientWidth - this.utilBox.nativeElement.offsetWidth;
@@ -40,32 +40,30 @@ export class CategoriesComponent implements OnInit {
     }
   }
 
-  buttonClicked(): Category {
-    const acc = this.overElement;
-    this.setOverAccount(null, null);
-    return acc;
-  }
-
   prepareToEdit(): void {
-    this.editElement = this.overElement;
+    this.categoryToEdit = this.categoryWithMouseCursorOnIt;
   }
 
   prepareToCreate(): void {
-    this.editElement = new Category();
+    this.categoryToEdit = new Category();
   }
 
   reset(): void {
-    this.editElement = null;
+    this.categoryToEdit = null;
     this.setOverAccount(null, null);
   }
 
   create(): void {
-    this.createEvent.emit(this.editElement);
-    this.reset();
+    if (this.categoryToEdit) {
+      this.createEvent.emit(this.categoryToEdit);
+      this.reset();
+    }
   }
 
   update(): void {
-    this.updateEvent.emit(this.editElement);
-    this.reset();
+    if (this.categoryToEdit) {
+      this.updateEvent.emit(this.categoryToEdit);
+      this.reset();
+    }
   }
 }

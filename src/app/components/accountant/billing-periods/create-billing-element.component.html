@@ -32,7 +32,7 @@
           name="category"
           class="col-9"
           [inputClass]="'form-control'"
-          [readonly]="null"
+          [readonly]="false"
           [(ngModel)]="billingElement.category"
           [dataProvider]="categoriesForTypeAhead()"
           #category="ngModel"
@@ -42,7 +42,7 @@
 
       <div class="form-group row">
         <label for="dateOfElement" class="col-3 col-form-label">Data</label>
-        <app-date-picker class="col-9" [id]="'dateOfElement'" name="dateOfElement" [(ngModel)]="elementDate">
+        <app-date-picker class="col-9" id="dateOfElement" name="dateOfElement" [(ngModel)]="elementDate">
         </app-date-picker>
       </div>
 
@@ -62,7 +62,7 @@
           name="piggybank"
           class="col-8"
           [inputClass]="'form-control'"
-          [readonly]="null"
+          [readonly]="false"
           [(ngModel)]="piggyBank"
           [availableData]="piggyBanksForSelectedAccount"
           [dataProvider]="piggyBanksForTypeAhead()"

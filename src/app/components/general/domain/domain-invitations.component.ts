@@ -13,7 +13,7 @@ export class DomainInvitationsComponent<T> implements OnInit {
   constructor(private domainService: DomainService) {
   }
 
-  @Input() invitations: Domain[];
+  @Input() invitations: Domain[] = [];
   @Output() acceptInvitationEvent = new EventEmitter<Domain>();
   @Output() rejectInvitationEvent = new EventEmitter<Domain>();
 

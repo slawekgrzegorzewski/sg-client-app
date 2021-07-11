@@ -14,13 +14,13 @@ import {DatePipe, TitleCasePipe} from '@angular/common';
 })
 export class BrowseBillingElementsComponent implements OnInit {
 
-  billingPeriodInfoInternal: BillingPeriodInfo;
+  billingPeriodInfoInternal: BillingPeriodInfo | null = null;
 
-  @Input() get billingPeriodInfo(): BillingPeriodInfo {
+  @Input() get billingPeriodInfo(): BillingPeriodInfo | null {
     return this.billingPeriodInfoInternal;
   }
 
-  set billingPeriodInfo(value: BillingPeriodInfo) {
+  set billingPeriodInfo(value: BillingPeriodInfo | null) {
     this.billingPeriodInfoInternal = value;
     if (this.billingPeriodInfoInternal) {
       this.currentBilling = this.billingPeriodInfoInternal.result;
@@ -33,10 +33,10 @@ export class BrowseBillingElementsComponent implements OnInit {
     }
   }
 
-  @Input() accounts: Account[];
-  @Input() piggyBanks: PiggyBank[];
-  @Input() categories: Category[];
-  @Input() minRowHeight: number;
+  @Input() accounts: Account[] = [];
+  @Input() piggyBanks: PiggyBank[] = [];
+  @Input() categories: Category[] = [];
+  @Input() minRowHeight = 40;
 
   @Output() dateSelected = new EventEmitter<Date>();
   @Output() finishBillingPeriod = new EventEmitter<Date>();
@@ -44,10 +44,10 @@ export class BrowseBillingElementsComponent implements OnInit {
   @Output() createElementEvent = new EventEmitter<[BillingPeriod, Income | Expense, number]>();
   @Output() updatePiggyBankEvent = new EventEmitter<PiggyBank>();
 
-  currentBilling: BillingPeriod;
-  isCurrentBillingFinished: boolean;
+  currentBilling: BillingPeriod | null = null;
+  isCurrentBillingFinished = true;
   unfinishedBillingPeriods: BillingPeriod[] = [];
-  displayingPeriod: Date;
+  displayingPeriod: Date = new Date();
 
   constructor(private datePipe: DatePipe,
               private titleCasePipe: TitleCasePipe) {

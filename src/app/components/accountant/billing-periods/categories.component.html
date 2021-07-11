@@ -1,6 +1,6 @@
 <div class="sg-flex-row sg-flex-justify-center">
   <div class="sg-flex-column">
-    <div (mouseleave)="setOverAccount(null, null)" *ngIf="!editElement">
+    <div (mouseleave)="setOverAccount(null, null)" *ngIf="!categoryToEdit">
       <div *ngFor="let category of categories" #row class="sg-row-hoverable"
            (mouseenter)="setOverAccount(category, row)">
         {{category.name}} {{category.description}}
@@ -13,18 +13,18 @@
       </div>
     </div>
 
-    <button (click)="prepareToCreate()" *ngIf="!editElement" class="btn btn-primary">
+    <button (click)="prepareToCreate()" *ngIf="!categoryToEdit" class="btn btn-primary">
       Nowa kategoria
     </button>
   </div>
 
-  <div *ngIf="editElement">
+  <div *ngIf="categoryToEdit">
     <div class="form-group row">
       <label for="name" class="col-2 col-form-label">Nazwa</label>
       <div class="col-10">
         <input id="name" name="name" type="name" class="form-control"
                #name="ngModel"
-               [(ngModel)]="editElement.name"
+               [(ngModel)]="categoryToEdit.name"
                required/>
       </div>
     </div>
@@ -33,15 +33,15 @@
       <div class="col-10">
       <textarea id="description" name="description" type="description" class="form-control"
                 #description="ngModel"
-                [(ngModel)]="editElement.description"
+                [(ngModel)]="categoryToEdit.description"
                 required>
       </textarea>
       </div>
     </div>
-    <button *ngIf="editElement.id" [disabled]="name?.errors?.required || description?.errors?.required"
+    <button *ngIf="categoryToEdit.id" [disabled]="name?.errors?.required || description?.errors?.required"
             (click)="update()" class="btn btn-primary">Zapisz
     </button>
-    <button *ngIf="!editElement.id" [disabled]="name?.errors?.required || description?.errors?.required"
+    <button *ngIf="!categoryToEdit.id" [disabled]="name?.errors?.required || description?.errors?.required"
             (click)="create()" class="btn btn-primary">Stwórz
     </button>
     <button (click)="reset()" class="btn btn-primary">Anuluj</button>
