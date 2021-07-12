@@ -1,6 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {BillingPeriod} from '../../../model/accountant/billings/billing-period';
-import {throwError} from 'rxjs';
 import {Income} from '../../../model/accountant/billings/income';
 import {Expense} from '../../../model/accountant/billings/expense';
 import {Category} from '../../../model/accountant/billings/category';
@@ -34,7 +33,7 @@ export class BillingElementsComponent implements OnInit {
     this.selectElementsToShow();
   }
 
-  public billingPeriodInternal: BillingPeriod  | null = null;
+  public billingPeriodInternal: BillingPeriod | null = null;
 
   @Input() get billingPeriod(): BillingPeriod | null {
     return this.billingPeriodInternal;
@@ -109,7 +108,7 @@ export class BillingElementsComponent implements OnInit {
     }
   }
 
-  createElement(elementToCreate: Income | Expense, accountIdForElement: number, piggyBankToUpdate: PiggyBank): void {
+  createElement(elementToCreate: Income | Expense | null, accountIdForElement: number | null, piggyBankToUpdate: PiggyBank | null): void {
     if (elementToCreate && accountIdForElement) {
       this.createElementEvent.emit([elementToCreate, accountIdForElement]);
       if (piggyBankToUpdate) {

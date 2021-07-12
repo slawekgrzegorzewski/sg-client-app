@@ -93,7 +93,10 @@ export class AccountantHomeSmallComponent implements OnInit {
     this.mode = this.CREATE_EXPENSE;
   }
 
-  createElement(elementToCreate: Income | Expense, accountIdForElement: number, piggyBankToUpdate: PiggyBank): void {
+  createElement(elementToCreate: Income | Expense | null, accountIdForElement: number | null, piggyBankToUpdate: PiggyBank | null): void {
+    if (!elementToCreate || !accountIdForElement) {
+      return;
+    }
     const requests: Observable<any>[] = [
       this.billingsService.createBillingElement(elementToCreate, accountIdForElement)
     ];

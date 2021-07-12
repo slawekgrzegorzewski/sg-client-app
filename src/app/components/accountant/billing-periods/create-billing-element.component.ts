@@ -1,6 +1,6 @@
 import {Component, Input, OnInit, Output} from '@angular/core';
 import {BillingPeriod} from '../../../model/accountant/billings/billing-period';
-import {Observable, of, Subject, throwError} from 'rxjs';
+import {Observable, of, Subject} from 'rxjs';
 import {Income} from '../../../model/accountant/billings/income';
 import {Expense} from '../../../model/accountant/billings/expense';
 import {Account} from '../../../model/accountant/account';
@@ -11,6 +11,7 @@ import {CurrencyPipe, getCurrencySymbol} from '@angular/common';
 
 export const INCOME = 'income';
 export const EXPENSE = 'expense';
+export type BillingElementType = 'income' | 'expense';
 
 @Component({
   selector: 'app-create-billing-element',
@@ -23,25 +24,22 @@ export class CreateBillingElementComponent implements OnInit {
 
   @Input() categories: Category[] = [];
 
-  private elementTypeInternal: string;
+  @Input() elementType: BillingElementType = 'income';
 
-  get elementType(): string {
-    return this.elementTypeInternal;
-  }
-
-  @Input() set elementType(value: string) {
-    if (value === INCOME || value === EXPENSE) {
-      this.elementTypeInternal = value;
-    } else {
-      throwError('incorrect value for display');
+  get elementDate(): Date | null {
+    if (!this.billingElement) {
+      return null;
     }
+    if (this.billingElement instanceof Income) {
+      return this.billingElement.incomeDate;
+    }
+    return this.billingElement.expenseDate;
   }
 
-  get elementDate(): Date {
-    return this.billingElement instanceof Income ? this.billingElement.incomeDate : this.billingElement.expenseDate;
-  }
-
-  set elementDate(value: Date) {
+  set elementDate(value: Date | null) {
+    if (!value || !this.billingElement) {
+      return;
+    }
     if (this.billingElement instanceof Income) {
       this.billingElement.incomeDate = value;
     } else {
@@ -49,7 +47,7 @@ export class CreateBillingElementComponent implements OnInit {
     }
   }
 
-  private userAccountsInternal: Account[];
+  private userAccountsInternal: Account[] = [];
 
   get userAccounts(): Account[] {
     return this.userAccountsInternal || [];
@@ -60,30 +58,37 @@ export class CreateBillingElementComponent implements OnInit {
     this.availableCurrencies = [...new Set(this.userAccountsInternal.map(c => c.currency))];
   }
 
-  @Output() editEvent = new Subject<[Income | Expense, number, PiggyBank]>();
+  @Output() editEvent = new Subject<[Income | Expense | null, number | null, PiggyBank | null]>();
 
-  selectedAccountInternal: Account;
+  selectedAccountInternal: Account | null = null;
 
-  get selectedAccount(): Account {
-    return this.selectedAccountInternal || new Account({});
+  get selectedAccount(): Account | null {
+    return this.selectedAccountInternal;
   }
 
-  set selectedAccount(value: Account) {
+  set selectedAccount(value: Account | null) {
     this.selectedAccountInternal = value;
-    this.billingElement.currency = this.selectedAccount.currency;
+    if (this.selectedAccountInternal && this.billingElement) {
+      this.billingElement.currency = this.selectedAccountInternal.currency;
+    } else {
+      this.billingElement = null;
+    }
     this.filterPiggyBanks();
   }
 
-  forAccountIdInternal: number;
+  forAccountIdInternal: number | null = null;
 
-  get forAccountId(): number {
+  get forAccountId(): number | null {
     return Number(this.forAccountIdInternal);
   }
 
-  set forAccountId(value: number) {
+  set forAccountId(value: number | null) {
     this.forAccountIdInternal = value;
-
-    this.selectedAccount = this.userAccounts.find(account => account.id === (this.forAccountId || -1));
+    if (this.forAccountId) {
+      this.selectedAccount = this.userAccounts.find(account => account.id === this.forAccountId) || null;
+    } else {
+      this.selectedAccount = null;
+    }
   }
 
   availableCurrenciesInternal: string[] = [];
@@ -96,13 +101,13 @@ export class CreateBillingElementComponent implements OnInit {
     this.availableCurrenciesInternal = value;
   }
 
-  private piggyBankInternal: PiggyBank;
+  private piggyBankInternal: PiggyBank | null = null;
 
-  get piggyBank(): PiggyBank {
+  get piggyBank(): PiggyBank | null {
     return this.piggyBankInternal;
   }
 
-  set piggyBank(value: PiggyBank) {
+  set piggyBank(value: PiggyBank | null) {
     this.piggyBankInternal = value;
   }
 
@@ -117,8 +122,9 @@ export class CreateBillingElementComponent implements OnInit {
     this.filterPiggyBanks();
   }
 
-  billingElement: Income | Expense;
-  piggyBanksForSelectedAccount: string[];
+  billingElement: Income | Expense | null = null;
+
+  piggyBanksForSelectedAccount: string[] | null = null;
 
   constructor(private currencyPipe: CurrencyPipe,
               private ngbCalendar: NgbCalendar) {
@@ -128,9 +134,11 @@ export class CreateBillingElementComponent implements OnInit {
     if (this.elementType === INCOME) {
       this.billingElement = new Income();
       this.billingElement.incomeDate = new Date();
-    } else {
+    } else if (this.elementType === EXPENSE) {
       this.billingElement = new Expense();
       this.billingElement.expenseDate = new Date();
+    } else {
+      this.billingElement = null;
     }
   }
 
@@ -138,18 +146,20 @@ export class CreateBillingElementComponent implements OnInit {
     return 'Skarbonka do ' + (this.elementType === INCOME ? 'uznania' : 'obciążenia');
   }
 
-  piggyBankToFinance(): PiggyBank {
-    let piggyBank: PiggyBank = null;
-    if (this.piggyBankInternal) {
-      piggyBank = this.piggyBanks.find(pg => pg.id === this.piggyBankInternal.id);
+  piggyBankToFinance(): PiggyBank | null {
+    let piggyBank: PiggyBank | null = null;
+    const currentPiggyBank = this.piggyBankInternal;
+    if (currentPiggyBank) {
+      piggyBank = this.piggyBanks.find(pg => pg.id === currentPiggyBank.id) || null;
     }
     return piggyBank;
   }
 
   private filterPiggyBanks(): void {
-    if (this.selectedAccount?.currency) {
+    const account = this.selectedAccount;
+    if (account?.currency) {
       this.piggyBanksForSelectedAccount = this.piggyBanks
-        .filter(pg => pg.currency === this.selectedAccount.currency)
+        .filter(pg => pg.currency === account.currency)
         .map(pg => pg.getTypeaheadId());
     } else {
       this.piggyBanksForSelectedAccount = null;
@@ -161,6 +171,9 @@ export class CreateBillingElementComponent implements OnInit {
   }
 
   add(): void {
+    if (!this.selectedAccount || !this.billingElement) {
+      return;
+    }
     let amount = this.billingElement.amount;
     if (this.billingElement instanceof Expense) {
       amount = -amount;
@@ -181,7 +194,8 @@ export class CreateBillingElementComponent implements OnInit {
   }
 
   isAllowed(): boolean {
-    return this.isIncome() || this.billingElement.amount <= this.selectedAccount.currentBalance;
+    return this.selectedAccount !== null && this.billingElement !== null
+      && (this.isIncome() || this.billingElement.amount <= this.selectedAccount.currentBalance);
   }
 
   categoriesForTypeAhead(): () => Observable<Category[]> {
@@ -193,7 +207,7 @@ export class CreateBillingElementComponent implements OnInit {
     const that = this;
     return () => of(
       that.piggyBanks
-        .filter(pb => that.selectedAccount && pb.currency === this.selectedAccount.currency)
+        .filter(pb => that.selectedAccount && pb.currency === that.selectedAccount.currency)
         .sort((a, b) => a.name.localeCompare(b.name))
     );
   }

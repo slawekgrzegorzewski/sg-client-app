@@ -12,7 +12,7 @@
       </select>
     </div>
 
-    <div *ngIf="forAccountId">
+    <div *ngIf="forAccountId && billingElement">
       <div class="form-group row">
         <label for="amount" class="col-3 col-form-label">Kwota</label>
         <input id="amount" name="amount" type="number" class="form-control col-7"
@@ -58,6 +58,7 @@
       <div class="form-group row">
         <label for="piggybank" class="col-4 col-form-label">{{piggyBankAction()}}</label>
         <app-general-typeahead
+          id="piggybank"
           [id]="'piggybank'"
           name="piggybank"
           class="col-8"
@@ -70,14 +71,16 @@
           required>
         </app-general-typeahead>
       </div>
+
+      <div class="sg-flex-row sg-flex-align-stretch">
+        <button type="button" class="btn btn-outline-primary" *ngIf="forAccountId"
+                [disabled]="amount?.errors?.required || !isAllowed()"
+                (click)="add()">
+          Stwórz
+        </button>
+        <button type="button" class="btn btn-outline-primary" (click)="cancel()">Anuluj</button>
+      </div>
     </div>
   </form>
-  <div class="sg-flex-row sg-flex-align-stretch">
-    <button type="button" class="btn btn-outline-primary" *ngIf="forAccountId"
-            [disabled]="amount?.errors?.required || !isAllowed()"
-            (click)="add()">
-      Stwórz
-    </button>
-    <button type="button" class="btn btn-outline-primary" (click)="cancel()">Anuluj</button>
-  </div>
+
 </div>
