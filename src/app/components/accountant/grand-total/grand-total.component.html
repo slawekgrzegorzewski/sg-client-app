@@ -13,12 +13,10 @@
                        [valuesRight]="piggyBanks"
   ></app-currency-totals>
   <h5 style="text-align: center">Historyczne oszczędonści</h5>
-  <div *ngFor="let month of dates">
-    <app-multi-currency-total
-      [title]="month | date: 'yyyy-MM'"
-      [values]="historicalSavings.get(month)">
-    </app-multi-currency-total>
-  </div>
+  <app-multi-currency-total *ngFor="let date of dates"
+                            [title]="formatMonthDate(date)"
+                            [values]="getHistoricalSavings(date)">
+  </app-multi-currency-total>
   <app-multi-currency-total
     [title]="'Bieżące oszczędności'"
     [values]="savingsTotal"

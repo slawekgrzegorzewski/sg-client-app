@@ -15,7 +15,7 @@
   <ng-container *ngTemplateOutlet="piggyBanksTemplate"></ng-container>
 </div>
 <ng-template #piggyBanksTemplate>
-  <div class="sg-flex-column">
+  <div class="sg-flex-column" *ngIf="editElement">
     <h5 *ngIf="title" style="text-align: center">{{title}}</h5>
     <div (mouseleave)="setOverPiggyBank(null, null)" *ngIf="isNonEditMode()" class="sg-flex-row sg-flex-justify-center">
       <table>

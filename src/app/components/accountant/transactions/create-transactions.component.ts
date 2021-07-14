@@ -12,18 +12,18 @@ import {NgModel} from '@angular/forms';
 })
 export class CreateTransactionsComponent implements OnInit {
 
-  private internalAccount: Account;
+  private internalAccount: Account | null = null;
 
-  get account(): Account {
+  get account(): Account | null {
     return this.internalAccount;
   }
 
-  @Input() set account(value: Account) {
+  @Input() set account(value: Account | null) {
     this.internalAccount = value;
     this.targetAccounts = this.filterTargetAccounts(this.targetAccounts);
   }
 
-  private internalTargetAccounts: Account[];
+  private internalTargetAccounts: Account[] = [];
 
   get targetAccounts(): Account[] {
     return this.internalTargetAccounts;
@@ -33,14 +33,14 @@ export class CreateTransactionsComponent implements OnInit {
     this.internalTargetAccounts = this.filterTargetAccounts(value);
   }
 
+  targetAccount: Account | null = null;
+
   set targetAccountId(id: string) {
     const idNumber = Number(id);
-    this.targetAccount = this.targetAccounts.find(a => a.id === idNumber);
+    this.targetAccount = this.targetAccounts.find(a => a.id === idNumber) || null;
   }
 
-  targetAccount: Account;
-
-  private internalTransactionType: TransactionType;
+  private internalTransactionType: TransactionType = TransactionType.CREDIT;
 
   get transactionType(): TransactionType {
     return this.internalTransactionType;
@@ -52,7 +52,8 @@ export class CreateTransactionsComponent implements OnInit {
   }
 
   @Output() finishSubject = new EventEmitter<string>();
-  internalAmount: number;
+
+  internalAmount: number = 0;
 
   set amount(a: number) {
     this.internalAmount = a;
@@ -66,9 +67,9 @@ export class CreateTransactionsComponent implements OnInit {
     return this.internalAmount;
   }
 
-  @Input() description: string;
+  @Input() description: string = '';
 
-  internalRate: number;
+  internalRate: number = 1;
 
   set rate(value: number) {
     this.internalRate = value;
@@ -79,7 +80,7 @@ export class CreateTransactionsComponent implements OnInit {
     return this.internalRate;
   }
 
-  targetAmount: number;
+  targetAmount: number = 0;
 
   private calculateTargetAmount(): void {
     if (this.isTransferWithConversion()) {
@@ -103,37 +104,43 @@ export class CreateTransactionsComponent implements OnInit {
   }
 
   credit(): void {
-    this.transactionService.credit(this.account, this.amount, this.description)
-      .subscribe(
-        data => this.finishSubject.emit('OK'),
-        error => this.finishSubject.emit('Error')
-      );
+    if (this.account) {
+      this.transactionService.credit(this.account, this.amount, this.description)
+        .subscribe(
+          data => this.finishSubject.emit('OK'),
+          error => this.finishSubject.emit('Error')
+        );
+    }
   }
 
   debit(): void {
-    this.transactionService.debit(this.account, this.amount, this.description)
-      .subscribe(
-        data => this.finishSubject.emit('OK'),
-        error => this.finishSubject.emit('Error')
-      );
+    if (this.account) {
+      this.transactionService.debit(this.account, this.amount, this.description)
+        .subscribe(
+          data => this.finishSubject.emit('OK'),
+          error => this.finishSubject.emit('Error')
+        );
+    }
   }
 
   transfer(): void {
-    this.transactionService.transfer(this.account, this.targetAccount, this.amount, this.description)
-      .subscribe(
-        data => this.finishSubject.emit('OK'),
-        error => this.finishSubject.emit('Error')
-      );
+    if (this.account && this.targetAccount) {
+      this.transactionService.transfer(this.account, this.targetAccount, this.amount, this.description)
+        .subscribe(
+          data => this.finishSubject.emit('OK'),
+          error => this.finishSubject.emit('Error')
+        );
+    }
   }
 
   transferWithConversion(): void {
-    this.transactionService.transferWithConversion(
-      this.account, this.targetAccount, this.amount,
-      this.targetAmount, this.description, this.rate)
-      .subscribe(
-        data => this.finishSubject.emit('OK'),
-        error => this.finishSubject.emit('Error')
-      );
+    if (this.account && this.targetAccount) {
+      this.transactionService.transferWithConversion(this.account, this.targetAccount, this.amount, this.targetAmount, this.description, this.rate)
+        .subscribe(
+          data => this.finishSubject.emit('OK'),
+          error => this.finishSubject.emit('Error')
+        );
+    }
   }
 
   cancel(): void {
@@ -149,7 +156,10 @@ export class CreateTransactionsComponent implements OnInit {
   }
 
   public isTransferWithConversion(): boolean {
-    return this.targetAccount && this.targetAccount.currency !== this.account.currency;
+    if (!this.account) {
+      return false;
+    }
+    return this.targetAccount !== null && this.targetAccount.currency !== this.account.currency;
   }
 
   public accountLabel(): string {
@@ -188,12 +198,13 @@ export class CreateTransactionsComponent implements OnInit {
   }
 
   isTransferNotAllowed(transferAmount: NgModel, transferDescription: NgModel): boolean {
-    const req1 = transferAmount?.errors?.required;
-    const req2 = transferAmount?.value < 0;
-    const req3 = !this.isIncome() && transferAmount?.value > this.account.currentBalance;
-    const req4 = transferDescription?.errors?.required;
-    const req5 = (this.isTransfer() || this.isTransferWithConversion()) && !this.targetAccount;
-    const req6 = this.isTransferWithConversion() && !this.targetAmount;
-    return [req1, req2, req3, req4, req5, req6].some(b => b);
+    return [
+      transferAmount?.errors?.required,
+      transferAmount?.value < 0,
+      !this.isIncome() && transferAmount?.value > (this.account?.currentBalance || 0),
+      transferDescription?.errors?.required,
+      (this.isTransfer() || this.isTransferWithConversion()) && !this.targetAccount,
+      this.isTransferWithConversion() && !this.targetAmount
+    ].some(b => b);
   }
 }

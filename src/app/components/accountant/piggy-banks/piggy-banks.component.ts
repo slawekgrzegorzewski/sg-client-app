@@ -4,13 +4,15 @@ import {Observable, of} from 'rxjs';
 import {Currency} from '../../../model/accountant/currency';
 import {CurrencyPipe, getCurrencySymbol} from '@angular/common';
 
-export const INCOME = 'income';
-export const EXPENSE = 'expense';
+const INCOME = 'income';
+const EXPENSE = 'expense';
 const GENERAL_EDIT_MODE = 'general';
 const CREATE_EDIT_MODE = 'create';
 const TOPUP_EDIT_MODE = 'topup';
 const DEBIT_EDIT_MODE = 'debit';
 const EMPTY_EDIT_MODE = '';
+
+export type EditMode = 'income' | 'expense' | 'general' | 'create' | 'topup' | 'debit' | '';
 
 @Component({
   selector: 'app-piggy-banks',
@@ -18,9 +20,9 @@ const EMPTY_EDIT_MODE = '';
   styleUrls: ['./piggy-banks.component.css']
 })
 export class PiggyBanksComponent implements OnInit {
-  @Input() title: string;
-  @Input() adminMode: boolean;
-  piggyBanksInternal: PiggyBank[];
+  @Input() title: string | null = null;
+  @Input() adminMode = false;
+  piggyBanksInternal: PiggyBank[] = [];
 
   @Input() get piggyBanks(): PiggyBank[] {
     return this.piggyBanksInternal;
@@ -29,31 +31,33 @@ export class PiggyBanksComponent implements OnInit {
   set piggyBanks(value: PiggyBank[]) {
     this.piggyBanksInternal = value;
     (this.piggyBanksInternal || []).forEach(pg => {
-      this.calculateAndStoreSum(this.sumOfPiggyBanks, pg, pg.balance);
-      this.calculateAndStoreSum(this.sumOfMonthlyTopUps, pg, pg.monthlyTopUp);
+      PiggyBanksComponent.calculateAndStoreSum(this.sumOfPiggyBanks, pg, pg.balance);
+      PiggyBanksComponent.calculateAndStoreSum(this.sumOfMonthlyTopUps, pg, pg.monthlyTopUp);
     });
   }
 
   sumOfPiggyBanks = new Map<string, number>();
   sumOfMonthlyTopUps = new Map<string, number>();
 
-  @Input() allCurrencies: Currency[];
+  @Input() allCurrencies: Currency[] = [];
   @Output() updateEvent = new EventEmitter<PiggyBank>();
   @Output() createEvent = new EventEmitter<PiggyBank>();
-  editMode: string = EMPTY_EDIT_MODE;
+  editMode: EditMode = EMPTY_EDIT_MODE;
 
-  private editElementInternal: PiggyBank;
+  overElement: PiggyBank | null = null;
 
-  get editElement(): PiggyBank {
+  private editElementInternal: PiggyBank | null = null;
+
+  get editElement(): PiggyBank | null {
     return this.editElementInternal;
   }
 
-  set editElement(value: PiggyBank) {
+  set editElement(value: PiggyBank | null) {
     this.editElementInternal = value;
-    this.monthlyTopUpEnabled = this.editElementInternal?.monthlyTopUp > 0;
+    this.monthlyTopUpEnabled = (this.editElementInternal?.monthlyTopUp || 0) > 0;
   }
 
-  private monthlyTopUpEnabledInternal = false;
+  private monthlyTopUpEnabledInternal: boolean = false;
 
   get monthlyTopUpEnabled(): boolean {
     return this.monthlyTopUpEnabledInternal;
@@ -70,10 +74,9 @@ export class PiggyBanksComponent implements OnInit {
 
   operationAmount = 0;
 
-  @ViewChild('utilBox') utilBox: ElementRef;
-  overElement: PiggyBank;
-  utilBoxTop: number;
-  utilBoxLeft: number;
+  @ViewChild('utilBox') utilBox: ElementRef | null = null;
+  utilBoxTop: number = 0;
+  utilBoxLeft: number = 0;
   utilBoxVisibility = 'hidden';
 
   constructor(private currencyPipe: CurrencyPipe) {
@@ -86,18 +89,18 @@ export class PiggyBanksComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  private calculateAndStoreSum(aMap: Map<string, number>, pg: PiggyBank, toAdd: number): void {
+  private static calculateAndStoreSum(aMap: Map<string, number>, pg: PiggyBank, toAdd: number): void {
     let sum = aMap.get(pg.currency) || 0;
     sum += toAdd;
     aMap.set(pg.currency, sum);
   }
 
-  setOverPiggyBank(piggyBank: PiggyBank, row: HTMLTableRowElement): void {
+  setOverPiggyBank(piggyBank: PiggyBank | null, row: HTMLTableRowElement | null): void {
     this.overElement = piggyBank;
-    if (piggyBank) {
-      const adjustment = (row.offsetHeight - this.utilBox.nativeElement.offsetHeight) / 2;
+    if (piggyBank && row) {
+      const adjustment = (row.offsetHeight - this.utilBox!.nativeElement.offsetHeight) / 2;
       this.utilBoxTop = row.getBoundingClientRect().top + adjustment;
-      this.utilBoxLeft = row.getBoundingClientRect().left + row.clientWidth - (this.utilBox.nativeElement.offsetWidth / 2);
+      this.utilBoxLeft = row.getBoundingClientRect().left + row.clientWidth - (this.utilBox!.nativeElement.offsetWidth / 2);
       this.utilBoxVisibility = 'visible';
     } else {
       this.utilBoxVisibility = 'hidden';
@@ -106,7 +109,7 @@ export class PiggyBanksComponent implements OnInit {
 
   prepareToCreate(): void {
     if (this.adminMode) {
-      this.prepareToEdit(new PiggyBank(this.currencyPipe, null), CREATE_EDIT_MODE);
+      this.prepareToEdit(new PiggyBank(this.currencyPipe, {}), CREATE_EDIT_MODE);
     }
   }
 
@@ -125,7 +128,7 @@ export class PiggyBanksComponent implements OnInit {
     this.prepareToEdit(this.overElement, DEBIT_EDIT_MODE);
   }
 
-  prepareToEdit(editElement: PiggyBank, editMode): void {
+  prepareToEdit(editElement: PiggyBank | null, editMode: EditMode): void {
     this.editElement = editElement;
     this.editMode = editMode;
   }
@@ -138,8 +141,10 @@ export class PiggyBanksComponent implements OnInit {
   }
 
   create(): void {
-    this.editElement.correctCurrencyToString();
-    this.createEvent.emit(this.editElement);
+    if (this.editElement) {
+      this.editElement.correctCurrencyToString();
+      this.createEvent.emit(this.editElement);
+    }
     this.resetEditForm();
   }
 
@@ -148,7 +153,7 @@ export class PiggyBanksComponent implements OnInit {
   }
 
   topUp(): void {
-    if (this.operationAmount > 0) {
+    if (this.editElement && this.operationAmount > 0) {
       this.editElement.balance += this.operationAmount;
       this.updateEditElement();
     } else {
@@ -157,7 +162,7 @@ export class PiggyBanksComponent implements OnInit {
   }
 
   debit(): void {
-    if (this.operationAmount > 0) {
+    if (this.editElement && this.operationAmount > 0) {
       this.editElement.balance -= this.operationAmount;
       this.updateEditElement();
     } else {
@@ -166,8 +171,10 @@ export class PiggyBanksComponent implements OnInit {
   }
 
   private updateEditElement(): void {
-    this.editElement.correctCurrencyToString();
-    this.updateEvent.emit(this.editElement);
+    if (this.editElement) {
+      this.editElement.correctCurrencyToString();
+      this.updateEvent.emit(this.editElement);
+    }
     this.resetEditForm();
   }
 
@@ -192,13 +199,11 @@ export class PiggyBanksComponent implements OnInit {
   }
 
   canCreate(): boolean {
-    return this.isCreateEditMode()
-      && !PiggyBanksComponent.isEmptyString(this.editElement.name);
+    return this.isCreateEditMode() && !PiggyBanksComponent.isEmptyString(this.editElement?.name || '');
   }
 
   canEdit(): boolean {
-    return this.isGeneralEditMode()
-      && !PiggyBanksComponent.isEmptyString(this.editElement.name);
+    return this.isGeneralEditMode() && !PiggyBanksComponent.isEmptyString(this.editElement?.name || '');
   }
 
   currenciesForTypeAhead(): () => Observable<Currency[]> {

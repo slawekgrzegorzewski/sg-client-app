@@ -12,14 +12,14 @@ import {Client} from '../../../model/accountant/client';
 })
 export class PerformedServiceEditComponent implements OnInit {
 
-  @Input() performedService: PerformedService;
-  @Input() performedServices: PerformedService[];
-  @Input() editMode: boolean;
-  @Input() createMode: boolean;
+  @Input() performedService: PerformedService | null = null;
+  @Input() performedServices: PerformedService[] = [];
+  @Input() editMode: boolean = false;
+  @Input() createMode: boolean = false;
 
-  @Input() services: Service[];
-  @Input() clients: Client[];
-  @Input() allCurrencies: Currency[];
+  @Input() services: Service[] = [];
+  @Input() clients: Client[] = [];
+  @Input() allCurrencies: Currency[] = [];
 
   @Output() updateEvent = new EventEmitter<PerformedService>();
   @Output() createEvent = new EventEmitter<PerformedService>();
@@ -37,7 +37,9 @@ export class PerformedServiceEditComponent implements OnInit {
   }
 
   create(): void {
-    this.createEvent.emit(this.performedService);
+    if (this.performedService) {
+      this.createEvent.emit(this.performedService);
+    }
   }
 
   update(): void {
@@ -45,7 +47,9 @@ export class PerformedServiceEditComponent implements OnInit {
   }
 
   private updateEditElement(): void {
-    this.updateEvent.emit(this.performedService);
+    if (this.performedService) {
+      this.updateEvent.emit(this.performedService);
+    }
   }
 
   canCreate(): boolean {
@@ -57,12 +61,12 @@ export class PerformedServiceEditComponent implements OnInit {
   }
 
   private allRequiredFieldsSet(): boolean {
-    return this.performedService != null
-      && this.performedService.service
-      && this.performedService.client
-      && this.performedService.price
-      && this.performedService.currency
-      && this.performedService.date != null;
+    return this.performedService !== null
+      && this.performedService.service !== null
+      && this.performedService.client !== null
+      && this.performedService.price !== null
+      && this.performedService.currency !== null
+      && this.performedService.date !== null;
   }
 
   servicesForTypeAhead(): () => Observable<Service[]> {

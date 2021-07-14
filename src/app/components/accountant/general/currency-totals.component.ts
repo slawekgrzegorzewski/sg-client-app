@@ -6,34 +6,34 @@ import {WithBalance} from '../../../model/accountant/with-balance';
   templateUrl: './currency-totals.component.html',
   styleUrls: ['./currency-totals.component.css']
 })
-export class CurrencyTotalsComponent<T extends WithBalance> implements OnInit {
+export class CurrencyTotalsComponent<L extends WithBalance, R extends WithBalance> implements OnInit {
 
-  private valuesLeftInternal: T[] = [];
+  private valuesLeftInternal: L[] = [];
 
-  @Input() get valuesLeft(): T[] {
+  @Input() get valuesLeft(): L[] {
     return this.valuesLeftInternal;
   }
 
-  set valuesLeft(value: T[]) {
+  set valuesLeft(value: L[]) {
     this.valuesLeftInternal = value;
     this.calulateTotals();
   }
 
-  private valuesRightInternal: T[] = [];
+  private valuesRightInternal: R[] = [];
 
-  @Input() get valuesRight(): T[] {
+  @Input() get valuesRight(): R[] {
     return this.valuesRightInternal;
   }
 
-  set valuesRight(value: T[]) {
+  set valuesRight(value: R[]) {
     this.valuesRightInternal = value;
     this.calulateTotals();
   }
 
-  totalsLeft = new Map<string, number>();
-  totalsDifference = new Map<string, number>();
+  totalsLeft: Map<string, number> | null = null;
+  totalsDifference: Map<string, number> | null = null;
 
-  @Input() title: string;
+  @Input() title: string = '';
 
   constructor() {
   }
@@ -44,11 +44,11 @@ export class CurrencyTotalsComponent<T extends WithBalance> implements OnInit {
 
   private calulateTotals(): void {
     if (this.valuesRight) {
-      this.totalsDifference = this.calculateTotalDifference();
       this.totalsLeft = null;
+      this.totalsDifference = this.calculateTotalDifference();
     } else {
-      this.totalsDifference = null;
       this.totalsLeft = this.calculateTotalLeft();
+      this.totalsDifference = null;
     }
   }
 
@@ -61,7 +61,7 @@ export class CurrencyTotalsComponent<T extends WithBalance> implements OnInit {
     return this.calculateOneSideTotals(this.valuesRight);
   }
 
-  private calculateOneSideTotals(values: T[]): Map<string, number> {
+  private calculateOneSideTotals(values: (L | R)[]): Map<string, number> {
     if (!values) {
       return new Map<string, number>();
     }
@@ -87,7 +87,7 @@ export class CurrencyTotalsComponent<T extends WithBalance> implements OnInit {
     return result;
   }
 
-  private processValues(vals: T[]): Map<string, number> {
+  private processValues(vals: (L | R)[]): Map<string, number> {
     const result = new Map<string, number>();
     for (const value of vals || []) {
       const balance = value.getBalance();

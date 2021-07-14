@@ -12,23 +12,34 @@ import {Component, forwardRef, Input} from '@angular/core';
 })
 export class DataPickerComponent implements ControlValueAccessor {
 
-  @Input() id: string;
+  @Input() id: string = 'datePickerId';
 
-  private dataInternal: NgbDateStruct;
+  private dataInternal: NgbDateStruct | null = null;
 
-  get data(): NgbDateStruct {
+  get data(): NgbDateStruct | null {
     return this.dataInternal;
   }
 
-  set data(value: NgbDateStruct) {
+  set data(value: NgbDateStruct | null) {
+    function convertToDate(date: NgbDateStruct): Date {
+      const result = new Date();
+      result.setFullYear(date.year);
+      result.setMonth(date.month - 1);
+      result.setDate(date.day);
+      result.setHours(12, 0, 0, 0);
+      return result;
+    }
+
     this.dataInternal = value;
-    const dateValue = this.convertToDate(this.dataInternal);
+    const dateValue = convertToDate(this.dataInternal!);
     this.propagateChange(dateValue);
     this.propagateTouched(dateValue);
   }
 
-  propagateChange: (_: Date) => void;
-  propagateTouched: (_: Date) => void;
+  propagateChange: (_: Date) => void = (d: Date) => {
+  };
+  propagateTouched: (_: Date) => void = (d: Date) => {
+  };
 
   registerOnChange(fn: (_: Date) => void): void {
     this.propagateChange = fn;
@@ -40,21 +51,12 @@ export class DataPickerComponent implements ControlValueAccessor {
 
   writeValue(obj: Date): void {
     if (!obj) {
-      return null;
+      return;
     }
     this.dataInternal = new NgbDate(
       obj.getFullYear(),
       obj.getMonth() + 1,
       obj.getDate());
-  }
-
-  private convertToDate(date: NgbDateStruct): Date {
-    const result = new Date();
-    result.setFullYear(date.year);
-    result.setMonth(date.month - 1);
-    result.setDate(date.day);
-    result.setHours(12, 0, 0, 0);
-    return result;
   }
 
 }

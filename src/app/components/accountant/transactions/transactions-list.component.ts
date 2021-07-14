@@ -2,8 +2,7 @@ import {Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@an
 import {TransactionType} from '../../../model/accountant/transaction-type';
 import {Account} from '../../../model/accountant/account';
 import {Transaction} from '../../../model/accountant/transaction';
-import {CreateTransactionsComponent} from './create-transactions.component';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-transactions-list',
@@ -13,21 +12,21 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 export class TransactionsListComponent {
 
   transferCreationMode = false;
-  creatingTransactionType: TransactionType;
-  creatingTransactionAmount: number;
-  creatingTransactionFieldDescription: string;
+  creatingTransactionType = TransactionType.CREDIT;
+  creatingTransactionAmount: number = 0;
+  creatingTransactionFieldDescription: string = '';
 
-  @ViewChild('utilBox') utilBox: ElementRef;
-  utilBoxTop: number;
-  utilBoxLeft: number;
+  @ViewChild('utilBox') utilBox: ElementRef | null = null;
+  utilBoxTop: number = 0;
+  utilBoxLeft: number = 0;
   utilBoxVisibility = 'hidden';
 
 
-  @Input() transactions: Transaction[];
-  private overTransaction: Transaction;
+  @Input() transactions: Transaction[] = [];
+  private overTransaction: Transaction | null = null;
 
-  internalAllAccounts: Account[];
-  accountsToSelect: Account[];
+  internalAllAccounts: Account[] = [];
+  accountsToSelect: Account[] = [];
 
   @Input() get allAccounts(): Account[] {
     return this.internalAllAccounts;
@@ -38,14 +37,14 @@ export class TransactionsListComponent {
     this.accountsToSelect = this.filterAccountsOtherThanSelectedOne();
   }
 
-  private internalAccount: Account;
+  private internalAccount: Account | null = null;
 
   @Input()
-  get account(): Account {
+  get account(): Account | null {
     return this.internalAccount;
   }
 
-  set account(value: Account) {
+  set account(value: Account | null) {
     this.internalAccount = value;
     this.accountsToSelect = this.filterAccountsOtherThanSelectedOne();
   }
@@ -62,12 +61,12 @@ export class TransactionsListComponent {
     return this.internalAllAccounts.filter(account => !this.internalAccount || account.id !== this.internalAccount.id);
   }
 
-  setOverTransaction(value: Transaction, transactionRow: HTMLTableRowElement): void {
+  setOverTransaction(value: Transaction | null, transactionRow: HTMLTableRowElement | null): void {
     this.overTransaction = value;
-    if (value && value.destination?.id === this.account.id) {
-      const adjustment = (transactionRow.offsetHeight - this.utilBox.nativeElement.offsetHeight) / 2;
+    if (value && this.account && value.destination?.id === this.account.id && transactionRow) {
+      const adjustment = (transactionRow.offsetHeight - this.utilBox!.nativeElement.offsetHeight) / 2;
       this.utilBoxTop = transactionRow.getBoundingClientRect().top + adjustment;
-      this.utilBoxLeft = transactionRow.getBoundingClientRect().left + transactionRow.clientWidth - this.utilBox.nativeElement.offsetWidth;
+      this.utilBoxLeft = transactionRow.getBoundingClientRect().left + transactionRow.clientWidth - this.utilBox!.nativeElement.offsetWidth;
       this.utilBoxVisibility = 'visible';
     } else {
       this.utilBoxVisibility = 'hidden';
@@ -75,7 +74,7 @@ export class TransactionsListComponent {
   }
 
   buttonClicked(): Transaction {
-    const transaction = this.overTransaction;
+    const transaction = this.overTransaction!;
     this.setOverTransaction(null, null);
     return transaction;
   }
@@ -88,22 +87,22 @@ export class TransactionsListComponent {
   }
 
   openIncomeCreationDialog(): void {
-    this.creatingTransactionType  = TransactionType.CREDIT;
-    this.creatingTransactionAmount = null;
+    this.creatingTransactionType = TransactionType.CREDIT;
+    this.creatingTransactionAmount = 0;
     this.creatingTransactionFieldDescription = '';
     this.transferCreationMode = true;
   }
 
   openExpenseCreationDialog(): void {
-    this.creatingTransactionType  = TransactionType.DEBIT;
-    this.creatingTransactionAmount = null;
+    this.creatingTransactionType = TransactionType.DEBIT;
+    this.creatingTransactionAmount = 0;
     this.creatingTransactionFieldDescription = '';
     this.transferCreationMode = true;
   }
 
   openTransferCreationDialog(): void {
-    this.creatingTransactionType  = TransactionType.TRANSFER;
-    this.creatingTransactionAmount = null;
+    this.creatingTransactionType = TransactionType.TRANSFER;
+    this.creatingTransactionAmount = 0;
     this.creatingTransactionFieldDescription = '';
     this.transferCreationMode = true;
   }

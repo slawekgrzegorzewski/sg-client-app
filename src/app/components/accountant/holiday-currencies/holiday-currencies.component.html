@@ -35,7 +35,8 @@
     </form>
   </div>
   <div>
-    <form>
+    <form
+      *ngIf="holidayCurrencies && holidayCurrencies.kunaConversionRate > 0 && holidayCurrencies.euroConversionRate > 0">
       <div class="form-group row">
         <label for="eurCurrencyRate" class="col-4 col-form-label">EUR</label>
         <div class="col-8">

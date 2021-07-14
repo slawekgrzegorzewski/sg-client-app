@@ -1,6 +1,6 @@
 <div class="creating-transaction-main">
   <h5>Enter transaction details</h5>
-  <form #createTransactionForm="ngForm" class="needs-validation">
+  <form #createTransactionForm="ngForm" class="needs-validation" *ngIf="account">
     <div class="form-group row">
       <label for="account" class="col-4 col-form-label">{{accountLabel()}}</label>
       <div class="col-8">

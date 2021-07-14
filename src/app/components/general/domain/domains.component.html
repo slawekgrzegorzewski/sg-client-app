@@ -33,7 +33,7 @@
       </div>
     </div>
 
-    <div *ngIf="isGeneralEditMode() || isCreateEditMode()" class="form-group row">
+    <div *ngIf="editElement && (isGeneralEditMode() || isCreateEditMode())" class="form-group row">
       <label for="name" class="col-2 col-form-label">Nazwa</label>
       <div class="col-10">
         <input id="name" name="name" type="name" class="form-control"

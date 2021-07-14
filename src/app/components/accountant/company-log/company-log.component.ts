@@ -14,11 +14,11 @@ import {DatePipe, TitleCasePipe} from '@angular/common';
 })
 export class CompanyLogComponent implements OnInit {
 
-  @Input() services: Service[];
-  @Input() clients: Client[];
-  @Input() clientPayments: ClientPayment[];
-  @Input() allCurrencies: Currency[];
-  @Input() performedServices: PerformedService[];
+  @Input() services: Service[] = [];
+  @Input() clients: Client[] = [];
+  @Input() clientPayments: ClientPayment[] = [];
+  @Input() allCurrencies: Currency[] = [];
+  @Input() performedServices: PerformedService[] = [];
 
   @Output() createPSEvent = new EventEmitter<PerformedService>();
   @Output() updatePSEvent = new EventEmitter<PerformedService>();
@@ -27,7 +27,7 @@ export class CompanyLogComponent implements OnInit {
   @Output() updateCPEvent = new EventEmitter<ClientPayment>();
 
   @Output() dateSelected = new EventEmitter<Date>();
-  displayingPeriod: Date;
+  displayingPeriod = new Date();
 
   constructor(private datePipe: DatePipe,
               private titleCasePipe: TitleCasePipe) {

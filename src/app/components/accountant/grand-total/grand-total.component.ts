@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {Account} from '../../../model/accountant/account';
 import {PiggyBank} from '../../../model/accountant/piggy-bank';
 import {BillingPeriodsService} from '../../../services/accountant/billing-periods.service';
+import {DatePipe} from '@angular/common';
 
 @Component({
   selector: 'app-accounts-grand-total',
@@ -10,9 +11,9 @@ import {BillingPeriodsService} from '../../../services/accountant/billing-period
 })
 export class GrandTotalComponent implements OnInit {
 
-  @Input() title: string;
-  @Input() accounts: Account[];
-  piggyBanksInternal: PiggyBank[];
+  @Input() title = '';
+  @Input() accounts: Account[] = [];
+  piggyBanksInternal: PiggyBank[] = [];
 
   @Input() get piggyBanks(): PiggyBank[] {
     return this.piggyBanksInternal;
@@ -30,7 +31,7 @@ export class GrandTotalComponent implements OnInit {
     );
   }
 
-  historicalSavingsInternal: Map<Date, Map<string, number>>;
+  historicalSavingsInternal = new Map<Date, Map<string, number>>();
 
   @Input() get historicalSavings(): Map<Date, Map<string, number>> {
     return this.historicalSavingsInternal;
@@ -41,10 +42,12 @@ export class GrandTotalComponent implements OnInit {
     this.dates = BillingPeriodsService.getMapWithDatesKeysSorted(this.historicalSavings);
   }
 
-  dates: Date[];
+  dates: Date[] = [];
   savingsTotal = new Map<string, number>();
 
-  constructor() {
+  constructor(
+    private datePipe: DatePipe
+  ) {
   }
 
   ngOnInit(): void {
@@ -54,8 +57,11 @@ export class GrandTotalComponent implements OnInit {
     return this.accounts && this.accounts.length > 0;
   }
 
-  piggyBanksPresent(): boolean {
-    return this.piggyBanks && this.piggyBanks.length > 0;
+  getHistoricalSavings(month: Date): Map<string, number> {
+    return this.historicalSavings.get(month) || new Map<string, number>();
   }
 
+  formatMonthDate(date: Date): string {
+    return this.datePipe.transform(date, 'yyyy-MM') || '';
+  }
 }

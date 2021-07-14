@@ -11,18 +11,18 @@ import {ComparatorBuilder} from '../../../../utils/comparator-builder';
 })
 export class PaymentSelectionComponent implements OnInit {
 
-  forServiceInternal: PerformedService;
+  forServiceInternal: PerformedService | null = null;
 
-  @Input() get forService(): PerformedService {
+  @Input() get forService(): PerformedService | null {
     return this.forServiceInternal;
   }
 
-  set forService(value: PerformedService) {
+  set forService(value: PerformedService | null) {
     this.forServiceInternal = value;
     this.filterPayments();
   }
 
-  paymentsInternal: ClientPayment[];
+  paymentsInternal: ClientPayment[] = [];
 
   @Input() get payments(): ClientPayment[] {
     return this.paymentsInternal;
@@ -33,11 +33,11 @@ export class PaymentSelectionComponent implements OnInit {
     this.filterPayments();
   }
 
-  paymentsToChoose: ClientPayment[];
-  selectedPayment: ClientPayment;
+  paymentsToChoose: ClientPayment[] = [];
+  selectedPayment: ClientPayment | null = null;
 
-  @Input() maxPrice: number;
-  price: number;
+  @Input() maxPrice: number = 0;
+  price: number | null = null;
 
   @Output() createEvent = new EventEmitter<PerformedServicePayment>();
   @Output() cancelEvent = new EventEmitter<any>();
@@ -60,7 +60,9 @@ export class PaymentSelectionComponent implements OnInit {
   }
 
   createPSP(): void {
-    this.create(this.price);
+    if (this.price) {
+      this.create(this.price);
+    }
   }
 
   createFullPSP(): void {
@@ -68,7 +70,7 @@ export class PaymentSelectionComponent implements OnInit {
   }
 
   private create(price: number): void {
-    if (this.selectedPayment) {
+    if (this.forService && this.selectedPayment) {
       const toCreate = new PerformedServicePayment();
       toCreate.performedService = this.forService;
       toCreate.clientPayment = this.selectedPayment;
@@ -79,25 +81,29 @@ export class PaymentSelectionComponent implements OnInit {
   }
 
   canCreate(): boolean {
-    return this.selectedPayment && this.price > 0 && this.price <= this.maxPrice;
+    return this.selectedPayment !== null && this.price !== null && this.price > 0 && this.price <= this.maxPrice;
   }
 
   private filterPayments(): void {
-    if (!this.forService || !this.forService.client) {
-      this.paymentsToChoose = [];
-    } else {
-      this.paymentsToChoose = (this.payments || [])
+    const forService = this.forService;
+    if (forService !== null && forService.client !== null) {
+      this.paymentsToChoose = this.payments
         .filter(p => p.client)
-        .filter(p => p.client.id === this.forService.client.id)
+        .filter(p => p.client.id === forService.client.id)
         .filter(p => p.getPaidAmountForNow() < p.price)
         .sort(ComparatorBuilder.comparingByDate<ClientPayment>(cp => cp?.date || new Date(0)).desc().build());
+    } else {
+      this.paymentsToChoose = [];
     }
-    if ((this.paymentsToChoose && this.paymentsToChoose.length || 0) === 1) {
+    if (this.paymentsToChoose.length === 1) {
       this.pickPayment(this.paymentsToChoose[0]);
     }
   }
 
   currentMax(): number {
-    return Math.min(this.maxPrice, this.selectedPayment.price - this.selectedPayment.getPaidAmountForNow());
+    if (this.selectedPayment) {
+      return Math.min(this.maxPrice, this.selectedPayment.price - this.selectedPayment.getPaidAmountForNow());
+    }
+    return this.maxPrice;
   }
 }

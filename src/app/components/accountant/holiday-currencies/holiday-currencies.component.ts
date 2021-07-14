@@ -10,44 +10,61 @@ import {HolidayCurrencies} from 'src/app/model/accountant/holiday-currencies';
 export class HolidayCurrenciesComponent implements OnInit {
 
   edit = false;
-  holidayCurrencies: HolidayCurrencies;
-  private _eurPrice: number;
+  holidayCurrencies: HolidayCurrencies | null = null;
+
+  private eurPriceInternal: number = 0;
 
   get eurPrice(): number {
-    return this._eurPrice;
+    return this.eurPriceInternal;
   }
 
   set eurPrice(value: number) {
-    this._eurPrice = value;
-    this.eurInPln = this.eurPrice * this.holidayCurrencies.euroConversionRate;
+    this.eurPriceInternal = value;
+    if (this.holidayCurrencies) {
+      this.eurInPln = this.eurPrice * this.holidayCurrencies.euroConversionRate;
+    } else {
+      this.eurInPln = 0;
+    }
   }
 
-  eurInPln: number;
+  eurInPln: number = 0;
 
-  private _kunPrice: number;
+  private kunPriceInternal: number = 0;
+
   get kunPrice(): number {
-    return this._kunPrice;
+    return this.kunPriceInternal;
   }
 
   set kunPrice(value: number) {
-    this._kunPrice = value;
-    this.kunInPln = this.kunPrice * this.holidayCurrencies.kunaConversionRate;
+    this.kunPriceInternal = value;
+    if (this.holidayCurrencies) {
+      this.kunInPln = this.kunPrice * this.holidayCurrencies.kunaConversionRate;
+    } else {
+      this.kunInPln = 0;
+    }
   }
 
-  kunInPln: number;
-  private _plnPrice: number;
+  kunInPln: number = 0;
+
+  private plnPriceInternal: number = 0;
+
   get plnPrice(): number {
-    return this._plnPrice;
+    return this.plnPriceInternal;
   }
 
   set plnPrice(value: number) {
-    this._plnPrice = value;
-    this.plnInKun = this.plnPrice / this.holidayCurrencies.kunaConversionRate;
-    this.plnInEur = this.plnPrice / this.holidayCurrencies.euroConversionRate;
+    this.plnPriceInternal = value;
+    if (this.holidayCurrencies) {
+      this.plnInKun = this.plnPrice / this.holidayCurrencies.kunaConversionRate;
+      this.plnInEur = this.plnPrice / this.holidayCurrencies.euroConversionRate;
+    } else {
+      this.plnInKun = 0;
+      this.plnInEur = 0;
+    }
   }
 
-  plnInKun: number;
-  plnInEur: number;
+  plnInKun: number = 0;
+  plnInEur: number = 0;
 
   constructor(private holidayCurrenciesService: HolidayCurrenciesService) {
   }
@@ -62,7 +79,9 @@ export class HolidayCurrenciesComponent implements OnInit {
   }
 
   save(): void {
-    this.holidayCurrenciesService.update(this.holidayCurrencies).subscribe(hc => this.reset(), err => this.reset());
+    if (this.holidayCurrencies) {
+      this.holidayCurrenciesService.update(this.holidayCurrencies).subscribe(hc => this.reset(), err => this.reset());
+    }
   }
 
   cancel(): void {
@@ -74,11 +93,11 @@ export class HolidayCurrenciesComponent implements OnInit {
 
   reset(): void {
     this.edit = false;
-    this._eurPrice = 0;
+    this.eurPriceInternal = 0;
     this.eurInPln = 0;
-    this._kunPrice = 0;
+    this.kunPriceInternal = 0;
     this.kunInPln = 0;
-    this._plnPrice = 0;
+    this.plnPriceInternal = 0;
     this.plnInKun = 0;
     this.plnInEur = 0;
   }

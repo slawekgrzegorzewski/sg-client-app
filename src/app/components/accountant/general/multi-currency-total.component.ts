@@ -7,8 +7,8 @@ import {Component, Input, OnInit} from '@angular/core';
 })
 export class MultiCurrencyTotalComponent implements OnInit {
 
-  @Input() title: string;
-  @Input() values: Map<string, number>;
+  @Input() title: string = '';
+  @Input() values: Map<string, number> | null = null;
   @Input() hoverable = true;
 
   constructor() {
