@@ -13,41 +13,49 @@ import {PerformedService} from '../../../model/accountant/performed-service';
 export class ClientPaymentEditComponent implements OnInit {
 
   get receiptType(): string | null {
-    if (this.clientPayment.billOfSale) {
-      return 'BOS';
-    }
-    if (this.clientPayment.billOfSaleAsInvoice) {
-      return 'BOSAI';
-    }
-    if (this.clientPayment.invoice) {
-      return 'I';
-    }
-    if (this.clientPayment.notRegistered) {
-      return 'NR';
+    if (this.clientPayment) {
+      if (this.clientPayment.billOfSale) {
+        return 'BOS';
+      }
+      if (this.clientPayment.billOfSaleAsInvoice) {
+        return 'BOSAI';
+      }
+      if (this.clientPayment.invoice) {
+        return 'I';
+      }
+      if (this.clientPayment.notRegistered) {
+        return 'NR';
+      }
     }
     return null;
   }
 
   set receiptType(value: string | null) {
-    if (value === 'BOS') {
-      this.setBillOfSale();
-    } else if (value === 'BOSAI') {
-      this.setBillAsInvoice();
-    } else if (value === 'I') {
-      this.setInvoice();
-    } else if (value === 'NR') {
-      this.setNotRegistered();
-    } else {
-      this.clearReceiptType();
+    switch (value) {
+      case 'BOS':
+        this.setBillOfSale();
+        break;
+      case 'BOSAI':
+        this.setBillAsInvoice();
+        break;
+      case 'I':
+        this.setInvoice();
+        break;
+      case 'NR':
+        this.setNotRegistered();
+        break;
+      default:
+        this.clearReceiptType();
+        break;
     }
   }
 
-  @Input() clientPayment: ClientPayment;
-  @Input() performedServices: PerformedService[];
+  @Input() clientPayment: ClientPayment | null = null;
+  @Input() performedServices: PerformedService[] = [];
   @Input() editMode = false;
   @Input() createMode = false;
-  @Input() allCurrencies: Currency[];
-  @Input() clients: Client[];
+  @Input() allCurrencies: Currency[] = [];
+  @Input() clients: Client[] = [];
 
   @Output() updateEvent = new EventEmitter<ClientPayment>();
   @Output() createEvent = new EventEmitter<ClientPayment>();
@@ -64,7 +72,9 @@ export class ClientPaymentEditComponent implements OnInit {
   }
 
   create(): void {
-    this.createEvent.emit(this.clientPayment);
+    if (this.clientPayment) {
+      this.createEvent.emit(this.clientPayment);
+    }
   }
 
   update(): void {
@@ -72,7 +82,9 @@ export class ClientPaymentEditComponent implements OnInit {
   }
 
   private updateEditElement(): void {
-    this.updateEvent.emit(this.clientPayment);
+    if (this.clientPayment) {
+      this.updateEvent.emit(this.clientPayment);
+    }
   }
 
   canCreate(): boolean {
@@ -84,10 +96,10 @@ export class ClientPaymentEditComponent implements OnInit {
   }
 
   private allRequiredFieldsSet(): boolean {
-    return this.clientPayment != null
-      && this.clientPayment.price
-      && this.clientPayment.currency
-      && this.clientPayment.date != null;
+    return this.clientPayment !== null
+      && this.clientPayment.price > 0
+      && this.clientPayment.currency !== ''
+      && this.clientPayment.date !== null;
   }
 
   currenciesForTypeAhead(): () => Observable<Currency[]> {
@@ -112,37 +124,47 @@ export class ClientPaymentEditComponent implements OnInit {
   }
 
   setBillOfSale(): void {
-    this.clientPayment.billOfSale = true;
-    this.clientPayment.billOfSaleAsInvoice = false;
-    this.clientPayment.invoice = false;
-    this.clientPayment.notRegistered = false;
+    if (this.clientPayment) {
+      this.clientPayment.billOfSale = true;
+      this.clientPayment.billOfSaleAsInvoice = false;
+      this.clientPayment.invoice = false;
+      this.clientPayment.notRegistered = false;
+    }
   }
 
   setBillAsInvoice(): void {
-    this.clientPayment.billOfSale = false;
-    this.clientPayment.billOfSaleAsInvoice = true;
-    this.clientPayment.invoice = false;
-    this.clientPayment.notRegistered = false;
+    if (this.clientPayment) {
+      this.clientPayment.billOfSale = false;
+      this.clientPayment.billOfSaleAsInvoice = true;
+      this.clientPayment.invoice = false;
+      this.clientPayment.notRegistered = false;
+    }
   }
 
   setInvoice(): void {
-    this.clientPayment.billOfSale = false;
-    this.clientPayment.billOfSaleAsInvoice = false;
-    this.clientPayment.invoice = true;
-    this.clientPayment.notRegistered = false;
+    if (this.clientPayment) {
+      this.clientPayment.billOfSale = false;
+      this.clientPayment.billOfSaleAsInvoice = false;
+      this.clientPayment.invoice = true;
+      this.clientPayment.notRegistered = false;
+    }
   }
 
   setNotRegistered(): void {
-    this.clientPayment.billOfSale = false;
-    this.clientPayment.billOfSaleAsInvoice = false;
-    this.clientPayment.invoice = false;
-    this.clientPayment.notRegistered = true;
+    if (this.clientPayment) {
+      this.clientPayment.billOfSale = false;
+      this.clientPayment.billOfSaleAsInvoice = false;
+      this.clientPayment.invoice = false;
+      this.clientPayment.notRegistered = true;
+    }
   }
 
   private clearReceiptType(): void {
-    this.clientPayment.billOfSale = false;
-    this.clientPayment.billOfSaleAsInvoice = false;
-    this.clientPayment.invoice = false;
-    this.clientPayment.notRegistered = false;
+    if (this.clientPayment) {
+      this.clientPayment.billOfSale = false;
+      this.clientPayment.billOfSaleAsInvoice = false;
+      this.clientPayment.invoice = false;
+      this.clientPayment.notRegistered = false;
+    }
   }
 }

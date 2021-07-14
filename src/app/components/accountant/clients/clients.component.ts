@@ -11,12 +11,12 @@ export class ClientsComponent implements OnInit {
   @Input() clients: Client[] = [];
   @Output() createEvent = new EventEmitter<Client>();
   @Output() updateEvent = new EventEmitter<Client>();
-  editElement: Client;
+  editElement: Client | null = null;
 
-  @ViewChild('utilBox') utilBox: ElementRef;
-  overElement: Client;
-  utilBoxTop: number;
-  utilBoxLeft: number;
+  @ViewChild('utilBox') utilBox: ElementRef | null = null;
+  overElement: Client | null = null;
+  utilBoxTop: number = 0;
+  utilBoxLeft: number = 0;
   utilBoxVisibility = 'hidden';
 
   constructor() {
@@ -25,22 +25,16 @@ export class ClientsComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  setOverAccount(client: Client, row: HTMLDivElement): void {
+  setOverAccount(client: Client | null, row: HTMLDivElement | null): void {
     this.overElement = client;
-    if (client) {
-      const adjustment = (row.offsetHeight - this.utilBox.nativeElement.offsetHeight) / 2;
+    if (client && row) {
+      const adjustment = (row.offsetHeight - this.utilBox!.nativeElement.offsetHeight) / 2;
       this.utilBoxTop = row.getBoundingClientRect().top + adjustment;
-      this.utilBoxLeft = row.getBoundingClientRect().left + row.clientWidth - this.utilBox.nativeElement.offsetWidth;
+      this.utilBoxLeft = row.getBoundingClientRect().left + row.clientWidth - this.utilBox!.nativeElement.offsetWidth;
       this.utilBoxVisibility = 'visible';
     } else {
       this.utilBoxVisibility = 'hidden';
     }
-  }
-
-  buttonClicked(): Client {
-    const acc = this.overElement;
-    this.setOverAccount(null, null);
-    return acc;
   }
 
   prepareToEdit(): void {
@@ -57,12 +51,16 @@ export class ClientsComponent implements OnInit {
   }
 
   create(): void {
-    this.createEvent.emit(this.editElement);
-    this.reset();
+    if(this.editElement) {
+      this.createEvent.emit(this.editElement);
+      this.reset();
+    }
   }
 
   update(): void {
-    this.updateEvent.emit(this.editElement);
-    this.reset();
+    if(this.editElement) {
+      this.updateEvent.emit(this.editElement);
+      this.reset();
+    }
   }
 }
