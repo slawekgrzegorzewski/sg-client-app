@@ -41,7 +41,7 @@ import {GrandTotalComponent} from './components/accountant/grand-total/grand-tot
 import {AccountantHomeSmallComponent} from './pages/accountant/accountant-home/accountant-home-small.component';
 import {BillingSmallComponent} from './pages/accountant/billings/billing-small.component';
 import {BrowseBillingElementsComponent} from './components/accountant/billing-periods/browse-billing-elements.component';
-import {PiggyBanksSmallComponent} from './pages/accountant/piggy-banks/piggy-banks-small..component';
+import {PiggyBanksSmallComponent} from './pages/accountant/piggy-banks/piggy-banks-small.component';
 import {ChartsModule} from 'ng2-charts';
 import {ChartsComponent} from './pages/accountant/charts/charts.component';
 import {HomeComponent} from './pages/home/home.component';

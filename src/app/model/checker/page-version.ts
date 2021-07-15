@@ -1,4 +1,4 @@
-type PageVersionDTO = Omit<Partial<PageVersion>, 'versionTime'> & { versionTime?: string }
+export type PageVersionDTO = Omit<Partial<PageVersion>, 'versionTime'> & { versionTime?: string }
 
 export class PageVersion {
   public id: number;

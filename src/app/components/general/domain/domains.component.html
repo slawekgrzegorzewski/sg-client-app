@@ -44,7 +44,7 @@
     </div>
     <div *ngIf="showDomainMembersToEdit()" class="form-group row">
       <label class="col-3 col-form-label">Członkowie domeny</label>
-      <div class="col-9 sg-flex-column" style="padding-left: 5px">
+      <div class="col-9 sg-flex-column" style="padding-left: 5px" *ngIf="editElement">
         <div *ngFor="let member of editElement.usersAccessLevel | keyvalue" class="sg-flex-row">
           <div class="col-2">
             {{member.key}}

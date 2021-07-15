@@ -1,6 +1,6 @@
 <div class="sg-flex-row sg-flex-justify-center">
   <div style="padding:10px; width: 320px;" class="sg-flex-column">
-    <h5 *ngIf="showTitle" style="text-align: center">Konta w domenie {{domain}}</h5>
+    <h5 *ngIf="showTitle && domain" style="text-align: center">Konta w domenie {{domain}}</h5>
     <div style="margin-left: auto; margin-right: 10px; width: 65%">
       <app-multi-currency-total
         class="mb-2 text-muted"

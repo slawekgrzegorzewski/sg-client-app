@@ -16,61 +16,58 @@ import {BaseChartDirective} from 'ng2-charts';
 export class CubesHomeComponent implements OnInit, AfterViewInit {
 
   @ViewChild('rubiks', {static: true})
-  canvas: ElementRef<HTMLCanvasElement>;
-  cube: RubiksCube;
-  reverseAlgorithm = [];
-  _cubeRecordsChartType: ChartMode = 'RAW';
+  canvas: ElementRef<HTMLCanvasElement> | null = null;
+  cube: RubiksCube | null = null;
+  reverseAlgorithm: ((duration?: number) => Promise<void>)[] = [];
+  cubeRecordsChartTypeInternal: ChartMode = 'RAW';
 
   get cubeRecordsChartType(): ChartMode {
-    return this._cubeRecordsChartType;
+    return this.cubeRecordsChartTypeInternal;
   }
 
   set cubeRecordsChartType(value: ChartMode) {
-    this._cubeRecordsChartType = value;
+    this.cubeRecordsChartTypeInternal = value;
     this.refreshStatsForSelectedCube();
   }
 
   cubeRecordsLineChart: CubeRecordsLineChart = new CubeRecordsLineChart([], this.cubeRecordsChartType);
   @ViewChild('piggyBanksChart')
-  public cubesRecordsChart: BaseChartDirective;
+  public cubesRecordsChart: BaseChartDirective | null = null;
 
-  max: Date;
-  min: Date;
-  avg: Date;
+  max = new Date(0);
+  min = new Date(0);
+  avg = new Date(0);
 
-  private _records: CubeRecord[];
+  private recordsInternal: CubeRecord[] = [];
+
   get records(): CubeRecord[] {
-    return this._records;
+    return this.recordsInternal;
   }
 
   set records(value: CubeRecord[]) {
-    this._records = value;
+    this.recordsInternal = value;
     this.refreshStatsForSelectedCube();
   }
 
-  recordsForSelectedCube: CubeRecord[];
+  recordsForSelectedCube: CubeRecord[] = [];
 
-  _selectedCube: CubeType = 'THREE';
+  selectedCubeInternal: CubeType = 'THREE';
 
   get selectedCube(): CubeType {
-    return this._selectedCube;
+    return this.selectedCubeInternal;
   }
 
   set selectedCube(value: CubeType) {
-    this._selectedCube = value;
+    this.selectedCubeInternal = value;
     this.refreshStatsForSelectedCube();
-    if (this.isThreeByThree()) {
-      this.visible = true;
-    } else {
-      this.visible = false;
-    }
+    this.visible = this.isThreeByThree();
   }
 
   cubeTypes = cubeTypeDescriptions;
 
-  @ViewChild('timer') timer: TimerComponent;
+  @ViewChild('timer') timer: TimerComponent | null = null;
   private firstRun = true;
-  turns: string;
+  turns: string = '';
   visible = true;
 
   constructor(private cubeRecordsService: CubeRecordsService) {
@@ -80,7 +77,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.cube = new RubiksCube(this.canvas.nativeElement, classicMaterials, 100);
+    this.cube = new RubiksCube(this.canvas!.nativeElement, classicMaterials, 100);
     this.refreshStats();
   }
 
@@ -95,7 +92,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   private refreshStatsForSelectedCube(): void {
     this.recordsForSelectedCube = this.records.filter(r => r.cubesType === this.selectedCube);
     this.cubeRecordsLineChart = new CubeRecordsLineChart(this.recordsForSelectedCube, this.cubeRecordsChartType);
-    this.cubeRecordsLineChart.updateChart.subscribe(d => this.cubesRecordsChart.chart.update());
+    this.cubeRecordsLineChart.updateChart.subscribe(d => this.cubesRecordsChart!.chart.update());
     const values = this.recordsForSelectedCube.map(r => r.time * 1_000);
     this.max = (values && values.length > 0) ? new Date(Math.max(...values)) : new Date(0);
     this.min = (values && values.length > 0) ? new Date(Math.min(...values)) : new Date(0);
@@ -105,7 +102,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   @HostListener('window:keyup', ['$event'])
   onKeyUp(event: KeyboardEvent): void {
     if (event.code === 'Space') {
-      if (this.timer.isRunning()) {
+      if (this.timer!.isRunning()) {
         this.stop();
       } else {
         this.start();
@@ -134,7 +131,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
     this.turns = turns.join(' ');
 
     const algorithm = [];
-    const reverseAlgorithm = [];
+    const reverseAlgorithm: ((duration?: number) => Promise<void>)[] = [];
 
     for (const turn of turns) {
       const clockwise = !turn.includes('\'');
@@ -153,7 +150,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
     this.reverseAlgorithm = reverseAlgorithm.reverse();
   }
 
-  private performAlgorithm(algorithm: any[], promise: Promise<void>): Promise<void> {
+  private performAlgorithm(algorithm: any[], promise: Promise<void> | null): Promise<void> | null {
     for (const step of algorithm) {
       if (!promise) {
         promise = step(1);
@@ -168,28 +165,28 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
     if (this.firstRun) {
       this.firstRun = false;
     }
-    this.timer.start();
+    this.timer!.start();
   }
 
   resume(): void {
-    if (!this.timer.isRunning() && !this.firstRun) {
-      this.timer.resume();
+    if (!this.timer!.isRunning() && !this.firstRun) {
+      this.timer!.resume();
     }
   }
 
   stop(): void {
-    this.timer.stop();
+    this.timer!.stop();
   }
 
   save(): void {
-    if (!this.timer.isRunning()) {
+    if (!this.timer!.isRunning()) {
       const cubeRecord = this.createCubeRecordEntity(this.turns);
       this.cubeRecordsService.createService(cubeRecord).subscribe(r => this.refreshStats());
     }
   }
 
   saveWithoutScramble(): void {
-    if (!this.timer.isRunning()) {
+    if (!this.timer!.isRunning()) {
       const cubeRecord = this.createCubeRecordEntity('');
       this.cubeRecordsService.createService(cubeRecord).subscribe(r => this.refreshStats());
     }
@@ -200,71 +197,72 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
     cubeRecord.cubesType = this.selectedCube;
     cubeRecord.recordTime = new Date();
     cubeRecord.scramble = scrambleToSave;
-    cubeRecord.time = this.timer.committedTime / 1000;
+    cubeRecord.time = this.timer!.committedTime / 1000;
     return cubeRecord;
   }
 
   turnToMethod(turn: string, clockwise: boolean): (duration?: number) => Promise<void> {
+    const cube = this.cube!;
     switch (turn.charAt(0)) {
       case 'F':
         return (d) => {
-          return this.cube.F(clockwise, d);
+          return cube.F(clockwise, d);
         };
       case 'B':
         return (d) => {
-          return this.cube.B(!clockwise, d);
+          return cube.B(!clockwise, d);
         };
       case 'U':
         return (d) => {
-          return this.cube.U(clockwise, d);
+          return cube.U(clockwise, d);
         };
       case 'D':
         return (d) => {
-          return this.cube.D(!clockwise, d);
+          return cube.D(!clockwise, d);
         };
       case 'L':
         return (d) => {
-          return this.cube.L(!clockwise, d);
+          return cube.L(!clockwise, d);
         };
       case 'R':
         return (d) => {
-          return this.cube.R(clockwise, d);
+          return cube.R(clockwise, d);
         };
       case 'f':
         return (d) => {
-          return this.cube.f(clockwise, d);
+          return cube.f(clockwise, d);
         };
       case 'b':
         return (d) => {
-          return this.cube.b(!clockwise, d);
+          return cube.b(!clockwise, d);
         };
       case 'u':
         return (d) => {
-          return this.cube.u(clockwise, d);
+          return cube.u(clockwise, d);
         };
       case 'd':
         return (d) => {
-          return this.cube.d(!clockwise, d);
+          return cube.d(!clockwise, d);
         };
       case 'l':
         return (d) => {
-          return this.cube.l(!clockwise, d);
+          return cube.l(!clockwise, d);
         };
       case 'r':
         return (d) => {
-          return this.cube.r(clockwise, d);
+          return cube.r(clockwise, d);
         };
       case 'x':
         return (d) => {
-          return this.cube.x(clockwise, d);
+          return cube.x(clockwise, d);
         };
       case 'y':
         return (d) => {
-          return this.cube.y(clockwise, d);
+          return cube.y(clockwise, d);
         };
       case 'z':
         return (d) => {
-          return this.cube.z(clockwise, d);
+          return cube.z(clockwise, d);
         };
       default:
         return (d) => Promise.resolve();

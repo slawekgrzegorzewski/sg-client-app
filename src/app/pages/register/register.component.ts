@@ -8,8 +8,8 @@ import {ActivatedRoute, Router} from '@angular/router';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
-  message: string = null;
-  qrUrl: string = null;
+  message: string | null = null;
+  qrUrl: string | null = null;
   confirmPass = '';
   confirmNewPass = '';
 
@@ -25,7 +25,7 @@ export class RegisterComponent implements OnInit {
     authcode: '',
     newpass: ''
   };
-  private type: string;
+  private type: string | null = null;
 
   constructor(private loginService: LoginService, private router: Router, private route: ActivatedRoute) {
   }
@@ -61,7 +61,7 @@ export class RegisterComponent implements OnInit {
     }
   }
 
-  private registrationResult(that): (data: any) => void {
+  private registrationResult(that: RegisterComponent): (data: any) => void {
     return data => {
       if (data.status === 200) {
         that.qrUrl = data.body;
@@ -71,12 +71,12 @@ export class RegisterComponent implements OnInit {
     };
   }
 
-  private tokenValidationResult(that): (data: any) => void {
+  private tokenValidationResult(that: RegisterComponent): (data: any) => void {
     return data => {
       if (data.status === 200) {
         that.message = data.body;
         setTimeout(() => {
-          that._router.navigate(['/login']);
+          that.router.navigate(['/login']);
         }, 2000);
       } else {
         that.message = data.body;
@@ -84,7 +84,7 @@ export class RegisterComponent implements OnInit {
     };
   }
 
-  private changePasswordResult(that): (data: any) => void {
+  private changePasswordResult(that: RegisterComponent): (data: any) => void {
     return data => {
       if (data.status === 200) {
         if (that.loginService.isLoggedIn()) {
@@ -92,7 +92,7 @@ export class RegisterComponent implements OnInit {
         }
         that.message = data.body;
         setTimeout(() => {
-          that._router.navigate(['/login']);
+          that.router.navigate(['/login']);
         }, 2000);
       } else {
         that.message = data.body;
@@ -100,7 +100,7 @@ export class RegisterComponent implements OnInit {
     };
   }
 
-  private error(that): (error: any) => void {
+  private error(that: RegisterComponent): (error: any) => void {
     return error => that.message = error.error;
   }
 

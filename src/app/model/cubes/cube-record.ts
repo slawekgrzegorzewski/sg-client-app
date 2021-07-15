@@ -13,7 +13,7 @@ export const cubeTypeDescriptions = new Map(
   ]
 );
 
-type CubeRecordDTO = Omit<Partial<CubeRecord>, 'recordTime'> & { recordTime?: string };
+export type CubeRecordDTO = Omit<Partial<CubeRecord>, 'recordTime'> & { recordTime?: string };
 
 export class CubeRecord {
   public id: number;

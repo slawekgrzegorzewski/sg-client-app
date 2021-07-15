@@ -9,7 +9,7 @@ import {PiggyBanksService} from '../../../services/accountant/piggy-banks.servic
 })
 export class PiggyBanksSmallComponent implements OnInit {
 
-  piggyBanks: PiggyBank[];
+  piggyBanks: PiggyBank[] = [];
 
   constructor(private piggyBanksService: PiggyBanksService
   ) {

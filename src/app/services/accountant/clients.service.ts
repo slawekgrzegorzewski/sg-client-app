@@ -16,7 +16,7 @@ export class ClientsService {
   }
 
   currentDomainClients(): Observable<Client[]> {
-    return this.http.get<Client[]>(this.endpoint).pipe(map((data: []) => (data.map(d => new Client(d)))));
+    return this.http.get<Client[]>(this.endpoint).pipe(map((data: Client[]) => (data.map(d => new Client(d)))));
   }
 
   updateClient(client: Client): Observable<Client> {

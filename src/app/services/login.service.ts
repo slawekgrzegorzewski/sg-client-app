@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
-import {Observable, of, Subject} from 'rxjs';
+import {EMPTY, Observable, Subject} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {Router} from '@angular/router';
 import jwt_decode from 'jwt-decode';
@@ -13,10 +13,10 @@ export const SYR_APP = 'SYR';
 export const CUBES_APP = 'Cubes';
 
 class TokenData {
-  sub: string;
-  roles: string[];
-  defaultDomain: number;
-  exp: Date;
+  sub: string = '';
+  roles: string[] = [];
+  defaultDomain: number = Number.NaN;
+  exp: Date = new Date(0);
 }
 
 @Injectable({
@@ -27,7 +27,7 @@ export class LoginService {
   private readonly loginEndpoint = `${environment.serviceUrl}/login`;
   private readonly registerEndpoint = `${environment.serviceUrl}/register`;
   loginSubject = new Subject<any>();
-  accountantSettings: AccountantSettings;
+  accountantSettings: AccountantSettings | null = null;
 
   constructor(
     private http: HttpClient,
@@ -112,45 +112,58 @@ export class LoginService {
     if (this.getAvailableApps().get(ACCOUNTANT_APP)) {
       return this.accountantSettingsService.getForDomain();
     } else {
-      return of(null);
+      return EMPTY;
     }
   }
 
-  getToken(): string {
+  getToken(): string | null {
     return localStorage.getItem('token');
   }
 
   isAdmin(): boolean {
+    const token = this.getToken();
+    if (token) {
     try {
-      return jwt_decode<TokenData>(this.getToken()).roles.includes('ACCOUNTANT_ADMIN');
+      return jwt_decode<TokenData>(token).roles.includes('ACCOUNTANT_ADMIN');
     } catch (Error) {
       return false;
     }
+    }
+    return false;
   }
 
   getUserId(): number {
-    try {
-      const sub = jwt_decode<TokenData>(this.getToken()).sub;
-      return Number(sub.split(':')[0]);
-    } catch (Error) {
-      return Number.NaN;
+    const token = this.getToken();
+    if (token) {
+      try {
+        const sub = jwt_decode<TokenData>(token).sub;
+        return Number(sub.split(':')[0]);
+      } catch (Error) {
+        return Number.NaN;
+      }
     }
+    return Number.NaN;
   }
 
   getUserName(): string {
-    try {
-      const sub = jwt_decode<TokenData>(this.getToken()).sub;
-      const split = sub.split(':');
-      return sub.replace(split[0] + ':', '');
-    } catch (Error) {
-      return '';
+    const token = this.getToken();
+    if (token) {
+      try {
+        const sub = jwt_decode<TokenData>(token).sub;
+        const split = sub.split(':');
+        return sub.replace(split[0] + ':', '');
+      } catch (Error) {
+        return '';
+      }
     }
+    return '';
   }
 
   getAvailableApps(): Map<string, string> {
     const apps = new Map<string, string>();
-    if (this.getToken()) {
-      const roles = jwt_decode<TokenData>(this.getToken()).roles;
+    const token = this.getToken();
+    if (token) {
+      const roles = jwt_decode<TokenData>(token).roles;
       if (roles.includes('ACCOUNTANT_ADMIN') || roles.includes('ACCOUNTANT_USER')) {
         apps.set(ACCOUNTANT_APP, 'accountant-home');
       }
@@ -168,12 +181,14 @@ export class LoginService {
   }
 
   containsRole(role: string): boolean {
-    return this.getToken() ? jwt_decode<TokenData>(this.getToken()).roles.includes(role) : false;
+    const token = this.getToken();
+    return token ? jwt_decode<TokenData>(token).roles.includes(role) : false;
   }
 
-  public getDefaultDomain(): number {
-    if (this.getToken()) {
-      return jwt_decode<TokenData>(this.getToken()).defaultDomain;
+  public getDefaultDomain(): number | null {
+    const token = this.getToken();
+    if (token) {
+      return jwt_decode<TokenData>(token).defaultDomain;
     }
     return null;
   }
@@ -200,9 +215,10 @@ export class LoginService {
 
   get currentDomainId(): number {
     let item = localStorage.getItem('domain');
+    const defaultDomain = this.getDefaultDomain();
     if (!item) {
-      if (this.getDefaultDomain()) {
-        item = this.getDefaultDomain().toString();
+      if (defaultDomain) {
+        item = defaultDomain.toString();
       }
       if (item) {
         localStorage.setItem('domain', item);

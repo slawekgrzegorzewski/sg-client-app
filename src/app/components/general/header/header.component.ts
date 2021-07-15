@@ -11,20 +11,22 @@ import {DetailedDomain, Domain} from '../../../model/domain';
 })
 export class HeaderComponent implements OnInit {
   isLoggedIn = false;
-  selectedProduct: string;
   availableApps: { app: string, routerLink: string }[] = [];
-  selectedAppInternal: string;
-  invitations: Domain[];
-  availableDomains: DetailedDomain[];
+  invitations: Domain[] = [];
+  availableDomains: DetailedDomain[] = [];
 
-  get selectedApp(): string {
+  selectedAppInternal: string | null = null;
+
+  get selectedApp(): string | null {
     return this.selectedAppInternal;
   }
 
-  set selectedApp(value: string) {
+  set selectedApp(value: string | null) {
     this.selectedAppInternal = value;
     const app = this.availableApps.find(v => v.app === value);
-    this.router.navigate([app.routerLink]);
+    if (app) {
+      this.router.navigate([app.routerLink]);
+    }
   }
 
   constructor(
@@ -50,19 +52,21 @@ export class HeaderComponent implements OnInit {
   private getAvailableApps(): void {
     const apps = this.loginService.getAvailableApps();
     this.availableApps = [];
-    for (const a of apps.keys()) {
-      this.availableApps.push({app: a, routerLink: apps.get(a)});
-    }
+    apps.forEach((value, key) => this.availableApps.push({app: key, routerLink: value}));
     if (this.availableApps && this.availableApps.length > 0) {
       this.selectedApp = this.availableApps[0].app;
     }
   }
 
   toggleMenuBar(): void {
-    if (document.getElementById('collapsibleNavId').style.display === 'block') {
-      document.getElementById('collapsibleNavId').style.display = 'none';
+    const collapsibleNav = document.getElementById('collapsibleNavId');
+    if (!collapsibleNav) {
+      return;
+    }
+    if (collapsibleNav.style.display === 'block') {
+      collapsibleNav.style.display = 'none';
     } else {
-      document.getElementById('collapsibleNavId').style.display = 'block';
+      collapsibleNav.style.display = 'block';
     }
   }
 
@@ -72,23 +76,23 @@ export class HeaderComponent implements OnInit {
   }
 
   isAccountant(): boolean {
-    return this.loginService.isAccountant(this.selectedApp);
+    return this.selectedApp !== null && this.loginService.isAccountant(this.selectedApp);
   }
 
   isChecker(): boolean {
-    return this.loginService.isChecker(this.selectedApp);
+    return this.selectedApp !== null && this.loginService.isChecker(this.selectedApp);
   }
 
   isSYR(): boolean {
-    return this.loginService.isSYR(this.selectedApp);
+    return this.selectedApp !== null && this.loginService.isSYR(this.selectedApp);
   }
 
   isSYRAdmin(): boolean {
-    return this.loginService.isSYRAdmin(this.selectedApp);
+    return this.selectedApp !== null && this.loginService.isSYRAdmin(this.selectedApp);
   }
 
   isCubesApp(): boolean {
-    return this.loginService.isCubesApp(this.selectedApp);
+    return this.selectedApp !== null && this.loginService.isCubesApp(this.selectedApp);
   }
 
   acceptInvitation(domain: Domain): void {

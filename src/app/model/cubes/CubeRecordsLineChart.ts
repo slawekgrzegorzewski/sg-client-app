@@ -12,7 +12,7 @@ export class CubeRecordsLineChart {
   public updateChart = new EventEmitter<any>();
   public lineChartData: ChartDataSets[];
   public lineChartLabels: Label[];
-  public lineChartOptions: (ChartOptions & { annotation: any }) = {
+  public lineChartOptions: (ChartOptions  & { annotation: pluginAnnotations.AnnotationConfig }) = {
     responsive: true,
     maintainAspectRatio: true,
     aspectRatio: screen.width < 600 ? 0.5 : 1.5,

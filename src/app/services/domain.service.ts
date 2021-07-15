@@ -14,11 +14,11 @@ export class DomainService {
   private readonly endpoint = `${environment.serviceUrl}/domains`;
   domainsChangeEvent = new EventEmitter<DetailedDomain[]>();
   invitationChangeEvent = new EventEmitter<Domain[]>();
-  availableDomains: DetailedDomain[];
-  invitations: Domain[];
+  availableDomains: DetailedDomain[] = [];
+  invitations: Domain[] = [];
 
-  get currentDomain(): DetailedDomain {
-    return (this.availableDomains || []).find(d => d.id === (this.loginService.currentDomainId || -1));
+  get currentDomain(): DetailedDomain | null {
+    return (this.availableDomains || []).find(d => d.id === (this.loginService.currentDomainId || -1)) || null;
   }
 
   constructor(
@@ -50,7 +50,7 @@ export class DomainService {
 
   getAllDomains(): Observable<DetailedDomain[]> {
     return this.http.get<DetailedDomain[]>(this.endpoint, {responseType: 'json'})
-      .pipe(map((r: []) => r.map(r1 => new DetailedDomain(r1))));
+      .pipe(map((r: DetailedDomain[]) => r.map(r1 => new DetailedDomain(r1))));
   }
 
   create(name: string): Observable<Domain> {
@@ -86,8 +86,8 @@ export class DomainService {
   }
 
   getInvitations(): Observable<Domain[]> {
-    return this.http.get<Domain[]>(`${this.endpoint}/invitations`, {responseType: 'json'})
-      .pipe(map((data: []) => data.map(d => new Domain(d))));
+    return this.http.get<Partial<Domain>[]>(`${this.endpoint}/invitations`, {responseType: 'json'})
+      .pipe(map((data: Partial<Domain>[]) => data.map(d => new Domain(d))));
   }
 
   removeUserFromDomain(domainId: number, userLogin: string): Observable<DetailedDomain> {

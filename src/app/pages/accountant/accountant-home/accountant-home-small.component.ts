@@ -26,13 +26,13 @@ export class AccountantHomeSmallComponent implements OnInit {
   public readonly CREATE_INCOME = 'CREATE_INCOME';
   public readonly CREATE_EXPENSE = 'CREATE_EXPENSE';
 
-  accounts: Account[];
-  piggyBanks: PiggyBank[];
-  historicalSavings: Map<Date, Map<string, number>>;
-  categories: Category[];
-  billingPeriod: BillingPeriod;
+  accounts: Account[] = [];
+  piggyBanks: PiggyBank[] = [];
+  historicalSavings = new Map<Date, Map<string, number>>();
+  categories: Category[] = [];
+  billingPeriod: BillingPeriod | null = null;
   mode = this.DISPLAY;
-  currentDomainName: string;
+  currentDomainName: string | null = null;
 
   constructor(private domainService: DomainService,
               private accountsService: AccountsService,
@@ -55,7 +55,7 @@ export class AccountantHomeSmallComponent implements OnInit {
     this.fetchPiggyBanks();
     this.fetchHistoricalSavings();
     this.fetchBillingPeriods();
-    this.currentDomainName = this.domainService.currentDomain?.name || '';
+    this.currentDomainName = this.domainService.currentDomain?.name || null;
   }
 
   fetchAccounts(): void {

@@ -16,13 +16,13 @@ import {ComparatorBuilder} from '../../../../utils/comparator-builder';
 })
 export class AccountsHistoryComponent implements OnInit {
 
-  accounts: Account[];
-  selectedAccount: Account;
-  allTransactions: Transaction[];
-  transactionsOfSelectedAccount: Transaction[];
-  currentDomainName: string;
+  accounts: Account[] = [];
+  selectedAccount: Account | null = null;
+  allTransactions: Transaction[] = [];
+  transactionsOfSelectedAccount: Transaction[] = [];
+  currentDomainName: string = '';
 
-  private static areAccountsEqual(a: Account, b: Account): boolean {
+  private static areAccountsEqual(a: Account | null, b: Account | null): boolean {
     if (!a || !b) {
       return false;
     }
@@ -85,7 +85,7 @@ export class AccountsHistoryComponent implements OnInit {
       || AccountsHistoryComponent.areAccountsEqual(t.destination, this.selectedAccount);
   }
 
-  selectAccount(account: Account): void {
+  selectAccount(account: Account | null): void {
     this.selectedAccount = account;
     this.transactionsOfSelectedAccount = this.filterTransactionsForSelectedAccount();
   }

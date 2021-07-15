@@ -9,7 +9,7 @@ import {AccountantHomeComponent} from './pages/accountant/accountant-home/accoun
 import {AccountsHistoryComponent} from './pages/accountant/accounts-history/accounts-history.component';
 import {AccountantHomeSmallComponent} from './pages/accountant/accountant-home/accountant-home-small.component';
 import {BillingSmallComponent} from './pages/accountant/billings/billing-small.component';
-import {PiggyBanksSmallComponent} from './pages/accountant/piggy-banks/piggy-banks-small..component';
+import {PiggyBanksSmallComponent} from './pages/accountant/piggy-banks/piggy-banks-small.component';
 import {ChartsComponent} from './pages/accountant/charts/charts.component';
 import {CheckerHomeComponent} from './pages/checker/checker-home/checker-home.component';
 import {SyrHomeComponent} from './pages/syr/syr-home.component';

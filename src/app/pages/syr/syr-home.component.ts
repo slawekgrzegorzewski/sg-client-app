@@ -15,23 +15,23 @@ import {CountrySyrLineChart, SyrCell} from '../../model/syr/CountrySyrLineChart'
 })
 export class SyrHomeComponent implements OnInit {
 
-  private countryInternal: Country;
+  private countryInternal: Country | null = null;
 
-  get country(): Country {
+  get country(): Country | null {
     return this.countryInternal;
   }
 
-  set country(value: Country) {
+  set country(value: Country | null ) {
     this.countryInternal = value;
     this.refreshView();
   }
 
-  reports: (CountrySYR | SecretCountriesSYR)[];
+  reports: (CountrySYR | SecretCountriesSYR)[] = [];
 
   selectedCountryData: Map<number, SyrCell[]> = new Map<number, SyrCell[]>();
   availableCountries: Country[] = [];
 
-  countrySyrLineChart: CountrySyrLineChart;
+  countrySyrLineChart: CountrySyrLineChart | null = null;
 
   constructor(private syrService: SyrService, private router: Router) {
   }
@@ -66,22 +66,6 @@ export class SyrHomeComponent implements OnInit {
       data.set(this.country.names[0], this.selectedCountryData);
       this.countrySyrLineChart = new CountrySyrLineChart(data);
     }
-  }
-
-  countriesForTypeAhead(): () => Observable<Country[]> {
-    const that = this;
-    return () => of(that.availableCountries);
-  }
-
-  countryIdExtractor(country: Country): number {
-    if (!country) {
-      return null;
-    }
-    return country.id;
-  }
-
-  countryToString(country: Country): string {
-    return country.names.join(', ');
   }
 
   getSyrCells(r: CountrySYR): SyrCell[] {

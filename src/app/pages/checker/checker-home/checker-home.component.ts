@@ -9,9 +9,8 @@ import {PageVersion} from '../../../model/checker/page-version';
 })
 export class CheckerHomeComponent implements OnInit {
 
-  versions: PageVersion[];
-  selectedVersion: PageVersion;
-
+  versions: PageVersion[] = [];
+  selectedVersion: PageVersion | null = null;
 
   constructor(private pageVersionsService: PageVersionsService) {
   }

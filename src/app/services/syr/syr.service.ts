@@ -30,7 +30,10 @@ export class SyrService {
 
   public getAll(): Observable<(CountrySYR | SecretCountriesSYR) []> {
     return this.http.get<(CountrySYR | SecretCountriesSYR) []>(this.endpoint, {responseType: 'json'})
-      .pipe(map((r: []) => r.map(r1 => CountrySYR.isInstanceOf(r1) ? new CountrySYR(r1) : new SecretCountriesSYR(r1))));
+      .pipe(
+        map((r: (CountrySYR | SecretCountriesSYR)[]) => r.map(r1 => CountrySYR.isInstanceOf(r1)
+          ? new CountrySYR(r1)
+          : new SecretCountriesSYR(r1))));
   }
 
 }

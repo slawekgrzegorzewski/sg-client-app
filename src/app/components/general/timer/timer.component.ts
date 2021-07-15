@@ -10,7 +10,7 @@ export class TimerComponent {
 
   interval = 99;
   timeoutId = 0;
-  startTime: Date;
+  startTime: Date = new Date();
 
   committedTime = 0;
   currentTime = 0;
@@ -20,6 +20,7 @@ export class TimerComponent {
   hours = 0;
 
   constructor() {
+    this.clear();
   }
 
   start(): void {

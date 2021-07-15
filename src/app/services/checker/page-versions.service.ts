@@ -3,7 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {PageVersion} from '../../model/checker/page-version';
+import {PageVersion, PageVersionDTO} from '../../model/checker/page-version';
 import {SettingsService} from '../accountant/settings.service';
 
 @Injectable({
@@ -19,7 +19,8 @@ export class PageVersionsService {
   }
 
   public getAllPageVersions(): Observable<PageVersion[]> {
-    return this.http.get<PageVersion[]>(this.endpoint).pipe(map((data: []) => data.map(d => new PageVersion(d))));
+    return this.http.get<PageVersionDTO[]>(this.endpoint)
+      .pipe(map((data: PageVersionDTO[]) => data.map(d => new PageVersion(d))));
   }
 
 }

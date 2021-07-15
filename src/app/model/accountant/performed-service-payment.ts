@@ -1,7 +1,7 @@
 import {ClientPayment, ClientPaymentDTO} from './client-payment';
 import {PerformedService, PerformedServiceDTO} from './performed-service';
 
-type PerformedServicePaymentDTO = Omit<Partial<PerformedServicePayment>, 'performedService' | 'clientPayment' | 'date'>
+export type PerformedServicePaymentDTO = Omit<Partial<PerformedServicePayment>, 'performedService' | 'clientPayment' | 'date'>
   & {
   performedService?: Partial<PerformedServiceDTO>,
   clientPayment?: Partial<ClientPaymentDTO>,

@@ -177,9 +177,9 @@ export class ComparatorBuilder<T> {
       res = 1 * extractor.order;
     } else if (!v2 && this.nullMode === NullMode.LOWEST && !!v1) {
       res = -1 * extractor.order;
-    } else if (v1 > v2) {
+    } else if (v1! > v2!) {
       res = 1 * extractor.order;
-    } else if (v2 > v1) {
+    } else if (v2! > v1!) {
       res = -1 * extractor.order;
     } else if (v1 === v2 && ((depth + 1) < extractors.length)) {
       res = this.compare(t1, t2, extractors, depth + 1);

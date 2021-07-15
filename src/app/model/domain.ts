@@ -14,7 +14,7 @@ export class Domain {
 export class DetailedDomain {
   public id: number;
   public name: string;
-  public usersAccessLevel: Map<string, string>;
+  public usersAccessLevel = new Map<string, string>();
 
   constructor(data?: any) {
     this.id = data && data.id;

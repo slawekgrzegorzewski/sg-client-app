@@ -30,20 +30,20 @@ import {Button} from '../../components/general/hoverable-buttons.component';
 export class SettingsComponent implements OnInit {
 
   private isLoggedIn = false;
-  accountsInCurrentDomain: Account[];
-  otherDomainsAccounts: Map<string, Account[]>;
+  accountsInCurrentDomain: Account[] = [];
+  otherDomainsAccounts = new Map<string, Account[]>();
   isEditAccount = false;
-  accountToEdit: Account;
-  accountToDelete: null;
+  accountToEdit: Account | null = null;
+  accountToDelete: Account | null = null;
   showAccountDeletionConfirmation = false;
-  accountBeingDeletedDescription: string;
-  currentDomainName: string;
-  piggyBanks: PiggyBank[];
-  allCurrencies: Currency[];
-  categories: Category[];
-  clients: Client[];
-  services: Service[];
-  userDomains: DetailedDomain[];
+  accountBeingDeletedDescription = '';
+  currentDomainName = '';
+  piggyBanks: PiggyBank[] = [];
+  allCurrencies: Currency[] = [];
+  categories: Category[] = [];
+  clients: Client[] = [];
+  services: Service[] = [];
+  userDomains: DetailedDomain[] = [];
   buttons = [
     new Button({name: 'usuń', action: this.deleteAccount(this)}),
     new Button({name: 'zmień nazwę', action: this.rename(this)}),
@@ -115,9 +115,9 @@ export class SettingsComponent implements OnInit {
           new Map<string, Account[]>()
         );
         for (const domainName of this.otherDomainsAccounts.keys()) {
-          this.otherDomainsAccounts[domainName] = (this.otherDomainsAccounts[domainName] || []).sort(
-            ComparatorBuilder.comparing<Account>(a => a.currency).thenComparing(a => a.name).build()
-          );
+          const domains = (this.otherDomainsAccounts.get(domainName) || [])
+            .sort(ComparatorBuilder.comparing<Account>(a => a.currency).thenComparing(a => a.name).build());
+          this.otherDomainsAccounts.set(domainName, domains);
         }
       },
       err => {
@@ -164,13 +164,13 @@ export class SettingsComponent implements OnInit {
     );
   }
 
-  rename(that): (a: Account) => void {
+  rename(that: SettingsComponent): (a: Account) => void {
     return (a: Account) => {
       that.editAccount(a);
     };
   }
 
-  showAccount(that): (a: Account) => void {
+  showAccount(that: SettingsComponent): (a: Account) => void {
     return (a: Account) => {
       a.visible = true;
       this.accountsService.update(a).subscribe(a => {
@@ -178,7 +178,7 @@ export class SettingsComponent implements OnInit {
     };
   }
 
-  hideAccount(that): (a: Account) => void {
+  hideAccount(that: SettingsComponent): (a: Account) => void {
     return (a: Account) => {
       a.visible = false;
       this.accountsService.update(a).subscribe(a => {
@@ -196,7 +196,7 @@ export class SettingsComponent implements OnInit {
     this.isEditAccount = true;
   }
 
-  deleteAccount(that): (account: Account) => void {
+  deleteAccount(that: SettingsComponent): (account: Account) => void {
     return (account: Account) => {
       that.accountToDelete = account;
       that.accountBeingDeletedDescription = account.name;
@@ -214,7 +214,9 @@ export class SettingsComponent implements OnInit {
   }
 
   deleteAccountMethod(): void {
-    this.callAccountsService(this.accountsService.delete(this.accountToDelete));
+    if (this.accountToDelete) {
+      this.callAccountsService(this.accountsService.delete(this.accountToDelete));
+    }
   }
 
   private callAccountsService(result: Observable<any>): void {
@@ -307,7 +309,7 @@ export class SettingsComponent implements OnInit {
   }
 
   changeDomainUserAccess(data: { domain: DetailedDomain; user: string }): void {
-    let newDomain: Observable<DetailedDomain> = null;
+    let newDomain: Observable<DetailedDomain>;
     if (data.domain.usersAccessLevel.get(data.user) === 'ADMIN') {
       newDomain = this.domainsService.makeUserMember(data.domain.id, data.user);
     } else {

@@ -3,7 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {PerformedService} from '../../model/accountant/performed-service';
+import {PerformedService, PerformedServiceDTO} from '../../model/accountant/performed-service';
 import {DatePipe} from '@angular/common';
 
 @Injectable({
@@ -18,8 +18,8 @@ export class PerformedServicesService {
 
   currentDomainServices(date: Date): Observable<PerformedService[]> {
     const dateString = this.datePipe.transform(date, 'yyyy-MM');
-    return this.http.get<PerformedService[]>(`${this.endpoint}/${dateString}`)
-      .pipe(map((data: []) => (data.map(d => new PerformedService(d)))));
+    return this.http.get<PerformedServiceDTO[]>(`${this.endpoint}/${dateString}`)
+      .pipe(map((data: PerformedServiceDTO[]) => (data.map(d => new PerformedService(d)))));
   }
 
   updateService(service: PerformedService): Observable<PerformedService> {

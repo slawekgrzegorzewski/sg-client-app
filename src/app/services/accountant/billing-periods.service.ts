@@ -113,7 +113,7 @@ export class BillingPeriodsService {
         Object.entries(d).forEach(dateToPiggyBanks => {
           const date = new Date(dateToPiggyBanks[0]);
           const piggyBanksForDate = resultUnsorted.get(date) || [];
-          dateToPiggyBanks[1].forEach(pg => {
+          dateToPiggyBanks[1].forEach((pg: PiggyBank) => {
             const piggyBank = new PiggyBank(this.currencyPipe, pg);
             this.updatePerIdMap(piggyBanksPerId, piggyBank);
             piggyBanksForDate.push(piggyBank);

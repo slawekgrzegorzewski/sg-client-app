@@ -10,7 +10,7 @@ export class HolidayCurrencies {
     if (!data) {
       data = {};
     }
-    this.id = data && data.id;
+    this.id = data && data.id || 0;
     this.euroConversionRate = data && data.euroConversionRate || 0;
     this.kunaConversionRate = data && data.kunaConversionRate || 0;
     this.domain = data && new Domain(data.domain);

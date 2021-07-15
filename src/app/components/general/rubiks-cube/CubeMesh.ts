@@ -7,8 +7,6 @@ type CubeMeshProps = {
 
 export default class CubeMesh extends Mesh {
 
-  position: { x: number, y: number, z: number };
-
   constructor({position, materials}: CubeMeshProps) {
     super(new BoxGeometry(1, 1, 1), materials);
     this.position.x = position.x;

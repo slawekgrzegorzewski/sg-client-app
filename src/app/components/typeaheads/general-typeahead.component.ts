@@ -32,9 +32,7 @@ export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit
       return;
     }
     this.internalValue = value;
-    if (this.propagateChange) {
-      this.propagateChange(value);
-    }
+    this.propagateChange(value);
   }
 
   get readonlyValue(): string {
@@ -60,8 +58,10 @@ export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit
   @ViewChild('tTypeAhead', {static: true}) tTypeAhead: NgbTypeahead | null = null;
   focus = new Subject<string>();
   click = new Subject<string>();
-  propagateChange: ((t: T | null) => void) | null = null;
-  propagateTouch: ((t: T | null) => void) | null = null;
+  propagateChange: ((t: T | null) => void) = (t: T | null) => {
+  };
+  propagateTouch: ((t: T | null) => void) = (t: T | null) => {
+  };
 
   search: OperatorFunction<string, readonly T[]> = (text: Observable<string>) => {
     const debouncedText: Observable<string> = text.pipe(

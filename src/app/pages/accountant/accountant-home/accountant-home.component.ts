@@ -24,7 +24,7 @@ import {ClientsService} from '../../../services/accountant/clients.service';
 import {switchMap} from 'rxjs/operators';
 import {ClientPayment} from '../../../model/accountant/client-payment';
 import {ClientPaymentsService} from '../../../services/accountant/client-payments.service';
-import {forkJoin} from 'rxjs';
+import {EMPTY, forkJoin, Observable} from 'rxjs';
 import {PerformedServicePaymentsService} from '../../../services/accountant/performed-service-payments.service';
 import {PerformedServicePayment, PerformedServicePaymentShort} from '../../../model/accountant/performed-service-payment';
 import {ComparatorBuilder} from '../../../../utils/comparator-builder';
@@ -182,7 +182,9 @@ export class AccountantHomeComponent implements OnInit {
   createPerformedService(performedService: PerformedService): void {
     this.performedServicesService.createService(performedService)
       .pipe(
-        switchMap(value => this.performedServicesService.currentDomainServices(this.currentComapnyDate))
+        switchMap(value => this.currentComapnyDate
+          ? this.performedServicesService.currentDomainServices(this.currentComapnyDate)
+          : EMPTY)
       )
       .subscribe(data => this.performedServices = data);
   }
@@ -190,7 +192,9 @@ export class AccountantHomeComponent implements OnInit {
   updatePerformedService(performedService: PerformedService): void {
     this.performedServicesService.updateService(performedService)
       .pipe(
-        switchMap(value => this.performedServicesService.currentDomainServices(this.currentComapnyDate))
+        switchMap(value => this.currentComapnyDate
+          ? this.performedServicesService.currentDomainServices(this.currentComapnyDate)
+          : EMPTY)
       )
       .subscribe(data => this.performedServices = data);
   }
@@ -198,24 +202,32 @@ export class AccountantHomeComponent implements OnInit {
   createClientPayment(clientPayment: ClientPayment): void {
     this.clientPaymentsService.createClientPayment(clientPayment)
       .pipe(
-        switchMap(value => this.clientPaymentsService.currentDomainClientPayments(this.currentComapnyDate))
+        switchMap(value => this.currentComapnyDate
+          ? this.clientPaymentsService.currentDomainClientPayments(this.currentComapnyDate)
+          : EMPTY)
       )
-      .subscribe(data => this.clientPayments = this.filterClientPaymentByDate(data, this.currentComapnyDate));
+      .subscribe(data => this.clientPayments = this.currentComapnyDate
+        ? this.filterClientPaymentByDate(data, this.currentComapnyDate)
+        : data);
   }
 
   updateClientPayment(clientPayment: ClientPayment): void {
     this.clientPaymentsService.updateClientPayment(clientPayment)
       .pipe(
-        switchMap(value => this.clientPaymentsService.currentDomainClientPayments(this.currentComapnyDate))
+        switchMap(value => this.currentComapnyDate
+          ? this.clientPaymentsService.currentDomainClientPayments(this.currentComapnyDate)
+          : EMPTY)
       )
-      .subscribe(data => this.clientPayments = this.filterClientPaymentByDate(data, this.currentComapnyDate));
+      .subscribe(data => this.clientPayments = this.currentComapnyDate
+        ? this.filterClientPaymentByDate(data, this.currentComapnyDate)
+        : data);
   }
 
   createPerformedServicePayment(performedServicePayment: PerformedServicePayment): void {
     this.performedServicePaymentsService.createPerformedServicePayments(new PerformedServicePaymentShort(performedServicePayment))
       .subscribe(
-        data => this.fetchCompanyData(this.currentComapnyDate),
-        error => this.fetchCompanyData(this.currentComapnyDate)
+        data => this.currentComapnyDate ? this.fetchCompanyData(this.currentComapnyDate) : EMPTY,
+        error => this.currentComapnyDate ? this.fetchCompanyData(this.currentComapnyDate) : EMPTY
       );
   }
 }

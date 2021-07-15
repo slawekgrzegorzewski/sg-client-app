@@ -12,9 +12,9 @@ import {Observable, of} from 'rxjs';
 })
 export class SyrAdminComponent implements OnInit {
 
-  countriesToMatch: { name: string; country: number }[];
-  allCountries: Country[];
-  fileToImport: File;
+  countriesToMatch: { name: string; country: number }[] = [];
+  allCountries: Country[] = [];
+  fileToImport: File | null = null;
 
   constructor(private syrService: SyrService, private router: Router) {
   }
@@ -22,11 +22,13 @@ export class SyrAdminComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  fileChange(event): void {
-    const fileList: FileList = event.target.files;
-    if (fileList.length > 0) {
-      this.fileToImport = fileList[0];
-      this.import([]);
+  fileChange(event: Event): void {
+    if (event.target) {
+      const fileList = (event.target as HTMLInputElement).files;
+      if (fileList && fileList.length > 0) {
+        this.fileToImport = fileList[0];
+        this.import([]);
+      }
     }
   }
 
@@ -40,11 +42,14 @@ export class SyrAdminComponent implements OnInit {
   }
 
   private import(newCountriesMatch: { name: string; country: number }[]): void {
+    if (!this.fileToImport) {
+      return;
+    }
     this.syrService.import(this.fileToImport, newCountriesMatch).subscribe(
       result => {
         if (result.notMatchedCountries) {
           this.countriesToMatch = [];
-          result.notMatchedCountries.forEach(c => this.countriesToMatch.push({name: c, country: null}));
+          result.notMatchedCountries.forEach(c => this.countriesToMatch.push({name: c, country: -1}));
           this.allCountries = result.knownCountries;
         } else {
           this.countriesToMatch = [];

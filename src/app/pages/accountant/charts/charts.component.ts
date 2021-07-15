@@ -12,15 +12,15 @@ import {BaseChartDirective} from 'ng2-charts';
   styleUrls: ['./charts.component.css']
 })
 export class ChartsComponent implements OnInit {
-  private savingsData: Map<Date, Map<string, number>>;
-  private piggyBanksData: Map<Date, PiggyBank[]>;
-  savingsLineChart: SavingsLineChart;
-  piggyBanksLineChart: PiggyBanksLineChart;
+  private savingsData = new Map<Date, Map<string, number>>();
+  private piggyBanksData = new Map<Date, PiggyBank[]>();
+  savingsLineChart: SavingsLineChart | null = null;
+  piggyBanksLineChart: PiggyBanksLineChart | null = null;
 
   @ViewChild('savingsChart')
-  public savingsChart: BaseChartDirective;
+  public savingsChart: BaseChartDirective | null = null;
   @ViewChild('piggyBanksChart')
-  public piggyBanksChart: BaseChartDirective;
+  public piggyBanksChart: BaseChartDirective | null = null;
 
   constructor(private billingPeriodsService: BillingPeriodsService,
               private datePipe: DatePipe) {
@@ -37,22 +37,35 @@ export class ChartsComponent implements OnInit {
       data => {
         this.piggyBanksData = data;
         this.piggyBanksLineChart = new PiggyBanksLineChart(data, this.datePipe);
-        this.piggyBanksLineChart.updateChart.subscribe(d => this.piggyBanksChart.chart.update());
-      }
-    );
+        this.piggyBanksLineChart.updateChart.subscribe(d => {
+          if (this.piggyBanksChart) {
+            this.piggyBanksChart.chart.update();
+          }
+        });
+      });
   }
 
   hideAllPiggyBanksDataSets(): void {
-    this.piggyBanksChart.chart.data.datasets.forEach(value => {
+    if (!this.isPiggyBankChartSet()) {
+      return;
+    }
+    this.piggyBanksChart!.chart!.data!.datasets!.forEach(value => {
       value.hidden = true;
     });
-    this.piggyBanksChart.chart.update();
+    this.piggyBanksChart!.chart!.update();
   }
 
   showAllPiggyBanksDataSets(): void {
-    this.piggyBanksChart.chart.data.datasets.forEach(value => {
+    if (!this.isPiggyBankChartSet()) {
+      return;
+    }
+    this.piggyBanksChart!.chart!.data!.datasets!.forEach(value => {
       value.hidden = false;
     });
-    this.piggyBanksChart.chart.update();
+    this.piggyBanksChart!.chart.update();
+  }
+
+  private isPiggyBankChartSet() {
+    return this.piggyBanksChart && this.piggyBanksChart.chart && this.piggyBanksChart.chart.data && this.piggyBanksChart.chart.data.datasets;
   }
 }

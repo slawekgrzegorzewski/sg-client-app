@@ -3,7 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {CubeRecord} from '../../model/cubes/cube-record';
+import {CubeRecord, CubeRecordDTO} from '../../model/cubes/cube-record';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +16,8 @@ export class CubeRecordsService {
   }
 
   currentDomainRecords(): Observable<CubeRecord[]> {
-    return this.http.get<CubeRecord[]>(this.endpoint).pipe(map((data: []) => (data.map(d => new CubeRecord(d)))));
+    return this.http.get<CubeRecordDTO[]>(this.endpoint)
+      .pipe(map((data: CubeRecordDTO[]) => (data.map(d => new CubeRecord(d)))));
   }
 
   createService(cubeRecord: CubeRecord): Observable<CubeRecord> {

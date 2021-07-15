@@ -24,7 +24,7 @@ export class CountrySyrLineChart {
 
   public lineChartData: ChartDataSets[];
   public lineChartLabels: Label[];
-  public lineChartOptions: (ChartOptions & { annotation: any }) = {
+  public lineChartOptions: (ChartOptions & { annotation: pluginAnnotations.AnnotationConfig }) = {
     responsive: true,
     maintainAspectRatio: true,
     scales: {

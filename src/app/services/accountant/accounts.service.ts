@@ -25,7 +25,7 @@ export class AccountsService {
   private fetchCurrencies(): Observable<Currency[]> {
     return this.http.get<Currency[]>(`${this.currenciesEndpoint}/${this.settingsService.getUsersLocale()}`)
       .pipe(
-        map((data: []) => data.map(d => Currency.fromData(d))),
+        map((data: Currency[]) => data.map(d => Currency.fromData(d))),
         map((data: Currency[]) => {
           this.currencies = data;
           return data;
@@ -35,11 +35,11 @@ export class AccountsService {
 
 
   allAccounts(): Observable<Account[]> {
-    return this.http.get<Account[]>(this.accountEndpoint).pipe(map((data: []) => data.map(d => new Account(d))));
+    return this.http.get<Account[]>(this.accountEndpoint).pipe(map((data: Account[]) => data.map(d => new Account(d))));
   }
 
   currentDomainAccounts(): Observable<Account[]> {
-    return this.http.get<Account[]>(`${this.accountEndpoint}/mine`).pipe(map((data: []) => data.map(d => new Account(d))));
+    return this.http.get<Account[]>(`${this.accountEndpoint}/mine`).pipe(map((data: Account[]) => data.map(d => new Account(d))));
   }
 
   delete(a: Account): Observable<string> {

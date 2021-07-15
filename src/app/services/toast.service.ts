@@ -11,8 +11,4 @@ export class ToastService {
   showWarning(textOrTpl: string | TemplateRef<any>, header?: string): void {
     this.toasts.push({textOrTpl: textOrTpl, header: header, classname: 'bg-danger text-light', delay: 15000});
   }
-
-  remove(toast): void {
-    this.toasts = this.toasts.filter(t => t !== toast);
-  }
 }

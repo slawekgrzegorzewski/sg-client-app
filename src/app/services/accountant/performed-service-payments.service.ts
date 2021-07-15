@@ -4,7 +4,11 @@ import {environment} from '../../../environments/environment';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {PerformedService} from '../../model/accountant/performed-service';
-import {PerformedServicePayment, PerformedServicePaymentShort} from '../../model/accountant/performed-service-payment';
+import {
+  PerformedServicePayment,
+  PerformedServicePaymentDTO,
+  PerformedServicePaymentShort
+} from '../../model/accountant/performed-service-payment';
 import {DatePipe} from '@angular/common';
 
 @Injectable({
@@ -19,8 +23,8 @@ export class PerformedServicePaymentsService {
 
   currentDomainPerformedServicePayments(date: Date): Observable<PerformedServicePayment[]> {
     const dateString = this.datePipe.transform(date, 'yyyy-MM');
-    return this.http.get<PerformedService[]>(`${this.endpoint}/${dateString}`)
-      .pipe(map((data: []) => (data.map(d => new PerformedServicePayment(d)))));
+    return this.http.get<PerformedServicePaymentDTO[]>(`${this.endpoint}/${dateString}`)
+      .pipe(map((data: PerformedServicePaymentDTO[]) => (data.map(d => new PerformedServicePayment(d)))));
   }
 
   updatePerformedServicePayments(payment: PerformedServicePaymentShort): Observable<PerformedServicePayment> {

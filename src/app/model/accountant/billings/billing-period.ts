@@ -7,14 +7,14 @@ export type BillingPeriodInfoDTO = Omit<Partial<BillingPeriodInfo>, 'result' | '
 }
 
 export class BillingPeriodInfo {
-  public result: BillingPeriod;
+  public result: BillingPeriod | null = null;
   public unfinishedBillingPeriods: BillingPeriod[];
 
   constructor(data?: Partial<BillingPeriodInfoDTO>) {
     if (!data) {
       data = {};
     }
-    this.result = new BillingPeriod(data.result);
+    this.result = data.result ? new BillingPeriod(data.result) : null;
     this.unfinishedBillingPeriods = data.unfinishedBillingPeriods && data.unfinishedBillingPeriods.map(up => new BillingPeriod(up)) || [];
   }
 }

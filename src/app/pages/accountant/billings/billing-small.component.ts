@@ -18,10 +18,10 @@ import {ComparatorBuilder} from '../../../../utils/comparator-builder';
 })
 export class BillingSmallComponent implements OnInit {
 
-  accounts: Account[];
-  piggyBanks: PiggyBank[];
-  categories: Category[];
-  billingPeriodInfo: BillingPeriodInfo;
+  accounts: Account[] = [];
+  piggyBanks: PiggyBank[] = [];
+  categories: Category[] = [];
+  billingPeriodInfo: BillingPeriodInfo | null = null;
 
   constructor(private accountsService: AccountsService,
               private piggyBanksService: PiggyBanksService,

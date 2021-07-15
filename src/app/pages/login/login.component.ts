@@ -13,7 +13,7 @@ export class LoginComponent implements OnInit {
     upass: '',
     authcode: null
   };
-  message: string = null;
+  message: string | null = null;
 
   constructor(private loginService: LoginService) {
   }

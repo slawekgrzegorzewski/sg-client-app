@@ -18,7 +18,7 @@ export class PiggyBanksService {
 
   currentDomainPiggyBanks(): Observable<PiggyBank[]> {
     return this.http.get<PiggyBank[]>(this.endpoint)
-      .pipe(map((data: []) => data.map(d => new PiggyBank(this.currencyPipe, d))));
+      .pipe(map((data: PiggyBank[]) => data.map(d => new PiggyBank(this.currencyPipe, d))));
   }
 
   create(piggyBank: PiggyBank): Observable<number> {
