@@ -24,7 +24,7 @@ import {ClientsService} from '../../../services/accountant/clients.service';
 import {switchMap} from 'rxjs/operators';
 import {ClientPayment} from '../../../model/accountant/client-payment';
 import {ClientPaymentsService} from '../../../services/accountant/client-payments.service';
-import {EMPTY, forkJoin, Observable} from 'rxjs';
+import {EMPTY, forkJoin} from 'rxjs';
 import {PerformedServicePaymentsService} from '../../../services/accountant/performed-service-payments.service';
 import {PerformedServicePayment, PerformedServicePaymentShort} from '../../../model/accountant/performed-service-payment';
 import {ComparatorBuilder} from '../../../../utils/comparator-builder';
