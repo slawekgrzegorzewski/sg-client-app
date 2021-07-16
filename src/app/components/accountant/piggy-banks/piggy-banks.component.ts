@@ -57,6 +57,16 @@ export class PiggyBanksComponent implements OnInit {
     this.monthlyTopUpEnabled = (this.editElementInternal?.monthlyTopUp || 0) > 0;
   }
 
+  get editElementCurrency(): Currency | null {
+    return this.allCurrencies.find(currency => currency.code === this.editElementInternal?.currency || '') || null;
+  }
+
+  set editElementCurrency(value: Currency | null) {
+    if(this.editElementInternal) {
+      this.editElementInternal.currency = value?.code || '';
+    }
+  }
+
   private monthlyTopUpEnabledInternal: boolean = false;
 
   get monthlyTopUpEnabled(): boolean {
