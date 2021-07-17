@@ -1,5 +1,6 @@
-import {BrowserModule} from '@angular/platform-browser';
-import {LOCALE_ID, NgModule} from '@angular/core';
+import * as Hammer from 'hammerjs';
+import {BrowserModule, HAMMER_GESTURE_CONFIG, HammerGestureConfig, HammerModule} from '@angular/platform-browser';
+import {Injectable, LOCALE_ID, NgModule} from '@angular/core';
 
 import {AppComponent} from './app.component';
 import {HeaderComponent} from './components/general/header/header.component';
@@ -75,6 +76,14 @@ import {CubesHomeComponent} from './pages/cubes/home/cubes-home.component';
 import {CubeRecordsService} from './services/accountant/cube-records.service';
 import {HolidayCurrenciesService} from './services/accountant/holiday-currencies.service';
 import {HolidayCurrenciesComponent} from './components/accountant/holiday-currencies/holiday-currencies.component';
+import {CompanyLogDayByDayComponent} from './components/accountant/company-log/company-log-day-by-day.component';
+
+@Injectable()
+export class MyHammerConfig extends HammerGestureConfig {
+  overrides = <any> {
+    swipe: {direction: Hammer.DIRECTION_ALL},
+  };
+}
 
 @NgModule({
   declarations: [
@@ -123,7 +132,8 @@ import {HolidayCurrenciesComponent} from './components/accountant/holiday-curren
     CompanyLogComponent,
     TimerComponent,
     CubesHomeComponent,
-    HolidayCurrenciesComponent
+    HolidayCurrenciesComponent,
+    CompanyLogDayByDayComponent
   ],
   imports: [
     BrowserModule,
@@ -132,7 +142,8 @@ import {HolidayCurrenciesComponent} from './components/accountant/holiday-curren
     HttpClientModule,
     ReactiveFormsModule,
     NgbModule,
-    ChartsModule
+    ChartsModule,
+    HammerModule
   ],
   providers: [
     LoginService,
@@ -162,7 +173,11 @@ import {HolidayCurrenciesComponent} from './components/accountant/holiday-curren
     PerformedServicesService,
     ClientPaymentsService,
     PerformedServicePaymentsService,
-    CubeRecordsService
+    CubeRecordsService,
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig,
+    }
   ],
   bootstrap: [AppComponent]
 })

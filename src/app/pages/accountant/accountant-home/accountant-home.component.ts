@@ -21,13 +21,13 @@ import {ServicesService} from '../../../services/accountant/services.service';
 import {Currency} from '../../../model/accountant/currency';
 import {Client} from '../../../model/accountant/client';
 import {ClientsService} from '../../../services/accountant/clients.service';
-import {switchMap} from 'rxjs/operators';
 import {ClientPayment} from '../../../model/accountant/client-payment';
 import {ClientPaymentsService} from '../../../services/accountant/client-payments.service';
-import {EMPTY, forkJoin} from 'rxjs';
 import {PerformedServicePaymentsService} from '../../../services/accountant/performed-service-payments.service';
-import {PerformedServicePayment, PerformedServicePaymentShort} from '../../../model/accountant/performed-service-payment';
-import {ComparatorBuilder} from '../../../../utils/comparator-builder';
+import {PerformedServicePayment} from '../../../model/accountant/performed-service-payment';
+import {CompanyLogHelper} from './company-log-helper';
+import {BillingPeriodsHelper} from './billing-periods-helper';
+import {forkJoin} from 'rxjs';
 
 @Component({
   selector: 'app-accounts-home',
@@ -49,7 +49,10 @@ export class AccountantHomeComponent implements OnInit {
   billingPeriodInfo: BillingPeriodInfo | null = null;
   historicalSavings: Map<Date, Map<string, number>> = new Map();
   currentDomainName: string | null = null;
-  private currentComapnyDate: Date | null = null;
+  private currentCompanyDate: Date | null = null;
+
+  private billingPeriodsHelper: BillingPeriodsHelper;
+  private companyLogHelper: CompanyLogHelper;
 
   constructor(private accountsService: AccountsService,
               private transactionsService: TransactionsService,
@@ -65,6 +68,8 @@ export class AccountantHomeComponent implements OnInit {
               private servicesService: ServicesService,
               private clientsService: ClientsService,
               private router: Router) {
+    this.billingPeriodsHelper = new BillingPeriodsHelper(accountsService, categoriesService, piggyBanksService, billingsService);
+    this.companyLogHelper = new CompanyLogHelper(performedServicePaymentsService, performedServicesService, clientPaymentsService, servicesService, clientsService);
   }
 
   ngOnInit(): void {
@@ -76,74 +81,24 @@ export class AccountantHomeComponent implements OnInit {
   }
 
   refreshData(): void {
-    this.fetchAccounts();
-    this.fetchCurrencies();
-    this.fetchPiggyBanks();
-    this.fetchHistoricalSavings();
+    forkJoin([
+      this.billingPeriodsHelper.fetchData(),
+      this.accountsService.possibleCurrencies()
+    ]).subscribe(([[accounts, piggyBanks, historicalSavings, billingPeriodInfo], currencies]) => {
+      this.accounts = accounts;
+      this.piggyBanks = piggyBanks;
+      this.historicalSavings = historicalSavings;
+      this.allCurrencies = currencies;
+    });
     this.currentDomainName = this.domainService.currentDomain?.name || '';
   }
 
-  fetchAccounts(): void {
-    this.accountsService.currentDomainAccounts().subscribe(
-      data => this.accounts = data
-        .filter(a => a.visible)
-        .sort(
-          ComparatorBuilder.comparing<Account>(a => a.currency).thenComparing(a => a.name).build()
-        ),
-      error => this.accounts = []
-    );
-  }
-
-  private fetchCurrencies(): void {
-    this.accountsService.possibleCurrencies().subscribe(
-      data => this.allCurrencies = data
-    );
-  }
 
   fetchBillingPeriod(date: Date): void {
-    this.billingsService.billingPeriodFor(date).subscribe(
+    this.billingPeriodsHelper.fetchBillingPeriod(date).subscribe(
       data => this.billingPeriodInfo = data,
       error => this.billingPeriodInfo = null
     );
-  }
-
-  private fetchPiggyBanks(): void {
-    this.piggyBanksService.currentDomainPiggyBanks().subscribe(data => {
-      this.piggyBanks = data.sort((a, b) => a.name.localeCompare(b.name));
-    });
-  }
-
-  private fetchHistoricalSavings(): void {
-    this.billingsService.getHistoricalSavings(12).subscribe(
-      data => this.historicalSavings = data
-    );
-  }
-
-  fetchCompanyData(date: Date): void {
-    this.currentComapnyDate = date;
-    forkJoin([
-      this.performedServicesService.currentDomainServices(this.currentComapnyDate),
-      this.clientPaymentsService.currentDomainClientPayments(this.currentComapnyDate),
-      this.servicesService.currentDomainServices(),
-      this.clientsService.currentDomainClients()
-    ])
-      .subscribe(([ps, cp, services, clients]) => {
-        this.performedServices = ps;
-        this.clientPayments = this.filterClientPaymentByDate(cp, date);
-        this.services = services;
-        this.clients = clients;
-      });
-  }
-
-  private filterClientPaymentByDate(clientPayments1: ClientPayment[], date: Date): ClientPayment[] {
-    const currentMonth = new Date().getMonth();
-    return (clientPayments1 || []).filter(cp => {
-      const clientPaymentMonth = cp.date.getMonth();
-      const displayingMonth = date.getMonth();
-      return displayingMonth === currentMonth
-        || clientPaymentMonth === displayingMonth
-        || cp.serviceRelations.find(sr => sr.date.getMonth() === displayingMonth);
-    });
   }
 
   createElement(billingPeriod: BillingPeriod, element: Income | Expense, accountId: number): void {
@@ -179,55 +134,48 @@ export class AccountantHomeComponent implements OnInit {
     );
   }
 
+  fetchCompanyData(date: Date): void {
+    this.currentCompanyDate = date;
+    this.companyLogHelper.fetchCompanyData(date).subscribe(([ps, cp, services, clients]) => this.setCompanyLogData(ps, cp, services, clients));
+  }
+
   createPerformedService(performedService: PerformedService): void {
-    this.performedServicesService.createService(performedService)
-      .pipe(
-        switchMap(value => this.currentComapnyDate
-          ? this.performedServicesService.currentDomainServices(this.currentComapnyDate)
-          : EMPTY)
-      )
+    this.companyLogHelper.createPerformedServiceAndFetchData(performedService, this.currentCompanyDate)
       .subscribe(data => this.performedServices = data);
   }
 
   updatePerformedService(performedService: PerformedService): void {
-    this.performedServicesService.updateService(performedService)
-      .pipe(
-        switchMap(value => this.currentComapnyDate
-          ? this.performedServicesService.currentDomainServices(this.currentComapnyDate)
-          : EMPTY)
-      )
+    this.companyLogHelper.updatePerformedService(performedService, this.currentCompanyDate)
       .subscribe(data => this.performedServices = data);
   }
 
   createClientPayment(clientPayment: ClientPayment): void {
-    this.clientPaymentsService.createClientPayment(clientPayment)
-      .pipe(
-        switchMap(value => this.currentComapnyDate
-          ? this.clientPaymentsService.currentDomainClientPayments(this.currentComapnyDate)
-          : EMPTY)
-      )
-      .subscribe(data => this.clientPayments = this.currentComapnyDate
-        ? this.filterClientPaymentByDate(data, this.currentComapnyDate)
-        : data);
+    this.companyLogHelper.createClientPayment(clientPayment, this.currentCompanyDate)
+      .subscribe(data => this.clientPayments = data);
   }
 
   updateClientPayment(clientPayment: ClientPayment): void {
-    this.clientPaymentsService.updateClientPayment(clientPayment)
-      .pipe(
-        switchMap(value => this.currentComapnyDate
-          ? this.clientPaymentsService.currentDomainClientPayments(this.currentComapnyDate)
-          : EMPTY)
-      )
-      .subscribe(data => this.clientPayments = this.currentComapnyDate
-        ? this.filterClientPaymentByDate(data, this.currentComapnyDate)
-        : data);
+    this.companyLogHelper.updateClientPayment(clientPayment, this.currentCompanyDate)
+      .subscribe(data => this.clientPayments = data);
   }
 
   createPerformedServicePayment(performedServicePayment: PerformedServicePayment): void {
-    this.performedServicePaymentsService.createPerformedServicePayments(new PerformedServicePaymentShort(performedServicePayment))
-      .subscribe(
-        data => this.currentComapnyDate ? this.fetchCompanyData(this.currentComapnyDate) : EMPTY,
-        error => this.currentComapnyDate ? this.fetchCompanyData(this.currentComapnyDate) : EMPTY
-      );
+    this.companyLogHelper.createPerformedServicePayment(performedServicePayment, this.currentCompanyDate)
+      .subscribe((performedServices) => this.setCompanyLogData(performedServices));
+  }
+
+  private setCompanyLogData(performedServices?: PerformedService[], clientPayments?: ClientPayment[], services?: Service[], clients?: Client[]) {
+    if (performedServices) {
+      this.performedServices = performedServices;
+    }
+    if (clientPayments) {
+      this.clientPayments = clientPayments;
+    }
+    if (services) {
+      this.services = services;
+    }
+    if (clients) {
+      this.clients = clients;
+    }
   }
 }

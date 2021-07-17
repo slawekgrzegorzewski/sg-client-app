@@ -1,5 +1,5 @@
 <div class="sg-flex-column sg-flex-align-center">
-  <div style="width: 320px">
+  <div style="width: 320px" *ngIf="loginService.accountantSettings && !loginService.accountantSettings.company">
     <button (click)="addIncome()" class="btn btn-outline-primary" style="width: 100%" *ngIf="mode === DISPLAY">Dodaj
       dochód
     </button>
@@ -34,5 +34,17 @@
       [historicalSavings]="historicalSavings"
     >
     </app-accounts-grand-total>
+  </div>
+  <div style="width: 320px" *ngIf="loginService.accountantSettings && loginService.accountantSettings.company">
+    <app-company-log-day-by-day
+      [services]="services"
+      [clients]="clients"
+      [allCurrencies]="allCurrencies"
+      [performedServices]="performedServices"
+      [clientPayments]="clientPayments"
+      (displayingDateChanged)="moveToDay($event)"
+      (performedServiceCreated)="createPerformedService($event)"
+    >
+    </app-company-log-day-by-day>
   </div>
 </div>

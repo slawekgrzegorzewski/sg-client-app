@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "startDev": "ng serve --host 0.0.0.0",
     "build": "ng build",
     "buildProd": "ng build --configuration=production",
     "buildDev": "ng build --configuration=development",
@@ -28,6 +29,7 @@
     "chart.js": "~2.9.4",
     "chartjs-plugin-annotation": "~0.5.7",
     "cors": "~2.8.5",
+    "hammerjs": "^2.0.8",
     "jwt-decode": "~3.1.2",
     "ng-event-bus": "~2.0.0",
     "ng2-charts": "~2.4.2",
@@ -45,6 +47,7 @@
     "@angular/compiler-cli": "~12.0.2",
     "@types/chai": "~4.2.18",
     "@types/chartjs-plugin-annotation": "^0.5.2",
+    "@types/hammerjs": "^2.0.40",
     "@types/jasmine": "~3.7.4",
     "@types/jasminewd2": "~2.0.9",
     "@types/mocha": "~8.2.2",

@@ -12,7 +12,11 @@ const GENERAL_EDIT_MODE = 'general';
 const CREATE_EDIT_MODE = 'create';
 const EMPTY_EDIT_MODE = '';
 
+export const GROUPING_BUTTON_AT_HEAD = 'head';
+export const GROUPING_BUTTON_AT_BOTTOM = 'bottom';
+
 export type EditMode = 'general' | 'create' | '';
+export type GroupingButtonsPosition = 'head' | 'bottom';
 
 enum Grouping {
   LACK, BY_CLIENTS, BY_RECEIPT_TYPE
@@ -26,6 +30,8 @@ enum Grouping {
 export class ClientPaymentComponent implements OnInit {
 
   @Input() title: string | null = null;
+  @Input() editable = true;
+  @Input() groupingButtonsPosition: GroupingButtonsPosition = GROUPING_BUTTON_AT_HEAD;
 
   groupingMode = Grouping.LACK;
 
@@ -170,7 +176,7 @@ export class ClientPaymentComponent implements OnInit {
 
   setOverClientPayment(cp: ClientPayment | null, row: HTMLTableRowElement | null): void {
     this.overElement = cp;
-    if (cp && row) {
+    if (cp && row && this.editable) {
       const adjustment = (row.offsetHeight - this.utilBox!.nativeElement.offsetHeight) / 2;
       this.utilBoxTop = row.getBoundingClientRect().top + adjustment;
       this.utilBoxLeft = row.getBoundingClientRect().left + row.clientWidth - (this.utilBox!.nativeElement.offsetWidth / 2);
