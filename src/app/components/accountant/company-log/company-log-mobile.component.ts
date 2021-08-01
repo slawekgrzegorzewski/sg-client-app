@@ -5,24 +5,27 @@ import {Client} from '../../../model/accountant/client';
 import {PerformedService} from '../../../model/accountant/performed-service';
 import {ClientPayment} from '../../../model/accountant/client-payment';
 import {DatePipe} from '@angular/common';
+import {PayableGroup} from '../../../model/accountant/payable-groupper';
+import {ComparatorBuilder} from '../../../../utils/comparator-builder';
 
 type DisplayKind = 'services' | 'payments'
+type ServicesDisplayKind = 'by-clients' | 'day-by-day'
 
 @Component({
-  selector: 'app-company-log-day-by-day',
-  templateUrl: './company-log-day-by-day.component.html',
-  styleUrls: ['./company-log-day-by-day.component.css']
+  selector: 'app-company-log-mobile',
+  templateUrl: './company-log-mobile.component.html',
+  styleUrls: ['./company-log-mobile.component.css']
 })
-export class CompanyLogDayByDayComponent {
+export class CompanyLogMobileComponent {
 
-  private _displayingDate = new Date();
+  private displayingDateInternal = new Date();
 
   get displayingDate(): Date {
-    return this._displayingDate;
+    return this.displayingDateInternal;
   }
 
   set displayingDate(value: Date) {
-    this._displayingDate = value;
+    this.displayingDateInternal = value;
     this.filterPerformedServices();
   }
 
@@ -32,7 +35,6 @@ export class CompanyLogDayByDayComponent {
   @Input() services: Service[] = [];
   @Input() clients: Client[] = [];
   @Input() allCurrencies: Currency[] = [];
-  @Input() performedServicesForDay: PerformedService[] = [];
   @Input() clientPayments: ClientPayment[] = [];
   performedServiceToCreate: PerformedService | null = null;
 
@@ -45,9 +47,16 @@ export class CompanyLogDayByDayComponent {
   set performedServices(value: PerformedService[]) {
     this._performedServices = value;
     this.filterPerformedServices();
+    this.performedServicesByClients = this.groupPerformedServicesByClients();
+    this.selectGroup(null);
   }
 
+  performedServicesForDay: PerformedService[] = [];
+  performedServicesByClients: PayableGroup<PerformedService>[] = [];
+  selectedPerformedServicesGroup: PayableGroup<PerformedService> | null = null;
+
   displayKind: DisplayKind = 'services';
+  servicesDisplayKind: ServicesDisplayKind = 'day-by-day';
 
   constructor(private datePipe: DatePipe) {
   }
@@ -67,17 +76,39 @@ export class CompanyLogDayByDayComponent {
   }
 
   previousDayPerformedServices() {
-    this.moveToNextDay(1);
+    if (this.displayingServicesDayByDay()) {
+      this.moveToNextDay(1);
+    } else {
+      this.moveToNextMonth(1);
+    }
   }
 
   nextDayPerformedServices() {
-    this.moveToNextDay(-1);
+    if (this.displayingServicesDayByDay()) {
+      this.moveToNextDay(-1);
+    } else {
+      this.moveToNextMonth(-1);
+    }
   }
 
   private moveToNextDay(days: number) {
+    this.changeDate(
+      days,
+      (date, numberOfUnits) => new Date(date.setDate((date.getDate() + numberOfUnits)))
+    );
+  }
+
+  private moveToNextMonth(months: number): void {
+    this.changeDate(
+      months,
+      (date, numberOfUnits) => new Date(date.setMonth((date.getMonth() + numberOfUnits)))
+    );
+  }
+
+  private changeDate(numberOfUnits: number, dateChangingFunction: (date: Date, numberOfUnits: number) => Date): void {
+
     const previous = new Date(this.displayingDate);
-    const next = new Date(this.displayingDate);
-    next.setDate(next.getDate() + days);
+    const next = dateChangingFunction(new Date(this.displayingDate), numberOfUnits);
     if (next.getTime() > new Date().getTime()) {
       return;
     }
@@ -95,7 +126,6 @@ export class CompanyLogDayByDayComponent {
     return this.isTheSameMonth(date1, date2) && date1.getDate() == date2.getDate();
   }
 
-
   private filterPerformedServices() {
     this.performedServicesForDay = this.performedServices.filter(ps => this.isTheSameDay(ps.date, this.displayingDate));
   }
@@ -112,11 +142,51 @@ export class CompanyLogDayByDayComponent {
     this.displayKind = 'services';
   }
 
+  displayingServicesDayByDay(): boolean {
+    return this.servicesDisplayKind === 'day-by-day';
+  }
+
+  showServicesDayByDay(): void {
+    this.servicesDisplayKind = 'day-by-day';
+  }
+
+  displayingServicesByClients(): boolean {
+    return this.servicesDisplayKind === 'by-clients';
+  }
+
+  showServicesByClients(): void {
+    this.servicesDisplayKind = 'by-clients';
+  }
+
   displayingPayments(): boolean {
     return this.displayKind === 'payments';
   }
 
   showPayments(): void {
     this.displayKind = 'payments';
+  }
+
+  groupPerformedServicesByClients(): PayableGroup<PerformedService>[] {
+    return PayableGroup.groupData(
+      this.performedServices,
+      ps => ps && ps.client && ps.client.id || -1,
+      ps => ps && ps.client && ps.client.name || '',
+      ComparatorBuilder.comparingByDate<PerformedService>(ps => ps?.date || new Date(0)).desc()
+        .thenComparing(ps => ps.service?.name || '')
+        .thenComparing(ps => ps.price || 0)
+        .build()
+    );
+  }
+
+  selectGroup(group: PayableGroup<PerformedService> | null) {
+    if (this.selectedPerformedServicesGroup && group && this.selectedPerformedServicesGroup.id === group.id) {
+      this.selectedPerformedServicesGroup = null;
+    } else {
+      this.selectedPerformedServicesGroup = group;
+    }
+  }
+
+  isGroupSelected(group: PayableGroup<PerformedService>) {
+    return this.selectedPerformedServicesGroup && this.selectedPerformedServicesGroup.id === group.id;
   }
 }
