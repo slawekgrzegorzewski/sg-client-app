@@ -65,6 +65,11 @@
   color: black;
 }
 
+.sg-row-selected {
+  background-color: #d0d0d0;
+  color: black;
+}
+
 .sg-text-center {
   text-align: center;
 }

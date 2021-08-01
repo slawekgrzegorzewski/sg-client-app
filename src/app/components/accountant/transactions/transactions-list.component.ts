@@ -1,8 +1,8 @@
-import {Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {TransactionType} from '../../../model/accountant/transaction-type';
 import {Account} from '../../../model/accountant/account';
 import {Transaction} from '../../../model/accountant/transaction';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ComparatorBuilder} from '../../../../utils/comparator-builder';
 
 @Component({
   selector: 'app-transactions-list',
@@ -11,22 +11,41 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 })
 export class TransactionsListComponent {
 
+  displayingMonthInternal = new Date();
+  prevMonthToDisplay: Date | null = null;
+  nextMonthToDisplay: Date | null = null;
   transferCreationMode = false;
   creatingTransactionType = TransactionType.CREDIT;
   creatingTransactionAmount: number = 0;
   creatingTransactionFieldDescription: string = '';
-
-  @ViewChild('utilBox') utilBox: ElementRef | null = null;
-  utilBoxTop: number = 0;
-  utilBoxLeft: number = 0;
-  utilBoxVisibility = 'hidden';
-
-
-  @Input() transactions: Transaction[] = [];
-  private overTransaction: Transaction | null = null;
-
+  selectedTransaction: Transaction | null = null;
+  transactionsInternal: Transaction[] = [];
+  displayingTransactions: Transaction[] = [];
   internalAllAccounts: Account[] = [];
   accountsToSelect: Account[] = [];
+  @Output() transactionAction = new EventEmitter<any>();
+  private internalAccount: Account | null = null;
+
+  constructor() {
+  }
+
+  get displayingMonth(): Date {
+    return this.displayingMonthInternal;
+  }
+
+  set displayingMonth(value: Date) {
+    this.displayingMonthInternal = value;
+    this.filterDisplayingTransactions();
+  }
+
+  get transactions(): Transaction[] {
+    return this.transactionsInternal;
+  }
+
+  @Input() set transactions(value: Transaction[]) {
+    this.transactionsInternal = value.sort(ComparatorBuilder.comparingByDate<Transaction>(t => t.timeOfTransaction).build());
+    this.filterDisplayingTransactions();
+  }
 
   @Input() get allAccounts(): Account[] {
     return this.internalAllAccounts;
@@ -35,48 +54,17 @@ export class TransactionsListComponent {
   set allAccounts(value: Account[]) {
     this.internalAllAccounts = value;
     this.accountsToSelect = this.filterAccountsOtherThanSelectedOne();
+    this.displayingMonth = new Date();
   }
 
-  private internalAccount: Account | null = null;
-
-  @Input()
-  get account(): Account | null {
+  @Input() get account(): Account | null {
     return this.internalAccount;
   }
 
   set account(value: Account | null) {
     this.internalAccount = value;
     this.accountsToSelect = this.filterAccountsOtherThanSelectedOne();
-  }
-
-  @Output() transactionAction = new EventEmitter<any>();
-
-  constructor(private modalService: NgbModal) {
-  }
-
-  private filterAccountsOtherThanSelectedOne(): Account[] {
-    if (!this.internalAllAccounts) {
-      return [];
-    }
-    return this.internalAllAccounts.filter(account => !this.internalAccount || account.id !== this.internalAccount.id);
-  }
-
-  setOverTransaction(value: Transaction | null, transactionRow: HTMLTableRowElement | null): void {
-    this.overTransaction = value;
-    if (value && this.account && value.destination?.id === this.account.id && transactionRow) {
-      const adjustment = (transactionRow.offsetHeight - this.utilBox!.nativeElement.offsetHeight) / 2;
-      this.utilBoxTop = transactionRow.getBoundingClientRect().top + adjustment;
-      this.utilBoxLeft = transactionRow.getBoundingClientRect().left + transactionRow.clientWidth - this.utilBox!.nativeElement.offsetWidth;
-      this.utilBoxVisibility = 'visible';
-    } else {
-      this.utilBoxVisibility = 'hidden';
-    }
-  }
-
-  buttonClicked(): Transaction {
-    const transaction = this.overTransaction!;
-    this.setOverTransaction(null, null);
-    return transaction;
+    this.displayingMonth = new Date();
   }
 
   openPredefinedTransferCreationDialog(transaction: Transaction): void {
@@ -111,6 +99,66 @@ export class TransactionsListComponent {
     this.transferCreationMode = false;
     if (input === 'OK') {
       this.transactionAction.emit();
+    }
+  }
+
+  private filterAccountsOtherThanSelectedOne(): Account[] {
+    if (!this.internalAllAccounts) {
+      return [];
+    }
+    return this.internalAllAccounts.filter(account => !this.internalAccount || account.id !== this.internalAccount.id);
+  }
+
+  public goBackInHistory(): void {
+    if (this.prevMonthToDisplay) {
+      this.displayingMonth = this.prevMonthToDisplay;
+    }
+  }
+
+  public goForwardInHistory(): void {
+    if (this.nextMonthToDisplay) {
+      this.displayingMonth = this.nextMonthToDisplay;
+    }
+  }
+
+  private filterDisplayingTransactions(): void {
+    this.displayingTransactions = this.transactions
+      .filter(t => TransactionsListComponent.isForTheSameMonth(t.timeOfTransaction, this.displayingMonth));
+
+    this.prevMonthToDisplay = new Date(this.displayingMonth.getTime());
+    this.prevMonthToDisplay = new Date(this.prevMonthToDisplay.setMonth(this.prevMonthToDisplay.getMonth() - 1));
+    this.nextMonthToDisplay = new Date(this.displayingMonth.getTime());
+    this.nextMonthToDisplay = new Date(this.nextMonthToDisplay.setMonth(this.nextMonthToDisplay.getMonth() + 1));
+
+    if (this.transactions.length == 0) {
+      this.prevMonthToDisplay = null;
+      this.nextMonthToDisplay = null;
+    } else if (TransactionsListComponent.isForTheSameMonth(this.transactions[0].timeOfTransaction, this.displayingMonth)) {
+      this.prevMonthToDisplay = null;
+    }
+    if (TransactionsListComponent.isForTheSameMonth(new Date(), this.displayingMonth)) {
+      this.nextMonthToDisplay = null;
+    }
+
+  }
+
+  private static isForTheSameMonth(timeOfTransaction: Date, displayingMonth: Date) {
+    return timeOfTransaction.getFullYear() === displayingMonth.getFullYear()
+      && timeOfTransaction.getMonth() === displayingMonth.getMonth();
+  }
+
+  showActionRow(transaction: Transaction): boolean {
+    return this.selectedTransaction !== null
+      && this.selectedTransaction.id === transaction.id
+      && this.account !== null
+      && this.selectedTransaction.destination.id === this.account.id;
+  }
+
+  selectTransaction(transaction: Transaction): void {
+    if (this.selectedTransaction && this.selectedTransaction.id === transaction.id) {
+      this.selectedTransaction = null;
+    } else {
+      this.selectedTransaction = transaction;
     }
   }
 }

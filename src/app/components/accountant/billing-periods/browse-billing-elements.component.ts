@@ -5,7 +5,6 @@ import {PiggyBank} from '../../../model/accountant/piggy-bank';
 import {Category} from '../../../model/accountant/billings/category';
 import {Income} from '../../../model/accountant/billings/income';
 import {Expense} from '../../../model/accountant/billings/expense';
-import {DatePipe, TitleCasePipe} from '@angular/common';
 
 @Component({
   selector: 'app-browse-billing-elements',
@@ -49,8 +48,7 @@ export class BrowseBillingElementsComponent implements OnInit {
   unfinishedBillingPeriods: BillingPeriod[] = [];
   displayingPeriod: Date = new Date();
 
-  constructor(private datePipe: DatePipe,
-              private titleCasePipe: TitleCasePipe) {
+  constructor() {
   }
 
   ngOnInit(): void {
@@ -72,11 +70,6 @@ export class BrowseBillingElementsComponent implements OnInit {
     const newDate = new Date(this.displayingPeriod);
     newDate.setMonth(newDate.getMonth() + 1);
     this.setDisplayingDate(newDate);
-  }
-
-  monthYearString(date: Date): string {
-    const value = this.datePipe.transform(date, 'LLLL') + '\'' + this.datePipe.transform(date, 'yy');
-    return this.titleCasePipe.transform(value);
   }
 
 }

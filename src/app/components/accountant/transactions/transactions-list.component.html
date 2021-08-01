@@ -1,32 +1,50 @@
 <div *ngIf="account && !transferCreationMode">
-  <div (mouseleave)="setOverTransaction(null, null)">
-    <table>
-      <tr #row *ngFor="let transaction of transactions" class="sg-row-hoverable"
-          (mouseenter)="setOverTransaction(transaction, row)">
-        <td>{{transaction.timeOfTransaction | localizedDate:'y-MM-d'}}</td>
-        <td>
-          <span *ngIf="transaction.source.id === account.id">
-            -{{transaction.debit | currency: transaction.source.currency}}
-          </span>
-          <span *ngIf="transaction.destination.id === account.id">
-            {{transaction.credit | currency: transaction.destination.currency}}
-          </span>
-        </td>
-        <td [innerHTML]="transaction.description | htmlNewLine" style="max-width: 300px"></td>
-      </tr>
-    </table>
-    <div #utilBox style="position: fixed;"
-         [ngStyle]="{'top.px': utilBoxTop, 'left.px': utilBoxLeft, 'visibility': utilBoxVisibility}">
-      <button (click)="openPredefinedTransferCreationDialog(buttonClicked())" class="btn btn-primary">
-        Transfer wewnętrzny
+
+  <div class="month-navigation sg-flex-row sg-flex-justify-space-between">
+    <div>
+      <button *ngIf="prevMonthToDisplay" (click)="goBackInHistory()" class="btn btn-link btn-small">
+        {{prevMonthToDisplay | localizedDate: "LLLL'\'yy"}}
+      </button>
+    </div>
+    <div class="sg-flex-column sg-flex-align-center sg-flex-justify-center">
+      <h6>{{displayingMonth | localizedDate: "LLLL'\'yy"}}</h6>
+    </div>
+    <div>
+      <button *ngIf="prevMonthToDisplay" (click)="goForwardInHistory()" class="btn btn-link btn-small">
+        {{nextMonthToDisplay | localizedDate: "LLLL'\'yy"}}
       </button>
     </div>
   </div>
 
-  <button (click)="openIncomeCreationDialog()" class="btn btn-primary">Uznanie</button>
-  <button (click)="openExpenseCreationDialog()" class="btn btn-primary">Obciążenie</button>
-  <button (click)="openTransferCreationDialog()" class="btn btn-primary">Transfer wewnętrzny</button>
+  <table>
+    <ng-container *ngFor="let transaction of displayingTransactions">
+      <tr #row
+          (click)="selectTransaction(transaction)"
+          [class.sg-row-selected]="selectedTransaction && transaction.id === selectedTransaction.id"
+          class="sg-row-hoverable">
+        <td>{{transaction.timeOfTransaction | localizedDate:'y-MM-dd'}}</td>
+        <td *ngIf="transaction.source.id === account.id" class="money-cell">
+          -{{transaction.debit | currency: transaction.source.currency}}
+        </td>
+        <td *ngIf="transaction.destination.id === account.id" class="money-cell">
+          {{transaction.credit | currency: transaction.destination.currency}}
+        </td>
+        <td [innerHTML]="transaction.description | htmlNewLine" class="description-cell"></td>
+      </tr>
+      <tr *ngIf="showActionRow(transaction)">
+        <td class="action-cell" colspan="3">
+          <button (click)="openPredefinedTransferCreationDialog(selectedTransaction!)" class="btn btn-link btn-small">
+            Przekaż te pieniądze na inne konto
+          </button>
+        </td>
+      </tr>
+    </ng-container>
+  </table>
+  <button (click)="openIncomeCreationDialog()" class="btn btn-outline-primary">Uznanie</button>
+  <button (click)="openExpenseCreationDialog()" class="btn btn-outline-primary">Obciążenie</button>
+  <button (click)="openTransferCreationDialog()" class="btn btn-outline-primary">Transfer wewnętrzny</button>
 </div>
+
 <div *ngIf="account && transferCreationMode">
   <app-create-transaction
     [account]="account"

@@ -3,7 +3,7 @@
     <button class="btn btn-link btn-small" (click)="previous()">Wcześniej</button>
   </div>
   <div>
-    <h4><span>{{monthYearString(displayingPeriod)}}</span></h4>
+    <h4><span>{{ displayingPeriod | localizedDate: "LLLL'\'yy" | titlecase}}</span></h4>
   </div>
   <div class="sg-flex-column">
     <button class="btn btn-link btn-small" (click)="next()">Później</button>
@@ -49,7 +49,7 @@
   <div *ngIf="unfinishedBillingPeriods.length > 0">
     Nie można rozpocząć kolejnego okresu ponieważ następujące okresy nie zostały jeszcze zakończone:
     <div *ngFor="let pb of unfinishedBillingPeriods">
-      {{monthYearString(pb.period)}}
+      {{ pb.period | localizedDate: "LLLL'\'yy" | titlecase}}
     </div>
   </div>
 </div>
