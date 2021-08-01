@@ -1,7 +1,3 @@
-.month-navigation > div {
-  flex: 1 1 0;
-}
-
 .month-navigation > div > h6 {
   text-align: center;
 }

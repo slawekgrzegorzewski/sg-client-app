@@ -74,6 +74,14 @@
   text-align: center;
 }
 
+.sg-flex-auto {
+  flex: auto;
+}
+
+.sg-flex-align-self-end {
+  align-self: flex-end;
+}
+
 app-general-typeahead, app-date-picker {
   padding: 0 !important;
   margin: 0 !important;

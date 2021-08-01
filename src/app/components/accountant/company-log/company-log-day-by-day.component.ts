@@ -6,6 +6,8 @@ import {PerformedService} from '../../../model/accountant/performed-service';
 import {ClientPayment} from '../../../model/accountant/client-payment';
 import {DatePipe} from '@angular/common';
 
+type DisplayKind = 'services' | 'payments'
+
 @Component({
   selector: 'app-company-log-day-by-day',
   templateUrl: './company-log-day-by-day.component.html',
@@ -44,6 +46,8 @@ export class CompanyLogDayByDayComponent {
     this._performedServices = value;
     this.filterPerformedServices();
   }
+
+  displayKind: DisplayKind = 'services';
 
   constructor(private datePipe: DatePipe) {
   }
@@ -97,6 +101,22 @@ export class CompanyLogDayByDayComponent {
   }
 
   getClientPaymentsTitle(): string {
-    return 'Płatności za ' + this.datePipe.transform(this.displayingDate, 'MMMM y');
+    return 'Płatności za ' + this.datePipe.transform(this.displayingDate, 'LLLL y');
+  }
+
+  displayingServices(): boolean {
+    return this.displayKind === 'services';
+  }
+
+  showServices(): void {
+    this.displayKind = 'services';
+  }
+
+  displayingPayments(): boolean {
+    return this.displayKind === 'payments';
+  }
+
+  showPayments(): void {
+    this.displayKind = 'payments';
   }
 }

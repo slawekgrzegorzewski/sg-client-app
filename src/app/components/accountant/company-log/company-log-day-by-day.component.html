@@ -1,38 +1,70 @@
-<div (swipeleft)="previousDayPerformedServices()" (swiperight)="nextDayPerformedServices()">
-  <h5>Usługi z dnia {{displayingDate | localizedDate}}</h5>
-  <table *ngIf="!performedServiceToCreate">
-    <tr *ngFor="let ps of performedServicesForDay">
-      <td>{{ps.client.name}}</td>
-      <td>{{ps.service.name}}</td>
-      <td style="text-align:right">{{ps.price| currency: ps.currency}}</td>
-    </tr>
-  </table>
-  <app-performed-service-edit
-    *ngIf="performedServiceToCreate"
-    [allCurrencies]="allCurrencies"
-    [services]="services"
-    [clients]="clients"
-    [performedServices]="performedServices"
-    [createMode]="true"
-    [performedService]="performedServiceToCreate"
-    (cancelEvent)="performedServiceToCreate = null"
-    (createEvent)="createPerformedService()"
-  >
+<div class="sg-flex-column" style="height: 100%;">
+  <div class="sg-flex-row">
+    <div class="btn-group sg-flex-auto">
+      <button class="btn"
+              [ngClass]="{'btn-outline-primary': !displayingServices(),'btn-primary': displayingServices()}"
+              (click)="showServices();">
+        Usługi
+      </button>
+      <button class="btn"
+              [ngClass]="{'btn-outline-primary': !displayingPayments(),'btn-primary': displayingPayments()}"
+              (click)="showPayments()">
+        Płatności
+      </button>
+    </div>
+  </div>
 
-  </app-performed-service-edit>
-  <button style="width: 100%" (click)="addPerformedService()" class="btn btn-outline-primary"
-          *ngIf="!performedServiceToCreate">
-    Dodaj
-  </button>
+  <div *ngIf="displayingServices()" (swipeleft)="previousDayPerformedServices()"
+       (swiperight)="nextDayPerformedServices()" style="height: 100%" class="sg-flex-column">
 
-  <h4></h4>
-  <app-client-payments
-    [editable]="false"
-    [title]="getClientPaymentsTitle()"
-    [clientPayments]="clientPayments"
-    [allCurrencies]="allCurrencies"
-    [performedServices]="performedServices"
-    [clients]="clients"
-    [groupingButtonsPosition]="'bottom'"
-  ></app-client-payments>
+    <div class="sg-flex-row sg-flex-justify-space-between">
+      <div class="sg-flex-auto">
+        <button class="btn btn-link btn-sm">Dzienne</button>
+      </div>
+      <div class="sg-flex-auto sg-flex-column sg-flex-align-center sg-flex-justify-center">
+        <h6 style="text-align: center">{{displayingDate | localizedDate: 'dd MMMM y'}}</h6>
+      </div>
+      <div class="sg-flex-auto">
+        <button class="btn btn-link btn-sm">Wg klientów</button>
+      </div>
+    </div>
+
+    <table *ngIf="!performedServiceToCreate">
+      <tr *ngFor="let ps of performedServicesForDay">
+        <td>{{ps.client.name}}</td>
+        <td>{{ps.service.name}}</td>
+        <td style="text-align:right">{{ps.price| currency: ps.currency}}</td>
+      </tr>
+    </table>
+    <app-performed-service-edit
+      *ngIf="performedServiceToCreate"
+      [allCurrencies]="allCurrencies"
+      [services]="services"
+      [clients]="clients"
+      [performedServices]="performedServices"
+      [createMode]="true"
+      [performedService]="performedServiceToCreate"
+      (cancelEvent)="performedServiceToCreate = null"
+      (createEvent)="createPerformedService()"
+    >
+
+    </app-performed-service-edit>
+
+    <button *ngIf="!performedServiceToCreate" style="width: 100%; margin-top: auto" (click)="addPerformedService()"
+            class="btn btn-outline-primary sg-flex-align-self-end">
+      Dodaj
+    </button>
+  </div>
+
+  <div *ngIf="displayingPayments()">
+    <app-client-payments
+      [editable]="false"
+      [title]="getClientPaymentsTitle()"
+      [clientPayments]="clientPayments"
+      [allCurrencies]="allCurrencies"
+      [performedServices]="performedServices"
+      [clients]="clients"
+      [groupingButtonsPosition]="'bottom'"
+    ></app-client-payments>
+  </div>
 </div>
