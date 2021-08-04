@@ -49,7 +49,7 @@
           <td colspan="3">{{client.title}}</td>
         </tr>
         <ng-container *ngIf="isGroupSelected(client)">
-          <tr *ngFor="let ps of client.data" (click)="selectGroup(client)" class="sg-row-selected">
+          <tr *ngFor="let ps of client.data" (click)="selectGroup(client)" [ngClass]="getClientPaymentRowClass(ps)">
             <td>{{ps.date | localizedDate: 'yyyy-MM-dd' }}</td>
             <td>{{ps.service.name}}</td>
             <td style="text-align:right">{{ps.price| currency: ps.currency}}</td>

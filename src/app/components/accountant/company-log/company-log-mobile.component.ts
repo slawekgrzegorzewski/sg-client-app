@@ -175,7 +175,17 @@ export class CompanyLogMobileComponent {
         .thenComparing(ps => ps.service?.name || '')
         .thenComparing(ps => ps.price || 0)
         .build()
-    );
+    )
+      .sort(ComparatorBuilder.comparingByDate<PayableGroup<PerformedService>>(CompanyLogMobileComponent.getMaxDateOfPerformedService).desc().build());
+  }
+
+  private static getMaxDateOfPerformedService(group: PayableGroup<PerformedService>): Date {
+    const dates = group.data.sort(ComparatorBuilder.comparingByDate<PerformedService>(ps => ps.date).desc().build());
+    if (dates.length > 0) {
+      return dates[0].date;
+    } else {
+      return new Date(0);
+    }
   }
 
   selectGroup(group: PayableGroup<PerformedService> | null) {
@@ -188,5 +198,16 @@ export class CompanyLogMobileComponent {
 
   isGroupSelected(group: PayableGroup<PerformedService>) {
     return this.selectedPerformedServicesGroup && this.selectedPerformedServicesGroup.id === group.id;
+  }
+
+  getClientPaymentRowClass(ps: PerformedService): string {
+    const paid = ps.clientPaymentsRelations.map(ps => ps.price).reduce((previousValue, currentValue) => previousValue + currentValue, 0);
+    if (paid === ps.price) {
+      return 'paid-ps';
+    } else if (paid === 0) {
+      return 'not-paid-ps';
+    } else {
+      return 'underpaid-ps';
+    }
   }
 }
