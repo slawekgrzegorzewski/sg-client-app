@@ -1,4 +1,4 @@
-<div style="height: 100vh" class="sg-flex-column">
+<div [style.height.px]="getAvailableHeight()" class="sg-flex-column">
   <app-header></app-header>
   <router-outlet></router-outlet>
 </div>
