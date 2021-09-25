@@ -12,7 +12,7 @@ export class CubeRecordsLineChart {
   public updateChart = new EventEmitter<any>();
   public lineChartData: ChartDataSets[];
   public lineChartLabels: Label[];
-  public lineChartOptions: (ChartOptions  & { annotation: pluginAnnotations.AnnotationConfig }) = {
+  public lineChartOptions: (ChartOptions & { annotation: pluginAnnotations.AnnotationConfig }) = {
     responsive: true,
     maintainAspectRatio: true,
     aspectRatio: screen.width < 600 ? 0.5 : 1.5,
@@ -80,7 +80,7 @@ export class CubeRecordsLineChart {
     }
   ];
 
-  constructor(data: CubeRecord[], mode: ChartMode) {
+  constructor(data: CubeRecord[], mode: ChartMode, movingAverageNumberOfElements?: number) {
     const records = data.sort(
       ComparatorBuilder.comparingByDate<CubeRecord>(cr => cr?.recordTime || new Date(0)).build()
     ).map(d => d.time);
@@ -89,21 +89,24 @@ export class CubeRecordsLineChart {
         this.lineChartData = [{data: records, label: 'Results'}];
         break;
       case 'MOVING_AVERAGE':
-        this.lineChartData = [{data: this.movingAverageOfSeven(records), label: 'Moving average'}];
+        if (!movingAverageNumberOfElements) {
+          movingAverageNumberOfElements = 7;
+        }
+        this.lineChartData = [{data: this.movingAverageOf(records, movingAverageNumberOfElements), label: 'Moving average'}];
         break;
     }
     this.lineChartLabels = records.map(r => '');
   }
 
-  private movingAverageOfSeven(records: number[]): number[] {
+  private movingAverageOf(records: number[], numberOfElements: number): number[] {
     const movingAverage = [];
-    const lastSevenRecords = [];
+    const lastNRecords = [];
     for (const d of records) {
-      lastSevenRecords.push(d);
-      if (lastSevenRecords.length > 7) {
-        lastSevenRecords.shift();
+      lastNRecords.push(d);
+      if (lastNRecords.length > numberOfElements) {
+        lastNRecords.shift();
       }
-      movingAverage.push(lastSevenRecords.reduce((a, b) => a + b, 0) / lastSevenRecords.length);
+      movingAverage.push(lastNRecords.reduce((a, b) => a + b, 0) / lastNRecords.length);
     }
     return movingAverage;
   }

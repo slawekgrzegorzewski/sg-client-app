@@ -32,10 +32,14 @@
     <div>
       Średnia {{avg | date: 'mm:ss'}}
     </div>
+    <div>
+      Średnia z ostatnich {{movingAverageNumberOfElements}} elementów {{avgOfLastNElements | date: 'mm:ss'}}
+    </div>
     <div class="flex-column">
       <div class="flex-row">
         <button (click)="cubeRecordsChartType = 'RAW'">Zwykły</button>
         <button (click)="cubeRecordsChartType = 'MOVING_AVERAGE'">Średnia ruchoma</button>
+        <input [(ngModel)]="movingAverageNumberOfElements" />
       </div>
       <div style="width: 50%">
         <canvas baseChart #cubesRecordsChart='base-chart'
