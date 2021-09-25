@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, HostListener, Input, OnInit, ViewChild} from '@angular/core';
 import {TimerComponent} from '../../../components/general/timer/timer.component';
 import {CubeRecordsService} from '../../../services/accountant/cube-records.service';
 import {CubeRecord, CubeType, cubeTypeDescriptions} from '../../../model/cubes/cube-record';
@@ -37,6 +37,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   max = new Date(0);
   min = new Date(0);
   avg = new Date(0);
+  avgOfLastNElements = new Date(0);
 
   private recordsInternal: CubeRecord[] = [];
 
@@ -70,6 +71,17 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   turns: string = '';
   visible = true;
 
+  private _movingAverageNumberOfElements: number = 7;
+
+  @Input() get movingAverageNumberOfElements(): number {
+    return this._movingAverageNumberOfElements;
+  }
+
+  set movingAverageNumberOfElements(value: number) {
+    this._movingAverageNumberOfElements = value;
+    this.refreshStatsForSelectedCube();
+  }
+
   constructor(private cubeRecordsService: CubeRecordsService) {
   }
 
@@ -91,12 +103,14 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
 
   private refreshStatsForSelectedCube(): void {
     this.recordsForSelectedCube = this.records.filter(r => r.cubesType === this.selectedCube);
-    this.cubeRecordsLineChart = new CubeRecordsLineChart(this.recordsForSelectedCube, this.cubeRecordsChartType);
+    this.cubeRecordsLineChart = new CubeRecordsLineChart(this.recordsForSelectedCube, this.cubeRecordsChartType, this.movingAverageNumberOfElements);
     this.cubeRecordsLineChart.updateChart.subscribe(d => this.cubesRecordsChart!.chart.update());
     const values = this.recordsForSelectedCube.map(r => r.time * 1_000);
+    const lastNValues = this.recordsForSelectedCube.slice(-this.movingAverageNumberOfElements).map(r => r.time * 1_000);
     this.max = (values && values.length > 0) ? new Date(Math.max(...values)) : new Date(0);
     this.min = (values && values.length > 0) ? new Date(Math.min(...values)) : new Date(0);
     this.avg = (values && values.length > 0) ? new Date(values.reduce((a, b) => a + b, 0) / values.length) : new Date(0);
+    this.avgOfLastNElements = (lastNValues && lastNValues.length > 0) ? new Date(lastNValues.reduce((a, b) => a + b, 0) / lastNValues.length) : new Date(0);
   }
 
   @HostListener('window:keyup', ['$event'])
