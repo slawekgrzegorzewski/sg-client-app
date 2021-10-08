@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   // serviceUrl: 'http://localhost:8080'
-  serviceUrl: 'http://172.18.242.17:8080'
+  serviceUrl: 'http://172.19.89.221:8080'
 };
 
 /*
