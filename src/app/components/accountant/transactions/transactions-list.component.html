@@ -1,15 +1,15 @@
 <div *ngIf="account && !transferCreationMode">
 
   <div class="month-navigation sg-flex-row sg-flex-justify-space-between">
-    <div>
+    <div class="sg-flex-auto">
       <button *ngIf="prevMonthToDisplay" (click)="goBackInHistory()" class="btn btn-link btn-small">
         {{prevMonthToDisplay | localizedDate: "LLLL'\'yy"}}
       </button>
     </div>
-    <div class="sg-flex-column sg-flex-align-center sg-flex-justify-center">
+    <div class="sg-flex-auto sg-flex-column sg-flex-align-center sg-flex-justify-center">
       <h6>{{displayingMonth | localizedDate: "LLLL'\'yy"}}</h6>
     </div>
-    <div>
+    <div class="sg-flex-auto">
       <button *ngIf="prevMonthToDisplay" (click)="goForwardInHistory()" class="btn btn-link btn-small">
         {{nextMonthToDisplay | localizedDate: "LLLL'\'yy"}}
       </button>

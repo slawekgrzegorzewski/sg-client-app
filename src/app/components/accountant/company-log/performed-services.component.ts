@@ -11,14 +11,10 @@ import {PayableGroup} from '../../../model/accountant/payable-groupper';
 import {ComparatorBuilder} from '../../../../utils/comparator-builder';
 import {SimplePerformedServicePayment} from '../../../model/accountant/simple-performed-service-payment';
 
-const GENERAL_EDIT_MODE = 'general';
-const CREATE_EDIT_MODE = 'create';
-const PAYMENT_SELECTION_EDIT_MODE = 'payment-selection';
-const EMPTY_EDIT_MODE = '';
+export type EditMode = 'edit' | 'create' | 'payment-selection' | ''
+export type PerformedServicesDisplayType = 'desktop' | 'mobile';
 
-export type EditMode = 'general' | 'create' | 'payment-selection' | ''
-
-enum Grouping {
+export enum Grouping {
   LACK, BY_CLIENTS, BY_DATES, BY_SERVICES
 }
 
@@ -28,49 +24,53 @@ enum Grouping {
   styleUrls: ['./performed-services.component.css']
 })
 export class PerformedServicesComponent implements OnInit {
+
   @Input() title: string | null = null;
+  @Input() performedServicesDisplayType: PerformedServicesDisplayType = 'desktop';
 
   allPerformedServices: PerformedService[] = [];
-  performedServicesInternal: PerformedService[] = [];
-  groupingMode = Grouping.LACK;
 
+  private _groupingMode = Grouping.LACK;
+  get groupingMode(): Grouping {
+    return this._groupingMode;
+  }
+
+  set groupingMode(value: Grouping) {
+    const change = this._groupingMode !== value;
+    this._groupingMode = value;
+    if (change) {
+      this.onGroupingModeChange.emit(value);
+    }
+  }
+
+  _performedServices: PerformedService[] = [];
   @Input() get performedServices(): PerformedService[] {
-    return this.performedServicesInternal;
+    return this._performedServices;
   }
 
   set performedServices(value: PerformedService[]) {
     this.allPerformedServices = value;
-    this.performedServicesInternal = (value || []).sort(PerformedService.compareByDateAndClientAndServiceAndId);
-
-    const editElement = this.editElement;
-    const selectedElement = this.selectedElement;
-
-    if (editElement) {
-      this.editElement = this.performedServicesInternal.find(ps => ps.id === editElement.id) || null;
-    }
-    if (selectedElement) {
-      this.selectedElement = this.performedServicesInternal.find(ps => ps.id === selectedElement.id) || null;
-    }
-
-    this.group();
+    this._performedServices = (value || []).sort(PerformedService.compareByDateAndClientAndServiceAndId);
+    this.onNewPerformedServicesData(value);
   }
-
-  displayData: PayableGroup<PerformedService>[] = [];
 
   @Input() services: Service[] = [];
 
   @Input() clients: Client[] = [];
   @Input() clientPayments: ClientPayment[] = [];
   @Input() allCurrencies: Currency[] = [];
-  @Output() updateEvent = new EventEmitter<PerformedService>();
 
-  @Output() createEvent = new EventEmitter<PerformedService>();
-  @Output() createPerformedServicePaymentEvent = new EventEmitter<PerformedServicePayment>();
-  editMode: EditMode = EMPTY_EDIT_MODE;
+  @Output() onPerformedServiceCreate = new EventEmitter<PerformedService>();
+  @Output() onPerformedServiceUpdate = new EventEmitter<PerformedService>();
+  @Output() onPerformedServicePaymentCreate = new EventEmitter<PerformedServicePayment>();
+  @Output() onGroupingModeChange = new EventEmitter<Grouping>();
 
-  editElement: PerformedService | null = null;
+  displayData: PayableGroup<PerformedService>[] = [];
   selectedGroup: PayableGroup<PerformedService> | null = null;
+
   selectedElement: PerformedService | null = null;
+  editElement: PerformedService | null = null;
+  editMode: EditMode = '';
 
   showDateColumn = true;
   showClientColumn = true;
@@ -82,44 +82,60 @@ export class PerformedServicesComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  group(): void {
+  public noGrouping(): void {
+    this.group(Grouping.LACK);
+  }
+
+  public byClients(): void {
+    this.group(Grouping.BY_CLIENTS);
+  }
+
+  public byDates(): void {
+    this.group(Grouping.BY_DATES);
+  }
+
+  public byServices(): void {
+    this.group(Grouping.BY_SERVICES);
+  }
+
+  private onNewPerformedServicesData(value: PerformedService[]) {
+    const editElement = this.editElement;
+    const selectedElement = this.selectedElement;
+
+    if (editElement) {
+      this.editElement = this.performedServices.find(ps => ps.id === editElement.id) || null;
+    }
+    if (selectedElement) {
+      this.selectedElement = this.performedServices.find(ps => ps.id === selectedElement.id) || null;
+    }
+    this.group();
+  }
+
+  private group(groupingMode: Grouping = this.groupingMode): void {
+    this.groupingMode = groupingMode;
     switch (this.groupingMode) {
       case Grouping.LACK:
         this.disableGrouping();
         break;
       case Grouping.BY_CLIENTS:
-        this.groupByClients();
+        this.groupByClientsOrServices(Grouping.BY_CLIENTS);
         break;
       case Grouping.BY_DATES:
         this.groupByDates();
         break;
       case Grouping.BY_SERVICES:
-        this.groupByServices();
+        this.groupByClientsOrServices(Grouping.BY_SERVICES);
         break;
     }
+    if (this.groupingMode === Grouping.LACK) {
+      this.selectedGroup = this.displayData.length > 0 ? this.displayData[0] : null;
+    } else {
+      this.selectGroup();
+    }
+    this.adjustTableColumns();
   }
 
-  noGrouping(): void {
-    this.groupingMode = Grouping.LACK;
-    this.group();
-  }
-
-  byClients(): void {
-    this.groupingMode = Grouping.BY_CLIENTS;
-    this.group();
-  }
-
-  byDates(): void {
-    this.groupingMode = Grouping.BY_DATES;
-    this.group();
-  }
-
-  byServices(): void {
-    this.groupingMode = Grouping.BY_SERVICES;
-    this.group();
-  }
-
-  disableGrouping(): void {
+  private disableGrouping(): void {
     this.displayData = PayableGroup.groupData(this.performedServices,
       ps => -1,
       ps => '',
@@ -129,26 +145,25 @@ export class PerformedServicesComponent implements OnInit {
         .thenComparing(ps => ps.price || 0)
         .build()
     );
-    this.selectedGroup = this.displayData.length > 0 ? this.displayData[0] : null;
-    this.enableAllColumns();
   }
 
-  groupByClients(): void {
+  private groupByClientsOrServices(grouping: Grouping.BY_CLIENTS | Grouping.BY_SERVICES): void {
+
+    const entityGetter = (ps: PerformedService) => grouping === Grouping.BY_CLIENTS ? ps.client : ps.service;
+    const secondEntityGetter = (ps: PerformedService) => grouping === Grouping.BY_CLIENTS ? ps.service : ps.client;
+
     this.displayData = PayableGroup.groupData(
       this.performedServices,
-      ps => ps && ps.client && ps.client.id || -1,
-      ps => ps && ps.client && ps.client.name || '',
+      ps => ps && entityGetter(ps) && entityGetter(ps).id || -1,
+      ps => ps && entityGetter(ps) && entityGetter(ps).name || '',
       ComparatorBuilder.comparingByDate<PerformedService>(ps => ps?.date || new Date(0)).desc()
-        .thenComparing(ps => ps.service?.name || '')
+        .thenComparing(ps => secondEntityGetter(ps)?.name || '')
         .thenComparing(ps => ps.price || 0)
         .build()
     );
-    this.selectGroup();
-    this.enableAllColumns();
-    this.showClientColumn = false;
   }
 
-  groupByDates(): void {
+  private groupByDates(): void {
     this.displayData = PayableGroup.groupData(
       this.performedServices,
       ps => ps && ps.date && ps.date.getTime() || -1,
@@ -158,24 +173,6 @@ export class PerformedServicesComponent implements OnInit {
         .thenComparing(ps => ps.price || 0)
         .build()
     );
-    this.selectGroup();
-    this.enableAllColumns();
-    this.showDateColumn = false;
-  }
-
-  groupByServices(): void {
-    this.displayData = PayableGroup.groupData(
-      this.performedServices,
-      ps => ps && ps.service && ps.service.id || -1,
-      ps => ps && ps.service && ps.service.name || '',
-      ComparatorBuilder.comparingByDate<PerformedService>(ps => ps?.date || new Date(0)).desc()
-        .thenComparing(ps => ps.client?.name || '')
-        .thenComparing(ps => ps.price || 0)
-        .build()
-    );
-    this.selectGroup();
-    this.enableAllColumns();
-    this.showServiceColumn = false;
   }
 
   private selectGroup(): void {
@@ -185,72 +182,72 @@ export class PerformedServicesComponent implements OnInit {
     }
   }
 
-  private enableAllColumns(): void {
+  private adjustTableColumns(): void {
     this.showDateColumn = true;
     this.showClientColumn = true;
     this.showServiceColumn = true;
+    switch (this.groupingMode) {
+      case Grouping.LACK:
+        if (this.performedServicesDisplayType === 'mobile') {
+          this.showDateColumn = false;
+        }
+        break;
+      case Grouping.BY_CLIENTS:
+        this.showClientColumn = false;
+        break;
+      case Grouping.BY_DATES:
+        this.showDateColumn = false;
+        break;
+      case Grouping.BY_SERVICES:
+        this.showServiceColumn = false;
+        break;
+    }
   }
 
-  prepareToCreate(): void {
+  public getNumberOfDisplayedColumns(): number {
+    return 1 + [this.showDateColumn, this.showClientColumn, this.showServiceColumn].filter(Boolean).length;
+  }
+
+  public prepareToCreate(): void {
     const performedService = new PerformedService();
     performedService.currency = 'PLN';
     performedService.date = new Date();
-    this.prepareToEdit(performedService, CREATE_EDIT_MODE);
+    this.prepareEdit(performedService, 'create');
   }
 
-  prepareToGeneralEdit(): void {
+  public prepareToEdit(): void {
     if (this.selectedElement) {
-      this.prepareToEdit(this.selectedElement, GENERAL_EDIT_MODE);
+      this.prepareEdit(this.selectedElement, 'edit');
     }
   }
 
-  prepareToPaymentSelectionEdit(): void {
+  public prepareToPaymentSelectionEdit(): void {
     if (this.selectedElement) {
-      this.prepareToEdit(this.selectedElement, PAYMENT_SELECTION_EDIT_MODE);
+      this.prepareEdit(this.selectedElement, 'payment-selection');
     }
   }
 
-  prepareToEdit(editElement: PerformedService, editMode: EditMode): void {
+  private prepareEdit(editElement: PerformedService, editMode: EditMode): void {
     this.editElement = editElement;
     this.editMode = editMode;
   }
 
-  resetEditForm(): void {
+  public resetEditForm(): void {
     this.editElement = null;
-    this.editMode = EMPTY_EDIT_MODE;
+    this.editMode = '';
   }
 
-  create(toCreate: PerformedService): void {
-    this.createEvent.emit(toCreate);
+  public create(toCreate: PerformedService): void {
+    this.onPerformedServiceCreate.emit(toCreate);
     this.resetEditForm();
   }
 
-  update(toUpdate: PerformedService): void {
-    this.updateEditElement(toUpdate);
-  }
-
-  private updateEditElement(toUpdate: PerformedService): void {
-    this.updateEvent.emit(toUpdate);
+  public update(toUpdate: PerformedService): void {
+    this.onPerformedServiceUpdate.emit(toUpdate);
     this.resetEditForm();
   }
 
-  isNonEditMode(): boolean {
-    return this.editMode === EMPTY_EDIT_MODE;
-  }
-
-  isGeneralEditMode(): boolean {
-    return this.editMode === GENERAL_EDIT_MODE;
-  }
-
-  isCreateEditMode(): boolean {
-    return this.editMode === CREATE_EDIT_MODE;
-  }
-
-  isPaymentSelectionEditMode(): boolean {
-    return this.editMode === PAYMENT_SELECTION_EDIT_MODE;
-  }
-
-  setGroupToDisplay(payableGroup: PayableGroup<PerformedService>): void {
+  public setGroupToDisplay(payableGroup: PayableGroup<PerformedService>): void {
     if (this.isEqualToSelectedGroup(payableGroup)) {
       this.selectedGroup = null;
     } else {
@@ -258,7 +255,7 @@ export class PerformedServicesComponent implements OnInit {
     }
   }
 
-  setPerformedService(ps: PerformedService): void {
+  public setPerformedService(ps: PerformedService): void {
     if (this.isEqualToSelectedElement(ps)) {
       this.selectedElement = null;
     } else {
@@ -266,44 +263,28 @@ export class PerformedServicesComponent implements OnInit {
     }
   }
 
-  isEqualToSelectedElement(performedService: PerformedService): boolean {
-    return this.selectedElement !== null && this.selectedElement.id === performedService.id;
-  }
-
-  getPerformedServiceClass(p: Payable): string {
-    const paymentStatus = p.getPaymentStatus();
-    return this.getPaymentStatusClass(paymentStatus);
-  }
-
-  getGroupClass(payableGroup: PayableGroup<PerformedService>): string {
-    if (this.isEqualToSelectedGroup(payableGroup)) {
-      return '';
-    }
-    return this.getPaymentStatusClass(payableGroup.status);
-  }
-
-  isGrouped(): boolean {
-    return this.displayData.length > 1 || (this.displayData.length === 1 && this.displayData[0].title !== '');
-  }
-
-  isEqualToSelectedGroup(payableGroup: PayableGroup<PerformedService>): boolean {
-    return this.selectedGroup !== null && this.selectedGroup.isEqual(payableGroup);
-  }
-
-  getPaymentStatusClass(paymentStatus: PaymentStatus): string {
+  public getPaymentStatusClass(paymentStatus: PaymentStatus): string {
     if (paymentStatus === PaymentStatus.PAID) {
       return 'paid-ps';
     }
     if (paymentStatus === PaymentStatus.NOT_PAID) {
       return 'not-paid-ps';
     }
-    if (paymentStatus === PaymentStatus.UNDERPAID) {
-      return 'underpaid-ps';
-    }
-    return '';
+    return 'underpaid-ps';
   }
 
-  serviceNeedsPayment(): boolean {
+  public getGroupClass(payableGroup: PayableGroup<PerformedService>): string {
+    if (this.isEqualToSelectedGroup(payableGroup)) {
+      return '';
+    }
+    return this.getPaymentStatusClass(payableGroup.status);
+  }
+
+  public isGrouped(): boolean {
+    return this.groupingMode !== Grouping.LACK;
+  }
+
+  public serviceNeedsPayment(): boolean {
     if (!this.selectedElement) {
       return false;
     }
@@ -311,27 +292,59 @@ export class PerformedServicesComponent implements OnInit {
     return paymentStatus === PaymentStatus.UNDERPAID || paymentStatus === PaymentStatus.NOT_PAID;
   }
 
-  getLackingAmount(): number {
+  public getLackingAmount(): number {
     if (!this.selectedElement) {
       return 0;
     }
     return this.selectedElement.price - this.selectedElement.getPaidAmountForNow();
   }
 
-  createPerformedServicePayment(performedServicePayment: PerformedServicePayment): void {
-    this.createPerformedServicePaymentEvent.emit(performedServicePayment);
+  public createPerformedServicePayment(performedServicePayment: PerformedServicePayment): void {
+    this.onPerformedServicePaymentCreate.emit(performedServicePayment);
     this.resetEditForm();
   }
 
-  getDataLength(): number {
-    return this.displayData.reduce((a, b) => a + (b && b.data && b.data.length || 0), 0);
-  }
-
-  getClientPaymentsRelations(performedService: PerformedService): SimplePerformedServicePayment[] {
+  public getClientPaymentsRelations(performedService: PerformedService): SimplePerformedServicePayment[] {
     return performedService.clientPaymentsRelations.sort(
       ComparatorBuilder.comparingByDate<SimplePerformedServicePayment>(p => p?.date || new Date(0))
         .thenComparing(p => p.price)
         .build()
     );
   }
+
+  //region Just utils - simple getters and setters and more trivial yet useful stuff
+
+  isNonEditMode(): boolean {
+    return this.editMode === '';
+  }
+
+  isGeneralEditMode(): boolean {
+    return this.editMode === 'edit';
+  }
+
+  isCreateEditMode(): boolean {
+    return this.editMode === 'create';
+  }
+
+  isPaymentSelectionEditMode(): boolean {
+    return this.editMode === 'payment-selection';
+  }
+
+  public isEqualToSelectedGroup(payableGroup: PayableGroup<PerformedService>): boolean {
+    return this.selectedGroup !== null && this.selectedGroup.isEqual(payableGroup);
+  }
+
+  public isEqualToSelectedElement(performedService: PerformedService): boolean {
+    return this.selectedElement !== null && this.selectedElement.id === performedService.id;
+  }
+
+  isNoGrouping(): boolean {
+    return this.groupingMode === Grouping.LACK;
+  }
+
+  isGroupingByClients(): boolean {
+    return this.groupingMode === Grouping.BY_CLIENTS;
+  }
+
+  //endregion
 }

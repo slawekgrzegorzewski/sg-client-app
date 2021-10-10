@@ -30,7 +30,7 @@
     <div class="sg-flex-column">
       <div class="sg-flex-row">
         <div style="width: 20%"></div>
-        <h5 *ngIf="title" style="text-align: center; width: 60%">{{title}} ({{getDataLength()}})</h5>
+        <h5 *ngIf="title" style="text-align: center; width: 60%">{{title}}</h5>
         <button style="width: 20%" (click)="prepareToCreate()" *ngIf="editable && isNonEditMode()"
                 class="btn btn-primary btn-sm">
           Stwórz

@@ -6,6 +6,10 @@ import {ClientPayment} from '../../../model/accountant/client-payment';
 import {PerformedService} from '../../../model/accountant/performed-service';
 import {PerformedServicePayment} from '../../../model/accountant/performed-service-payment';
 import {DatePipe, TitleCasePipe} from '@angular/common';
+import {Grouping} from './performed-services.component';
+
+type CompanyLogDisplayType = 'desktop' | 'mobile';
+type ShowEntity = 'services' | 'payments'
 
 @Component({
   selector: 'app-company-log',
@@ -18,45 +22,166 @@ export class CompanyLogComponent implements OnInit {
   @Input() clients: Client[] = [];
   @Input() clientPayments: ClientPayment[] = [];
   @Input() allCurrencies: Currency[] = [];
-  @Input() performedServices: PerformedService[] = [];
+  private _performedServices: PerformedService[] = [];
+  @Input() get performedServices(): PerformedService[] {
+    return this._performedServices;
+  }
 
-  @Output() createPSEvent = new EventEmitter<PerformedService>();
-  @Output() updatePSEvent = new EventEmitter<PerformedService>();
-  @Output() createPSPaymentEvent = new EventEmitter<PerformedServicePayment>();
-  @Output() createCPEvent = new EventEmitter<ClientPayment>();
-  @Output() updateCPEvent = new EventEmitter<ClientPayment>();
+  set performedServices(value: PerformedService[]) {
+    this._performedServices = value;
+    this.filterDataToShow();
+  }
+
+  performedServicesToShow: PerformedService[] = [];
+
+  @Input() displayType: CompanyLogDisplayType = 'desktop';
+
+  @Output() onPerformedServiceCreate = new EventEmitter<PerformedService>();
+  @Output() onPerformedServiceUpdate = new EventEmitter<PerformedService>();
+  @Output() onPerformedServicePaymentCreate = new EventEmitter<PerformedServicePayment>();
+  @Output() onClientPaymentCreate = new EventEmitter<ClientPayment>();
+  @Output() onClientPaymentUpdate = new EventEmitter<ClientPayment>();
 
   @Output() dateSelected = new EventEmitter<Date>();
-  displayingPeriod = new Date();
+
+  private performedServicesGroupingMode: Grouping = Grouping.LACK;
+
+  private _displayingDate = new Date(0);
+  get displayingDate(): Date {
+    return this._displayingDate;
+  }
+
+  set displayingDate(value: Date) {
+    const monthChanged = !this.isTheSameMonth(value, this._displayingDate);
+    this._displayingDate = value;
+    if (this.displayType === 'mobile') {
+      this.setMobileTitle();
+    }
+    if (monthChanged) {
+      this.dateSelected.emit(value);
+    }
+    this.filterDataToShow();
+  }
+
+  private setMobileTitle() {
+    if (this.performedServicesGroupingMode === Grouping.LACK) {
+      this.mobilePerformedServicesTitle = this.datePipe.transform(this.displayingDate, 'dd MMMM y') || '';
+    } else if (this.performedServicesGroupingMode === Grouping.BY_CLIENTS) {
+      this.mobilePerformedServicesTitle = this.datePipe.transform(this.displayingDate, 'LLLL\'\'yy') || '';
+    }
+    this.mobileClientPaymentsTitle = this.datePipe.transform(this.displayingDate, 'LLLL\'\'yy') || '';
+  }
+
+  showEntity: ShowEntity = 'services';
+  mobilePerformedServicesTitle = '';
+  mobileClientPaymentsTitle = '';
 
   constructor(private datePipe: DatePipe,
               private titleCasePipe: TitleCasePipe) {
   }
 
   ngOnInit(): void {
-    this.setDisplayingDate(new Date());
+    this.displayingDate = new Date();
   }
 
-  previous(): void {
-    const newDate = new Date(this.displayingPeriod);
+  previousMonth(): void {
+    const newDate = new Date(this.displayingDate);
     newDate.setMonth(newDate.getMonth() - 1);
-    this.setDisplayingDate(newDate);
+    this.displayingDate = newDate;
   }
 
-  next(): void {
-    const newDate = new Date(this.displayingPeriod);
+  nextMonth(): void {
+    const newDate = new Date(this.displayingDate);
     newDate.setMonth(newDate.getMonth() + 1);
-    this.setDisplayingDate(newDate);
+    this.displayingDate = newDate;
   }
 
-  monthYearString(date: Date): string {
-    const value = this.datePipe.transform(date, 'LLLL') + '\'' + this.datePipe.transform(date, 'yy');
-    return this.titleCasePipe.transform(value);
+  nextDayPerformedServices() {
+    if (this.displayType === 'mobile' && this.performedServicesGroupingMode === Grouping.LACK) {
+      this.moveToNextDay(1);
+    } else {
+      this.moveToNextMonth(1);
+    }
   }
 
-  private setDisplayingDate(date: Date): void {
-    this.displayingPeriod = date;
-    this.dateSelected.emit(this.displayingPeriod);
+  previousDayPerformedServices() {
+    if (this.displayType === 'mobile' && this.performedServicesGroupingMode === Grouping.LACK) {
+      this.moveToNextDay(-1);
+    } else {
+      this.moveToNextMonth(-1);
+    }
   }
 
+  private moveToNextDay(days: number) {
+    this.changeDay(
+      days,
+      (date, numberOfUnits) => new Date(date.setDate((date.getDate() + numberOfUnits)))
+    );
+  }
+
+  private moveToNextMonth(months: number): void {
+    this.changeDay(
+      months,
+      (date, numberOfUnits) => new Date(date.setMonth((date.getMonth() + numberOfUnits)))
+    );
+  }
+
+  private changeDay(numberOfUnits: number, dateChangingFunction: (date: Date, numberOfUnits: number) => Date): void {
+
+    const previous = new Date(this.displayingDate);
+    const next = dateChangingFunction(new Date(this.displayingDate), numberOfUnits);
+    if (next.getTime() > new Date().getTime()) {
+      return;
+    }
+    this.displayingDate = next;
+  }
+
+  onGroupingModeChange(event: Grouping) {
+    this.performedServicesGroupingMode = event;
+    this.filterDataToShow();
+    this.setMobileTitle();
+  }
+
+  filterDataToShow(): void {
+    if (this.displayType === 'mobile' && this.performedServicesGroupingMode === Grouping.LACK) {
+      this.performedServicesToShow = this.performedServices.filter(ps => this.isTheSameDay(ps.date, this.displayingDate));
+    } else {
+      this.performedServicesToShow = this.performedServices;
+    }
+  }
+
+//region Just utils - simple getters and setters and more trivial yet useful stuff
+  isDesktop() {
+    return this.displayType === 'desktop';
+  }
+
+  isMobile() {
+    return this.displayType === 'mobile';
+  }
+
+  displayingServices(): boolean {
+    return this.showEntity === 'services';
+  }
+
+  showServices(): void {
+    this.showEntity = 'services';
+  }
+
+  displayingPayments(): boolean {
+    return this.showEntity === 'payments';
+  }
+
+  showPayments(): void {
+    this.showEntity = 'payments';
+  }
+
+  isTheSameMonth(date1: Date, date2: Date): boolean {
+    return date1.getFullYear() == date2.getFullYear() && date1.getMonth() == date2.getMonth();
+  }
+
+  isTheSameDay(date1: Date, date2: Date): boolean {
+    return this.isTheSameMonth(date1, date2) && date1.getDate() == date2.getDate();
+  }
+
+  //endregion
 }

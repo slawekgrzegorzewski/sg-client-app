@@ -4,15 +4,7 @@ import {Observable, of} from 'rxjs';
 import {Currency} from '../../../model/accountant/currency';
 import {CurrencyPipe, getCurrencySymbol} from '@angular/common';
 
-const INCOME = 'income';
-const EXPENSE = 'expense';
-const GENERAL_EDIT_MODE = 'general';
-const CREATE_EDIT_MODE = 'create';
-const TOPUP_EDIT_MODE = 'topup';
-const DEBIT_EDIT_MODE = 'debit';
-const EMPTY_EDIT_MODE = '';
-
-export type EditMode = 'income' | 'expense' | 'general' | 'create' | 'topup' | 'debit' | '';
+export type EditMode = 'income' | 'expense' | 'edit' | 'create' | 'topup' | 'debit' | '';
 
 @Component({
   selector: 'app-piggy-banks',
@@ -42,7 +34,7 @@ export class PiggyBanksComponent implements OnInit {
   @Input() allCurrencies: Currency[] = [];
   @Output() updateEvent = new EventEmitter<PiggyBank>();
   @Output() createEvent = new EventEmitter<PiggyBank>();
-  editMode: EditMode = EMPTY_EDIT_MODE;
+  editMode: EditMode = '';
 
   overElement: PiggyBank | null = null;
 
@@ -119,23 +111,23 @@ export class PiggyBanksComponent implements OnInit {
 
   prepareToCreate(): void {
     if (this.adminMode) {
-      this.prepareToEdit(new PiggyBank(this.currencyPipe, {}), CREATE_EDIT_MODE);
+      this.prepareToEdit(new PiggyBank(this.currencyPipe, {}), 'create');
     }
   }
 
   prepareToGeneralEdit(): void {
     if (this.adminMode) {
-      this.prepareToEdit(this.overElement, GENERAL_EDIT_MODE);
+      this.prepareToEdit(this.overElement, 'edit');
     }
   }
 
   prepareToTopUp(): void {
-    this.prepareToEdit(this.overElement, TOPUP_EDIT_MODE);
+    this.prepareToEdit(this.overElement, 'topup');
 
   }
 
   prepareToDebit(): void {
-    this.prepareToEdit(this.overElement, DEBIT_EDIT_MODE);
+    this.prepareToEdit(this.overElement, 'debit');
   }
 
   prepareToEdit(editElement: PiggyBank | null, editMode: EditMode): void {
@@ -144,7 +136,7 @@ export class PiggyBanksComponent implements OnInit {
   }
 
   resetEditForm(): void {
-    this.editMode = EMPTY_EDIT_MODE;
+    this.editMode = '';
     this.editElement = null;
     this.operationAmount = 0;
     this.setOverPiggyBank(null, null);
@@ -189,23 +181,23 @@ export class PiggyBanksComponent implements OnInit {
   }
 
   isNonEditMode(): boolean {
-    return this.editMode === EMPTY_EDIT_MODE;
+    return this.editMode === '';
   }
 
   isGeneralEditMode(): boolean {
-    return this.editMode === GENERAL_EDIT_MODE;
+    return this.editMode === 'edit';
   }
 
   isCreateEditMode(): boolean {
-    return this.editMode === CREATE_EDIT_MODE;
+    return this.editMode === 'create';
   }
 
   isTopUpEditMode(): boolean {
-    return this.editMode === TOPUP_EDIT_MODE;
+    return this.editMode === 'topup';
   }
 
   isDebitEditMode(): boolean {
-    return this.editMode === DEBIT_EDIT_MODE;
+    return this.editMode === 'debit';
   }
 
   canCreate(): boolean {

@@ -1,11 +1,70 @@
-<div class="row col-sm sg-flex-justify-center">
-  <div class="sg-flex-column">
-    <ng-container *ngTemplateOutlet="displayTypeSelectorTemplate"></ng-container>
-    <ng-container *ngTemplateOutlet="performedServicesTemplate"></ng-container>
-  </div>
-</div>
+<ng-container *ngIf="performedServicesDisplayType === 'mobile'">
+  <ng-container *ngTemplateOutlet="mobileVersion"></ng-container>
+</ng-container>
 
-<ng-template #displayTypeSelectorTemplate>
+<ng-container *ngIf="performedServicesDisplayType === 'desktop'">
+  <ng-container *ngTemplateOutlet="desktopVersion"></ng-container>
+</ng-container>
+
+<ng-template #mobileVersion>
+  <div style="height: 100%" class="sg-flex-column">
+
+    <ng-container *ngTemplateOutlet="mobileGroupingHeader"></ng-container>
+
+    <ng-container *ngTemplateOutlet="performedServicesTable"></ng-container>
+
+    <app-performed-service-edit *ngIf="isGeneralEditMode() || isCreateEditMode()"
+                                [performedService]="editElement"
+                                [performedServices]="allPerformedServices"
+                                [editMode]="isGeneralEditMode()"
+                                [createMode]="isCreateEditMode()"
+                                [services]="services"
+                                [clients]="clients"
+                                [allCurrencies]="allCurrencies"
+                                (updateEvent)="update($event)"
+                                (createEvent)="create($event)"
+                                (cancelEvent)="resetEditForm()"
+    ></app-performed-service-edit>
+    <app-payment-selection *ngIf="isPaymentSelectionEditMode()"
+                           [forService]="selectedElement"
+                           [payments]="clientPayments"
+                           [maxPrice]="getLackingAmount()"
+                           (createEvent)="createPerformedServicePayment($event)"
+                           (cancelEvent)="resetEditForm()">
+    </app-payment-selection>
+
+    <button *ngIf="!editElement" (click)="prepareToCreate()"
+            style="width: 100%; margin-top: auto"
+            class="btn btn-outline-primary sg-flex-align-self-end">
+      Dodaj
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #mobileGroupingHeader>
+  <div class="sg-flex-row sg-flex-justify-space-between">
+    <div class="sg-flex-auto" style="width: 30%">
+      <button (click)="noGrouping()" class="btn btn-link btn-sm">Dzienne</button>
+    </div>
+    <div class="sg-flex-auto sg-flex-column sg-flex-align-center sg-flex-justify-center" style="width: 40%">
+      <h6 style="text-align: center">{{title}}</h6>
+    </div>
+    <div class="sg-flex-auto" style="width: 30%">
+      <button (click)="byClients()" class="btn btn-link btn-sm">Wg klientów</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #desktopVersion>
+  <div class="row col-sm sg-flex-justify-center">
+    <div class="sg-flex-column">
+      <ng-container *ngTemplateOutlet="desktopGroupingHeader"></ng-container>
+      <ng-container *ngTemplateOutlet="desktopVersionContent"></ng-container>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #desktopGroupingHeader>
   <div class="sg-flex-row sg-flex-justify-center">
     <button (click)="byClients()" class="btn btn-link btn-sm">
       Według klientów
@@ -22,108 +81,20 @@
   </div>
 </ng-template>
 
-<ng-template #performedServicesTemplate>
+<ng-template #desktopVersionContent>
   <div class="sg-flex-column">
 
     <div class="sg-flex-row">
       <div style="width: 20%"></div>
-      <h5 *ngIf="title" style="text-align: center; width: 60%">{{title}} ({{getDataLength()}})</h5>
-      <button style="width: 20%" (click)="prepareToCreate()" *ngIf="isNonEditMode()" class="btn btn-primary btn-sm">Stwórz</button>
+      <h5 *ngIf="title" style="text-align: center; width: 60%">{{title}}</h5>
+      <button (click)="prepareToCreate()" *ngIf="isNonEditMode()"
+              style="width: 20%"
+              class="btn btn-outline-primary btn-sm">
+        Stwórz
+      </button>
     </div>
-
-    <div *ngIf="isNonEditMode()" class="sg-flex-row sg-flex-justify-center">
-      <table style="width: 400px;">
-        <ng-container *ngFor="let group of displayData">
-          <tr *ngIf="group.title" (click)="setGroupToDisplay(group)"
-              [ngClass]="getGroupClass(group)"
-              [class.expanded-highlight-top]="isGrouped() && isEqualToSelectedGroup(group)"
-              [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)">
-            <td colspan="2" style="font-weight: bold">
-              {{group.title}}
-            </td>
-            <td colspan="2">
-              <div class="sg-flex-column">
-                <div *ngFor="let pi of group.additionalFinancialData | keyvalue" style="text-align: right">
-                  {{ pi.value.paid | currency: pi.key }} / {{ pi.value.of | currency: pi.key }}
-                </div>
-              </div>
-            </td>
-          </tr>
-          <ng-container *ngIf="isEqualToSelectedGroup(group)">
-            <tr [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)">
-              <td *ngIf="isGrouped()" style="width: 50px"></td>
-              <td *ngIf="showDateColumn" style="width: 110px">Data</td>
-              <td *ngIf="showClientColumn" style="width: 130px">Klient</td>
-              <td *ngIf="showServiceColumn" style="width: 100px">Usługa</td>
-              <td style="width: 60px">Cena</td>
-            </tr>
-            <ng-container *ngFor="let performedService of group.data">
-              <tr #row [ngClass]="getPerformedServiceClass(performedService)"
-                  (click)="setPerformedService(performedService)"
-                  [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)"
-                  class="performed-service-row sg-row-hoverable">
-                <td *ngIf="isGrouped()" style="width: 50px"></td>
-                <td *ngIf="showDateColumn">{{performedService.date | localizedDate }}</td>
-                <td *ngIf="showClientColumn">{{performedService.client.name}}</td>
-                <td *ngIf="showServiceColumn">{{performedService.service.name}}</td>
-                <td style="text-align:right">{{performedService.price| currency: performedService.currency}}</td>
-              </tr>
-
-              <tr *ngIf="isEqualToSelectedElement(performedService)"
-                  [ngClass]="getPerformedServiceClass(performedService)"
-                  (click)="setPerformedService(performedService)"
-                  [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)">
-                <td *ngIf="isGrouped()" style="width: 50px"></td>
-                <td [colSpan]="isGrouped() ? 3 :4">
-                  <div class="sg-flex-column">
-                    <div class="sg-flex-row sg-flex-justify-flex-end">
-                      <button (click)="prepareToGeneralEdit()" class="btn btn-link btn-sm">
-                        Edytuj
-                      </button>
-                      <button (click)="prepareToPaymentSelectionEdit()" *ngIf="serviceNeedsPayment()"
-                              class="btn btn-link btn-sm">
-                        Opłać
-                      </button>
-                    </div>
-                    <table style="width: 100%">
-                      <thead>
-                      <tr>
-                        <td>Data</td>
-                        <td>Cena</td>
-                        <td style="width: 30px">P</td>
-                        <td style="width: 30px">PF</td>
-                        <td style="width: 30px">F</td>
-                        <td style="width: 30px">C</td>
-                      </tr>
-                      </thead>
-                      <tr *ngFor="let payment of getClientPaymentsRelations(performedService)">
-                        <td style="text-align:center">{{payment.date | localizedDate}}</td>
-                        <td style="text-align:right">{{payment.price | currency: payment.currency}}</td>
-                        <td style="text-align:center">
-                          <input type="checkbox" [ngModel]="payment.billOfSale" disabled>
-                        </td>
-                        <td style="text-align:center">
-                          <input type="checkbox" [ngModel]="payment.billOfSaleAsInvoice" disabled>
-                        </td>
-                        <td style="text-align:center">
-                          <input type="checkbox" [ngModel]="payment.invoice" disabled>
-                        </td>
-                        <td style="text-align:center">
-                          <input type="checkbox" [ngModel]="payment.notRegistered" disabled>
-                        </td>
-                      </tr>
-                    </table>
-                  </div>
-                </td>
-              </tr>
-            </ng-container>
-            <tr [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)"
-                [class.expanded-highlight-bottom]="isGrouped() && isEqualToSelectedGroup(group)">
-              <td colspan="4"></td>
-            </tr>
-          </ng-container>
-        </ng-container>
-      </table>
+    <div class="sg-flex-row sg-flex-justify-center" style="width: 400px;">
+      <ng-container *ngTemplateOutlet="performedServicesTable"></ng-container>
     </div>
 
     <app-performed-service-edit *ngIf="isGeneralEditMode() || isCreateEditMode()"
@@ -146,4 +117,104 @@
                            (cancelEvent)="resetEditForm()">
     </app-payment-selection>
   </div>
+</ng-template>
+
+<ng-template #performedServicesTable>
+  <table *ngIf="isNonEditMode()" style="width: 100%">
+    <ng-container *ngFor="let group of displayData">
+      <tr *ngIf="isGrouped()" (click)="setGroupToDisplay(group)"
+          [ngClass]="getGroupClass(group)"
+          [class.expanded-highlight-top]="isEqualToSelectedGroup(group)"
+          [class.expanded-highlight-sides]="isEqualToSelectedGroup(group)">
+        <td [colSpan]="2" style="font-weight: bold">
+          {{group.title}}
+        </td>
+        <td [colSpan]="2">
+          <div class="sg-flex-column">
+            <div *ngFor="let pi of group.additionalFinancialData | keyvalue" style="text-align: right">
+              {{ pi.value.paid | currency: pi.key }} / {{ pi.value.of | currency: pi.key }}
+            </div>
+          </div>
+        </td>
+      </tr>
+      <ng-container *ngIf="isEqualToSelectedGroup(group)">
+        <tr [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)">
+          <td *ngIf="isGrouped()" style="width: 50px"></td>
+          <td *ngIf="showDateColumn" style="width: 110px">Data</td>
+          <td *ngIf="showClientColumn" style="width: 130px">Klient</td>
+          <td *ngIf="showServiceColumn" style="width: 100px">Usługa</td>
+          <td style="width: 60px">Cena</td>
+        </tr>
+        <ng-container *ngFor="let performedService of group.data">
+          <tr #row [ngClass]="getPaymentStatusClass(performedService.getPaymentStatus())"
+              (click)="setPerformedService(performedService)"
+              [class.expanded-highlight-sides]="(isGrouped() && isEqualToSelectedGroup(group)) || (!isGrouped() && isEqualToSelectedElement(performedService))"
+              [class.expanded-highlight-top]="!isGrouped() && isEqualToSelectedElement(performedService)"
+              class="performed-service-row sg-row-hoverable">
+            <td *ngIf="isGrouped()" style="width: 50px"></td>
+            <td *ngIf="showDateColumn">{{performedService.date | localizedDate }}</td>
+            <td *ngIf="showClientColumn">{{performedService.client.name}}</td>
+            <td *ngIf="showServiceColumn">{{performedService.service.name}}</td>
+            <td style="text-align:right">{{performedService.price| currency: performedService.currency}}</td>
+          </tr>
+
+          <tr *ngIf="isEqualToSelectedElement(performedService)"
+              [ngClass]="getPaymentStatusClass(performedService.getPaymentStatus())"
+              (click)="setPerformedService(performedService)"
+              [class.expanded-highlight-sides]="(isGrouped() && isEqualToSelectedGroup(group)) || (!isGrouped() && isEqualToSelectedElement(performedService))"
+              [class.expanded-highlight-bottom]="!isGrouped() && isEqualToSelectedElement(performedService)">
+            <td *ngIf="isGrouped()" style="width: 50px"></td>
+            <td [colSpan]="getNumberOfDisplayedColumns()">
+              <div class="sg-flex-column">
+                <div class="sg-flex-row sg-flex-justify-flex-end">
+                  <button (click)="prepareToEdit()" class="btn btn-link btn-sm">
+                    Edytuj
+                  </button>
+                  <button (click)="prepareToPaymentSelectionEdit()" *ngIf="serviceNeedsPayment()"
+                          class="btn btn-link btn-sm">
+                    Opłać
+                  </button>
+                </div>
+                <table *ngIf="performedService.clientPaymentsRelations.length > 0" style="width: 100%">
+                  <thead>
+                  <tr>
+                    <td colspan="6" style="font-weight: bold">Płatności</td>
+                  </tr>
+                  <tr>
+                    <td>Data</td>
+                    <td>Cena</td>
+                    <td style="width: 30px">P</td>
+                    <td style="width: 30px">PF</td>
+                    <td style="width: 30px">F</td>
+                    <td style="width: 30px">C</td>
+                  </tr>
+                  </thead>
+                  <tr *ngFor="let payment of getClientPaymentsRelations(performedService)">
+                    <td style="text-align:center">{{payment.date | localizedDate}}</td>
+                    <td style="text-align:right">{{payment.price | currency: payment.currency}}</td>
+                    <td style="text-align:center">
+                      <input type="checkbox" [ngModel]="payment.billOfSale" disabled>
+                    </td>
+                    <td style="text-align:center">
+                      <input type="checkbox" [ngModel]="payment.billOfSaleAsInvoice" disabled>
+                    </td>
+                    <td style="text-align:center">
+                      <input type="checkbox" [ngModel]="payment.invoice" disabled>
+                    </td>
+                    <td style="text-align:center">
+                      <input type="checkbox" [ngModel]="payment.notRegistered" disabled>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+        <tr [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)"
+            [class.expanded-highlight-bottom]="isGrouped() && isEqualToSelectedGroup(group)">
+          <td colspan="4"></td>
+        </tr>
+      </ng-container>
+    </ng-container>
+  </table>
 </ng-template>

@@ -1,37 +1,98 @@
-<div class="sg-flex-row sg-flex-justify-space-between">
-  <div>
-    <button class="btn btn-link btn-small" (click)="previous()">Wcześniej</button>
+<ng-container *ngIf="isDesktop()">
+  <ng-container *ngTemplateOutlet="desktopView"></ng-container>
+</ng-container>
+<ng-container *ngIf="isMobile()">
+  <ng-container *ngTemplateOutlet="mobileView"></ng-container>
+</ng-container>
+
+
+<ng-template #mobileView>
+  <div class="sg-flex-column" style="height: 100%;">
+    <div class="sg-flex-row">
+      <div class="btn-group sg-flex-auto">
+        <button class="btn"
+                [ngClass]="{'btn-outline-primary': !displayingServices(),'btn-primary': displayingServices()}"
+                (click)="showServices();">
+          Usługi
+        </button>
+        <button class="btn"
+                [ngClass]="{'btn-outline-primary': !displayingPayments(),'btn-primary': displayingPayments()}"
+                (click)="showPayments()">
+          Płatności
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="displayingServices()"
+         (swipeleft)="nextDayPerformedServices()"
+         (swiperight)="previousDayPerformedServices()"
+         style="height: 100%"
+         class="sg-flex-column">
+      <app-performed-services
+        [performedServicesDisplayType]="'mobile'"
+        [title]="mobilePerformedServicesTitle"
+        [performedServices]="performedServicesToShow"
+        [services]="services"
+        [clients]="clients"
+        [clientPayments]="clientPayments"
+        [allCurrencies]="allCurrencies"
+        (onPerformedServiceCreate)="onPerformedServiceCreate.emit($event)"
+        (onPerformedServiceUpdate)="onPerformedServiceUpdate.emit($event)"
+        (onPerformedServicePaymentCreate)="onPerformedServicePaymentCreate.emit($event)"
+        (onGroupingModeChange)="onGroupingModeChange($event)"
+        style="margin-bottom: 20px; width: 100%;height: 100%;">
+      </app-performed-services>
+    </div>
+    <div *ngIf="displayingPayments()" (swipeleft)="nextMonth()" (swiperight)="previousMonth()"
+         style="height: 100%" class="sg-flex-column">
+      <app-client-payments
+        [title]="mobileClientPaymentsTitle"
+        [clientPayments]="clientPayments"
+        [clients]="clients"
+        [allCurrencies]="allCurrencies"
+        [performedServices]="performedServices"
+        (createEvent)="onClientPaymentCreate.emit($event)"
+        (updateEvent)="onClientPaymentUpdate.emit($event)"
+        style="margin-bottom: 20px; width: 400px;margin-left: 5px">
+      </app-client-payments>
+    </div>
   </div>
-  <div>
-    <h4><span>{{monthYearString(displayingPeriod)}}</span></h4>
+</ng-template>
+
+<ng-template #desktopView>
+  <div class="sg-flex-row sg-flex-justify-space-between">
+    <div>
+      <button class="btn btn-link btn-small" (click)="previousMonth()">Wcześniej</button>
+    </div>
+    <div>
+      <h4><span>{{displayingDate | localizedDate: "LLLL'\'yy"}}</span></h4>
+    </div>
+    <div class="sg-flex-column">
+      <button class="btn btn-link btn-small" (click)="nextMonth()">Później</button>
+    </div>
   </div>
-  <div class="sg-flex-column">
-    <button class="btn btn-link btn-small" (click)="next()">Później</button>
+  <div class="sg-flex-row sg-flex-justify-flex-start">
+    <app-performed-services
+      [title]="'Wykonane usługi'"
+      [performedServices]="performedServicesToShow"
+      [services]="services"
+      [clients]="clients"
+      [clientPayments]="clientPayments"
+      [allCurrencies]="allCurrencies"
+      (onPerformedServiceCreate)="onPerformedServiceCreate.emit($event)"
+      (onPerformedServiceUpdate)="onPerformedServiceUpdate.emit($event)"
+      (onPerformedServicePaymentCreate)="onPerformedServicePaymentCreate.emit($event)"
+      style="margin-bottom: 20px; width: 450px;margin-right: 5px">
+    </app-performed-services>
+    <app-client-payments
+      [title]="'Płatności'"
+      [clientPayments]="clientPayments"
+      [clients]="clients"
+      [allCurrencies]="allCurrencies"
+      [performedServices]="performedServices"
+      (createEvent)="onClientPaymentCreate.emit($event)"
+      (updateEvent)="onClientPaymentUpdate.emit($event)"
+      style="margin-bottom: 20px; width: 400px;margin-left: 5px">
+    </app-client-payments>
   </div>
-</div>
-<div class="sg-flex-row sg-flex-justify-flex-start">
-  <app-performed-services
-    [title]="'Wykonane usługi'"
-    [performedServices]="performedServices"
-    [services]="services"
-    [clients]="clients"
-    [clientPayments]="clientPayments"
-    [allCurrencies]="allCurrencies"
-    (createEvent)="createPSEvent.emit($event)"
-    (updateEvent)="updatePSEvent.emit($event)"
-    (createPerformedServicePaymentEvent)="createPSPaymentEvent.emit($event)"
-    style="margin-bottom: 20px; width: 450px;margin-right: 5px"
-  >
-  </app-performed-services>
-  <app-client-payments
-    [title]="'Płatności'"
-    [clientPayments]="clientPayments"
-    [clients]="clients"
-    [allCurrencies]="allCurrencies"
-    [performedServices]="performedServices"
-    (createEvent)="createCPEvent.emit($event)"
-    (updateEvent)="updateCPEvent.emit($event)"
-    style="margin-bottom: 20px; width: 400px;margin-left: 5px"
-  >
-  </app-client-payments>
-</div>
+</ng-template>

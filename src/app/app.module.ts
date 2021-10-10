@@ -76,7 +76,6 @@ import {CubesHomeComponent} from './pages/cubes/home/cubes-home.component';
 import {CubeRecordsService} from './services/accountant/cube-records.service';
 import {HolidayCurrenciesService} from './services/accountant/holiday-currencies.service';
 import {HolidayCurrenciesComponent} from './components/accountant/holiday-currencies/holiday-currencies.component';
-import {CompanyLogDayByDayComponent} from './components/accountant/company-log/company-log-day-by-day.component';
 
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
@@ -132,8 +131,7 @@ export class MyHammerConfig extends HammerGestureConfig {
     CompanyLogComponent,
     TimerComponent,
     CubesHomeComponent,
-    HolidayCurrenciesComponent,
-    CompanyLogDayByDayComponent
+    HolidayCurrenciesComponent
   ],
   imports: [
     BrowserModule,

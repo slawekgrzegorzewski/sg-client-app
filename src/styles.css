@@ -74,8 +74,22 @@
   text-align: center;
 }
 
+.sg-flex-auto {
+  flex: auto;
+}
+
+.sg-flex-align-self-end {
+  align-self: flex-end;
+}
+
 app-general-typeahead, app-date-picker {
   padding: 0 !important;
   margin: 0 !important;
   border: 0 !important;
+}
+
+.sg-flex-fill-available-space-evenly {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: auto;
 }

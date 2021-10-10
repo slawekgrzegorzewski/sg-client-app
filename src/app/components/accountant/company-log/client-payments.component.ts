@@ -8,14 +8,7 @@ import {PaymentStatus} from '../../../model/accountant/payable';
 import {PayableGroup} from '../../../model/accountant/payable-groupper';
 import {ComparatorBuilder} from '../../../../utils/comparator-builder';
 
-const GENERAL_EDIT_MODE = 'general';
-const CREATE_EDIT_MODE = 'create';
-const EMPTY_EDIT_MODE = '';
-
-export const GROUPING_BUTTON_AT_HEAD = 'head';
-export const GROUPING_BUTTON_AT_BOTTOM = 'bottom';
-
-export type EditMode = 'general' | 'create' | '';
+export type EditMode = 'edit' | 'create' | '';
 export type GroupingButtonsPosition = 'head' | 'bottom';
 
 enum Grouping {
@@ -31,7 +24,7 @@ export class ClientPaymentComponent implements OnInit {
 
   @Input() title: string | null = null;
   @Input() editable = true;
-  @Input() groupingButtonsPosition: GroupingButtonsPosition = GROUPING_BUTTON_AT_HEAD;
+  @Input() groupingButtonsPosition: GroupingButtonsPosition = 'head';
 
   groupingMode = Grouping.LACK;
 
@@ -58,7 +51,7 @@ export class ClientPaymentComponent implements OnInit {
   @Output() updateEvent = new EventEmitter<ClientPayment>();
   @Output() createEvent = new EventEmitter<ClientPayment>();
 
-  editMode: EditMode = EMPTY_EDIT_MODE;
+  editMode: EditMode = '';
   overElement: ClientPayment | null = null;
   editElement: ClientPayment | null = null;
 
@@ -190,12 +183,12 @@ export class ClientPaymentComponent implements OnInit {
     const clientPayment = new ClientPayment();
     clientPayment.currency = 'PLN';
     clientPayment.date = new Date();
-    this.prepareToEdit(clientPayment, CREATE_EDIT_MODE);
+    this.prepareToEdit(clientPayment, 'create');
   }
 
   prepareToGeneralEdit(): void {
     if (this.overElement) {
-      this.prepareToEdit(this.overElement, GENERAL_EDIT_MODE);
+      this.prepareToEdit(this.overElement, 'edit');
     }
   }
 
@@ -205,7 +198,7 @@ export class ClientPaymentComponent implements OnInit {
   }
 
   resetEditForm(): void {
-    this.editMode = EMPTY_EDIT_MODE;
+    this.editMode = '';
     this.editElement = null;
     this.setOverClientPayment(null, null);
   }
@@ -223,15 +216,15 @@ export class ClientPaymentComponent implements OnInit {
   }
 
   isNonEditMode(): boolean {
-    return this.editMode === EMPTY_EDIT_MODE;
+    return this.editMode === '';
   }
 
   isGeneralEditMode(): boolean {
-    return this.editMode === GENERAL_EDIT_MODE;
+    return this.editMode === 'edit';
   }
 
   isCreateEditMode(): boolean {
-    return this.editMode === CREATE_EDIT_MODE;
+    return this.editMode === 'create';
   }
 
   setGroupToDisplay(payableGroup: PayableGroup<ClientPayment>): void {
@@ -285,10 +278,6 @@ export class ClientPaymentComponent implements OnInit {
       return 'underpaid-ps';
     }
     return '';
-  }
-
-  getDataLength(): number {
-    return this.displayData.reduce((a, b) => a + (b && b.data && b.data.length || 0), 0);
   }
 
   getServiceRelations(clientPayment: ClientPayment): { date: Date, service: string, price: number, currency: string }[] {

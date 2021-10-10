@@ -149,6 +149,11 @@ export class AccountantHomeComponent implements OnInit {
       .subscribe(data => this.performedServices = data);
   }
 
+  createPerformedServicePayment(performedServicePayment: PerformedServicePayment): void {
+    this.companyLogHelper.createPerformedServicePayment(performedServicePayment, this.currentCompanyDate)
+      .subscribe((performedServices) => this.fetchCompanyData(this.currentCompanyDate || new Date()));
+  }
+
   createClientPayment(clientPayment: ClientPayment): void {
     this.companyLogHelper.createClientPayment(clientPayment, this.currentCompanyDate)
       .subscribe(data => this.clientPayments = data);
@@ -157,11 +162,6 @@ export class AccountantHomeComponent implements OnInit {
   updateClientPayment(clientPayment: ClientPayment): void {
     this.companyLogHelper.updateClientPayment(clientPayment, this.currentCompanyDate)
       .subscribe(data => this.clientPayments = data);
-  }
-
-  createPerformedServicePayment(performedServicePayment: PerformedServicePayment): void {
-    this.companyLogHelper.createPerformedServicePayment(performedServicePayment, this.currentCompanyDate)
-      .subscribe((performedServices) => this.setCompanyLogData(performedServices));
   }
 
   private setCompanyLogData(performedServices?: PerformedService[], clientPayments?: ClientPayment[], services?: Service[], clients?: Client[]) {

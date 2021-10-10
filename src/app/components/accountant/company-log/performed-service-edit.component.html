@@ -53,10 +53,21 @@
   </div>
 </div>
 
-<div class="sg-flex-row sg-flex-justify-center">
-  <button *ngIf="editMode" [disabled]="!canEdit()" (click)="update()" class="btn btn-primary">Zapisz
+<div class="sg-flex-row sg-flex-align-stretch">
+  <button *ngIf="editMode"
+          [disabled]="!canEdit()"
+          (click)="update()"
+          class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+    Zapisz
   </button>
-  <button *ngIf="createMode" [disabled]="!canCreate()" (click)="create()" class="btn btn-primary">Stwórz
+  <button *ngIf="createMode"
+          [disabled]="!canCreate()"
+          (click)="create()"
+          class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+    Stwórz
   </button>
-  <button (click)="resetEditForm()" class="btn btn-primary">Anuluj</button>
+  <button (click)="resetEditForm()"
+          class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+    Anuluj
+  </button>
 </div>
