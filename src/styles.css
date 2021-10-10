@@ -87,3 +87,9 @@ app-general-typeahead, app-date-picker {
   margin: 0 !important;
   border: 0 !important;
 }
+
+.sg-flex-fill-available-space-evenly {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: auto;
+}

@@ -26,6 +26,7 @@ import {ClientsService} from '../../../services/accountant/clients.service';
 import {BillingPeriodsHelper} from './billing-periods-helper';
 import {Currency} from '../../../model/accountant/currency';
 import {ComparatorBuilder} from '../../../../utils/comparator-builder';
+import {PerformedServicePayment} from '../../../model/accountant/performed-service-payment';
 
 type EditMode = 'DISPLAY' | 'CREATE_INCOME' | 'CREATE_EXPENSE' | 'CREATE_PERFORMED_SERVICE';
 
@@ -141,6 +142,26 @@ export class AccountantHomeSmallComponent implements OnInit {
   createPerformedService(performedService: PerformedService) {
     this.companyLogHelper.createPerformedServiceAndFetchData(performedService, this.displayingPerformedServicesDate)
       .subscribe(performedServices => this.setCompanyLogData(performedServices));
+  }
+
+  updatePerformedService(performedService: PerformedService): void {
+    this.companyLogHelper.updatePerformedService(performedService, this.displayingPerformedServicesDate)
+      .subscribe(data => this.performedServices = data);
+  }
+
+  createPerformedServicePayment(performedServicePayment: PerformedServicePayment): void {
+    this.companyLogHelper.createPerformedServicePayment(performedServicePayment, this.displayingPerformedServicesDate)
+      .subscribe((performedServices) => this.refreshData());
+  }
+
+  createClientPayment(clientPayment: ClientPayment): void {
+    this.companyLogHelper.createClientPayment(clientPayment, this.displayingPerformedServicesDate)
+      .subscribe(data => this.clientPayments = data);
+  }
+
+  updateClientPayment(clientPayment: ClientPayment): void {
+    this.companyLogHelper.updateClientPayment(clientPayment, this.displayingPerformedServicesDate)
+      .subscribe(data => this.clientPayments = data);
   }
 
   moveToDay(to: Date) {

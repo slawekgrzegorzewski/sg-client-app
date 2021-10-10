@@ -22,13 +22,12 @@
       [clientPayments]="clientPayments"
       [allCurrencies]="allCurrencies"
       [performedServices]="performedServices"
-      (createPSEvent)="createPerformedService($event)"
-      (updatePSEvent)="updatePerformedService($event)"
-      (createPSPaymentEvent)="createPerformedServicePayment($event)"
-      (createCPEvent)="createClientPayment($event)"
-      (updateCPEvent)="updateClientPayment($event)"
+      (onPerformedServiceCreate)="createPerformedService($event)"
+      (onPerformedServiceUpdate)="updatePerformedService($event)"
+      (onPerformedServicePaymentCreate)="createPerformedServicePayment($event)"
+      (onClientPaymentCreate)="createClientPayment($event)"
+      (onClientPaymentUpdate)="updateClientPayment($event)"
       (dateSelected)="fetchCompanyData($event)">
-
     </app-company-log>
   </div>
   <div class="billing">

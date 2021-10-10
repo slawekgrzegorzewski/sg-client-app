@@ -35,15 +35,21 @@
     >
     </app-accounts-grand-total>
   </div>
-  <app-company-log-mobile
-    style="width: 320px; height: 100%" *ngIf="loginService.accountantSettings && loginService.accountantSettings.company"
+  <app-company-log
+    *ngIf="loginService.accountantSettings && loginService.accountantSettings.company"
+    [displayType]="'mobile'"
     [services]="services"
     [clients]="clients"
     [allCurrencies]="allCurrencies"
     [performedServices]="performedServices"
     [clientPayments]="clientPayments"
-    (displayingDateChanged)="moveToDay($event)"
-    (performedServiceCreated)="createPerformedService($event)"
+    (dateSelected)="moveToDay($event)"
+    (onPerformedServiceCreate)="createPerformedService($event)"
+    (onPerformedServiceUpdate)="updatePerformedService($event)"
+    (onPerformedServicePaymentCreate)="createPerformedServicePayment($event)"
+    (onClientPaymentCreate)="createClientPayment($event)"
+    (onClientPaymentUpdate)="updateClientPayment($event)"
+    style="width: 320px; height: 100%"
   >
-  </app-company-log-mobile>
+  </app-company-log>
 </div>

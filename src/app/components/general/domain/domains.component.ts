@@ -3,12 +3,7 @@ import {Observable, of} from 'rxjs';
 import {Currency} from '../../../model/accountant/currency';
 import {DetailedDomain} from '../../../model/domain';
 
-const GENERAL_EDIT_MODE = 'general';
-const CREATE_EDIT_MODE = 'create';
-const INVITE_EDIT_MODE = 'invite';
-const EMPTY_EDIT_MODE = '';
-
-export type EditMode = 'general' | 'create' | 'invite' | '';
+export type EditMode = 'edit' | 'create' | 'invite' | '';
 
 @Component({
   selector: 'app-domains',
@@ -31,7 +26,7 @@ export class DomainsComponent implements OnInit {
     if (this.editElement) {
       const currentEditMode = this.editMode;
       const newDomain = this.domainsInternal.find(d => this.editElement && d.id === this.editElement.id);
-      this.editMode = EMPTY_EDIT_MODE;
+      this.editMode = '';
       this.editElement = null;
       if (newDomain) {
         setTimeout(() => this.prepareToEdit(newDomain, currentEditMode), 0.001);
@@ -49,7 +44,7 @@ export class DomainsComponent implements OnInit {
   @Output() removeUserFromDomainEvent = new EventEmitter<{ domain: DetailedDomain; user: string }>();
   @Output() inviteUserToDomainEvent = new EventEmitter<{ domain: DetailedDomain; user: string }>();
 
-  editMode: EditMode = EMPTY_EDIT_MODE;
+  editMode: EditMode = '';
 
   editElementInternal: DetailedDomain | null = null;
 
@@ -111,19 +106,19 @@ export class DomainsComponent implements OnInit {
 
   prepareToCreate(): void {
     if (this.adminMode) {
-      this.prepareToEdit(new DetailedDomain(), CREATE_EDIT_MODE);
+      this.prepareToEdit(new DetailedDomain(), 'create');
     }
   }
 
   prepareToGeneralEdit(): void {
     if (this.adminMode && this.overElement) {
-      this.prepareToEdit(this.overElement, GENERAL_EDIT_MODE);
+      this.prepareToEdit(this.overElement, 'edit');
     }
   }
 
   prepareToInvitationEdit(): void {
     if (this.adminMode && this.overElement) {
-      this.prepareToEdit(this.overElement, INVITE_EDIT_MODE);
+      this.prepareToEdit(this.overElement, 'invite');
     }
   }
 
@@ -133,14 +128,14 @@ export class DomainsComponent implements OnInit {
   }
 
   resetEditForm(): void {
-    this.editMode = EMPTY_EDIT_MODE;
+    this.editMode = '';
     this.editElement = null;
     this.operationAmount = 0;
     this.setOverDomain(null, null);
   }
 
   resetInviteForm(): void {
-    this.editMode = EMPTY_EDIT_MODE;
+    this.editMode = '';
     this.userToInviteLogin = '';
   }
 
@@ -163,19 +158,19 @@ export class DomainsComponent implements OnInit {
   }
 
   isNonEditMode(): boolean {
-    return this.editMode === EMPTY_EDIT_MODE;
+    return this.editMode === '';
   }
 
   isGeneralEditMode(): boolean {
-    return this.editMode === GENERAL_EDIT_MODE;
+    return this.editMode === 'edit';
   }
 
   isCreateEditMode(): boolean {
-    return this.editMode === CREATE_EDIT_MODE;
+    return this.editMode === 'create';
   }
 
   isInviteEditMode(): boolean {
-    return this.editMode === INVITE_EDIT_MODE;
+    return this.editMode === 'invite';
   }
 
   canCreate(): boolean {
