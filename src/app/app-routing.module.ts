@@ -7,7 +7,6 @@ import {AuthGuardGuard} from './guards/AuthGuard/auth-guard.guard';
 import {LoginGuard} from './guards/Login/login.guard';
 import {AccountantHomeComponent} from './pages/accountant/accountant-home/accountant-home.component';
 import {AccountsHistoryComponent} from './pages/accountant/accounts-history/accounts-history.component';
-import {AccountantHomeSmallComponent} from './pages/accountant/accountant-home/accountant-home-small.component';
 import {BillingSmallComponent} from './pages/accountant/billings/billing-small.component';
 import {PiggyBanksSmallComponent} from './pages/accountant/piggy-banks/piggy-banks-small.component';
 import {ChartsComponent} from './pages/accountant/charts/charts.component';
@@ -23,7 +22,6 @@ const routes: Routes = [
   {path: 'login', component: LoginComponent, canActivate: [LoginGuard]},
   {path: 'settings', component: SettingsComponent, canActivate: [AuthGuardGuard]},
   {path: 'accountant-home', component: AccountantHomeComponent, canActivate: [AuthGuardGuard]},
-  {path: 'accountant-home-small', component: AccountantHomeSmallComponent, canActivate: [AuthGuardGuard]},
   {path: 'holiday-currencies', component: HolidayCurrenciesComponent, canActivate: [AuthGuardGuard]},
   {path: 'billing-small', component: BillingSmallComponent, canActivate: [AuthGuardGuard]},
   {path: 'piggy-banks-small', component: PiggyBanksSmallComponent, canActivate: [AuthGuardGuard]},

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {AccountsService} from '../../../services/accountant/accounts.service';
 import {ToastService} from '../../../services/toast.service';
 import {Account} from '../../../model/accountant/account';
@@ -6,11 +6,10 @@ import {PiggyBanksService} from '../../../services/accountant/piggy-banks.servic
 import {PiggyBank} from '../../../model/accountant/piggy-bank';
 import {TransactionsService} from '../../../services/accountant/transations.service';
 import {BillingPeriodsService} from '../../../services/accountant/billing-periods.service';
-import {BillingPeriod, BillingPeriodInfo} from '../../../model/accountant/billings/billing-period';
+import {BillingPeriodInfo} from '../../../model/accountant/billings/billing-period';
 import {Category} from '../../../model/accountant/billings/category';
 import {Income} from '../../../model/accountant/billings/income';
 import {Expense} from '../../../model/accountant/billings/expense';
-import {Router} from '@angular/router';
 import {CategoriesService} from '../../../services/accountant/categories.service';
 import {DomainService} from '../../../services/domain.service';
 import {LoginService} from '../../../services/login.service';
@@ -27,7 +26,10 @@ import {PerformedServicePaymentsService} from '../../../services/accountant/perf
 import {PerformedServicePayment} from '../../../model/accountant/performed-service-payment';
 import {CompanyLogHelper} from './company-log-helper';
 import {BillingPeriodsHelper} from './billing-periods-helper';
-import {forkJoin} from 'rxjs';
+import {forkJoin, Observable} from 'rxjs';
+
+export type ViewMode = 'desktop' | 'mobile';
+type MobileEditMode = 'display' | 'create-income' | 'create-expense' | 'create-performed-service';
 
 @Component({
   selector: 'app-accounts-home',
@@ -35,6 +37,11 @@ import {forkJoin} from 'rxjs';
   styleUrls: ['./accountant-home.component.css']
 })
 export class AccountantHomeComponent implements OnInit {
+
+  currentDomainName: string | null = null;
+
+  viewMode: ViewMode = 'desktop';
+  mobileEditMode: MobileEditMode = 'display';
 
   accounts: Account[] = [];
   piggyBanks: PiggyBank[] = [];
@@ -46,11 +53,11 @@ export class AccountantHomeComponent implements OnInit {
   services: Service[] = [];
   clients: Client[] = [];
   allCurrencies: Currency[] = [];
-  billingPeriodInfo: BillingPeriodInfo | null = null;
   historicalSavings: Map<Date, Map<string, number>> = new Map();
-  currentDomainName: string | null = null;
-  private currentCompanyDate: Date | null = null;
 
+  billingPeriodInfo: BillingPeriodInfo | null = null;
+
+  private currentCompanyDate: Date | null = null;
   private billingPeriodsHelper: BillingPeriodsHelper;
   private companyLogHelper: CompanyLogHelper;
 
@@ -66,52 +73,96 @@ export class AccountantHomeComponent implements OnInit {
               private clientPaymentsService: ClientPaymentsService,
               private performedServicePaymentsService: PerformedServicePaymentsService,
               private servicesService: ServicesService,
-              private clientsService: ClientsService,
-              private router: Router) {
+              private clientsService: ClientsService) {
     this.billingPeriodsHelper = new BillingPeriodsHelper(accountsService, categoriesService, piggyBanksService, billingsService);
     this.companyLogHelper = new CompanyLogHelper(performedServicePaymentsService, performedServicesService, clientPaymentsService, servicesService, clientsService);
   }
 
   ngOnInit(): void {
-    if (window.innerWidth < 640) {
-      this.router.navigate(['/accountant-home-small']);
-    }
+    this.onResize();
     this.refreshData();
     this.categoriesService.currentDomainCategories().subscribe(data => this.categories = data);
   }
 
-  refreshData(): void {
+  @HostListener('window:resize')
+  onResize(): void {
+    if (window.innerWidth < 640) {
+      this.viewMode = 'mobile';
+    } else {
+      this.viewMode = 'desktop';
+    }
+  }
+
+  refreshData(date: Date | null = null): void {
+    if (!date) {
+      date = this.billingPeriodInfo?.result?.period || null;
+    }
     forkJoin([
-      this.billingPeriodsHelper.fetchData(),
+      this.billingPeriodsHelper.fetchData(date),
       this.accountsService.possibleCurrencies()
     ]).subscribe(([[accounts, piggyBanks, historicalSavings, billingPeriodInfo], currencies]) => {
       this.accounts = accounts;
       this.piggyBanks = piggyBanks;
       this.historicalSavings = historicalSavings;
+      this.billingPeriodInfo = billingPeriodInfo;
       this.allCurrencies = currencies;
     });
     this.currentDomainName = this.domainService.currentDomain?.name || '';
   }
 
+  fetchCompanyData(date: Date): void {
+    this.currentCompanyDate = date;
+    this.companyLogHelper.fetchCompanyData(date)
+      .subscribe(([ps, cp, services, clients]) => this.setCompanyLogData(ps, cp, services, clients));
+  }
 
-  fetchBillingPeriod(date: Date): void {
-    this.billingPeriodsHelper.fetchBillingPeriod(date).subscribe(
-      data => this.billingPeriodInfo = data,
-      error => this.billingPeriodInfo = null
+  private setCompanyLogData(performedServices?: PerformedService[], clientPayments?: ClientPayment[], services?: Service[], clients?: Client[]) {
+    if (performedServices) {
+      this.performedServices = performedServices;
+    }
+    if (clientPayments) {
+      this.clientPayments = clientPayments;
+    }
+    if (services) {
+      this.services = services;
+    }
+    if (clients) {
+      this.clients = clients;
+    }
+  }
+
+  createBillingPeriod(date: Date): void {
+    this.billingsService.createBillingPeriodFor(date).subscribe(
+      data => this.refreshData(date)
     );
   }
 
-  createElement(billingPeriod: BillingPeriod, element: Income | Expense, accountId: number): void {
-    this.billingsService.createBillingElement(element, accountId)
+  createBillingPeriodElement(
+    elementToCreate: Income | Expense | null,
+    accountIdForElement: number | null,
+    piggyBankToUpdate: PiggyBank | null = null): void {
+    if (this.viewMode === 'mobile') {
+      this.mobileEditMode = 'display';
+    }
+    if (!elementToCreate || !accountIdForElement) {
+      return;
+    }
+    const requests: Observable<any>[] = [
+      this.billingsService.createBillingElement(elementToCreate, accountIdForElement)
+    ];
+    if (piggyBankToUpdate) {
+      requests.push(this.piggyBanksService.update(piggyBankToUpdate));
+    }
+    forkJoin(requests)
       .subscribe(
-        success => {
-          this.refreshData();
-          this.fetchBillingPeriod(billingPeriod.period);
-        },
-        error => {
-          this.refreshData();
-          this.fetchBillingPeriod(billingPeriod.period);
-        });
+        success => this.refreshData(),
+        error => this.refreshData());
+  }
+
+  finishBillingPeriod(date: Date): void {
+    this.billingsService.finishBillingPeriodOf(date).subscribe(
+      data => this.refreshData(date)
+    );
   }
 
   updatePiggyBank(piggyBank: PiggyBank): void {
@@ -120,23 +171,6 @@ export class AccountantHomeComponent implements OnInit {
         success => this.refreshData(),
         error => this.refreshData()
       );
-  }
-
-  finishBillingPeriod(date: Date): void {
-    this.billingsService.finishBillingPeriodOf(date).subscribe(
-      data => this.fetchBillingPeriod(date)
-    );
-  }
-
-  createBilling(date: Date): void {
-    this.billingsService.createBillingPeriodFor(date).subscribe(
-      data => this.fetchBillingPeriod(date)
-    );
-  }
-
-  fetchCompanyData(date: Date): void {
-    this.currentCompanyDate = date;
-    this.companyLogHelper.fetchCompanyData(date).subscribe(([ps, cp, services, clients]) => this.setCompanyLogData(ps, cp, services, clients));
   }
 
   createPerformedService(performedService: PerformedService): void {
@@ -164,18 +198,11 @@ export class AccountantHomeComponent implements OnInit {
       .subscribe(data => this.clientPayments = data);
   }
 
-  private setCompanyLogData(performedServices?: PerformedService[], clientPayments?: ClientPayment[], services?: Service[], clients?: Client[]) {
-    if (performedServices) {
-      this.performedServices = performedServices;
-    }
-    if (clientPayments) {
-      this.clientPayments = clientPayments;
-    }
-    if (services) {
-      this.services = services;
-    }
-    if (clients) {
-      this.clients = clients;
-    }
+  addIncome(): void {
+    this.mobileEditMode = 'create-income';
+  }
+
+  addExpense(): void {
+    this.mobileEditMode = 'create-expense';
   }
 }

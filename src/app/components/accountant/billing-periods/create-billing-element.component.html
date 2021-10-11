@@ -72,14 +72,17 @@
         </app-general-typeahead>
       </div>
 
-      <div class="sg-flex-row sg-flex-align-stretch">
-        <button type="button" class="btn btn-outline-primary" *ngIf="forAccountId"
+      <div class="sg-flex-row">
+        <button type="button" class="btn btn-outline-primary sg-flex-fill-available-space-evenly" *ngIf="forAccountId"
                 [disabled]="amount?.errors?.required || !isAllowed()"
                 (click)="add()">
           Stwórz
         </button>
-        <button type="button" class="btn btn-outline-primary" (click)="cancel()">Anuluj</button>
+        <button type="button" class="btn btn-outline-primary sg-flex-fill-available-space-evenly" (click)="cancel()">Anuluj</button>
       </div>
+    </div>
+    <div *ngIf="!forAccountId && billingElement" class="sg-flex-row">
+      <button type="button" class="btn btn-outline-primary sg-flex-fill-available-space-evenly" (click)="cancel()">Anuluj</button>
     </div>
   </form>
 

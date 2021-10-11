@@ -1,56 +1,113 @@
-<div class="sg-flex-row sg-flex-justify-space-around sg-flex-wrap">
-  <div *ngIf="loginService.accountantSettings && !loginService.accountantSettings.company"
-       class="sg-flex-column sg-flex-justify-flex-start savings">
-    <app-accounts-grand-total
-      [title]="'Podsumowanie'"
-      [piggyBanks]="piggyBanks"
-      [accounts]="accounts"
-      [historicalSavings]="historicalSavings"
-      style="margin-bottom: 20px"
-    >
-    </app-accounts-grand-total>
-    <app-domain-accounts *ngIf="accounts && accounts.length > 0"
-                         [domain]="currentDomainName"
-                         [accounts]="accounts">
-    </app-domain-accounts>
+<ng-container *ngIf="viewMode === 'desktop'">
+  <ng-container *ngTemplateOutlet="desktopVersion"></ng-container>
+</ng-container>
+<ng-container *ngIf="viewMode === 'mobile'">
+  <ng-container *ngTemplateOutlet="mobileVersion"></ng-container>
+</ng-container>
+
+<ng-template #mobileVersion>
+  <div style="height: 100%;">
+    <div *ngIf="loginService.accountantSettings && !loginService.accountantSettings.company"
+         style="width: 320px; height: 100%; margin: auto;">
+      <ng-container *ngTemplateOutlet="mobileVersionOfAccountant"></ng-container>
+    </div>
+    <div *ngIf="loginService.accountantSettings && loginService.accountantSettings.company"
+         style="width: 320px; height: 100%; margin: auto;">
+      <ng-container *ngTemplateOutlet="companyLog"></ng-container>
+    </div>
   </div>
-  <div *ngIf="loginService.accountantSettings && loginService.accountantSettings.company"
-       class="sg-flex-row sg-flex-justify-flex-start">
-    <app-company-log
-      [services]="services"
-      [clients]="clients"
-      [clientPayments]="clientPayments"
-      [allCurrencies]="allCurrencies"
-      [performedServices]="performedServices"
-      (onPerformedServiceCreate)="createPerformedService($event)"
-      (onPerformedServiceUpdate)="updatePerformedService($event)"
-      (onPerformedServicePaymentCreate)="createPerformedServicePayment($event)"
-      (onClientPaymentCreate)="createClientPayment($event)"
-      (onClientPaymentUpdate)="updateClientPayment($event)"
-      (dateSelected)="fetchCompanyData($event)">
-    </app-company-log>
+</ng-template>
+
+<ng-template #desktopVersion>
+  <ng-container *ngIf="loginService.accountantSettings && !loginService.accountantSettings.company">
+    <ng-container *ngTemplateOutlet="desktopVersionOfAccountant"></ng-container>
+  </ng-container>
+  <ng-container *ngIf="loginService.accountantSettings && loginService.accountantSettings.company">
+    <ng-container *ngTemplateOutlet="companyLog"></ng-container>
+  </ng-container>
+</ng-template>
+
+<ng-template #mobileVersionOfAccountant>
+  <div class="sg-flex-row">
+    <button *ngIf="mobileEditMode === 'display'" (click)="addIncome()"
+            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+      Dodaj dochód
+    </button>
+    <button *ngIf="mobileEditMode === 'display'" (click)="addExpense()"
+            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+      Dodaj wydatek
+    </button>
   </div>
-  <div class="billing">
+  <app-create-billing-element
+    *ngIf="(mobileEditMode === 'create-expense' || mobileEditMode === 'create-income') && billingPeriodInfo && billingPeriodInfo.result"
+    [elementType]="mobileEditMode === 'create-expense' ? 'expense' : 'income'"
+    [categories]="categories"
+    [userAccounts]="accounts"
+    [billingPeriod]="billingPeriodInfo.result"
+    [piggyBanks]="piggyBanks"
+    (editEvent)="createBillingPeriodElement($event[0], $event[1], $event[2])"
+  >
+  </app-create-billing-element>
+  <app-domain-accounts [domain]="currentDomainName" [accounts]="accounts"></app-domain-accounts>
+  <app-accounts-grand-total
+    [title]="'Podsumowanie'"
+    [piggyBanks]="piggyBanks"
+    [accounts]="accounts"
+    [historicalSavings]="historicalSavings">
+  </app-accounts-grand-total>
+</ng-template>
+
+<ng-template #companyLog>
+  <app-company-log
+    [displayType]="viewMode"
+    [services]="services"
+    [clients]="clients"
+    [clientPayments]="clientPayments"
+    [allCurrencies]="allCurrencies"
+    [performedServices]="performedServices"
+    (dateSelected)="fetchCompanyData($event)"
+    (onPerformedServiceCreate)="createPerformedService($event)"
+    (onPerformedServiceUpdate)="updatePerformedService($event)"
+    (onPerformedServicePaymentCreate)="createPerformedServicePayment($event)"
+    (onClientPaymentCreate)="createClientPayment($event)"
+    (onClientPaymentUpdate)="updateClientPayment($event)">
+  </app-company-log>
+</ng-template>
+
+<ng-template #desktopVersionOfAccountant>
+  <div class="sg-flex-row sg-flex-justify-space-around sg-flex-wrap">
+    <div class="sg-flex-column sg-flex-fill-available-space-evenly savings">
+      <app-accounts-grand-total
+        [title]="'Podsumowanie'"
+        [piggyBanks]="piggyBanks"
+        [accounts]="accounts"
+        [historicalSavings]="historicalSavings"
+        style="margin-bottom: 20px">
+      </app-accounts-grand-total>
+      <app-domain-accounts *ngIf="accounts && accounts.length > 0"
+                           [domain]="currentDomainName"
+                           [accounts]="accounts">
+      </app-domain-accounts>
+    </div>
     <app-browse-billing-elements
       [accounts]="accounts"
       [categories]="categories"
       [piggyBanks]="piggyBanks"
       [billingPeriodInfo]="billingPeriodInfo"
-      (dateSelected)="fetchBillingPeriod($event)"
+      (dateSelected)="refreshData($event)"
       (finishBillingPeriod)="finishBillingPeriod($event)"
-      (createBillingPeriod)="createBilling($event)"
-      (createElementEvent)="createElement($event[0], $event[1], $event[2])"
+      (createBillingPeriod)="createBillingPeriod($event)"
+      (createElementEvent)="createBillingPeriodElement($event[1], $event[2])"
       (updatePiggyBankEvent)="updatePiggyBank($event)"
+      class="sg-flex-fill-available-space-evenly billing"
     ></app-browse-billing-elements>
-  </div>
-  <div *ngIf="loginService.accountantSettings && !loginService.accountantSettings.company" class="piggy-banks">
     <app-piggy-banks
       [title]="'Skarbonki'"
       [adminMode]="false"
       [piggyBanks]="piggyBanks"
       (updateEvent)="updatePiggyBank($event)"
+      class="sg-flex-fill-available-space-evenly piggy-banks"
       style="margin-left: 50px; margin-top: 50px;margin-right: 50px">
-
     </app-piggy-banks>
   </div>
-</div>
+</ng-template>

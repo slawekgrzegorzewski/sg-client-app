@@ -39,7 +39,6 @@ import {CurrencyTotalsComponent} from './components/accountant/general/currency-
 import {MultiCurrencyTotalComponent} from './components/accountant/general/multi-currency-total.component';
 import {AccountsHistoryComponent} from './pages/accountant/accounts-history/accounts-history.component';
 import {GrandTotalComponent} from './components/accountant/grand-total/grand-total.component';
-import {AccountantHomeSmallComponent} from './pages/accountant/accountant-home/accountant-home-small.component';
 import {BillingSmallComponent} from './pages/accountant/billings/billing-small.component';
 import {BrowseBillingElementsComponent} from './components/accountant/billing-periods/browse-billing-elements.component';
 import {PiggyBanksSmallComponent} from './pages/accountant/piggy-banks/piggy-banks-small.component';
@@ -108,7 +107,6 @@ export class MyHammerConfig extends HammerGestureConfig {
     MultiCurrencyTotalComponent,
     AccountsHistoryComponent,
     GrandTotalComponent,
-    AccountantHomeSmallComponent,
     BillingSmallComponent,
     BrowseBillingElementsComponent,
     PiggyBanksSmallComponent,
