@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Currency} from '../../../model/accountant/currency';
 import {ClientPayment} from '../../../model/accountant/client-payment';
 import {Client} from '../../../model/accountant/client';
@@ -54,13 +54,7 @@ export class ClientPaymentComponent implements OnInit {
   @Output() createEvent = new EventEmitter<ClientPayment>();
 
   editMode: EditMode = '';
-  overElement: ClientPayment | null = null;
   editElement: ClientPayment | null = null;
-
-  @ViewChild('utilBox') utilBox: ElementRef | null = null;
-  utilBoxTop: number = 0;
-  utilBoxLeft: number = 0;
-  utilBoxVisibility = 'hidden';
 
   selectedGroup: PayableGroup<ClientPayment> | null = null;
   private selectedElement: ClientPayment | null = null;
@@ -209,8 +203,8 @@ export class ClientPaymentComponent implements OnInit {
   }
 
   public prepareToGeneralEdit(): void {
-    if (this.overElement) {
-      this.prepareToEdit(this.overElement, 'edit');
+    if (this.selectedElement) {
+      this.prepareToEdit(this.selectedElement, 'edit');
     }
   }
 
@@ -222,7 +216,6 @@ export class ClientPaymentComponent implements OnInit {
   public resetEditForm(): void {
     this.editMode = '';
     this.editElement = null;
-    this.setOverClientPayment(null, null);
   }
 
   public createClientPayment(clientPayment: ClientPayment): void {
@@ -262,18 +255,6 @@ export class ClientPaymentComponent implements OnInit {
       this.selectedElement = null;
     } else {
       this.selectedElement = clientPayment;
-    }
-  }
-
-  public setOverClientPayment(cp: ClientPayment | null, row: HTMLTableRowElement | null): void {
-    this.overElement = cp;
-    if (cp && row && this.editable) {
-      const adjustment = (row.offsetHeight - this.utilBox!.nativeElement.offsetHeight) / 2;
-      this.utilBoxTop = row.getBoundingClientRect().top + adjustment;
-      this.utilBoxLeft = row.getBoundingClientRect().left + row.clientWidth - (this.utilBox!.nativeElement.offsetWidth / 2);
-      this.utilBoxVisibility = 'visible';
-    } else {
-      this.utilBoxVisibility = 'hidden';
     }
   }
 

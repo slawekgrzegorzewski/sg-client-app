@@ -23,8 +23,8 @@
                                 [allCurrencies]="allCurrencies"
                                 (updateEvent)="update($event)"
                                 (createEvent)="create($event)"
-                                (cancelEvent)="resetEditForm()"
-    ></app-performed-service-edit>
+                                (cancelEvent)="resetEditForm()">
+    </app-performed-service-edit>
     <app-payment-selection *ngIf="isPaymentSelectionEditMode()"
                            [forService]="selectedElement"
                            [payments]="clientPayments"
@@ -107,8 +107,8 @@
                                 [allCurrencies]="allCurrencies"
                                 (updateEvent)="update($event)"
                                 (createEvent)="create($event)"
-                                (cancelEvent)="resetEditForm()"
-    ></app-performed-service-edit>
+                                (cancelEvent)="resetEditForm()">
+    </app-performed-service-edit>
     <app-payment-selection *ngIf="isPaymentSelectionEditMode()"
                            [forService]="selectedElement"
                            [payments]="clientPayments"

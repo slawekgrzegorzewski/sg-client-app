@@ -110,3 +110,7 @@ app-general-typeahead, app-date-picker {
   flex-shrink: 1;
   flex-basis: auto;
 }
+
+.full-height {
+  height: 100%;
+}
