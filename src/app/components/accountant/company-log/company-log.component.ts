@@ -41,10 +41,7 @@ export class CompanyLogComponent implements OnInit {
   @Output() onPerformedServicePaymentCreate = new EventEmitter<PerformedServicePayment>();
   @Output() onClientPaymentCreate = new EventEmitter<ClientPayment>();
   @Output() onClientPaymentUpdate = new EventEmitter<ClientPayment>();
-
-  @Output() dateSelected = new EventEmitter<Date>();
-
-  private performedServicesGroupingMode: Grouping = Grouping.LACK;
+  @Output() onDateSelected = new EventEmitter<Date>();
 
   private _displayingDate = new Date(0);
   get displayingDate(): Date {
@@ -52,25 +49,18 @@ export class CompanyLogComponent implements OnInit {
   }
 
   set displayingDate(value: Date) {
-    const monthChanged = !this.isTheSameMonth(value, this._displayingDate);
+    const monthChanged = !CompanyLogComponent.isTheSameMonth(value, this._displayingDate);
     this._displayingDate = value;
     if (this.displayType === 'mobile') {
       this.setMobileTitle();
     }
     if (monthChanged) {
-      this.dateSelected.emit(value);
+      this.onDateSelected.emit(value);
     }
     this.filterDataToShow();
   }
 
-  private setMobileTitle() {
-    if (this.performedServicesGroupingMode === Grouping.LACK) {
-      this.mobilePerformedServicesTitle = this.datePipe.transform(this.displayingDate, 'dd MMMM y') || '';
-    } else if (this.performedServicesGroupingMode === Grouping.BY_CLIENTS) {
-      this.mobilePerformedServicesTitle = this.datePipe.transform(this.displayingDate, 'LLLL\'\'yy') || '';
-    }
-    this.mobileClientPaymentsTitle = this.datePipe.transform(this.displayingDate, 'LLLL\'\'yy') || '';
-  }
+  private performedServicesGroupingMode: Grouping = Grouping.LACK;
 
   showEntity: ShowEntity = 'services';
   mobilePerformedServicesTitle = '';
@@ -82,6 +72,15 @@ export class CompanyLogComponent implements OnInit {
 
   ngOnInit(): void {
     this.displayingDate = new Date();
+  }
+
+  private setMobileTitle() {
+    if (this.performedServicesGroupingMode === Grouping.LACK) {
+      this.mobilePerformedServicesTitle = this.datePipe.transform(this.displayingDate, 'dd MMMM y') || '';
+    } else if (this.performedServicesGroupingMode === Grouping.BY_CLIENTS) {
+      this.mobilePerformedServicesTitle = this.datePipe.transform(this.displayingDate, 'LLLL\'\'yy') || '';
+    }
+    this.mobileClientPaymentsTitle = this.datePipe.transform(this.displayingDate, 'LLLL\'\'yy') || '';
   }
 
   previousMonth(): void {
@@ -127,8 +126,6 @@ export class CompanyLogComponent implements OnInit {
   }
 
   private changeDay(numberOfUnits: number, dateChangingFunction: (date: Date, numberOfUnits: number) => Date): void {
-
-    const previous = new Date(this.displayingDate);
     const next = dateChangingFunction(new Date(this.displayingDate), numberOfUnits);
     if (next.getTime() > new Date().getTime()) {
       return;
@@ -136,50 +133,51 @@ export class CompanyLogComponent implements OnInit {
     this.displayingDate = next;
   }
 
-  onGroupingModeChange(event: Grouping) {
+  public onGroupingModeChange(event: Grouping) {
     this.performedServicesGroupingMode = event;
     this.filterDataToShow();
     this.setMobileTitle();
   }
 
-  filterDataToShow(): void {
+  private filterDataToShow(): void {
     if (this.displayType === 'mobile' && this.performedServicesGroupingMode === Grouping.LACK) {
-      this.performedServicesToShow = this.performedServices.filter(ps => this.isTheSameDay(ps.date, this.displayingDate));
+      this.performedServicesToShow = this.performedServices.filter(ps => CompanyLogComponent.isTheSameDay(ps.date, this.displayingDate));
     } else {
       this.performedServicesToShow = this.performedServices;
     }
   }
 
 //region Just utils - simple getters and setters and more trivial yet useful stuff
-  isDesktop() {
+
+  public isDesktop() {
     return this.displayType === 'desktop';
   }
 
-  isMobile() {
+  public isMobile() {
     return this.displayType === 'mobile';
   }
 
-  displayingServices(): boolean {
+  public displayingServices(): boolean {
     return this.showEntity === 'services';
   }
 
-  showServices(): void {
+  public showServices(): void {
     this.showEntity = 'services';
   }
 
-  displayingPayments(): boolean {
+  public displayingPayments(): boolean {
     return this.showEntity === 'payments';
   }
 
-  showPayments(): void {
+  public showPayments(): void {
     this.showEntity = 'payments';
   }
 
-  isTheSameMonth(date1: Date, date2: Date): boolean {
+  private static isTheSameMonth(date1: Date, date2: Date): boolean {
     return date1.getFullYear() == date2.getFullYear() && date1.getMonth() == date2.getMonth();
   }
 
-  isTheSameDay(date1: Date, date2: Date): boolean {
+  private static isTheSameDay(date1: Date, date2: Date): boolean {
     return this.isTheSameMonth(date1, date2) && date1.getDate() == date2.getDate();
   }
 

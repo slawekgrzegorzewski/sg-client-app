@@ -10,6 +10,7 @@ import {ComparatorBuilder} from '../../../../utils/comparator-builder';
 
 export type EditMode = 'edit' | 'create' | '';
 export type GroupingButtonsPosition = 'head' | 'bottom';
+export type ClientPaymentsDisplayType = 'desktop' | 'mobile';
 
 enum Grouping {
   LACK, BY_CLIENTS, BY_RECEIPT_TYPE
@@ -22,6 +23,7 @@ enum Grouping {
 })
 export class ClientPaymentComponent implements OnInit {
 
+  @Input() clientPaymentsDisplayType: ClientPaymentsDisplayType = 'desktop';
   @Input() title: string | null = null;
   @Input() editable = true;
   @Input() groupingButtonsPosition: GroupingButtonsPosition = 'head';
@@ -65,19 +67,34 @@ export class ClientPaymentComponent implements OnInit {
 
   showClientColumn = true;
   showReceiptTypeColumns = true;
+  numberOfColumns = 8;
 
   constructor() {
   }
 
   ngOnInit(): void {
+    this.resetColumnsVisibility();
   }
 
-  resetColumnsVisibility(): void {
-    this.showClientColumn = true;
-    this.showReceiptTypeColumns = true;
+  //region Grouping data
+  public isGrouped(): boolean {
+    return this.groupingMode !== Grouping.LACK;
   }
 
-  group(): void {
+  public noGrouping(): void {
+    this.group(Grouping.LACK);
+  }
+
+  public byClients(): void {
+    this.group(Grouping.BY_CLIENTS);
+  }
+
+  public byReceiptType(): void {
+    this.group(Grouping.BY_RECEIPT_TYPE);
+  }
+
+  private group(groupingMode: Grouping = this.groupingMode): void {
+    this.groupingMode = groupingMode;
     switch (this.groupingMode) {
       case Grouping.LACK:
         this.disableGrouping();
@@ -89,24 +106,15 @@ export class ClientPaymentComponent implements OnInit {
         this.groupByReceiptType();
         break;
     }
+    if (this.groupingMode === Grouping.LACK) {
+      this.selectedGroup = this.displayData.length > 0 ? this.displayData[0] : null;
+    } else {
+      this.reselectGroup();
+    }
+    this.adjustTableColumns();
   }
 
-  noGrouping(): void {
-    this.groupingMode = Grouping.LACK;
-    this.disableGrouping();
-  }
-
-  byClients(): void {
-    this.groupingMode = Grouping.BY_CLIENTS;
-    this.groupByClients();
-  }
-
-  byReceiptType(): void {
-    this.groupingMode = Grouping.BY_RECEIPT_TYPE;
-    this.groupByReceiptType();
-  }
-
-  disableGrouping(): void {
+  private disableGrouping(): void {
     this.displayData = PayableGroup.groupData(
       this.clientPayments,
       ps => -1,
@@ -116,11 +124,9 @@ export class ClientPaymentComponent implements OnInit {
         .thenComparing(cp => cp?.price || 0)
         .build()
     );
-    this.selectedGroup = this.displayData.length > 0 ? this.displayData[0] : null;
-    this.resetColumnsVisibility();
   }
 
-  groupByClients(): void {
+  private groupByClients(): void {
     this.displayData = PayableGroup.groupData(
       this.clientPayments,
       cp => cp && cp.client && cp.client.id || -1,
@@ -129,45 +135,137 @@ export class ClientPaymentComponent implements OnInit {
         .thenComparing(cp => cp?.price || 0)
         .build()
     );
-    this.selectGroup();
-    this.resetColumnsVisibility();
-    this.showClientColumn = false;
   }
 
-  groupByReceiptType(): void {
+  private groupByReceiptType(): void {
+
+    function convertReceiptTypeToId(cp: ClientPayment): number {
+      return cp.invoice ? 1 : cp.billOfSale ? 2 : cp.billOfSaleAsInvoice ? 3 : cp.notRegistered ? 4 : 5;
+    }
+
     this.displayData = PayableGroup.groupData(
       this.clientPayments,
-      cp => cp && this.convertReceiptTypeToId(cp),
+      cp => cp && convertReceiptTypeToId(cp),
       cp => cp && this.convertReceiptTypeToName(cp),
       ComparatorBuilder.comparingByDate<ClientPayment>(cp => cp?.date || new Date(0))
         .thenComparing(cp => cp?.client?.name || '')
         .thenComparing(cp => cp?.price || 0)
         .build()
     );
-    this.selectGroup();
-    this.resetColumnsVisibility();
-    this.showReceiptTypeColumns = false;
   }
 
-  private selectGroup(): void {
+  private reselectGroup(): void {
     if (this.selectedGroup !== null) {
       const title = this.selectedGroup.title;
       this.selectedGroup = (this.displayData || []).find(g => g.title === title) || null;
     }
   }
 
-  convertReceiptTypeToId(cp: ClientPayment): number {
-    return cp.invoice ? 1 : cp.billOfSale ? 2 : cp.billOfSaleAsInvoice ? 3 : cp.notRegistered ? 4 : 5;
+  private adjustTableColumns() {
+    this.resetColumnsVisibility();
+    switch (this.groupingMode) {
+      case Grouping.BY_CLIENTS:
+        this.showClientColumn = false;
+        break;
+      case Grouping.BY_RECEIPT_TYPE:
+        this.showReceiptTypeColumns = false;
+        break;
+    }
+    this.numberOfColumns = (this.showClientColumn ? 1 : 0) + (this.showReceiptTypeColumns ? 4 : 0) + 3;
   }
 
-  convertReceiptTypeToName(cp: ClientPayment): string {
-    return cp.invoice ? 'faktura'
-      : cp.billOfSale ? 'paragon'
-        : cp.billOfSaleAsInvoice ? 'paragon jako faktura'
-          : cp.notRegistered ? 'na czarno' : 'brak';
+  private resetColumnsVisibility(): void {
+    this.showClientColumn = true;
+    this.showReceiptTypeColumns = this.clientPaymentsDisplayType === 'desktop';
   }
 
-  setOverClientPayment(cp: ClientPayment | null, row: HTMLTableRowElement | null): void {
+  //endregion
+
+  public isShowExtraReceiptTypeRow(clientPayment: ClientPayment): boolean {
+    return this.clientPaymentsDisplayType == 'mobile'
+      && (clientPayment.billOfSale
+        || clientPayment.billOfSaleAsInvoice
+        || clientPayment.invoice
+        || clientPayment.notRegistered);
+  }
+
+  public convertReceiptTypeToName(cp: ClientPayment): string {
+    return cp.invoice
+      ? 'faktura'
+      : cp.billOfSale
+        ? 'paragon'
+        : cp.billOfSaleAsInvoice
+          ? 'paragon jako faktura'
+          : cp.notRegistered
+            ? 'na czarno'
+            : 'brak';
+  }
+
+  public prepareToCreate(): void {
+    const clientPayment = new ClientPayment();
+    clientPayment.currency = 'PLN';
+    clientPayment.date = new Date();
+    this.prepareToEdit(clientPayment, 'create');
+  }
+
+  public prepareToGeneralEdit(): void {
+    if (this.overElement) {
+      this.prepareToEdit(this.overElement, 'edit');
+    }
+  }
+
+  private prepareToEdit(editElement: ClientPayment, editMode: EditMode): void {
+    this.editElement = editElement;
+    this.editMode = editMode;
+  }
+
+  public resetEditForm(): void {
+    this.editMode = '';
+    this.editElement = null;
+    this.setOverClientPayment(null, null);
+  }
+
+  public createClientPayment(clientPayment: ClientPayment): void {
+    this.createEvent.emit(clientPayment);
+    this.resetEditForm();
+  }
+
+  public updateClientPayment(): void {
+    if (this.editElement) {
+      this.updateEvent.emit(this.editElement);
+      this.resetEditForm();
+    }
+  }
+
+  public isNonEditMode(): boolean {
+    return this.editMode === '';
+  }
+
+  public isGeneralEditMode(): boolean {
+    return this.editMode === 'edit';
+  }
+
+  public isCreateEditMode(): boolean {
+    return this.editMode === 'create';
+  }
+
+  public selectGroup(payableGroup: PayableGroup<ClientPayment>): void {
+    if (this.isEqualToSelectedGroup(payableGroup)) {
+      this.selectedGroup = null;
+    } else {
+      this.selectedGroup = payableGroup;
+    }
+  }
+
+  public selectClientPayment(clientPayment: ClientPayment): void {
+    if (this.isEqualToSelectedElement(clientPayment)) {
+      this.selectedElement = null;
+    } else {
+      this.selectedElement = clientPayment;
+    }
+  }
+
+  public setOverClientPayment(cp: ClientPayment | null, row: HTMLTableRowElement | null): void {
     this.overElement = cp;
     if (cp && row && this.editable) {
       const adjustment = (row.offsetHeight - this.utilBox!.nativeElement.offsetHeight) / 2;
@@ -179,90 +277,22 @@ export class ClientPaymentComponent implements OnInit {
     }
   }
 
-  prepareToCreate(): void {
-    const clientPayment = new ClientPayment();
-    clientPayment.currency = 'PLN';
-    clientPayment.date = new Date();
-    this.prepareToEdit(clientPayment, 'create');
-  }
-
-  prepareToGeneralEdit(): void {
-    if (this.overElement) {
-      this.prepareToEdit(this.overElement, 'edit');
-    }
-  }
-
-  prepareToEdit(editElement: ClientPayment, editMode: EditMode): void {
-    this.editElement = editElement;
-    this.editMode = editMode;
-  }
-
-  resetEditForm(): void {
-    this.editMode = '';
-    this.editElement = null;
-    this.setOverClientPayment(null, null);
-  }
-
-  create(clientPayment: ClientPayment): void {
-    this.createEvent.emit(clientPayment);
-    this.resetEditForm();
-  }
-
-  update(): void {
-    if (this.editElement) {
-      this.updateEvent.emit(this.editElement);
-      this.resetEditForm();
-    }
-  }
-
-  isNonEditMode(): boolean {
-    return this.editMode === '';
-  }
-
-  isGeneralEditMode(): boolean {
-    return this.editMode === 'edit';
-  }
-
-  isCreateEditMode(): boolean {
-    return this.editMode === 'create';
-  }
-
-  setGroupToDisplay(payableGroup: PayableGroup<ClientPayment>): void {
-    if (this.isEqualToSelectedGroup(payableGroup)) {
-      this.selectedGroup = null;
-    } else {
-      this.selectedGroup = payableGroup;
-    }
-  }
-
-  setClientPayment(clientPayment: ClientPayment): void {
-    if (this.isEqualToSelectedElement(clientPayment)) {
-      this.selectedElement = null;
-    } else {
-      this.selectedElement = clientPayment;
-    }
-  }
-
-  isGrouped(): boolean {
-    return this.displayData.length > 1;
-  }
-
-  isEqualToSelectedGroup(payableGroup: PayableGroup<ClientPayment>): boolean {
+  public isEqualToSelectedGroup(payableGroup: PayableGroup<ClientPayment>): boolean {
     return this.selectedGroup !== null && this.selectedGroup.isEqual(payableGroup);
   }
 
-  isEqualToSelectedElement(clientPayment: ClientPayment): boolean {
+  public isEqualToSelectedElement(clientPayment: ClientPayment): boolean {
     return this.selectedElement !== null && this.selectedElement.id === clientPayment.id;
   }
 
-  getGroupClass(payableGroup: PayableGroup<ClientPayment>): string {
+  public getGroupClass(payableGroup: PayableGroup<ClientPayment>): string {
     if (this.isEqualToSelectedGroup(payableGroup)) {
       return '';
     }
     return this.getPaymentStatusClass(payableGroup.status);
   }
 
-  getClientPaymentClass(clientPayment: ClientPayment): string {
+  public getClientPaymentClass(clientPayment: ClientPayment): string {
     const paymentStatus = clientPayment.getPaymentStatus();
     return this.getPaymentStatusClass(paymentStatus);
   }
@@ -280,7 +310,7 @@ export class ClientPaymentComponent implements OnInit {
     return '';
   }
 
-  getServiceRelations(clientPayment: ClientPayment): { date: Date, service: string, price: number, currency: string }[] {
+  public getServiceRelations(clientPayment: ClientPayment): { date: Date, service: string, price: number, currency: string }[] {
     type PaymentAndPerformedServices = {
       performedServicePayment: SimplePerformedServicePayment,
       performedService: PerformedService | undefined

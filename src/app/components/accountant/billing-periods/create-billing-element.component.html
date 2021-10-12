@@ -1,88 +1,94 @@
-<div class="sg-flex-column creating-billing-element-main">
+<div class="sg-flex-column creating-billing-element-main" style="height: 100%">
   <h5>Wprowadź szczegóły</h5>
-  <form #createBillingElementForm="ngForm" class="needs-validation">
-
-    <div class="form-group row">
-      <label for="forAccount" class="col-3 col-form-label">Konto</label>
-      <select id="forAccount" name="forAccount" class="form-control col-9"
-              #forAccount="ngModel" [(ngModel)]="forAccountId" required ngbAutofocus>
-        <option *ngFor="let account of userAccounts" [value]="account.id">{{account.name}}
-          ({{account.currentBalance | currency:account.currency}})
-        </option>
-      </select>
-    </div>
-
-    <div *ngIf="forAccountId && billingElement">
+  <form #createBillingElementForm="ngForm" class="needs-validation" style="height: 100%">
+    <div class="sg-flex-column" style="height: 100%">
       <div class="form-group row">
-        <label for="amount" class="col-3 col-form-label">Kwota</label>
-        <input id="amount" name="amount" type="number" class="form-control col-7"
-               #amount="ngModel"
-               [(ngModel)]="billingElement.amount"
-               min=0 required/>
-        <div class="sg-flex-row sg-flex-align-center sg-flex-justify-center col-2">
-          {{getCurrencySymbol(billingElement.currency)}}
+        <label for="forAccount" class="col-3 col-form-label">Konto</label>
+        <select id="forAccount" name="forAccount" class="form-control col-9"
+                #forAccount="ngModel" [(ngModel)]="forAccountId" required ngbAutofocus>
+          <option *ngFor="let account of userAccounts" [value]="account.id">{{account.name}}
+            ({{account.currentBalance | currency:account.currency}})
+          </option>
+        </select>
+      </div>
+
+      <ng-container *ngIf="forAccountId && billingElement">
+        <div class="form-group row">
+          <label for="amount" class="col-3 col-form-label">Kwota</label>
+          <input id="amount" name="amount" type="number" class="form-control col-7"
+                 #amount="ngModel"
+                 [(ngModel)]="billingElement.amount"
+                 min=0 required/>
+          <div class="sg-flex-row sg-flex-align-center sg-flex-justify-center col-2">
+            {{getCurrencySymbol(billingElement.currency)}}
+          </div>
         </div>
-      </div>
 
-      <div class="form-group row">
-        <label for="category" class="col-3 col-form-label">Kategoria</label>
-        <app-general-typeahead
-          id="category"
-          [id]="'category'"
-          name="category"
-          class="col-9"
-          [inputClass]="'form-control'"
-          [readonly]="false"
-          [(ngModel)]="billingElement.category"
-          [dataProvider]="categoriesForTypeAhead()"
-          #category="ngModel"
-          required>
-        </app-general-typeahead>
-      </div>
+        <div class="form-group row">
+          <label for="category" class="col-3 col-form-label">Kategoria</label>
+          <app-general-typeahead
+            id="category"
+            [id]="'category'"
+            name="category"
+            class="col-9"
+            [inputClass]="'form-control'"
+            [readonly]="false"
+            [(ngModel)]="billingElement.category"
+            [dataProvider]="categoriesForTypeAhead()"
+            #category="ngModel"
+            required>
+          </app-general-typeahead>
+        </div>
 
-      <div class="form-group row">
-        <label for="dateOfElement" class="col-3 col-form-label">Data</label>
-        <app-date-picker class="col-9" id="dateOfElement" name="dateOfElement" [(ngModel)]="elementDate">
-        </app-date-picker>
-      </div>
+        <div class="form-group row">
+          <label for="dateOfElement" class="col-3 col-form-label">Data</label>
+          <app-date-picker class="col-9" id="dateOfElement" name="dateOfElement" [(ngModel)]="elementDate">
+          </app-date-picker>
+        </div>
 
-      <div class="form-group row">
-        <label for="description" class="col-3 col-form-label">Opis</label>
-        <textarea id="description" name="description" class="form-control col-9"
-                  #description="ngModel"
-                  [(ngModel)]="billingElement.description">
+        <div class="form-group row">
+          <label for="description" class="col-3 col-form-label">Opis</label>
+          <textarea id="description" name="description" class="form-control col-9"
+                    #description="ngModel"
+                    [(ngModel)]="billingElement.description">
 
         </textarea>
-      </div>
+        </div>
 
-      <div class="form-group row">
-        <label for="piggybank" class="col-4 col-form-label">{{piggyBankAction()}}</label>
-        <app-general-typeahead
-          id="piggybank"
-          [id]="'piggybank'"
-          name="piggybank"
-          class="col-8"
-          [inputClass]="'form-control'"
-          [readonly]="false"
-          [(ngModel)]="piggyBank"
-          [availableData]="piggyBanksForSelectedAccount"
-          [dataProvider]="piggyBanksForTypeAhead()"
-          #piggybank="ngModel"
-          required>
-        </app-general-typeahead>
-      </div>
+        <div class="form-group row">
+          <label for="piggybank" class="col-4 col-form-label">{{piggyBankAction()}}</label>
+          <app-general-typeahead
+            id="piggybank"
+            [id]="'piggybank'"
+            name="piggybank"
+            class="col-8"
+            [inputClass]="'form-control'"
+            [readonly]="false"
+            [(ngModel)]="piggyBank"
+            [availableData]="piggyBanksForSelectedAccount"
+            [dataProvider]="piggyBanksForTypeAhead()"
+            #piggybank="ngModel"
+            required>
+          </app-general-typeahead>
+        </div>
 
-      <div class="sg-flex-row">
-        <button type="button" class="btn btn-outline-primary sg-flex-fill-available-space-evenly" *ngIf="forAccountId"
-                [disabled]="amount?.errors?.required || !isAllowed()"
-                (click)="add()">
-          Stwórz
+        <div class="sg-flex-row sg-flex-justify-self-flex-end" style="margin-top: auto;">
+          <button type="button" class="btn btn-outline-primary sg-flex-fill-available-space-evenly" *ngIf="forAccountId"
+                  [disabled]="amount?.errors?.required || !isAllowed()"
+                  (click)="add()">
+            Stwórz
+          </button>
+          <button type="button" class="btn btn-outline-primary sg-flex-fill-available-space-evenly" (click)="cancel()">
+            Anuluj
+          </button>
+        </div>
+      </ng-container>
+      <div *ngIf="!forAccountId && billingElement" class="sg-flex-row sg-flex-justify-self-flex-end"
+           style="margin-top: auto;">
+        <button type="button" class="btn btn-outline-primary sg-flex-fill-available-space-evenly" (click)="cancel()">
+          Anuluj
         </button>
-        <button type="button" class="btn btn-outline-primary sg-flex-fill-available-space-evenly" (click)="cancel()">Anuluj</button>
       </div>
-    </div>
-    <div *ngIf="!forAccountId && billingElement" class="sg-flex-row">
-      <button type="button" class="btn btn-outline-primary sg-flex-fill-available-space-evenly" (click)="cancel()">Anuluj</button>
     </div>
   </form>
 

@@ -46,10 +46,12 @@
     [billingPeriod]="billingPeriodInfo.result"
     [piggyBanks]="piggyBanks"
     (editEvent)="createBillingPeriodElement($event[0], $event[1], $event[2])"
-  >
+    style="height: 100%">
   </app-create-billing-element>
-  <app-domain-accounts [domain]="currentDomainName" [accounts]="accounts"></app-domain-accounts>
+  <app-domain-accounts *ngIf="mobileEditMode==='display'" [domain]="currentDomainName"
+                       [accounts]="accounts"></app-domain-accounts>
   <app-accounts-grand-total
+    *ngIf="mobileEditMode==='display'"
     [title]="'Podsumowanie'"
     [piggyBanks]="piggyBanks"
     [accounts]="accounts"
@@ -65,7 +67,7 @@
     [clientPayments]="clientPayments"
     [allCurrencies]="allCurrencies"
     [performedServices]="performedServices"
-    (dateSelected)="fetchCompanyData($event)"
+    (onDateSelected)="fetchCompanyData($event)"
     (onPerformedServiceCreate)="createPerformedService($event)"
     (onPerformedServiceUpdate)="updatePerformedService($event)"
     (onPerformedServicePaymentCreate)="createPerformedServicePayment($event)"

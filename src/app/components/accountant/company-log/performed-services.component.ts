@@ -6,7 +6,7 @@ import {Client} from '../../../model/accountant/client';
 import {PerformedServicePayment} from '../../../model/accountant/performed-service-payment';
 import {ClientPayment} from '../../../model/accountant/client-payment';
 import {DatePipe} from '@angular/common';
-import {Payable, PaymentStatus} from '../../../model/accountant/payable';
+import {PaymentStatus} from '../../../model/accountant/payable';
 import {PayableGroup} from '../../../model/accountant/payable-groupper';
 import {ComparatorBuilder} from '../../../../utils/comparator-builder';
 import {SimplePerformedServicePayment} from '../../../model/accountant/simple-performed-service-payment';
@@ -75,6 +75,7 @@ export class PerformedServicesComponent implements OnInit {
   showDateColumn = true;
   showClientColumn = true;
   showServiceColumn = true;
+  numberOfDisplayedColumns: number = 4;
 
   constructor(private datePipe: DatePipe) {
   }
@@ -202,10 +203,7 @@ export class PerformedServicesComponent implements OnInit {
         this.showServiceColumn = false;
         break;
     }
-  }
-
-  public getNumberOfDisplayedColumns(): number {
-    return 1 + [this.showDateColumn, this.showClientColumn, this.showServiceColumn].filter(Boolean).length;
+    this.numberOfDisplayedColumns = 1 + [this.showDateColumn, this.showClientColumn, this.showServiceColumn].filter(Boolean).length;
   }
 
   public prepareToCreate(): void {

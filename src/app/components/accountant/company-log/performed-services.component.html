@@ -150,6 +150,7 @@
               (click)="setPerformedService(performedService)"
               [class.expanded-highlight-sides]="(isGrouped() && isEqualToSelectedGroup(group)) || (!isGrouped() && isEqualToSelectedElement(performedService))"
               [class.expanded-highlight-top]="!isGrouped() && isEqualToSelectedElement(performedService)"
+              [class.expanded-highlight-top-subgroup]="isGrouped() && isEqualToSelectedElement(performedService)"
               class="performed-service-row sg-row-hoverable">
             <td *ngIf="isGrouped()" style="width: 50px"></td>
             <td *ngIf="showDateColumn">{{performedService.date | localizedDate }}</td>
@@ -164,7 +165,7 @@
               [class.expanded-highlight-sides]="(isGrouped() && isEqualToSelectedGroup(group)) || (!isGrouped() && isEqualToSelectedElement(performedService))"
               [class.expanded-highlight-bottom]="!isGrouped() && isEqualToSelectedElement(performedService)">
             <td *ngIf="isGrouped()" style="width: 50px"></td>
-            <td [colSpan]="getNumberOfDisplayedColumns()">
+            <td [colSpan]="numberOfDisplayedColumns">
               <div class="sg-flex-column">
                 <div class="sg-flex-row sg-flex-justify-flex-end">
                   <button (click)="prepareToEdit()" class="btn btn-link btn-sm">
@@ -208,6 +209,11 @@
                 </table>
               </div>
             </td>
+          </tr>
+          <tr *ngIf="isGrouped() && isEqualToSelectedElement(performedService)"
+              [ngClass]="getPaymentStatusClass(performedService.getPaymentStatus())"
+              class="expanded-highlight-bottom-subgroup">
+            <td [colSpan]="numberOfDisplayedColumns + 1"></td>
           </tr>
         </ng-container>
         <tr [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)"

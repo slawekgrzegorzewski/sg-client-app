@@ -44,25 +44,25 @@
 
     <div (mouseleave)="setOverClientPayment(null, null)" *ngIf="isNonEditMode()"
          class="sg-flex-row sg-flex-justify-center">
-      <table style="width: 420px;">
+      <table style="width: 100%;">
         <ng-container *ngFor="let group of displayData">
-          <tr *ngIf="group.title" (click)="setGroupToDisplay(group)"
+          <tr *ngIf="group.title" (click)="selectGroup(group)"
               [ngClass]="getGroupClass(group)"
               [class.expanded-highlight-top]="isGrouped() && isEqualToSelectedGroup(group)"
               [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)">
-            <td colspan="2" style="font-weight: bold">
-              {{group.title}}
-            </td>
-            <td [colSpan]="showReceiptTypeColumns ? 5 : 2">
-              <div class="sg-flex-column">
-                <div *ngFor="let pi of group.additionalFinancialData | keyvalue" style="text-align: right">
-                  {{ pi.value.paid | currency: pi.key }} / {{ pi.value.of | currency: pi.key }}
+            <td [colSpan]="numberOfColumns" style="font-weight: bold">
+              <div style="width: 100%" class="sg-flex-row">
+                <div style="text-align: left; width: 33%;">{{group.title}}</div>
+                <div class="sg-flex-column sg-flex-align-flex-end" style="width: 67%">
+                  <div *ngFor="let pi of group.additionalFinancialData | keyvalue" style="text-align: right; vertical-align: top">
+                    {{ pi.value.paid | currency: pi.key }} / {{ pi.value.of | currency: pi.key }}
+                  </div>
                 </div>
               </div>
             </td>
           </tr>
           <ng-container *ngIf="isEqualToSelectedGroup(group)">
-            <tr [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)">
+            <tr [class.expanded-highlight-sides]="isGrouped()">
               <td *ngIf="isGrouped()" style="width: 50px"></td>
               <td style="width: 110px">Data</td>
               <td *ngIf="showClientColumn" style="width: 110px">Klient</td>
@@ -73,35 +73,47 @@
               <td *ngIf="showReceiptTypeColumns" style="width: 30px; text-align: center">C</td>
             </tr>
             <ng-container *ngFor="let clientPayment of group.data">
-
-              <tr #row (click)="setClientPayment(clientPayment)"
+              <tr #row (click)="selectClientPayment(clientPayment)"
                   (mouseenter)="setOverClientPayment(clientPayment, row)"
                   class="performed-service-row sg-row-hoverable"
                   [ngClass]="getClientPaymentClass(clientPayment)"
-                  [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)">
+                  [class.expanded-highlight-top-subgroup]="isGrouped() && isEqualToSelectedElement(clientPayment)"
+                  [class.expanded-highlight-top]="!isGrouped() && isEqualToSelectedElement(clientPayment)"
+                  [class.expanded-highlight-sides]="isGrouped() || isEqualToSelectedElement(clientPayment)">
                 <td *ngIf="isGrouped()"></td>
                 <td>{{clientPayment.date | localizedDate }}</td>
                 <td *ngIf="showClientColumn">{{clientPayment.client.name}}</td>
                 <td style="text-align:right">{{clientPayment.price| currency: clientPayment.currency}}</td>
-                <td *ngIf="showReceiptTypeColumns" style="text-align:center"><input type="checkbox"
-                                                                                    [ngModel]="clientPayment.billOfSale"
-                                                                                    disabled></td>
-                <td *ngIf="showReceiptTypeColumns" style="text-align:center"><input type="checkbox"
-                                                                                    [ngModel]="clientPayment.billOfSaleAsInvoice"
-                                                                                    disabled></td>
-                <td *ngIf="showReceiptTypeColumns" style="text-align:center"><input type="checkbox"
-                                                                                    [ngModel]="clientPayment.invoice"
-                                                                                    disabled></td>
-                <td *ngIf="showReceiptTypeColumns" style="text-align:center"><input type="checkbox"
-                                                                                    [ngModel]="clientPayment.notRegistered"
-                                                                                    disabled>
+                <td *ngIf="showReceiptTypeColumns" style="text-align:center">
+                  <input type="checkbox" [ngModel]="clientPayment.billOfSale" disabled>
+                </td>
+                <td *ngIf="showReceiptTypeColumns" style="text-align:center">
+                  <input type="checkbox" [ngModel]="clientPayment.billOfSaleAsInvoice" disabled>
+                </td>
+                <td *ngIf="showReceiptTypeColumns" style="text-align:center">
+                  <input type="checkbox" [ngModel]="clientPayment.invoice" disabled>
+                </td>
+                <td *ngIf="showReceiptTypeColumns" style="text-align:center">
+                  <input type="checkbox" [ngModel]="clientPayment.notRegistered" disabled>
+                </td>
+              </tr>
+              <tr *ngIf="isShowExtraReceiptTypeRow(clientPayment)" [ngClass]="getClientPaymentClass(clientPayment)"
+                  [class.expanded-highlight-sides]="(isGrouped() && isEqualToSelectedGroup(group)) || (!isGrouped() && isEqualToSelectedElement(clientPayment))">
+                <td [colSpan]="numberOfColumns" style="text-align: right">
+                  {{convertReceiptTypeToName(clientPayment)}}
                 </td>
               </tr>
               <tr *ngIf="isEqualToSelectedElement(clientPayment)"
-                  (click)="setClientPayment(clientPayment)"
+                  (click)="selectClientPayment(clientPayment)"
                   [ngClass]="getClientPaymentClass(clientPayment)"
-                  [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)">
-                <td [colSpan]="2 + (showReceiptTypeColumns ? 5 : 2)">
+                  [class.expanded-highlight-sides]="(isGrouped() && isEqualToSelectedGroup(group)) || (!isGrouped() && isEqualToSelectedElement(clientPayment))">
+                <td [colSpan]="numberOfColumns" style="font-weight: bold; text-align: center;">Usługi</td>
+              </tr>
+              <tr *ngIf="isEqualToSelectedElement(clientPayment)"
+                  (click)="selectClientPayment(clientPayment)"
+                  [ngClass]="getClientPaymentClass(clientPayment)"
+                  [class.expanded-highlight-sides]="(isGrouped() && isEqualToSelectedGroup(group)) || (!isGrouped() && isEqualToSelectedElement(clientPayment))">
+                <td [colSpan]="numberOfColumns">
                   <div class="sg-flex-column">
                     <table style="width: 100%">
                       <thead>
@@ -121,10 +133,20 @@
                   </div>
                 </td>
               </tr>
+              <tr *ngIf="!isGrouped() && isEqualToSelectedElement(clientPayment)"
+                  [ngClass]="getClientPaymentClass(clientPayment)"
+                  class="expanded-highlight-sides expanded-highlight-bottom">
+                <td [colSpan]="numberOfColumns"></td>
+              </tr>
+              <tr *ngIf="isGrouped() && isEqualToSelectedElement(clientPayment)"
+                  [ngClass]="getClientPaymentClass(clientPayment)"
+                  class="expanded-highlight-bottom-subgroup">
+                <td [colSpan]="numberOfColumns"></td>
+              </tr>
             </ng-container>
-            <tr [class.expanded-highlight-sides]="isGrouped() && isEqualToSelectedGroup(group)"
-                [class.expanded-highlight-bottom]="isGrouped() && isEqualToSelectedGroup(group)">
-              <td [colSpan]="2 + (showReceiptTypeColumns ? 5 : 2)"></td>
+            <tr *ngIf="isGrouped() && isEqualToSelectedGroup(group)"
+                class="expanded-highlight-sides expanded-highlight-bottom">
+              <td [colSpan]="numberOfColumns"></td>
             </tr>
           </ng-container>
         </ng-container>
@@ -145,9 +167,9 @@
         [createMode]="isCreateEditMode()"
         [allCurrencies]="allCurrencies"
         [clients]="clients"
-        (createEvent)="create($event)"
-        (updateEvent)="update()"
-        (cancelEvent)="resetEditForm()"
+        (onClientPaymentCreate)="createClientPayment($event)"
+        (onClientPaymentUpdate)="updateClientPayment()"
+        (onEditCancel)="resetEditForm()"
       >
       </app-client-payment-edit>
     </div>

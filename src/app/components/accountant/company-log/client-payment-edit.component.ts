@@ -57,9 +57,9 @@ export class ClientPaymentEditComponent implements OnInit {
   @Input() allCurrencies: Currency[] = [];
   @Input() clients: Client[] = [];
 
-  @Output() updateEvent = new EventEmitter<ClientPayment>();
-  @Output() createEvent = new EventEmitter<ClientPayment>();
-  @Output() cancelEvent = new EventEmitter<any>();
+  @Output() onClientPaymentUpdate = new EventEmitter<ClientPayment>();
+  @Output() onClientPaymentCreate = new EventEmitter<ClientPayment>();
+  @Output() onEditCancel = new EventEmitter<any>();
 
   constructor() {
   }
@@ -68,12 +68,12 @@ export class ClientPaymentEditComponent implements OnInit {
   }
 
   resetEditForm(): void {
-    this.cancelEvent.emit();
+    this.onEditCancel.emit();
   }
 
   create(): void {
     if (this.clientPayment) {
-      this.createEvent.emit(this.clientPayment);
+      this.onClientPaymentCreate.emit(this.clientPayment);
     }
   }
 
@@ -83,7 +83,7 @@ export class ClientPaymentEditComponent implements OnInit {
 
   private updateEditElement(): void {
     if (this.clientPayment) {
-      this.updateEvent.emit(this.clientPayment);
+      this.onClientPaymentUpdate.emit(this.clientPayment);
     }
   }
 

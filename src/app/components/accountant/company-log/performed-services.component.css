@@ -31,3 +31,11 @@ thead > tr > td {
 .expanded-highlight-bottom {
   border-bottom: #343a40 solid 3px;
 }
+
+.expanded-highlight-top-subgroup {
+  border-top: #ff0000 dashed 2px;
+}
+
+.expanded-highlight-bottom-subgroup {
+  border-bottom: #ff0000 dashed 2px;
+}
