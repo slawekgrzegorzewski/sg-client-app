@@ -27,6 +27,7 @@ import {PerformedServicePayment} from '../../../model/accountant/performed-servi
 import {CompanyLogHelper} from './company-log-helper';
 import {BillingPeriodsHelper} from './billing-periods-helper';
 import {forkJoin, Observable} from 'rxjs';
+import {NgEventBus} from 'ng-event-bus';
 
 export type ViewMode = 'desktop' | 'mobile';
 type MobileEditMode = 'display' | 'create-income' | 'create-expense' | 'create-performed-service';
@@ -73,7 +74,8 @@ export class AccountantHomeComponent implements OnInit {
               private clientPaymentsService: ClientPaymentsService,
               private performedServicePaymentsService: PerformedServicePaymentsService,
               private servicesService: ServicesService,
-              private clientsService: ClientsService) {
+              private clientsService: ClientsService,
+              private eventBus: NgEventBus) {
     this.billingPeriodsHelper = new BillingPeriodsHelper(accountsService, categoriesService, piggyBanksService, billingsService);
     this.companyLogHelper = new CompanyLogHelper(performedServicePaymentsService, performedServicesService, clientPaymentsService, servicesService, clientsService);
   }
@@ -82,6 +84,10 @@ export class AccountantHomeComponent implements OnInit {
     this.onResize();
     this.refreshData();
     this.categoriesService.currentDomainCategories().subscribe(data => this.categories = data);
+    this.eventBus.on('data:refresh').subscribe(() => {
+      this.refreshData();
+      this.fetchCompanyData(this.currentCompanyDate || new Date());
+    });
   }
 
   @HostListener('window:resize')

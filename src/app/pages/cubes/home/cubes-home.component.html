@@ -13,7 +13,7 @@
 
     <button *ngIf="isThreeByThree()" (click)="scramble()">Scramble</button>
 
-    <sg-timer #timer></sg-timer>
+    <sg-timer style="height: 200px" #timer></sg-timer>
     <button *ngIf="!timer.isRunning()" (click)="start()">Start</button>
     <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="resume()">Resume</button>
     <button *ngIf="timer.isRunning()" (click)="stop()">Stop</button>

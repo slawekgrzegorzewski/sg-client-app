@@ -5,7 +5,7 @@ import {Client} from '../../../model/accountant/client';
 import {ClientPayment} from '../../../model/accountant/client-payment';
 import {PerformedService} from '../../../model/accountant/performed-service';
 import {PerformedServicePayment} from '../../../model/accountant/performed-service-payment';
-import {DatePipe, TitleCasePipe} from '@angular/common';
+import {DatePipe} from '@angular/common';
 import {Grouping} from './performed-services.component';
 
 type CompanyLogDisplayType = 'desktop' | 'mobile';
@@ -66,8 +66,7 @@ export class CompanyLogComponent implements OnInit {
   mobilePerformedServicesTitle = '';
   mobileClientPaymentsTitle = '';
 
-  constructor(private datePipe: DatePipe,
-              private titleCasePipe: TitleCasePipe) {
+  constructor(private datePipe: DatePipe) {
   }
 
   ngOnInit(): void {

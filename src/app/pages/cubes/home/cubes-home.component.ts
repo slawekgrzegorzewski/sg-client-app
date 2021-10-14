@@ -7,6 +7,7 @@ import {RubiksCube} from '../../../components/general/rubiks-cube/RubiksCube';
 import {classicMaterials} from '../../../components/general/rubiks-cube/types';
 import {ChartMode, CubeRecordsLineChart} from '../../../model/cubes/CubeRecordsLineChart';
 import {BaseChartDirective} from 'ng2-charts';
+import {NgEventBus} from 'ng-event-bus';
 
 @Component({
   selector: 'app-cubes-home',
@@ -82,10 +83,14 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
     this.refreshStatsForSelectedCube();
   }
 
-  constructor(private cubeRecordsService: CubeRecordsService) {
+  constructor(private cubeRecordsService: CubeRecordsService,
+              private eventBus: NgEventBus) {
   }
 
   ngOnInit(): void {
+    this.eventBus.on('data:refresh').subscribe(() => {
+      this.refreshStats();
+    });
   }
 
   ngAfterViewInit(): void {

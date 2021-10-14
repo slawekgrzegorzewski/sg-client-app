@@ -1,1 +1,1 @@
-<div><b>{{hours | number:'2.0-0'}}:{{minutes | number:'2.0-0'}}:{{seconds | number:'2.3-3':'pl-PL'}}</b></div>
+<seven-seg [digits]="3" [decimalPlaces]="1" [value]="(hours * 60 + minutes) * 60 + seconds"></seven-seg>

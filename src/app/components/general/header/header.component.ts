@@ -3,6 +3,7 @@ import {LoginService} from 'src/app/services/login.service';
 import {Router} from '@angular/router';
 import {DomainService} from '../../../services/domain.service';
 import {DetailedDomain, Domain} from '../../../model/domain';
+import {NgEventBus} from 'ng-event-bus';
 
 @Component({
   selector: 'app-header',
@@ -32,7 +33,8 @@ export class HeaderComponent implements OnInit {
   constructor(
     public loginService: LoginService,
     public domainService: DomainService,
-    private router: Router
+    private router: Router,
+    public eventBus: NgEventBus
   ) {
     this.loginService.loginSubject.subscribe(data => this.fetchData());
     this.domainService.domainsChangeEvent.subscribe(domains => this.availableDomains = domains);

@@ -26,7 +26,7 @@ import {SettingsService} from './services/accountant/settings.service';
 import '@angular/common/locales/global/pl';
 import {TransactionsListComponent} from './components/accountant/transactions/transactions-list.component';
 import {BillingPeriodsService} from './services/accountant/billing-periods.service';
-import {CurrencyPipe, DatePipe, TitleCasePipe} from '@angular/common';
+import {CurrencyPipe, DatePipe, DecimalPipe, TitleCasePipe} from '@angular/common';
 import {BillingElementsComponent} from './components/accountant/billing-periods/billing-elements.component';
 import {CreateBillingElementComponent} from './components/accountant/billing-periods/create-billing-element.component';
 import {CategoriesComponent} from './components/accountant/billing-periods/categories.component';
@@ -75,6 +75,8 @@ import {CubesHomeComponent} from './pages/cubes/home/cubes-home.component';
 import {CubeRecordsService} from './services/accountant/cube-records.service';
 import {HolidayCurrenciesService} from './services/accountant/holiday-currencies.service';
 import {HolidayCurrenciesComponent} from './components/accountant/holiday-currencies/holiday-currencies.component';
+import {SevenSegComponent} from './components/general/seven-seg/seven-seg.component';
+import {SevenSegDigitComponent} from './components/general/seven-seg/seven-seg-digit.component';
 
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
@@ -129,7 +131,9 @@ export class MyHammerConfig extends HammerGestureConfig {
     CompanyLogComponent,
     TimerComponent,
     CubesHomeComponent,
-    HolidayCurrenciesComponent
+    HolidayCurrenciesComponent,
+    SevenSegComponent,
+    SevenSegDigitComponent
   ],
   imports: [
     BrowserModule,
@@ -161,6 +165,7 @@ export class MyHammerConfig extends HammerGestureConfig {
       provide: LOCALE_ID,
       useValue: 'pl-PL'
     },
+    DecimalPipe,
     DomainService,
     CategoriesService,
     ClientsService,
