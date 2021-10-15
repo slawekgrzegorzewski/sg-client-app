@@ -77,6 +77,7 @@ import {HolidayCurrenciesService} from './services/accountant/holiday-currencies
 import {HolidayCurrenciesComponent} from './components/accountant/holiday-currencies/holiday-currencies.component';
 import {SevenSegComponent} from './components/general/seven-seg/seven-seg.component';
 import {SevenSegDigitComponent} from './components/general/seven-seg/seven-seg-digit.component';
+import {SevenSegTimerDisplay} from './components/general/seven-seg/seven-seg-timer-display.component';
 
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
@@ -133,7 +134,8 @@ export class MyHammerConfig extends HammerGestureConfig {
     CubesHomeComponent,
     HolidayCurrenciesComponent,
     SevenSegComponent,
-    SevenSegDigitComponent
+    SevenSegDigitComponent,
+    SevenSegTimerDisplay
   ],
   imports: [
     BrowserModule,

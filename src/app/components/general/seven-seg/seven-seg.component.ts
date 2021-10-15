@@ -29,7 +29,7 @@ export class SevenSegComponent implements AfterViewInit {
 
   @Input() class: string = '';
 
-  scale: number = 2;
+  scale: number = 1;
 
   @ViewChildren('digit') digitComponents!: QueryList<SevenSegDigitComponent>;
   allDigits: Array<number> = [];

@@ -1,0 +1,24 @@
+<svg style="display: none;">
+  <defs>
+    <circle id="colon_part1" cx="52" cy="25" r="5"/>
+    <circle id="colon_part12" cx="52" cy="15" r="5"/>
+  </defs>
+</svg>
+
+<seven-seg [digits]="2" [decimalPlaces]="0" [value]="hours"></seven-seg>
+<svg [attr.viewBox]="viewBox" focusable="false" display>
+  <g [attr.transform]="groupTransform()">
+    <svg:use href="#colon_part11"/>
+    <svg:use href="#colon_part12"/>
+  </g>
+</svg>
+
+<seven-seg [digits]="2" [decimalPlaces]="0" [value]="minutes"></seven-seg>
+
+<svg [attr.viewBox]="viewBox" focusable="false" display>
+  <g>
+    <svg:use href="#colon_part21"/>
+    <svg:use href="#colon_part22"/>
+  </g>
+</svg>
+<seven-seg [digits]="2" [decimalPlaces]="1" [value]="seconds"></seven-seg>
