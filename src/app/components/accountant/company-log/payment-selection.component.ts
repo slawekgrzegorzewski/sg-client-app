@@ -91,7 +91,7 @@ export class PaymentSelectionComponent implements OnInit {
         .filter(p => p.client)
         .filter(p => p.client.id === forService.client.id)
         .filter(p => p.getPaidAmountForNow() < p.price)
-        .sort(ComparatorBuilder.comparingByDate<ClientPayment>(cp => cp?.date || new Date(0)).desc().build());
+        .sort(ComparatorBuilder.comparingByDateDays<ClientPayment>(cp => cp?.date || new Date(0)).desc().build());
     } else {
       this.paymentsToChoose = [];
     }

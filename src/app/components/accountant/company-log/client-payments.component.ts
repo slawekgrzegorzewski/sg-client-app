@@ -113,7 +113,7 @@ export class ClientPaymentComponent implements OnInit {
       this.clientPayments,
       ps => -1,
       ps => '',
-      ComparatorBuilder.comparingByDate<ClientPayment>(cp => cp?.date || new Date(0)).desc()
+      ComparatorBuilder.comparingByDateDays<ClientPayment>(cp => cp?.date || new Date(0)).desc()
         .thenComparing(cp => cp?.client?.name || '')
         .thenComparing(cp => cp?.price || 0)
         .build()
@@ -125,7 +125,7 @@ export class ClientPaymentComponent implements OnInit {
       this.clientPayments,
       cp => cp && cp.client && cp.client.id || -1,
       cp => cp && cp.client && cp.client.name || '',
-      ComparatorBuilder.comparingByDate<ClientPayment>(cp => cp?.date || new Date(0))
+      ComparatorBuilder.comparingByDateDays<ClientPayment>(cp => cp?.date || new Date(0))
         .thenComparing(cp => cp?.price || 0)
         .build()
     );
@@ -141,7 +141,7 @@ export class ClientPaymentComponent implements OnInit {
       this.clientPayments,
       cp => cp && convertReceiptTypeToId(cp),
       cp => cp && this.convertReceiptTypeToName(cp),
-      ComparatorBuilder.comparingByDate<ClientPayment>(cp => cp?.date || new Date(0))
+      ComparatorBuilder.comparingByDateDays<ClientPayment>(cp => cp?.date || new Date(0))
         .thenComparing(cp => cp?.client?.name || '')
         .thenComparing(cp => cp?.price || 0)
         .build()
@@ -312,7 +312,7 @@ export class ClientPaymentComponent implements OnInit {
           currency: p.performedServicePayment.currency
         };
       })
-      .sort(ComparatorBuilder.comparingByDate<{ date: Date, service: string, price: number, currency: string }>(ps => ps?.date || new Date(0))
+      .sort(ComparatorBuilder.comparingByDateDays<{ date: Date, service: string, price: number, currency: string }>(ps => ps?.date || new Date(0))
         .thenComparing(ps => ps.service)
         .thenComparing(ps => ps.price || 0)
         .build());

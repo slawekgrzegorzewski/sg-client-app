@@ -90,8 +90,24 @@ export class ComparatorBuilder<T> {
     return new ComparatorBuilder<T>(keyExtractor);
   }
 
+  public static comparingByDateDays<T>(keyExtractor: TKeyDateExtractor<T>): ComparatorBuilder<T> {
+    return new ComparatorBuilder<T>(ComparatorBuilder.convertToNumberExtractorByDays(keyExtractor));
+  }
+
   public static comparingByDate<T>(keyExtractor: TKeyDateExtractor<T>): ComparatorBuilder<T> {
     return new ComparatorBuilder<T>(ComparatorBuilder.convertToNumberExtractor(keyExtractor));
+  }
+
+  private static convertToNumberExtractorByDays<T>(keyExtractor: TKeyDateExtractor<T>): TKeyExtractor<T> {
+    return t => {
+      if (t) {
+        const date = keyExtractor(t);
+        if (date) {
+          return Math.floor(date.getTime() / 1000 / 3600 / 24);
+        }
+      }
+      return null;
+    };
   }
 
   private static convertToNumberExtractor<T>(keyExtractor: TKeyDateExtractor<T>): TKeyExtractor<T> {
@@ -99,7 +115,7 @@ export class ComparatorBuilder<T> {
       if (t) {
         const date = keyExtractor(t);
         if (date) {
-          return Math.floor(date.getTime() / 1000 / 3600 / 24);
+          return Math.floor(date.getTime());
         }
       }
       return null;
@@ -137,6 +153,10 @@ export class ComparatorBuilder<T> {
     this.extractors.push(keyExtractor);
     this.lastExtractor = keyExtractor;
     return this;
+  }
+
+  public thenComparingByDateDays = (nextExtractor: TKeyDateExtractor<T>): ComparatorBuilder<T> => {
+    return this.thenComparing(ComparatorBuilder.convertToNumberExtractorByDays(nextExtractor));
   }
 
   public thenComparingByDate = (nextExtractor: TKeyDateExtractor<T>): ComparatorBuilder<T> => {

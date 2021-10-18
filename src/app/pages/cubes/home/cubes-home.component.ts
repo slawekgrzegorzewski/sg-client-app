@@ -50,8 +50,8 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
 
   set records(value: CubeRecord[]) {
     this.recordsInternal = value.sort(ComparatorBuilder.comparingByDate<CubeRecord>(cr => cr.recordTime).build());
-    this.recordsForTable = value.sort(ComparatorBuilder.comparingByDate<CubeRecord>(cr => cr.recordTime).desc().build())
-      .slice(0, this.movingAverageNumberOfElements);
+    this.recordsForTable = this.recordsInternal.slice(-this.movingAverageNumberOfElements)
+      .sort(ComparatorBuilder.comparingByDate<CubeRecord>(cr => cr.recordTime).desc().build());
     this.refreshStatsForSelectedCube();
   }
 

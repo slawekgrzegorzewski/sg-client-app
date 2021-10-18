@@ -43,7 +43,7 @@ export class TransactionsListComponent {
   }
 
   @Input() set transactions(value: Transaction[]) {
-    this.transactionsInternal = value.sort(ComparatorBuilder.comparingByDate<Transaction>(t => t.timeOfTransaction).build());
+    this.transactionsInternal = value.sort(ComparatorBuilder.comparingByDateDays<Transaction>(t => t.timeOfTransaction).build());
     this.filterDisplayingTransactions();
   }
 

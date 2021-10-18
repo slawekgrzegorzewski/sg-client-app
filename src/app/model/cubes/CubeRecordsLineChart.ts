@@ -15,7 +15,6 @@ export class CubeRecordsLineChart {
   public lineChartOptions: (ChartOptions & { annotation: pluginAnnotations.AnnotationConfig }) = {
     responsive: true,
     maintainAspectRatio: true,
-    onResize: (newSize: Chart.ChartSize) => console.log('height: ' + newSize.height + 'px; width:' + newSize.width + 'px;'),
     aspectRatio: screen.width < 600 ? 0.5 : 1.5,
     scales: {
       // We use this empty structure as a placeholder for dynamic theming.
@@ -83,7 +82,7 @@ export class CubeRecordsLineChart {
 
   constructor(data: CubeRecord[], mode: ChartMode, movingAverageNumberOfElements?: number) {
     const records = data.sort(
-      ComparatorBuilder.comparingByDate<CubeRecord>(cr => cr?.recordTime || new Date(0)).build()
+      ComparatorBuilder.comparingByDateDays<CubeRecord>(cr => cr?.recordTime || new Date(0)).build()
     ).map(d => d.time);
     switch (mode) {
       case 'RAW':

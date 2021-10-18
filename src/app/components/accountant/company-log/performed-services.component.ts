@@ -140,7 +140,7 @@ export class PerformedServicesComponent implements OnInit {
     this.displayData = PayableGroup.groupData(this.performedServices,
       ps => -1,
       ps => '',
-      ComparatorBuilder.comparingByDate<PerformedService>(ps => ps?.date || new Date(0)).desc()
+      ComparatorBuilder.comparingByDateDays<PerformedService>(ps => ps?.date || new Date(0)).desc()
         .thenComparing(ps => ps.client?.name || '')
         .thenComparing(ps => ps.service?.name || '')
         .thenComparing(ps => ps.price || 0)
@@ -157,7 +157,7 @@ export class PerformedServicesComponent implements OnInit {
       this.performedServices,
       ps => ps && entityGetter(ps) && entityGetter(ps).id || -1,
       ps => ps && entityGetter(ps) && entityGetter(ps).name || '',
-      ComparatorBuilder.comparingByDate<PerformedService>(ps => ps?.date || new Date(0)).desc()
+      ComparatorBuilder.comparingByDateDays<PerformedService>(ps => ps?.date || new Date(0)).desc()
         .thenComparing(ps => secondEntityGetter(ps)?.name || '')
         .thenComparing(ps => ps.price || 0)
         .build()
@@ -304,7 +304,7 @@ export class PerformedServicesComponent implements OnInit {
 
   public getClientPaymentsRelations(performedService: PerformedService): SimplePerformedServicePayment[] {
     return performedService.clientPaymentsRelations.sort(
-      ComparatorBuilder.comparingByDate<SimplePerformedServicePayment>(p => p?.date || new Date(0))
+      ComparatorBuilder.comparingByDateDays<SimplePerformedServicePayment>(p => p?.date || new Date(0))
         .thenComparing(p => p.price)
         .build()
     );
