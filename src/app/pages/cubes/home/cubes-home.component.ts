@@ -8,6 +8,7 @@ import {classicMaterials} from '../../../components/general/rubiks-cube/types';
 import {ChartMode, CubeRecordsLineChart} from '../../../model/cubes/CubeRecordsLineChart';
 import {BaseChartDirective} from 'ng2-charts';
 import {NgEventBus} from 'ng-event-bus';
+import {ComparatorBuilder} from '../../../../utils/comparator-builder';
 
 @Component({
   selector: 'app-cubes-home',
@@ -20,7 +21,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   canvas: ElementRef<HTMLCanvasElement> | null = null;
   cube: RubiksCube | null = null;
   reverseAlgorithm: ((duration?: number) => Promise<void>)[] = [];
-  cubeRecordsChartTypeInternal: ChartMode = 'RAW';
+  cubeRecordsChartTypeInternal: ChartMode = 'MOVING_AVERAGE';
 
   get cubeRecordsChartType(): ChartMode {
     return this.cubeRecordsChartTypeInternal;
@@ -47,7 +48,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   }
 
   set records(value: CubeRecord[]) {
-    this.recordsInternal = value;
+    this.recordsInternal = value.sort(ComparatorBuilder.comparingByDate<CubeRecord>(cr => cr.recordTime).build());
     this.refreshStatsForSelectedCube();
   }
 
@@ -72,7 +73,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   turns: string = '';
   visible = true;
 
-  private _movingAverageNumberOfElements: number = 7;
+  private _movingAverageNumberOfElements: number = 30;
 
   @Input() get movingAverageNumberOfElements(): number {
     return this._movingAverageNumberOfElements;
@@ -289,6 +290,10 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   }
 
   date(time: number): Date {
+    return new Date(time * 1000);
+  }
+
+  toDate(time: number): Date {
     return new Date(time * 1000);
   }
 }

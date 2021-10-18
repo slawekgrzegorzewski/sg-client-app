@@ -1,6 +1,4 @@
-[segmentOn] {
-  opacity: 1;
-}
-[segmentOff] {
-  opacity: 0;
+svg {
+  overflow: hidden;
+  stroke-width: 0;
 }

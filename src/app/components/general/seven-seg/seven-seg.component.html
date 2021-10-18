@@ -13,6 +13,6 @@
   </defs>
 </svg>
 
-<svg [attr.viewBox]="viewBox" focusable="false" display>
+<svg [attr.viewBox]="viewBox" focusable="false" display [style.height.px]="height" [style.fill]="color">
   <g [attr.transform]="groupTransform(i)" *ngFor="let i of allDigits" [idx]=i #digit sevenSegDigit></g>
 </svg>

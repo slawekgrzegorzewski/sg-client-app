@@ -2,5 +2,5 @@
   opacity: 1;
 }
 [segmentOff] {
-  opacity: 0;
+  opacity: 0.1;
 }

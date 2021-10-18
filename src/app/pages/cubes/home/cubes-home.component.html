@@ -1,48 +1,67 @@
-<div class="sg-flex-row">
+<div class="sg-flex-row" style="height: 100%;">
 
-  <div style="width: 50%;">
-    <select [(ngModel)]="selectedCube">
-      <option *ngFor=" let type of cubeTypes | keyvalue" [value]="type.key">{{type.value}}</option>
-    </select>
+  <div style="width: 25%;height: 100%;">
+    <div style="height: 130px">
+      <select [(ngModel)]="selectedCube" style="width: 100%">
+        <option *ngFor=" let type of cubeTypes | keyvalue" [value]="type.key">{{type.value}}</option>
+      </select>
+
+      <div>
+        Najszybsze ułożenie {{min | date: 'mm:ss'}}
+      </div>
+      <div>
+        Najwolniejsze ułożenie {{max | date: 'mm:ss'}}
+      </div>
+      <div>
+        Średnia {{avg | date: 'mm:ss'}}
+      </div>
+      <div>
+        Średnia z ostatnich {{movingAverageNumberOfElements}} elementów {{avgOfLastNElements | date: 'mm:ss'}}
+      </div>
+    </div>
+
+    <div class="table-responsive" style="max-height: 700px">
+      <table style="width: 100%;" class="table table-sm table-striped">
+        <thead>
+        <tr>
+          <th>Data wyniku</th>
+          <th>Wynik</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let record of records.reverse() | slice: 0 : movingAverageNumberOfElements">
+          <td>{{ record.recordTime | localizedDate : 'yyyy-MM-dd HH:mm:ss' }}</td>
+          <td style="text-align: right">{{ toDate(record.time) | date : 'mm:ss' }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="width: 50%;" class="sg-flex-column">
+    <div style="margin-top: auto; margin-bottom: auto">
+      <sg-timer style="height: 100px" #timer></sg-timer>
+      <button *ngIf="!timer.isRunning()" (click)="start()">Start</button>
+      <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="resume()">Resume</button>
+      <button *ngIf="timer.isRunning()" (click)="stop()">Stop</button>
+      <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="save()">Zapisz</button>
+      <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="saveWithoutScramble()">Zapisz bez scrambla
+      </button>
+    </div>
+  </div>
+
+  <div style="width: 25%;">
 
     <div [hidden]="!visible">
-      <canvas #rubiks width="1000"></canvas>
+      <canvas #rubiks></canvas>
     </div>
 
     <div *ngIf="isThreeByThree() && turns">{{turns}}</div>
 
     <button *ngIf="isThreeByThree()" (click)="scramble()">Scramble</button>
-
-    <sg-timer style="height: 200px" #timer></sg-timer>
-    <button *ngIf="!timer.isRunning()" (click)="start()">Start</button>
-    <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="resume()">Resume</button>
-    <button *ngIf="timer.isRunning()" (click)="stop()">Stop</button>
-    <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="save()">Zapisz</button>
-    <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="saveWithoutScramble()">Zapisz bez scrambla
-    </button>
-  </div>
-
-  <div style="width: 50%;">
-    <div>
-      Najszybsze ułożenie {{min | date: 'mm:ss'}}
-    </div>
-    <div>
-      Najwolniejsze ułożenie {{max | date: 'mm:ss'}}
-    </div>
-    <div>
-      Średnia {{avg | date: 'mm:ss'}}
-    </div>
-    <div>
-      Średnia z ostatnich {{movingAverageNumberOfElements}} elementów {{avgOfLastNElements | date: 'mm:ss'}}
-    </div>
-    <div class="flex-column">
-      <div class="flex-row">
-        <button (click)="cubeRecordsChartType = 'RAW'">Zwykły</button>
-        <button (click)="cubeRecordsChartType = 'MOVING_AVERAGE'">Średnia ruchoma</button>
-        <input [(ngModel)]="movingAverageNumberOfElements" />
-      </div>
-      <div style="width: 50%">
-        <canvas baseChart #cubesRecordsChart='base-chart'
+    <div class="flex-column" style="height: 20%">
+      <div>
+        <canvas baseChart #cubesRecordsChart='base-chart' style="position: relative"
                 [datasets]="cubeRecordsLineChart.lineChartData"
                 [labels]="cubeRecordsLineChart.lineChartLabels"
                 [options]="cubeRecordsLineChart.lineChartOptions"
@@ -53,6 +72,12 @@
 
         </canvas>
       </div>
+      <div class="flex-row">
+        <button (click)="cubeRecordsChartType = 'RAW'">Zwykły</button>
+        <button (click)="cubeRecordsChartType = 'MOVING_AVERAGE'">Średnia ruchoma</button>
+        <input [(ngModel)]="movingAverageNumberOfElements"/>
+      </div>
+
     </div>
   </div>
 </div>

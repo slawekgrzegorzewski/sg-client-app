@@ -29,7 +29,9 @@ export class SevenSegComponent implements AfterViewInit {
 
   @Input() class: string = '';
 
-  scale: number = 1;
+  @Input() color: string = 'black';
+
+  @Input() height: number = 48;
 
   @ViewChildren('digit') digitComponents!: QueryList<SevenSegDigitComponent>;
   allDigits: Array<number> = [];
@@ -50,13 +52,9 @@ export class SevenSegComponent implements AfterViewInit {
     this.renderAll();
   }
 
-  get transformGroup(): string {
-    return `scale(${this.scale})`;
-  }
-
   get viewBox(): string {
-    const w = this.digits * 57 * this.scale;
-    const h = 80 * this.scale;
+    const w = this.digits * 57;
+    const h = 80;
     return `0 0 ${w} ${h}`;
   }
 
