@@ -29,7 +29,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let record of records.reverse() | slice: 0 : movingAverageNumberOfElements">
+        <tr *ngFor="let record of recordsForTable">
           <td>{{ record.recordTime | localizedDate : 'yyyy-MM-dd HH:mm:ss' }}</td>
           <td style="text-align: right">{{ toDate(record.time) | date : 'mm:ss' }}</td>
         </tr>

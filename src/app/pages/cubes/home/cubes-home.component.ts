@@ -41,6 +41,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   avg = new Date(0);
   avgOfLastNElements = new Date(0);
 
+  recordsForTable: CubeRecord[] = [];
   private recordsInternal: CubeRecord[] = [];
 
   get records(): CubeRecord[] {
@@ -49,6 +50,8 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
 
   set records(value: CubeRecord[]) {
     this.recordsInternal = value.sort(ComparatorBuilder.comparingByDate<CubeRecord>(cr => cr.recordTime).build());
+    this.recordsForTable = value.sort(ComparatorBuilder.comparingByDate<CubeRecord>(cr => cr.recordTime).desc().build())
+      .slice(0, this.movingAverageNumberOfElements);
     this.refreshStatsForSelectedCube();
   }
 
