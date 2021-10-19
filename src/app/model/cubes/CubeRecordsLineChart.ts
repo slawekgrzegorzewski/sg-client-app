@@ -80,35 +80,16 @@ export class CubeRecordsLineChart {
     }
   ];
 
-  constructor(data: CubeRecord[], mode: ChartMode, movingAverageNumberOfElements?: number) {
-    const records = data.sort(
-      ComparatorBuilder.comparingByDateDays<CubeRecord>(cr => cr?.recordTime || new Date(0)).build()
-    ).map(d => d.time);
+  constructor(data: (number | null)[], mode: ChartMode) {
     switch (mode) {
       case 'RAW':
-        this.lineChartData = [{data: records, label: 'Results'}];
+        this.lineChartData = [{data: data, label: 'Results'}];
         break;
       case 'MOVING_AVERAGE':
-        if (!movingAverageNumberOfElements) {
-          movingAverageNumberOfElements = 7;
-        }
-        this.lineChartData = [{data: this.movingAverageOf(records, movingAverageNumberOfElements), label: 'Moving average'}];
+        this.lineChartData = [{data: data, label: 'Moving average'}];
         break;
     }
-    this.lineChartLabels = records.map(r => '');
-  }
-
-  private movingAverageOf(records: number[], numberOfElements: number): number[] {
-    const movingAverage = [];
-    const lastNRecords = [];
-    for (const d of records) {
-      lastNRecords.push(d);
-      if (lastNRecords.length > numberOfElements) {
-        lastNRecords.shift();
-      }
-      movingAverage.push(lastNRecords.reduce((a, b) => a + b, 0) / lastNRecords.length);
-    }
-    return movingAverage;
+    this.lineChartLabels = data.map(r => '');
   }
 
   hideAllDataSets(): void {

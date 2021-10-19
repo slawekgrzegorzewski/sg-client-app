@@ -1,5 +1,5 @@
 <div [style.height.px]="getAvailableHeight()" class="sg-flex-column"
      (tap)="onTap($event)">
-  <app-header></app-header>
+  <app-header #navigation></app-header>
   <router-outlet></router-outlet>
 </div>

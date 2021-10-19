@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-md navbar-dark bg-dark" style="z-index: 99998;">
+<nav #navigation class="navbar navbar-expand-md navbar-dark bg-dark" style="z-index: 99998;" (resize)="onResize()">
 
   <div class="navbar-brand bg-dark">
     <select *ngIf="availableApps && availableApps.length > 0" [(ngModel)]="selectedApp" class="navbar-brand bg-dark"

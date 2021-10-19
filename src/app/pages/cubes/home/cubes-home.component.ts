@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, HostListener, Input, OnInit, ViewChild} from '@angular/core';
 import {TimerComponent} from '../../../components/general/timer/timer.component';
 import {CubeRecordsService} from '../../../services/accountant/cube-records.service';
-import {CubeRecord, CubeType, cubeTypeDescriptions} from '../../../model/cubes/cube-record';
+import {CubeRecord, CubeStats, CubeType, cubeTypeDescriptions} from '../../../model/cubes/cube-record';
 import scramble from '../../../model/cubes/cube-scrambler';
 import {RubiksCube} from '../../../components/general/rubiks-cube/RubiksCube';
 import {classicMaterials} from '../../../components/general/rubiks-cube/types';
@@ -41,7 +41,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   avg = new Date(0);
   avgOfLastNElements = new Date(0);
 
-  recordsForTable: CubeRecord[] = [];
+  statsForSelectedCube: CubeStats[] = [];
   private recordsInternal: CubeRecord[] = [];
 
   get records(): CubeRecord[] {
@@ -49,13 +49,10 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   }
 
   set records(value: CubeRecord[]) {
-    this.recordsInternal = value.sort(ComparatorBuilder.comparingByDate<CubeRecord>(cr => cr.recordTime).build());
-    this.recordsForTable = this.recordsInternal.slice(-this.movingAverageNumberOfElements)
-      .sort(ComparatorBuilder.comparingByDate<CubeRecord>(cr => cr.recordTime).desc().build());
+    this.recordsInternal = value
+      .sort(ComparatorBuilder.comparingByDate<CubeRecord>(cr => cr.recordTime).build());
     this.refreshStatsForSelectedCube();
   }
-
-  recordsForSelectedCube: CubeRecord[] = [];
 
   selectedCubeInternal: CubeType = 'THREE';
 
@@ -77,6 +74,9 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   visible = true;
 
   private _movingAverageNumberOfElements: number = 30;
+  resultsSummaryHeight: number = 200;
+  resultsTableHeight: number = 0;
+  clockWidth: number = 130;
 
   @Input() get movingAverageNumberOfElements(): number {
     return this._movingAverageNumberOfElements;
@@ -95,6 +95,10 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
     this.eventBus.on('data:refresh').subscribe(() => {
       this.refreshStats();
     });
+    this.eventBus.on('app:resize').subscribe((event) => {
+      this.sizeLayout(event.data.h, event.data.w);
+    });
+    this.eventBus.cast('app:getsize');
   }
 
   ngAfterViewInit(): void {
@@ -111,15 +115,51 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   }
 
   private refreshStatsForSelectedCube(): void {
-    this.recordsForSelectedCube = this.records.filter(r => r.cubesType === this.selectedCube);
-    this.cubeRecordsLineChart = new CubeRecordsLineChart(this.recordsForSelectedCube, this.cubeRecordsChartType, this.movingAverageNumberOfElements);
+    const recordsForSelectedCube = this.records.filter(r => r.cubesType === this.selectedCube);
+    this.statsForSelectedCube = [];
+
+    const movingAverageOf5 = this.movingAverageOf(recordsForSelectedCube.map(cr => cr.time), 5);
+    const movingAverageOfN = this.movingAverageOf(recordsForSelectedCube.map(cr => cr.time), this.movingAverageNumberOfElements);
+
+    for (let i = recordsForSelectedCube.length - 1; i >= 0; i--) {
+      const cubeStat = new CubeStats();
+      cubeStat.time = this.toDate(recordsForSelectedCube[i].time);
+      cubeStat.recordTime = recordsForSelectedCube[i].recordTime;
+      cubeStat.averages.set(5, this.toDate(movingAverageOf5[i] || 0));
+      cubeStat.averages.set(this.movingAverageNumberOfElements, this.toDate(movingAverageOfN[i] || 0));
+      this.statsForSelectedCube.push(cubeStat);
+      if (this.statsForSelectedCube.length > 50) {
+        break;
+      }
+    }
+
+    const chartData = this.cubeRecordsChartType === 'RAW' ? recordsForSelectedCube.map(cr => cr.time) : movingAverageOfN;
+    this.cubeRecordsLineChart = new CubeRecordsLineChart(chartData.filter(cr => cr !== null), this.cubeRecordsChartType);
     this.cubeRecordsLineChart.updateChart.subscribe(d => this.cubesRecordsChart!.chart.update());
-    const values = this.recordsForSelectedCube.map(r => r.time * 1_000);
-    const lastNValues = this.recordsForSelectedCube.slice(-this.movingAverageNumberOfElements).map(r => r.time * 1_000);
+
+    const values = recordsForSelectedCube.map(r => r.time * 1_000);
+    const lastNValues = recordsForSelectedCube.slice(-this.movingAverageNumberOfElements).map(r => r.time * 1_000);
     this.max = (values && values.length > 0) ? new Date(Math.max(...values)) : new Date(0);
     this.min = (values && values.length > 0) ? new Date(Math.min(...values)) : new Date(0);
     this.avg = (values && values.length > 0) ? new Date(values.reduce((a, b) => a + b, 0) / values.length) : new Date(0);
-    this.avgOfLastNElements = (lastNValues && lastNValues.length > 0) ? new Date(lastNValues.reduce((a, b) => a + b, 0) / lastNValues.length) : new Date(0);
+    this.avgOfLastNElements = (lastNValues && lastNValues.length > 0)
+      ? new Date(lastNValues.reduce((a, b) => a + b, 0) / lastNValues.length)
+      : new Date(0);
+  }
+
+  private movingAverageOf(records: number[], numberOfElements: number): (number | null)[] {
+    const movingAverage = [];
+    const lastNRecords = [];
+    for (const d of records) {
+      lastNRecords.push(d);
+      if (lastNRecords.length > numberOfElements) {
+        lastNRecords.shift();
+        movingAverage.push(lastNRecords.reduce((a, b) => a + b, 0) / lastNRecords.length);
+      } else {
+        movingAverage.push(null);
+      }
+    }
+    return movingAverage;
   }
 
   @HostListener('window:keyup', ['$event'])
@@ -298,6 +338,11 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
 
   toDate(time: number): Date {
     return new Date(time * 1000);
+  }
+
+  private sizeLayout(height: number, width: number): void {
+    this.resultsTableHeight = height - this.resultsSummaryHeight;
+    this.clockWidth = width / 2;
   }
 }
 

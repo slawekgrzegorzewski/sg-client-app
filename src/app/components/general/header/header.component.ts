@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {LoginService} from 'src/app/services/login.service';
 import {Router} from '@angular/router';
 import {DomainService} from '../../../services/domain.service';
@@ -11,6 +11,8 @@ import {NgEventBus} from 'ng-event-bus';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
+
+  @ViewChild('navigation') navigation!: ElementRef;
   isLoggedIn = false;
   availableApps: { app: string, routerLink: string }[] = [];
   invitations: Domain[] = [];
@@ -27,7 +29,17 @@ export class HeaderComponent implements OnInit {
     const app = this.availableApps.find(v => v.app === value);
     if (app) {
       this.router.navigate([app.routerLink]);
+      this.onResize();
     }
+  }
+
+  get currentDomainId(): number {
+    return this.loginService.currentDomainId;
+  }
+
+  set currentDomainId(value: number) {
+    this.loginService.currentDomainId = value;
+    this.onResize();
   }
 
   constructor(
@@ -43,6 +55,14 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {
     this.fetchData();
+  }
+
+  public getTakenHeight(): number {
+    return this.navigation?.nativeElement?.offsetHeight || 0;
+  }
+
+  public getTakenWidth(): number {
+    return this.navigation?.nativeElement?.offsetWidth || 0;
   }
 
   private fetchData(): void {
@@ -105,5 +125,9 @@ export class HeaderComponent implements OnInit {
   rejectInvitation(domain: Domain): void {
     this.domainService.rejectInvitation(domain.id).subscribe(data => {
     });
+  }
+
+  onResize() {
+    this.eventBus.cast('navigation:resize', {h: this.getTakenHeight(), w: this.getTakenWidth()});
   }
 }

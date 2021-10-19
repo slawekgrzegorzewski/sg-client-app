@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, Input} from '@angular/core';
 
 
 @Component({
@@ -18,6 +18,8 @@ export class TimerComponent {
   seconds = 0;
   minutes = 0;
   hours = 0;
+
+  @Input() width: number = 0;
 
   constructor() {
     this.clear();

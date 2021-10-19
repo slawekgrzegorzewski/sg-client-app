@@ -1,37 +1,61 @@
 <div class="sg-flex-row" style="height: 100%;">
 
   <div style="width: 25%;height: 100%;">
-    <div style="height: 130px">
-      <select [(ngModel)]="selectedCube" style="width: 100%">
-        <option *ngFor=" let type of cubeTypes | keyvalue" [value]="type.key">{{type.value}}</option>
-      </select>
+    <div [style.height.px]="resultsSummaryHeight">
+
+      <div ngbDropdown class="d-inline-block" style="width: 100%">
+        <button class="btn btn-outline-primary" id="cubeTypeDropdown" style="width: 100%" ngbDropdownToggle>
+          {{ cubeTypes.get(selectedCube) }}
+        </button>
+        <div ngbDropdownMenu aria-labelledby="cubeTypeDropdown" style="width: 100%">
+          <button *ngFor=" let type of cubeTypes | keyvalue" (click)="selectedCube = type.key" ngbDropdownItem>{{type.value}}</button>
+        </div>
+      </div>
 
       <div>
-        Najszybsze ułożenie {{min | date: 'mm:ss'}}
+        Najszybsze ułożenie {{min | date: 'mm:ss.S'}}
       </div>
       <div>
-        Najwolniejsze ułożenie {{max | date: 'mm:ss'}}
+        Najwolniejsze ułożenie {{max | date: 'mm:ss.S'}}
       </div>
       <div>
-        Średnia {{avg | date: 'mm:ss'}}
+        Średnia {{avg | date: 'mm:ss.S'}}
       </div>
       <div>
-        Średnia z ostatnich {{movingAverageNumberOfElements}} elementów {{avgOfLastNElements | date: 'mm:ss'}}
+        Średnia z ostatnich {{movingAverageNumberOfElements}} elementów {{avgOfLastNElements | date: 'mm:ss.S'}}
       </div>
     </div>
 
-    <div class="table-responsive" style="max-height: 700px">
-      <table style="width: 100%;" class="table table-sm table-striped">
+    <div class="table-responsive" [style.height.px]="resultsTableHeight">
+      <table style="width: 100%;" class="table table-sm table-striped results-table">
         <thead>
         <tr>
-          <th>Data wyniku</th>
-          <th>Wynik</th>
+          <th style="width: 175px;">Data wyniku</th>
+          <th style="text-align: right; width: 50px;">Wynik</th>
+          <th style="text-align: right; width: 50px;" *ngIf="movingAverageNumberOfElements < 5">
+            Ao{{movingAverageNumberOfElements}}
+          </th>
+          <th style="text-align: right; width: 50px;">
+            Ao5
+          </th>
+          <th style="text-align: right; width: 50px;" *ngIf="movingAverageNumberOfElements > 5">
+            Ao{{movingAverageNumberOfElements}}
+          </th>
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let record of recordsForTable">
-          <td>{{ record.recordTime | localizedDate : 'yyyy-MM-dd HH:mm:ss' }}</td>
-          <td style="text-align: right">{{ toDate(record.time) | date : 'mm:ss' }}</td>
+        <tr *ngFor="let record of statsForSelectedCube">
+          <td style="width: 175px;">{{ record.recordTime | localizedDate : 'yyyy-MM-dd HH:mm:ss' }}</td>
+          <td style="text-align: right; width: 50px;">{{ record.time | date : 'mm:ss.S' }}</td>
+          <td style="text-align: right; width: 50px;" *ngIf="movingAverageNumberOfElements < 5">
+            {{record.averages.get(movingAverageNumberOfElements) | date : 'mm:ss.S' }}
+          </td>
+          <td style="text-align: right; width: 50px;">
+            {{record.averages.get(5) | date : 'mm:ss.S'}}
+          </td>
+          <td style="text-align: right; width: 50px;" *ngIf="movingAverageNumberOfElements > 5">
+            {{record.averages.get(movingAverageNumberOfElements) | date : 'mm:ss.S'}}
+          </td>
         </tr>
         </tbody>
       </table>
@@ -40,7 +64,7 @@
 
   <div style="width: 50%;" class="sg-flex-column">
     <div style="margin-top: auto; margin-bottom: auto">
-      <sg-timer style="height: 100px" #timer></sg-timer>
+      <sg-timer [width]="clockWidth" #timer></sg-timer>
       <button *ngIf="!timer.isRunning()" (click)="start()">Start</button>
       <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="resume()">Resume</button>
       <button *ngIf="timer.isRunning()" (click)="stop()">Stop</button>

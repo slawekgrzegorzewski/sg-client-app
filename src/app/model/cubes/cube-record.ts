@@ -1,7 +1,7 @@
 import {Domain} from '../domain';
 
 export type CubeType = 'TWO' | 'THREE' | 'FOUR' | 'FIVE' | 'SIX' | 'SEVEN' | 'MEGAMINX';
-export const cubeTypeDescriptions = new Map(
+export const cubeTypeDescriptions = new Map<CubeType, string>(
   [
     ['TWO', '2x2'],
     ['THREE', '3x3'],
@@ -35,4 +35,9 @@ export class CubeRecord {
     this.domain = new Domain(data.domain);
   }
 
+}
+export class CubeStats {
+  public time: Date = new Date(0);
+  public averages: Map<number, Date | null> = new Map<number, Date>();
+  public recordTime: Date = new Date(0);
 }

@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AccountsService} from '../../../services/accountant/accounts.service';
 import {ToastService} from '../../../services/toast.service';
 import {Account} from '../../../model/accountant/account';
@@ -88,10 +88,12 @@ export class AccountantHomeComponent implements OnInit {
       this.refreshData();
       this.fetchCompanyData(this.currentCompanyDate || new Date());
     });
+    this.eventBus.on('app:resize').subscribe(() => {
+      this.onResize();
+    });
   }
 
-  @HostListener('window:resize')
-  onResize(): void {
+  private onResize(): void {
     if (window.innerWidth < 640) {
       this.viewMode = 'mobile';
     } else {
