@@ -15,7 +15,7 @@ export class CubeRecordsLineChart {
   public lineChartOptions: (ChartOptions & { annotation: pluginAnnotations.AnnotationConfig }) = {
     responsive: true,
     maintainAspectRatio: true,
-    aspectRatio: screen.width < 600 ? 0.5 : 1.5,
+    aspectRatio: window.innerWidth < 600 ? 0.5 : 4.5,
     scales: {
       // We use this empty structure as a placeholder for dynamic theming.
       xAxes: [{}],

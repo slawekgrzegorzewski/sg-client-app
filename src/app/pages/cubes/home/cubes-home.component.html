@@ -8,7 +8,8 @@
           {{ cubeTypes.get(selectedCube) }}
         </button>
         <div ngbDropdownMenu aria-labelledby="cubeTypeDropdown" style="width: 100%">
-          <button *ngFor=" let type of cubeTypes | keyvalue" (click)="selectedCube = type.key" ngbDropdownItem>{{type.value}}</button>
+          <button *ngFor=" let type of cubeTypes | keyvalue" (click)="selectedCube = type.key"
+                  ngbDropdownItem>{{type.value}}</button>
         </div>
       </div>
 
@@ -62,28 +63,35 @@
     </div>
   </div>
 
-  <div style="width: 50%;" class="sg-flex-column">
-    <div style="margin-top: auto; margin-bottom: auto">
+  <div style="width: 50%;" class="sg-flex-column sg-flex-justify-space-around">
+
+    <div class="sg-flex-column">
       <sg-timer [width]="clockWidth" #timer></sg-timer>
-      <button *ngIf="!timer.isRunning()" (click)="start()">Start</button>
-      <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="resume()">Resume</button>
-      <button *ngIf="timer.isRunning()" (click)="stop()">Stop</button>
-      <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="save()">Zapisz</button>
-      <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="saveWithoutScramble()">Zapisz bez scrambla
-      </button>
+      <div class="sg-flex-row">
+        <button *ngIf="!timer.isRunning()" (click)="start()"
+                class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+          Start
+        </button>
+        <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="resume()"
+                class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+          Wznów
+        </button>
+        <button *ngIf="timer.isRunning()" (click)="stop()"
+                class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+          Stop
+        </button>
+        <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="save()"
+                class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+          Zapisz
+        </button>
+        <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="saveWithoutScramble()"
+                class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+          Zapisz bez scrambla
+        </button>
+      </div>
     </div>
-  </div>
 
-  <div style="width: 25%;">
-
-    <div [hidden]="!visible">
-      <canvas #rubiks></canvas>
-    </div>
-
-    <div *ngIf="isThreeByThree() && turns">{{turns}}</div>
-
-    <button *ngIf="isThreeByThree()" (click)="scramble()">Scramble</button>
-    <div class="flex-column" style="height: 20%">
+    <div class="sg-flex-column">
       <div>
         <canvas baseChart #cubesRecordsChart='base-chart' style="position: relative"
                 [datasets]="cubeRecordsLineChart.lineChartData"
@@ -96,12 +104,52 @@
 
         </canvas>
       </div>
-      <div class="flex-row">
-        <button (click)="cubeRecordsChartType = 'RAW'">Zwykły</button>
-        <button (click)="cubeRecordsChartType = 'MOVING_AVERAGE'">Średnia ruchoma</button>
-        <input [(ngModel)]="movingAverageNumberOfElements"/>
+      <div class="sg-flex-row">
+        <button (click)="cubeRecordsChartType = 'RAW'"
+                class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+          Zwykły
+        </button>
+        <div ngbDropdown class="sg-flex-row sg-flex-fill-available-space-evenly">
+          <button class="btn btn-outline-primary sg-flex-fill-available-space-evenly" id="movingAverageSettings"
+                  ngbDropdownToggle>Średnia ruchoma
+          </button>
+          <div ngbDropdownMenu aria-labelledby="movingAverageSettings">
+            <div class="form-group">
+              <label for="movingAverageElementsCount">Liczba elementów do średniej</label>
+              <input [(ngModel)]="movingAverageNumberOfElements" type="number" class="form-control"
+                     id="movingAverageElementsCount">
+            </div>
+            <button (click)="cubeRecordsChartType = 'MOVING_AVERAGE'"
+                    class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+              Ustaw
+            </button>
+          </div>
+        </div>
+
+
       </div>
 
+    </div>
+
+  </div>
+
+  <div style="width: 25%;" class="sg-flex-column">
+
+    <div [hidden]="!visible">
+      <canvas #rubiks></canvas>
+    </div>
+
+    <div *ngIf="isThreeByThree() && turns">{{turns}}</div>
+
+    <div class="sg-flex-row">
+      <button *ngIf="isThreeByThree()" (click)="scramble()"
+              class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+        Scramble
+      </button>
+      <button *ngIf="isThreeByThree() && turns" (click)="resetScramble()"
+              class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+        Reset
+      </button>
     </div>
   </div>
 </div>

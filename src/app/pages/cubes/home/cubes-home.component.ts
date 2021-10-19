@@ -189,7 +189,6 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
       this.reverseAlgorithm = [];
     }
 
-
     const turns = scramble({turns: 25});
     this.turns = turns.join(' ');
 
@@ -211,6 +210,11 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
     }
     this.performAlgorithm(algorithm, promise);
     this.reverseAlgorithm = reverseAlgorithm.reverse();
+  }
+
+  resetScramble(): void {
+    this.performAlgorithm(this.reverseAlgorithm, null);
+    this.turns = '';
   }
 
   private performAlgorithm(algorithm: any[], promise: Promise<void> | null): Promise<void> | null {

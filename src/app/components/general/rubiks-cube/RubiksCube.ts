@@ -17,7 +17,7 @@ export class RubiksCube {
   ) {
     this.camera = new THREE.PerspectiveCamera();
     this.camera.position.set(4, 4, 4);
-    this.camera.lookAt(0, -0.33, 0);
+    this.camera.lookAt(0, 0, 0);
 
     this.scene = new THREE.Scene();
     this.scene.add(...this.generateCubeCluster());
