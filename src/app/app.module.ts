@@ -78,6 +78,7 @@ import {HolidayCurrenciesComponent} from './components/accountant/holiday-curren
 import {SevenSegComponent} from './components/general/seven-seg/seven-seg.component';
 import {SevenSegDigitComponent} from './components/general/seven-seg/seven-seg-digit.component';
 import {SevenSegTimerDisplay} from './components/general/seven-seg/seven-seg-timer-display.component';
+import {SizeService} from './services/size.service';
 
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
@@ -180,7 +181,8 @@ export class MyHammerConfig extends HammerGestureConfig {
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig,
-    }
+    },
+    SizeService
   ],
   bootstrap: [AppComponent]
 })

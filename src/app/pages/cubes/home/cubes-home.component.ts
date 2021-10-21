@@ -95,8 +95,8 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
     this.eventBus.on('data:refresh').subscribe(() => {
       this.refreshStats();
     });
-    this.eventBus.on('app:resize').subscribe((event) => {
-      this.sizeLayout(event.data.h, event.data.w);
+    this.eventBus.on('app:size').subscribe((event) => {
+      this.sizeLayout(event.data.height, event.data.width);
     });
     this.eventBus.cast('app:getsize');
   }

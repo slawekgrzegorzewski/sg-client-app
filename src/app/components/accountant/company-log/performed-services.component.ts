@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {PerformedService} from '../../../model/accountant/performed-service';
 import {Service} from '../../../model/accountant/service';
 import {Currency} from '../../../model/accountant/currency';
@@ -10,6 +10,8 @@ import {PaymentStatus} from '../../../model/accountant/payable';
 import {PayableGroup} from '../../../model/accountant/payable-groupper';
 import {ComparatorBuilder} from '../../../../utils/comparator-builder';
 import {SimplePerformedServicePayment} from '../../../model/accountant/simple-performed-service-payment';
+import {NgEventBus} from 'ng-event-bus';
+import {SizeService} from '../../../services/size.service';
 
 export type EditMode = 'edit' | 'create' | 'payment-selection' | ''
 export type PerformedServicesDisplayType = 'desktop' | 'mobile';
@@ -24,6 +26,26 @@ export enum Grouping {
   styleUrls: ['./performed-services.component.css']
 })
 export class PerformedServicesComponent implements OnInit {
+
+  private _performedServicesTableContainer: ElementRef | null | undefined = null;
+  @ViewChild('performedServicesTableContainer') get performedServicesTableContainer(): ElementRef | null | undefined {
+    return this._performedServicesTableContainer;
+  }
+
+  set performedServicesTableContainer(value: ElementRef | null | undefined) {
+    this._performedServicesTableContainer = value;
+    setTimeout(() => this.sizeLayout(), 1);
+  }
+
+  private _availableHeight: number = 0;
+  get availableHeight(): number {
+    return this._availableHeight;
+  }
+
+  set availableHeight(value: number) {
+    this._availableHeight = value;
+    this.sizeLayout();
+  }
 
   @Input() title: string | null = null;
   @Input() performedServicesDisplayType: PerformedServicesDisplayType = 'desktop';
@@ -76,11 +98,19 @@ export class PerformedServicesComponent implements OnInit {
   showClientColumn = true;
   showServiceColumn = true;
   numberOfDisplayedColumns: number = 4;
+  performedServicesTableHeight: number = 0;
 
-  constructor(private datePipe: DatePipe) {
+  constructor(
+    private datePipe: DatePipe,
+    private eventBus: NgEventBus,
+    private sizeService: SizeService) {
+    this.availableHeight = sizeService.size.height;
   }
 
   ngOnInit(): void {
+    this.eventBus.on('app:size').subscribe((event) => {
+      this.availableHeight = event.data.height;
+    });
   }
 
   public noGrouping(): void {
@@ -345,4 +375,13 @@ export class PerformedServicesComponent implements OnInit {
   }
 
   //endregion
+
+  private sizeLayout(): void {
+    if (this.performedServicesTableContainer) {
+      const newHeight = this.availableHeight - this.performedServicesTableContainer.nativeElement.getBoundingClientRect().top;
+      if (newHeight !== this.performedServicesTableHeight) {
+        this.performedServicesTableHeight = newHeight;
+      }
+    }
+  }
 }

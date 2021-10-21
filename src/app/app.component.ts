@@ -1,6 +1,7 @@
 import {AfterViewInit, Component, HostListener, ViewChild} from '@angular/core';
 import {NgEventBus} from 'ng-event-bus';
 import {HeaderComponent} from './components/general/header/header.component';
+import {SizeService} from './services/size.service';
 
 @Component({
   selector: 'app-root',
@@ -11,14 +12,13 @@ export class AppComponent implements AfterViewInit {
 
   @ViewChild('navigation') navigation!: HeaderComponent;
 
-  constructor(public eventBus: NgEventBus) {
+  constructor(
+    private eventBus: NgEventBus,
+    private sizeService: SizeService) {
   }
 
   ngAfterViewInit(): void {
     this.eventBus.on('navigation:resize').subscribe(() => {
-      this.castSizeEvent();
-    });
-    this.eventBus.on('app:getsize').subscribe(() => {
       this.castSizeEvent();
     });
     this.castSizeEvent();
@@ -30,10 +30,10 @@ export class AppComponent implements AfterViewInit {
   }
 
   private castSizeEvent() {
-    this.eventBus.cast('app:resize', {
-      h: window.innerHeight - this.navigation.getTakenHeight(),
-      w: window.innerWidth
-    });
+    this.sizeService.size = {
+      height: window.innerHeight - this.navigation.getTakenHeight(),
+      width: window.innerWidth
+    }
   }
 
   getAvailableHeight(): number {

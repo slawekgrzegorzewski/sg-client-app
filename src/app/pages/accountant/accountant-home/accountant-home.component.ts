@@ -88,7 +88,7 @@ export class AccountantHomeComponent implements OnInit {
       this.refreshData();
       this.fetchCompanyData(this.currentCompanyDate || new Date());
     });
-    this.eventBus.on('app:resize').subscribe(() => {
+    this.eventBus.on('app:size').subscribe(() => {
       this.onResize();
     });
   }

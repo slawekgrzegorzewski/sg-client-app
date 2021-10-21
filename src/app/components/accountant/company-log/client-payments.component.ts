@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {Currency} from '../../../model/accountant/currency';
 import {ClientPayment} from '../../../model/accountant/client-payment';
 import {Client} from '../../../model/accountant/client';
@@ -7,6 +7,8 @@ import {PerformedService} from '../../../model/accountant/performed-service';
 import {PaymentStatus} from '../../../model/accountant/payable';
 import {PayableGroup} from '../../../model/accountant/payable-groupper';
 import {ComparatorBuilder} from '../../../../utils/comparator-builder';
+import {NgEventBus} from 'ng-event-bus';
+import {SizeService} from '../../../services/size.service';
 
 export type EditMode = 'edit' | 'create' | '';
 export type GroupingButtonsPosition = 'head' | 'bottom';
@@ -62,8 +64,36 @@ export class ClientPaymentComponent implements OnInit {
   showClientColumn = true;
   showReceiptTypeColumns = true;
   numberOfColumns = 8;
+  clientPaymentsTableContainerHeight: number = 0;
 
-  constructor() {
+  private _clientPaymentsTableContainer: ElementRef | null | undefined = null;
+  @ViewChild('clientPaymentsTableContainer') get clientPaymentsTableContainer(): ElementRef | null | undefined {
+    return this._clientPaymentsTableContainer;
+  }
+
+  set clientPaymentsTableContainer(value: ElementRef | null | undefined) {
+    this._clientPaymentsTableContainer = value;
+    setTimeout(() => this.sizeLayout(), 1);
+
+  }
+
+  private _availableHeight: number = 0;
+  get availableHeight(): number {
+    return this._availableHeight;
+  }
+
+  set availableHeight(value: number) {
+    this._availableHeight = value;
+    this.sizeLayout();
+  }
+
+  constructor(
+    private eventBus: NgEventBus,
+    private sizeService: SizeService) {
+    this.eventBus.on('app:size').subscribe((event) => {
+      this.availableHeight = event.data.height;
+    });
+    this.availableHeight = sizeService.size.height;
   }
 
   ngOnInit(): void {
@@ -316,5 +346,14 @@ export class ClientPaymentComponent implements OnInit {
         .thenComparing(ps => ps.service)
         .thenComparing(ps => ps.price || 0)
         .build());
+  }
+
+  private sizeLayout(): void {
+    if (this.clientPaymentsTableContainer) {
+      const newHeight = this.availableHeight - this.clientPaymentsTableContainer.nativeElement.getBoundingClientRect().top;
+      if (newHeight !== this.clientPaymentsTableContainerHeight) {
+        this.clientPaymentsTableContainerHeight = newHeight;
+      }
+    }
   }
 }
