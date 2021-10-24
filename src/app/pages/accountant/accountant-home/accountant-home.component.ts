@@ -54,7 +54,9 @@ export class AccountantHomeComponent implements OnInit {
   services: Service[] = [];
   clients: Client[] = [];
   allCurrencies: Currency[] = [];
+  historicalSavingDates: Date[] = [];
   historicalSavings: Map<Date, Map<string, number>> = new Map();
+  savingsTotal = new Map<string, number>();
 
   billingPeriodInfo: BillingPeriodInfo | null = null;
 
@@ -111,11 +113,24 @@ export class AccountantHomeComponent implements OnInit {
     ]).subscribe(([[accounts, piggyBanks, historicalSavings, billingPeriodInfo], currencies]) => {
       this.accounts = accounts;
       this.piggyBanks = piggyBanks;
+      this.calculateSavingsTotal();
       this.historicalSavings = historicalSavings;
+      this.historicalSavingDates = BillingPeriodsService.getMapWithDatesKeysSorted(this.historicalSavings);
       this.billingPeriodInfo = billingPeriodInfo;
       this.allCurrencies = currencies;
     });
     this.currentDomainName = this.domainService.currentDomain?.name || '';
+  }
+
+  private calculateSavingsTotal(): void {
+    this.savingsTotal.clear();
+    this.piggyBanks.filter(pg => pg.savings).forEach(
+      pg => {
+        let totalForCurrency = this.savingsTotal.get(pg.currency) || 0;
+        totalForCurrency += pg.balance;
+        this.savingsTotal.set(pg.currency, totalForCurrency);
+      }
+    );
   }
 
   fetchCompanyData(date: Date): void {

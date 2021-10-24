@@ -50,13 +50,9 @@
   </app-create-billing-element>
   <app-domain-accounts *ngIf="mobileEditMode==='display'" [domain]="currentDomainName"
                        [accounts]="accounts"></app-domain-accounts>
-  <app-accounts-grand-total
-    *ngIf="mobileEditMode==='display'"
-    [title]="'Podsumowanie'"
-    [piggyBanks]="piggyBanks"
-    [accounts]="accounts"
-    [historicalSavings]="historicalSavings">
-  </app-accounts-grand-total>
+  <ng-container *ngIf="mobileEditMode==='display'">
+    <ng-container *ngTemplateOutlet="stats"></ng-container>
+  </ng-container>
 </ng-template>
 
 <ng-template #companyLog>
@@ -79,13 +75,7 @@
 <ng-template #desktopVersionOfAccountant>
   <div class="sg-flex-row sg-flex-justify-space-around sg-flex-wrap">
     <div class="sg-flex-column sg-flex-fill-available-space-evenly savings">
-      <app-accounts-grand-total
-        [title]="'Podsumowanie'"
-        [piggyBanks]="piggyBanks"
-        [accounts]="accounts"
-        [historicalSavings]="historicalSavings"
-        style="margin-bottom: 20px">
-      </app-accounts-grand-total>
+      <ng-container *ngTemplateOutlet="stats"></ng-container>
       <app-domain-accounts *ngIf="accounts && accounts.length > 0"
                            [domain]="currentDomainName"
                            [accounts]="accounts">
@@ -112,4 +102,32 @@
       style="margin-left: 50px; margin-top: 50px;margin-right: 50px">
     </app-piggy-banks>
   </div>
+</ng-template>
+
+<ng-template #stats>
+  <div class="sg-flex-column">
+    <h5 style="text-align: center">{{'Podsumowanie'}}</h5>
+    <app-currency-totals [title]="'Zgromadzone środki'"
+                         [valuesLeft]="accounts"
+                         style="margin-bottom: 10px"
+    ></app-currency-totals>
+    <app-currency-totals [title]="'Środki rozlokowane w skarbonkach'"
+                         [valuesLeft]="piggyBanks"
+                         style="margin-bottom: 10px"
+    ></app-currency-totals>
+    <app-currency-totals [title]="'Wolne środki'"
+                         [valuesLeft]="accounts"
+                         [valuesRight]="piggyBanks"
+    ></app-currency-totals>
+    <h5 style="text-align: center">Historyczne oszczędonści</h5>
+    <app-multi-currency-total *ngFor="let date of historicalSavingDates"
+                              [title]="(date | date : 'yyyy-MM') || ''"
+                              [values]="historicalSavings.get(date) || null">
+    </app-multi-currency-total>
+    <app-multi-currency-total
+      [title]="'Bieżące oszczędności'"
+      [values]="savingsTotal">
+    </app-multi-currency-total>
+  </div>
+
 </ng-template>
