@@ -58,6 +58,20 @@
               "outputHashing": "all",
               "buildOptimizer": false
             },
+            "mac": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.mac.ts"
+                }
+              ]
+            },
             "development": {
               "buildOptimizer": false,
               "optimization": false,
@@ -77,6 +91,9 @@
             },
             "development": {
               "browserTarget": "accountant-client:build:development"
+            },
+            "mac": {
+              "browserTarget": "accountant-client:build:mac"
             }
           },
           "defaultConfiguration": "development"
