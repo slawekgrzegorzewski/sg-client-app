@@ -28,6 +28,7 @@ import {CompanyLogHelper} from './company-log-helper';
 import {BillingPeriodsHelper} from './billing-periods-helper';
 import {forkJoin, Observable} from 'rxjs';
 import {NgEventBus} from 'ng-event-bus';
+import {DatesUtils} from '../../../utils/dates-utils';
 
 export type ViewMode = 'desktop' | 'mobile';
 type MobileEditMode = 'display' | 'create-income' | 'create-expense' | 'create-performed-service';
@@ -110,12 +111,14 @@ export class AccountantHomeComponent implements OnInit {
     forkJoin([
       this.billingPeriodsHelper.fetchData(date),
       this.accountsService.possibleCurrencies()
-    ]).subscribe(([[accounts, piggyBanks, historicalSavings, billingPeriodInfo], currencies]) => {
+    ]).subscribe((
+      [[accounts, piggyBanks, historicalSavings, billingPeriodInfo], currencies]
+        : [readonly [Account[], PiggyBank[], Map<Date, Map<string, number>>, BillingPeriodInfo | null], Currency[]]) => {
       this.accounts = accounts;
       this.piggyBanks = piggyBanks;
       this.calculateSavingsTotal();
       this.historicalSavings = historicalSavings;
-      this.historicalSavingDates = BillingPeriodsService.getMapWithDatesKeysSorted(this.historicalSavings);
+      this.historicalSavingDates = DatesUtils.getMapWithDatesKeysSorted(this.historicalSavings);
       this.billingPeriodInfo = billingPeriodInfo;
       this.allCurrencies = currencies;
     });
@@ -178,8 +181,8 @@ export class AccountantHomeComponent implements OnInit {
     }
     forkJoin(requests)
       .subscribe(
-        success => this.refreshData(),
-        error => this.refreshData());
+        (success: any) => this.refreshData(),
+        (error: any) => this.refreshData());
   }
 
   finishBillingPeriod(date: Date): void {

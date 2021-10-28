@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {TransactionType} from '../../../model/accountant/transaction-type';
 import {Account} from '../../../model/accountant/account';
 import {Transaction} from '../../../model/accountant/transaction';
-import {ComparatorBuilder} from '../../../../utils/comparator-builder';
+import {ComparatorBuilder} from '../../../utils/comparator-builder';
 
 @Component({
   selector: 'app-transactions-list',

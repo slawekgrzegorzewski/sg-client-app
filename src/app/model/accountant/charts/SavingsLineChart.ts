@@ -2,7 +2,7 @@ import {ChartDataSets, ChartOptions, ChartType} from 'chart.js';
 import {Color, Label} from 'ng2-charts';
 import * as pluginAnnotations from 'chartjs-plugin-annotation';
 import {DatePipe} from '@angular/common';
-import {Dates} from '../../../../utils/dates';
+import {ComparatorBuilder} from '../../../utils/comparator-builder';
 
 export class SavingsLineChart {
 
@@ -83,7 +83,7 @@ export class SavingsLineChart {
     for (const key of data.keys()) {
       dates.push(key);
     }
-    dates = dates.sort(Dates.compareDates);
+    dates = dates.sort(ComparatorBuilder.comparingByDateDays<Date>(date => date).build());
     const dataPerCurrency = new Map<string, (number | null)[]>();
     dates.forEach(d => {
       let dateLabel = datePipe.transform(d, 'yyyy-MM') || '';

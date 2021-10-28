@@ -8,7 +8,11 @@ import {classicMaterials} from '../../../components/general/rubiks-cube/types';
 import {ChartMode, CubeRecordsLineChart} from '../../../model/cubes/CubeRecordsLineChart';
 import {BaseChartDirective} from 'ng2-charts';
 import {NgEventBus} from 'ng-event-bus';
-import {ComparatorBuilder} from '../../../../utils/comparator-builder';
+import {ComparatorBuilder} from '../../../utils/comparator-builder';
+import {DatesUtils} from '../../../utils/dates-utils';
+import {KeyValue} from '@angular/common';
+
+type DateStats = { sub30: number; sumOfAllSub30sTimes: number; all: number; sumOfAllTimes: number; };
 
 @Component({
   selector: 'app-cubes-home',
@@ -22,6 +26,8 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   cube: RubiksCube | null = null;
   reverseAlgorithm: ((duration?: number) => Promise<void>)[] = [];
   cubeRecordsChartTypeInternal: ChartMode = 'MOVING_AVERAGE';
+  statsByDates: Map<Date, DateStats> = new Map<Date, DateStats>();
+  compareKeyPair = ComparatorBuilder.comparingByDateDays((value: KeyValue<Date, DateStats>) => value.key).desc().build();
 
   get cubeRecordsChartType(): ChartMode {
     return this.cubeRecordsChartTypeInternal;
@@ -95,7 +101,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
     this.eventBus.on('data:refresh').subscribe(() => {
       this.refreshStats();
     });
-    this.eventBus.on('app:size').subscribe((event) => {
+    this.eventBus.on('app:size').subscribe((event: any) => {
       this.sizeLayout(event.data.height, event.data.width);
     });
     this.eventBus.cast('app:getsize');
@@ -106,8 +112,13 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
     this.refreshStats();
   }
 
-  private refreshStats(): void {
-    this.cubeRecordsService.currentDomainRecords().subscribe(r => this.records = r);
+  private refreshStats(newCubeRecord?: CubeRecord): void {
+    if (newCubeRecord) {
+      this.records.push(newCubeRecord);
+      this.refreshStatsForSelectedCube();
+    } else {
+      this.cubeRecordsService.currentDomainRecords().subscribe(r => this.records = r);
+    }
   }
 
   isThreeByThree(): boolean {
@@ -145,6 +156,27 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
     this.avgOfLastNElements = (lastNValues && lastNValues.length > 0)
       ? new Date(lastNValues.reduce((a, b) => a + b, 0) / lastNValues.length)
       : new Date(0);
+
+    const byDatesAsNumbers: Map<number, DateStats> = new Map<number, DateStats>();
+    recordsForSelectedCube.forEach(record => {
+      const dateMidnight = DatesUtils.getDateMidnight(record.recordTime);
+      let dateStats = byDatesAsNumbers.get(dateMidnight.getTime());
+      if (!dateStats) {
+        dateStats = {sub30: 0, sumOfAllSub30sTimes: 0, all: 0, sumOfAllTimes: 0};
+      }
+      dateStats.all++;
+      dateStats.sumOfAllTimes += record.time;
+      if (record.time < 30) {
+        dateStats.sub30++;
+        dateStats.sumOfAllSub30sTimes += record.time;
+      }
+      byDatesAsNumbers.set(dateMidnight.getTime(), dateStats);
+    });
+    const byDates: Map<Date, DateStats> = new Map<Date, DateStats>();
+    byDatesAsNumbers.forEach((value: DateStats, key: number) => {
+      byDates.set(new Date(key), value);
+    });
+    this.statsByDates = byDates;
   }
 
   private movingAverageOf(records: number[], numberOfElements: number): (number | null)[] {
@@ -248,14 +280,14 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   save(): void {
     if (!this.timer!.isRunning()) {
       const cubeRecord = this.createCubeRecordEntity(this.turns);
-      this.cubeRecordsService.createService(cubeRecord).subscribe(r => this.refreshStats());
+      this.cubeRecordsService.create(cubeRecord).subscribe((newCubeRecord: CubeRecord) => this.refreshStats(newCubeRecord));
     }
   }
 
   saveWithoutScramble(): void {
     if (!this.timer!.isRunning()) {
       const cubeRecord = this.createCubeRecordEntity('');
-      this.cubeRecordsService.createService(cubeRecord).subscribe(r => this.refreshStats());
+      this.cubeRecordsService.create(cubeRecord).subscribe((newCubeRecord: CubeRecord) => this.refreshStats(newCubeRecord));
     }
   }
 
@@ -345,7 +377,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   }
 
   private sizeLayout(height: number, width: number): void {
-    this.resultsTableHeight = height - this.resultsSummaryHeight;
+    this.resultsTableHeight = (height - this.resultsSummaryHeight) / 2;
     this.clockWidth = width / 2;
   }
 }

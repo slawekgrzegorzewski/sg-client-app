@@ -19,7 +19,7 @@ import {AccountantSettingsService} from '../../services/accountant/accountant-se
 import {AccountantSettings} from '../../model/accountant/accountant-settings';
 import {Service} from '../../model/accountant/service';
 import {ServicesService} from '../../services/accountant/services.service';
-import {ComparatorBuilder} from '../../../utils/comparator-builder';
+import {ComparatorBuilder} from '../../utils/comparator-builder';
 import {Button} from '../../components/general/hoverable-buttons.component';
 
 @Component({

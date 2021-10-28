@@ -8,7 +8,7 @@ import {ClientPayment} from '../../../model/accountant/client-payment';
 import {DatePipe} from '@angular/common';
 import {PaymentStatus} from '../../../model/accountant/payable';
 import {PayableGroup} from '../../../model/accountant/payable-groupper';
-import {ComparatorBuilder} from '../../../../utils/comparator-builder';
+import {ComparatorBuilder} from '../../../utils/comparator-builder';
 import {SimplePerformedServicePayment} from '../../../model/accountant/simple-performed-service-payment';
 import {NgEventBus} from 'ng-event-bus';
 import {SizeService} from '../../../services/size.service';

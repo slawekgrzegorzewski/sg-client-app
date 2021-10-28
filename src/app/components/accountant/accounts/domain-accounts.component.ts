@@ -1,7 +1,7 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {Account} from '../../../model/accountant/account';
 import {Button} from '../../general/hoverable-buttons.component';
-import {ComparatorBuilder} from '../../../../utils/comparator-builder';
+import {ComparatorBuilder} from '../../../utils/comparator-builder';
 
 @Component({
   selector: 'app-domain-accounts',

@@ -6,7 +6,7 @@ import {SimplePerformedServicePayment} from '../../../model/accountant/simple-pe
 import {PerformedService} from '../../../model/accountant/performed-service';
 import {PaymentStatus} from '../../../model/accountant/payable';
 import {PayableGroup} from '../../../model/accountant/payable-groupper';
-import {ComparatorBuilder} from '../../../../utils/comparator-builder';
+import {ComparatorBuilder} from '../../../utils/comparator-builder';
 import {NgEventBus} from 'ng-event-bus';
 import {SizeService} from '../../../services/size.service';
 
@@ -90,7 +90,7 @@ export class ClientPaymentComponent implements OnInit {
   constructor(
     private eventBus: NgEventBus,
     private sizeService: SizeService) {
-    this.eventBus.on('app:size').subscribe((event) => {
+    this.eventBus.on('app:size').subscribe((event: any) => {
       this.availableHeight = event.data.height;
     });
     this.availableHeight = sizeService.size.height;

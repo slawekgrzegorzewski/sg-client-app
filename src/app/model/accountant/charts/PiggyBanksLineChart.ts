@@ -2,9 +2,9 @@ import {ChartDataSets, ChartOptions, ChartType} from 'chart.js';
 import {Color, Label} from 'ng2-charts';
 import * as pluginAnnotations from 'chartjs-plugin-annotation';
 import {DatePipe} from '@angular/common';
-import {Dates} from '../../../../utils/dates';
 import {PiggyBank} from '../piggy-bank';
 import {EventEmitter} from '@angular/core';
+import {ComparatorBuilder} from '../../../utils/comparator-builder';
 
 export class PiggyBanksLineChart {
 
@@ -98,7 +98,7 @@ export class PiggyBanksLineChart {
       dates.push(entry[0]);
       entry[1].map(this.descriptionOfPiggyBank).forEach(value => piggyBanksNames.add(value));
     }
-    dates = dates.sort(Dates.compareDates);
+    dates = dates.sort(ComparatorBuilder.comparingByDateDays<Date>(date => date).build());
 
     const dataPerPiggyName = new Map<string, (number | null)[]>();
     dates.forEach(d => {

@@ -7,7 +7,7 @@ import {TransactionsService} from '../../../services/accountant/transations.serv
 import {Transaction} from '../../../model/accountant/transaction';
 import {take} from 'rxjs/operators';
 import {DomainService} from '../../../services/domain.service';
-import {ComparatorBuilder} from '../../../../utils/comparator-builder';
+import {ComparatorBuilder} from '../../../utils/comparator-builder';
 
 @Component({
   selector: 'app-accounts-history',

@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {TransactionType} from '../../../model/accountant/transaction-type';
 import {Account} from '../../../model/accountant/account';
 import {TransactionsService} from '../../../services/accountant/transations.service';
-import {CurrencyCalculator} from '../../../../utils/currency-calculator';
+import {CurrencyCalculator} from '../../../utils/currency-calculator';
 import {NgModel} from '@angular/forms';
 
 @Component({

@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ClientPayment} from '../../../model/accountant/client-payment';
 import {PerformedServicePayment} from '../../../model/accountant/performed-service-payment';
 import {PerformedService} from '../../../model/accountant/performed-service';
-import {ComparatorBuilder} from '../../../../utils/comparator-builder';
+import {ComparatorBuilder} from '../../../utils/comparator-builder';
 
 @Component({
   selector: 'app-payment-selection',

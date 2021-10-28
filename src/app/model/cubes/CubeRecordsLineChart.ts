@@ -3,7 +3,7 @@ import {Color, Label} from 'ng2-charts';
 import * as pluginAnnotations from 'chartjs-plugin-annotation';
 import {EventEmitter} from '@angular/core';
 import {CubeRecord} from './cube-record';
-import {ComparatorBuilder} from '../../../utils/comparator-builder';
+import {ComparatorBuilder} from '../../utils/comparator-builder';
 
 export type ChartMode = 'RAW' | 'MOVING_AVERAGE'
 

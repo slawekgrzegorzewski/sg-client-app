@@ -1,14 +1,14 @@
 import {Inject, Injectable, LOCALE_ID} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
-import {Observable} from 'rxjs';
 import {BillingPeriod, BillingPeriodInfo, BillingPeriodInfoDTO} from '../../model/accountant/billings/billing-period';
 import {CurrencyPipe, DatePipe} from '@angular/common';
-import {map} from 'rxjs/operators';
 import {Expense} from '../../model/accountant/billings/expense';
 import {Income} from '../../model/accountant/billings/income';
 import {PiggyBank} from '../../model/accountant/piggy-bank';
-import {Dates} from '../../../utils/dates';
+import {DatesUtils} from '../../utils/dates-utils';
+import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -17,26 +17,6 @@ export class BillingPeriodsService {
 
   private readonly billingEndpoint = `${environment.serviceUrl}/billing-periods`;
   private readonly summariesEndpoint = `${environment.serviceUrl}/month-summaries`;
-
-  static sortMapWithDatesKeys(resultUnsorted: Map<Date, any>): Map<Date, any> {
-    const resultSorted = new Map<Date, any>();
-    if (resultUnsorted) {
-      BillingPeriodsService.getMapWithDatesKeysSorted(resultUnsorted)
-        .forEach(d => resultSorted.set(d, resultUnsorted.get(d)));
-    }
-    return resultSorted;
-  }
-
-  static getMapWithDatesKeysSorted(resultUnsorted: Map<Date, any>): Date[] {
-    let dates: Date[] = [];
-    if (resultUnsorted) {
-      for (const date of resultUnsorted.keys()) {
-        dates.push(date);
-      }
-    }
-    dates = dates.sort(Dates.compareDates);
-    return dates;
-  }
 
   constructor(private http: HttpClient,
               private datePipe: DatePipe,
@@ -47,13 +27,13 @@ export class BillingPeriodsService {
 
   currentBillingPeriod(): Observable<BillingPeriodInfo> {
     return this.http.get<BillingPeriodInfoDTO>(this.billingEndpoint)
-      .pipe(map(d => new BillingPeriodInfo(d)));
+      .pipe(map((d: Partial<BillingPeriodInfoDTO>) => new BillingPeriodInfo(d)));
   }
 
   billingPeriodFor(date: Date): Observable<BillingPeriodInfo> {
     return this.http.get<BillingPeriodInfoDTO>(
       `${this.billingEndpoint}/${this.datePipe.transform(date, 'yyyy-MM')}`)
-      .pipe(map(d => new BillingPeriodInfo(d)));
+      .pipe(map((d: Partial<BillingPeriodInfoDTO>) => new BillingPeriodInfo(d)));
   }
 
   createCurrentBillingPeriod(): Observable<BillingPeriodInfo> {
@@ -65,7 +45,7 @@ export class BillingPeriodsService {
   }
 
   private createBillingPeriod(url: string): Observable<BillingPeriodInfo> {
-    return this.http.put<BillingPeriodInfoDTO>(url, null).pipe(map(d => new BillingPeriodInfo(d)));
+    return this.http.put<BillingPeriodInfoDTO>(url, null).pipe(map((d: Partial<BillingPeriodInfoDTO>) => new BillingPeriodInfo(d)));
   }
 
   finishBillingPeriod(period: BillingPeriod): Observable<BillingPeriodInfo> {
@@ -75,7 +55,7 @@ export class BillingPeriodsService {
   finishBillingPeriodOf(date: Date): Observable<BillingPeriodInfo> {
     const dateString = this.datePipe.transform(date, 'yyyy-MM');
     const url = `${this.billingEndpoint}/${dateString}/finish`;
-    return this.http.patch<BillingPeriodInfoDTO>(url, {responseType: 'json'}).pipe(map(d => new BillingPeriodInfo(d)));
+    return this.http.patch<BillingPeriodInfoDTO>(url, {responseType: 'json'}).pipe(map((d: Partial<BillingPeriodInfoDTO>) => new BillingPeriodInfo(d)));
   }
 
   createBillingElement(element: Income | Expense, accountId: number): Observable<string> {
@@ -90,9 +70,9 @@ export class BillingPeriodsService {
   getHistoricalSavings(noOfMonths: number): Observable<Map<Date, Map<string, number>>> {
     const url = `${this.summariesEndpoint}/savings/${noOfMonths}`;
     return this.http.get<Map<Date, Map<string, number>>>(url)
-      .pipe(map(d => {
+      .pipe(map((d: any) => {
         const resultUnsorted = new Map<Date, Map<string, number>>();
-        Object.entries(d).forEach(value => {
+        Object.entries(d).forEach((value: any[]) => {
           const key = new Date(value[0]);
           const entry = resultUnsorted.get(key) || new Map<string, number>();
           Object.entries<number>(value[1]).forEach(v => {
@@ -100,17 +80,17 @@ export class BillingPeriodsService {
           });
           resultUnsorted.set(key, entry);
         });
-        return BillingPeriodsService.sortMapWithDatesKeys(resultUnsorted);
+        return DatesUtils.sortMapWithDatesKeys(resultUnsorted);
       }));
   }
 
   getHistoricalPiggyBanks(noOfMonths: number): Observable<Map<Date, PiggyBank[]>> {
     const url = `${this.summariesEndpoint}/piggy-banks/${noOfMonths}`;
     return this.http.get<Map<Date, PiggyBank[]>>(url)
-      .pipe(map(d => {
+      .pipe(map((d: any) => {
         const resultUnsorted = new Map<Date, PiggyBank[]>();
         const piggyBanksPerId = new Map<number, PiggyBank[]>();
-        Object.entries(d).forEach(dateToPiggyBanks => {
+        Object.entries(d).forEach((dateToPiggyBanks: any[]) => {
           const date = new Date(dateToPiggyBanks[0]);
           const piggyBanksForDate = resultUnsorted.get(date) || [];
           dateToPiggyBanks[1].forEach((pg: PiggyBank) => {
@@ -121,7 +101,7 @@ export class BillingPeriodsService {
           resultUnsorted.set(date, piggyBanksForDate);
         });
         this.makeTheSameNamesForEqualId(piggyBanksPerId);
-        return BillingPeriodsService.sortMapWithDatesKeys(resultUnsorted);
+        return DatesUtils.sortMapWithDatesKeys(resultUnsorted);
       }));
   }
 

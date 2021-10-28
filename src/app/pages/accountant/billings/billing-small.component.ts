@@ -9,7 +9,7 @@ import {BillingPeriodsService} from '../../../services/accountant/billing-period
 import {Income} from '../../../model/accountant/billings/income';
 import {Expense} from '../../../model/accountant/billings/expense';
 import {CategoriesService} from '../../../services/accountant/categories.service';
-import {ComparatorBuilder} from '../../../../utils/comparator-builder';
+import {ComparatorBuilder} from '../../../utils/comparator-builder';
 
 @Component({
   selector: 'app-billing-small',
