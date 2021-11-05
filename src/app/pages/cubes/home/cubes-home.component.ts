@@ -362,6 +362,9 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   }
 
   public start(): void {
+    if (this.currentState === 'STOPPED') {
+      this.resetState();
+    }
     if (this.currentState === 'CLEAR' || this.currentState === 'SCRAMBLED') {
       this.timer!.start();
       this.currentState = 'ONGOING';
