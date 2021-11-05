@@ -30,7 +30,7 @@ export class TimerComponent {
     this.timeoutId = setInterval(() => this.update(), this.interval);
   }
 
-  private clear(): void {
+  clear(): void {
     this.committedTime = 0;
     this.currentTime = 0;
     this.startTime = new Date();

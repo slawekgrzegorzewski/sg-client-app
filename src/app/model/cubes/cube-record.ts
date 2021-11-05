@@ -1,15 +1,16 @@
 import {Domain} from '../domain';
 
 export type CubeType = 'TWO' | 'THREE' | 'FOUR' | 'FIVE' | 'SIX' | 'SEVEN' | 'MEGAMINX';
-export const cubeTypeDescriptions = new Map<CubeType, string>(
+export type CubeTypeSetting = { name: string, order: number };
+export const cubeTypeSettings = new Map<CubeType, CubeTypeSetting>(
   [
-    ['TWO', '2x2'],
-    ['THREE', '3x3'],
-    ['FOUR', '4x4'],
-    ['FIVE', '5x5'],
-    ['SIX', '6x6'],
-    ['SEVEN', '7x7'],
-    ['MEGAMINX', 'megaminx']
+    ['TWO', {name: '2x2', order: 0}],
+    ['THREE', {name: '3x3', order: 1}],
+    ['FOUR', {name: '4x4', order: 2}],
+    ['FIVE', {name: '5x5', order: 3}],
+    ['SIX', {name: '6x6', order: 4}],
+    ['SEVEN', {name: '7x7', order: 5}],
+    ['MEGAMINX', {name: 'megaminx', order: 6}]
   ]
 );
 
@@ -36,6 +37,7 @@ export class CubeRecord {
   }
 
 }
+
 export class CubeStats {
   public time: Date = new Date(0);
   public averages: Map<number, Date | null> = new Map<number, Date>();

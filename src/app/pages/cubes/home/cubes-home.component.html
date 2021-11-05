@@ -6,124 +6,70 @@
     <ng-container *ngTemplateOutlet="detailedResultsTable"></ng-container>
   </div>
 
-  <div style="width: 50%;" class="sg-flex-column sg-flex-justify-space-around">
+  <div style="width: 50%;" class="sg-flex-column sg-flex-justify-space-between">
 
-    <div class="sg-flex-column">
-      <sg-timer [width]="clockWidth" #timer></sg-timer>
-      <div class="sg-flex-row">
-        <button *ngIf="!timer.isRunning()" (click)="start()"
-                class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-          Start
-        </button>
-        <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="resume()"
-                class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-          Wznów
-        </button>
-        <button *ngIf="timer.isRunning()" (click)="stop()"
-                class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-          Stop
-        </button>
-        <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="save()"
-                class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-          Zapisz
-        </button>
-        <button *ngIf="!timer.isRunning() && timer.committedTime" (click)="saveWithoutScramble()"
-                class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-          Zapisz bez scrambla
-        </button>
-      </div>
-    </div>
+    <div></div>
 
-    <div class="sg-flex-column">
-      <div>
-        <canvas baseChart #cubesRecordsChart='base-chart' style="position: relative"
-                [datasets]="cubeRecordsLineChart.lineChartData"
-                [labels]="cubeRecordsLineChart.lineChartLabels"
-                [options]="cubeRecordsLineChart.lineChartOptions"
-                [colors]="cubeRecordsLineChart.lineChartColors"
-                [legend]="cubeRecordsLineChart.lineChartLegend"
-                [chartType]="cubeRecordsLineChart.lineChartType"
-                [plugins]="cubeRecordsLineChart.lineChartPlugins">
+    <sg-timer [width]="clockWidth" #timer class="sg-flex-justify-self-center"></sg-timer>
 
-        </canvas>
-      </div>
-      <div class="sg-flex-row">
-        <button (click)="cubeRecordsChartType = 'RAW'"
-                class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-          Zwykły
-        </button>
-        <div ngbDropdown class="sg-flex-row sg-flex-fill-available-space-evenly">
-          <button class="btn btn-outline-primary sg-flex-fill-available-space-evenly" id="movingAverageSettings"
-                  ngbDropdownToggle>Średnia ruchoma
-          </button>
-          <div ngbDropdownMenu aria-labelledby="movingAverageSettings">
-            <div class="form-group">
-              <label for="movingAverageElementsCount">Liczba elementów do średniej</label>
-              <input [(ngModel)]="movingAverageNumberOfElements" type="number" class="form-control"
-                     id="movingAverageElementsCount">
-            </div>
-            <button (click)="cubeRecordsChartType = 'MOVING_AVERAGE'"
-                    class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-              Ustaw
-            </button>
-          </div>
-        </div>
-
-
-      </div>
-
+    <div class="sg-flex-justify-self-flex-end sg-flex-column sg-flex-justify-flex-start">
+      <ng-container *ngTemplateOutlet="buttons"></ng-container>
     </div>
 
   </div>
 
   <div style="width: 25%;" class="sg-flex-column">
 
-    <div [hidden]="!visible">
-      <canvas #rubiks></canvas>
+    <div>
+      <canvas baseChart #cubesRecordsChart='base-chart' style="position: relative"
+              [datasets]="cubeRecordsLineChart.lineChartData"
+              [labels]="cubeRecordsLineChart.lineChartLabels"
+              [options]="cubeRecordsLineChart.lineChartOptions"
+              [colors]="cubeRecordsLineChart.lineChartColors"
+              [legend]="cubeRecordsLineChart.lineChartLegend"
+              [chartType]="cubeRecordsLineChart.lineChartType"
+              [plugins]="cubeRecordsLineChart.lineChartPlugins">
+      </canvas>
+    </div>
+
+    <div [hidden]="!isThreeByThree()">
+      <canvas #rubikCubeCanvas></canvas>
     </div>
 
     <div *ngIf="isThreeByThree() && turns">{{turns}}</div>
 
-    <div class="sg-flex-row">
-      <button *ngIf="isThreeByThree()" (click)="scramble()"
-              class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-        Scramble
-      </button>
-      <button *ngIf="isThreeByThree() && turns" (click)="resetScramble()"
-              class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-        Reset
-      </button>
-    </div>
   </div>
 </div>
 
 <ng-template #generalStats>
   <div [style.height.px]="resultsSummaryHeight">
-
-    <div ngbDropdown class="d-inline-block" style="width: 100%">
-      <button class="btn btn-outline-primary" id="cubeTypeDropdown" style="width: 100%" ngbDropdownToggle>
-        {{ cubeTypes.get(selectedCube) }}
-      </button>
-      <div ngbDropdownMenu aria-labelledby="cubeTypeDropdown" style="width: 100%">
-        <button *ngFor=" let type of cubeTypes | keyvalue" (click)="selectedCube = type.key"
-                ngbDropdownItem>{{type.value}}</button>
-      </div>
+    <div class="row">
+      <div class="col-8">Najszybsze ułożenie</div>
+      <div class="col-4">{{date(best) | date: 'mm:ss.SS'}}</div>
     </div>
-
-    <div>
-      Najszybsze ułożenie {{min | date: 'mm:ss.S'}}
+    <div class="row">
+      <div class="col-8">Najwolniejsze ułożenie</div>
+      <div class="col-4">{{date(worst) | date: 'mm:ss.SS'}}</div>
     </div>
-    <div>
-      Najwolniejsze ułożenie {{max | date: 'mm:ss.S'}}
+    <div class="row">
+      <div class="col-8">Średnia</div>
+      <div class="col-4">{{date(avg) | date: 'mm:ss.SS'}}</div>
     </div>
-    <div>
-      Średnia {{avg | date: 'mm:ss.S'}}
+    <div class="row">
+      <div class="col-8">Nalepsze Ao5</div>
+      <div class="col-4">{{date(bestAo5) | date: 'mm:ss.SS'}}</div>
     </div>
-    <div>
-      Średnia z ostatnich {{movingAverageNumberOfElements}} elementów {{avgOfLastNElements | date: 'mm:ss.S'}}
+    <div class="row">
+      <div class="col-8">Nalepsze Ao{{movingAverageNumberOfElements}}</div>
+      <div class="col-4">{{date(bestAoN) | date: 'mm:ss.SS'}}</div>
+    </div>
+    <div class="row">
+      <div class="col-8">Średnia z ostatnich {{movingAverageNumberOfElements}} elementów</div>
+      <div class="col-4">{{avgOfLastNElements | date: 'mm:ss.SS'}}</div>
     </div>
   </div>
 </ng-template>
+
 <ng-template #dailyStatsTable>
   <div class="table-fix-head" [style.height.px]="resultsTableHeight">
     <table style="width: 100%;" class="table table-sm table-striped results-table">
@@ -136,18 +82,19 @@
       </tr>
       </thead>
       <tbody>
-      <tr *ngFor="let record of statsByDates | keyvalue: compareKeyPair">
+      <tr *ngFor="let record of statsByDates | keyvalue: compareByDatesDesc">
         <td>{{ record.key | localizedDate : 'yyyy-MM-dd' }}</td>
         <td style="text-align: right">{{ record.value.sub30 }}
           ({{ (record.value.sub30 * 100 / record.value.all) | number: '.0-2' }}%)
         </td>
         <td style="text-align: right">{{ record.value.all }} </td>
-        <td style="text-align: right">{{ (record.value.sumOfAllTimes / record.value.all) | number: '.0-2'  }} </td>
+        <td style="text-align: right">{{ date(record.value.sumOfAllTimes / record.value.all) | date: 'mm:ss.SS' }} </td>
       </tr>
       </tbody>
     </table>
   </div>
 </ng-template>
+
 <ng-template #detailedResultsTable>
   <div class="table-fix-head" [style.height.px]="resultsTableHeight">
     <table style="width: 100%;" class="table table-sm table-striped results-table">
@@ -169,18 +116,84 @@
       <tbody>
       <tr *ngFor="let record of statsForSelectedCube">
         <td style="width: 175px;">{{ record.recordTime | localizedDate : 'yyyy-MM-dd HH:mm:ss' }}</td>
-        <td style="text-align: right; width: 50px;">{{ record.time | date : 'mm:ss.S' }}</td>
+        <td style="text-align: right; width: 50px;">{{ record.time | date : 'mm:ss.SS' }}</td>
         <td style="text-align: right; width: 50px;" *ngIf="movingAverageNumberOfElements < 5">
-          {{record.averages.get(movingAverageNumberOfElements) | date : 'mm:ss.S' }}
+          {{record.averages.get(movingAverageNumberOfElements) | date : 'mm:ss.SS' }}
         </td>
         <td style="text-align: right; width: 50px;">
-          {{record.averages.get(5) | date : 'mm:ss.S'}}
+          {{record.averages.get(5) | date : 'mm:ss.SS'}}
         </td>
         <td style="text-align: right; width: 50px;" *ngIf="movingAverageNumberOfElements > 5">
-          {{record.averages.get(movingAverageNumberOfElements) | date : 'mm:ss.S'}}
+          {{record.averages.get(movingAverageNumberOfElements) | date : 'mm:ss.SS'}}
         </td>
       </tr>
       </tbody>
     </table>
+  </div>
+</ng-template>
+
+<ng-template #buttons>
+  <div class="sg-flex-row">
+    <div ngbDropdown class="d-inline-block">
+      <button class="btn btn-outline-primary" id="cubeTypeDropdown" style="width: 100%" ngbDropdownToggle>
+        {{ cubeTypeSettings.get(selectedCubeType)?.name }}
+      </button>
+      <div ngbDropdownMenu aria-labelledby="cubeTypeDropdown" style="width: 100%">
+        <button *ngFor=" let cubeType of cubeTypesOrdered" (click)="selectedCubeType = cubeType"
+                ngbDropdownItem>{{cubeTypeSettings.get(cubeType)?.name}}</button>
+      </div>
+    </div>
+    <button *ngIf="isThreeByThree()" (click)="scramble()"
+            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+      Scramble (s)
+    </button>
+    <button *ngIf="isThreeByThree() && turns" (click)="resetState()"
+            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+      Reset (r)
+    </button>
+  </div>
+  <div class="sg-flex-row">
+    <button *ngIf="currentState === 'CLEAR' || currentState === 'SCRAMBLED'" (click)="start()"
+            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+      Start (spacja)
+    </button>
+    <button *ngIf="currentState === 'STOPPED'" (click)="resume()"
+            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+      Wznów (shift + spacja)
+    </button>
+    <button *ngIf="currentState === 'ONGOING'" (click)="stop()"
+            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+      Stop (spacja)
+    </button>
+    <button *ngIf="currentState === 'STOPPED'" (click)="save()"
+            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+      Zapisz (enter)
+    </button>
+    <button *ngIf="currentState === 'STOPPED'" (click)="saveWithoutScramble()"
+            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+      Zapisz bez scrambla (shift + enter)
+    </button>
+  </div>
+  <div class="sg-flex-row">
+    <button (click)="cubeRecordsChartType = 'RAW'"
+            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+      Zwykły
+    </button>
+    <div ngbDropdown class="sg-flex-row sg-flex-fill-available-space-evenly">
+      <button class="btn btn-outline-primary sg-flex-fill-available-space-evenly" id="movingAverageSettings"
+              ngbDropdownToggle>Średnia ruchoma
+      </button>
+      <div ngbDropdownMenu aria-labelledby="movingAverageSettings">
+        <div class="form-group">
+          <label for="movingAverageElementsCount">Liczba elementów do średniej</label>
+          <input [(ngModel)]="movingAverageNumberOfElements" type="number" class="form-control"
+                 id="movingAverageElementsCount">
+        </div>
+        <button (click)="cubeRecordsChartType = 'MOVING_AVERAGE'"
+                class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+          Ustaw
+        </button>
+      </div>
+    </div>
   </div>
 </ng-template>

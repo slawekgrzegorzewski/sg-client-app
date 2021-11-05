@@ -69,7 +69,6 @@ export class SevenSegComponent implements AfterViewInit {
     const stringRepresentation = this.decimalPipe.transform(value, format);
     let decimalFactor = Math.pow(10, this.decimalPlaces);
     this._value = Math.round(value * decimalFactor) / decimalFactor;
-    // console.log(`set value: ${this._value}`);
     this.renderAll();
   }
 
@@ -77,8 +76,6 @@ export class SevenSegComponent implements AfterViewInit {
     if (!this._viewInit) {
       return;
     }
-
-    // console.log('render all: ', this._value);
 
     // Special case: if value attribute is null or not given, blank the display
     if (this._value == null) {
@@ -102,7 +99,6 @@ export class SevenSegComponent implements AfterViewInit {
       let curDigit = value / divisor;
       value = value % divisor;
 
-      // console.log('CurDigit:', curDigit, 'next value:', value, 'idx', idx);
       if (Math.floor(curDigit) > 0) {
         leadingZero = false;
       }

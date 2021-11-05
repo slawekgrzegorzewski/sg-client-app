@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, ViewChild} from '@angular/core';
 import {LoginService} from 'src/app/services/login.service';
 import {Router} from '@angular/router';
 import {DomainService} from '../../../services/domain.service';
@@ -10,7 +10,7 @@ import {NgEventBus} from 'ng-event-bus';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent {
 
   @ViewChild('navigation') navigation!: ElementRef;
   isLoggedIn = false;
@@ -53,10 +53,6 @@ export class HeaderComponent implements OnInit {
     this.domainService.invitationChangeEvent.subscribe(domains => this.invitations = domains);
   }
 
-  ngOnInit(): void {
-    this.fetchData();
-  }
-
   public getTakenHeight(): number {
     return this.navigation?.nativeElement?.offsetHeight || 0;
   }
@@ -68,6 +64,7 @@ export class HeaderComponent implements OnInit {
   private fetchData(): void {
     this.isLoggedIn = this.loginService.isLoggedIn();
     this.getAvailableApps();
+    this.selectApp();
     this.invitations = this.domainService.invitations;
   }
 
@@ -75,8 +72,17 @@ export class HeaderComponent implements OnInit {
     const apps = this.loginService.getAvailableApps();
     this.availableApps = [];
     apps.forEach((value, key) => this.availableApps.push({app: key, routerLink: value}));
+  }
+
+  private selectApp() {
     if (this.availableApps && this.availableApps.length > 0) {
-      this.selectedApp = this.availableApps[0].app;
+      const path = this.router.url.substr(1);
+      const appFromPath = this.availableApps.find(app => app.routerLink === path);
+      if (appFromPath) {
+        this.selectedAppInternal = appFromPath.app;
+      } else {
+        this.selectedApp = this.availableApps[0].app;
+      }
     }
   }
 

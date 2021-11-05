@@ -37,7 +37,7 @@ const routes: Routes = [
 
   {path: 'cubes-home', component: CubesHomeComponent, canActivate: [AuthGuardGuard]},
 
-  {path: '**', redirectTo: '/home', pathMatch: 'full'}
+  {path: '**', redirectTo: '/home'}
 ];
 
 @NgModule({

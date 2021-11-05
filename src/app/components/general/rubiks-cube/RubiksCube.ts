@@ -34,6 +34,11 @@ export class RubiksCube {
     this.render();
   }
 
+  public reset(): void {
+    this.scene.clear();
+    this.scene.add(...this.generateCubeCluster());
+  }
+
   public resize(): void {
     const canvas = this.renderer.domElement;
     const pixelRatio = window.devicePixelRatio;
