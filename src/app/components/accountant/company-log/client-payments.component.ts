@@ -9,6 +9,7 @@ import {PayableGroup} from '../../../model/accountant/payable-groupper';
 import {ComparatorBuilder} from '../../../utils/comparator-builder';
 import {NgEventBus} from 'ng-event-bus';
 import {SizeService} from '../../../services/size.service';
+import {APP_SIZE_EVENT} from '../../../app.module';
 
 export type EditMode = 'edit' | 'create' | '';
 export type GroupingButtonsPosition = 'head' | 'bottom';
@@ -90,7 +91,7 @@ export class ClientPaymentComponent implements OnInit {
   constructor(
     private eventBus: NgEventBus,
     private sizeService: SizeService) {
-    this.eventBus.on('app:size').subscribe((event: any) => {
+    this.eventBus.on(APP_SIZE_EVENT).subscribe((event: any) => {
       this.availableHeight = event.data.height;
     });
     this.availableHeight = sizeService.size.height;

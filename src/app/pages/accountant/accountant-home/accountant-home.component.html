@@ -7,11 +7,11 @@
 
 <ng-template #mobileVersion>
   <div style="height: 100%;">
-    <div *ngIf="loginService.accountantSettings && !loginService.accountantSettings.company"
+    <div *ngIf="accountantSettings && !accountantSettings.company"
          style="width: 320px; height: 100%; margin: auto;">
       <ng-container *ngTemplateOutlet="mobileVersionOfAccountant"></ng-container>
     </div>
-    <div *ngIf="loginService.accountantSettings && loginService.accountantSettings.company"
+    <div *ngIf="accountantSettings && accountantSettings.company"
          style="width: 320px; height: 100%; margin: auto;">
       <ng-container *ngTemplateOutlet="companyLog"></ng-container>
     </div>
@@ -19,10 +19,10 @@
 </ng-template>
 
 <ng-template #desktopVersion>
-  <ng-container *ngIf="loginService.accountantSettings && !loginService.accountantSettings.company">
+  <ng-container *ngIf="accountantSettings && !accountantSettings.company">
     <ng-container *ngTemplateOutlet="desktopVersionOfAccountant"></ng-container>
   </ng-container>
-  <ng-container *ngIf="loginService.accountantSettings && loginService.accountantSettings.company">
+  <ng-container *ngIf="accountantSettings && accountantSettings.company">
     <ng-container *ngTemplateOutlet="companyLog"></ng-container>
   </ng-container>
 </ng-template>
@@ -48,7 +48,7 @@
     (editEvent)="createBillingPeriodElement($event[0], $event[1], $event[2])"
     style="height: 100%">
   </app-create-billing-element>
-  <app-domain-accounts *ngIf="mobileEditMode==='display'" [domain]="currentDomainName"
+  <app-domain-accounts *ngIf="mobileEditMode==='display'"
                        [accounts]="accounts"></app-domain-accounts>
   <ng-container *ngIf="mobileEditMode==='display'">
     <ng-container *ngTemplateOutlet="stats"></ng-container>
@@ -76,9 +76,7 @@
   <div class="sg-flex-row sg-flex-justify-space-around sg-flex-wrap">
     <div class="sg-flex-column sg-flex-fill-available-space-evenly savings">
       <ng-container *ngTemplateOutlet="stats"></ng-container>
-      <app-domain-accounts *ngIf="accounts && accounts.length > 0"
-                           [domain]="currentDomainName"
-                           [accounts]="accounts">
+      <app-domain-accounts *ngIf="accounts && accounts.length > 0" [accounts]="accounts">
       </app-domain-accounts>
     </div>
     <app-browse-billing-elements

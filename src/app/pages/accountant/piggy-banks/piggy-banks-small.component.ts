@@ -1,22 +1,42 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {PiggyBank} from '../../../model/accountant/piggy-bank';
 import {PiggyBanksService} from '../../../services/accountant/piggy-banks.service';
+import {Subscription} from 'rxjs';
+import {ActivatedRoute} from '@angular/router';
+import {DomainService} from '../../../services/domain.service';
+
+export const PIGGY_BANKS_SMALL_ROUTER_URL = 'piggy-banks-small';
 
 @Component({
   selector: 'app-piggy-banks-small',
   templateUrl: './piggy-banks-small.component.html',
   styleUrls: ['./piggy-banks-small.component.css']
 })
-export class PiggyBanksSmallComponent implements OnInit {
+export class PiggyBanksSmallComponent implements OnInit, OnDestroy {
 
   piggyBanks: PiggyBank[] = [];
 
-  constructor(private piggyBanksService: PiggyBanksService
+  domainSubscription: Subscription | null = null;
+
+  constructor(private piggyBanksService: PiggyBanksService,
+              private route: ActivatedRoute,
+              private domainService: DomainService
   ) {
+    this.domainService.registerToDomainChangesViaRouterUrl(PIGGY_BANKS_SMALL_ROUTER_URL, this.route);
+    this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
+      this.refreshData();
+    });
   }
 
   ngOnInit(): void {
     this.refreshData();
+  }
+
+  ngOnDestroy(): void {
+    if (this.domainSubscription) {
+      this.domainSubscription.unsubscribe();
+    }
+    this.domainService.deregisterFromDomainChangesViaRouterUrl(PIGGY_BANKS_SMALL_ROUTER_URL);
   }
 
   refreshData(): void {

@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, HostListener, Input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {TimerComponent} from '../../../components/general/timer/timer.component';
 import {CubeRecordsService} from '../../../services/accountant/cube-records.service';
 import {CubeRecord, CubeStats, CubeType, CubeTypeSetting, cubeTypeSettings} from '../../../model/cubes/cube-record';
@@ -12,16 +12,22 @@ import {ComparatorBuilder} from '../../../utils/comparator-builder';
 import {DatesUtils} from '../../../utils/dates-utils';
 import {KeyValue} from '@angular/common';
 import {AverageUtils} from '../../../utils/average-utils';
+import {APP_GET_SIZE_EVENT, APP_SIZE_EVENT, DATA_REFRESH_REQUEST_EVENT} from '../../../app.module';
+import {Subscription} from 'rxjs';
+import {ActivatedRoute} from '@angular/router';
+import {DomainService} from '../../../services/domain.service';
 
 type DateStats = { sub30: number; sumOfAllSub30sTimes: number; all: number; sumOfAllTimes: number; };
 type PageState = 'CLEAR' | 'SCRAMBLING' | 'SCRAMBLED' | 'ONGOING' | 'STOPPED';
+
+export const CUBES_HOME_ROUTER_URL = 'cubes-home';
 
 @Component({
   selector: 'app-cubes-home',
   templateUrl: './cubes-home.component.html',
   styleUrls: ['./cubes-home.component.css']
 })
-export class CubesHomeComponent implements OnInit, AfterViewInit {
+export class CubesHomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public compareByDatesDesc = ComparatorBuilder.comparingByDateDays((value: KeyValue<Date, DateStats>) => value.key).desc().build();
 
@@ -63,6 +69,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   bestAoN = 0;
   avg = 0;
   avgOfLastNElements = 0;
+  historicalRecords: number[] = [];
 
   cubeTypeSettings = cubeTypeSettings;
   cubeTypesOrdered = [...cubeTypeSettings.entries()]
@@ -97,23 +104,38 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
   resultsTableHeight: number = 0;
   clockWidth: number = 130;
 
+  domainSubscription: Subscription | null = null;
+
   constructor(private cubeRecordsService: CubeRecordsService,
-              private eventBus: NgEventBus) {
+              private eventBus: NgEventBus,
+              private route: ActivatedRoute,
+              private domainService: DomainService) {
+    this.domainService.registerToDomainChangesViaRouterUrl(CUBES_HOME_ROUTER_URL, this.route);
+    this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
+      this.refreshStats();
+    });
   }
 
   ngOnInit(): void {
-    this.eventBus.on('data:refresh').subscribe(() => {
+    this.eventBus.on(DATA_REFRESH_REQUEST_EVENT).subscribe(() => {
       this.refreshStats();
     });
-    this.eventBus.on('app:size').subscribe((event: any) => {
+    this.eventBus.on(APP_SIZE_EVENT).subscribe((event: any) => {
       this.sizeLayout(event.data.height, event.data.width);
     });
-    this.eventBus.cast('app:getsize');
+    this.eventBus.cast(APP_GET_SIZE_EVENT);
   }
 
   ngAfterViewInit(): void {
     this.cube = new RubiksCube(this.rubikCubeCanvas!.nativeElement, classicMaterials, 100);
     this.refreshStats();
+  }
+
+  ngOnDestroy(): void {
+    if (this.domainSubscription) {
+      this.domainSubscription.unsubscribe();
+    }
+    this.domainService.deregisterFromDomainChangesViaRouterUrl(CUBES_HOME_ROUTER_URL);
   }
 
   private refreshStats(newCubeRecord?: CubeRecord): void {
@@ -182,6 +204,19 @@ export class CubesHomeComponent implements OnInit, AfterViewInit {
     this.avgOfLastNElements = (lastNValues && lastNValues.length > 0)
       ? lastNValues.reduce((a, b) => a + b, 0) / lastNValues.length
       : 0;
+
+    const historicalRecords: number[] = [];
+    recordsForSelectedCube.forEach((record) => {
+        if (historicalRecords.length === 0) {
+          historicalRecords.push(record.time);
+        } else {
+          if (record.time < historicalRecords[historicalRecords.length - 1]) {
+            historicalRecords.push(record.time);
+          }
+        }
+      }
+    );
+    this.historicalRecords = historicalRecords;
   }
 
   isThreeByThree(): boolean {

@@ -1,4 +1,4 @@
-<div *ngIf="this.loggedIn()" class="sg-flex-column">
+<div class="sg-flex-column">
   <ul ngbNav #nav="ngbNav" class="nav-tabs">
     <li ngbNavItem>
       <a ngbNavLink>Konta</a>
@@ -62,7 +62,7 @@
             ></app-categories>
           </div>
           <div class="sg-flex-column sg-flex-align-stretch"
-               *ngIf="loginService.accountantSettings && !loginService.accountantSettings.company">
+               *ngIf="accountantSettings && !accountantSettings.company">
             <h5 class="sg-text-center">Skarbonki</h5>
             <app-piggy-banks
               [adminMode]="true"
@@ -75,7 +75,7 @@
         </div>
       </ng-template>
     </li>
-    <li ngbNavItem *ngIf="loginService.accountantSettings && loginService.accountantSettings.company">
+    <li ngbNavItem *ngIf="accountantSettings && accountantSettings.company">
       <a ngbNavLink>Firma</a>
       <ng-template ngbNavContent>
         <div class="sg-flex-row">
@@ -105,7 +105,7 @@
           <div class="sg-flex-column">
             <h5 class="sg-text-center">Ustawienia accountant</h5>
             <app-accountant-settings
-              [accountantSettings]="loginService.accountantSettings"
+              [accountantSettings]="accountantSettings"
               (isCompanyUpdateEvent)="updateIsCompany($event)"
             >
             </app-accountant-settings>

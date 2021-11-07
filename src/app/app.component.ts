@@ -2,6 +2,7 @@ import {AfterViewInit, Component, HostListener, ViewChild} from '@angular/core';
 import {NgEventBus} from 'ng-event-bus';
 import {HeaderComponent} from './components/general/header/header.component';
 import {SizeService} from './services/size.service';
+import {DATA_REFRESH_REQUEST_EVENT, NAVIGATION_RESIZE_EVENT} from './app.module';
 
 @Component({
   selector: 'app-root',
@@ -18,7 +19,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.eventBus.on('navigation:resize').subscribe(() => {
+    this.eventBus.on(NAVIGATION_RESIZE_EVENT).subscribe(() => {
       this.castSizeEvent();
     });
     this.castSizeEvent();
@@ -42,7 +43,7 @@ export class AppComponent implements AfterViewInit {
 
   onTap(event: any) {
     if (event.tapCount === 2) {
-      this.eventBus.cast('data:refresh');
+      this.eventBus.cast(DATA_REFRESH_REQUEST_EVENT);
     }
   }
 }

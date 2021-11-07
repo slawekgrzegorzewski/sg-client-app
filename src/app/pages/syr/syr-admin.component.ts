@@ -1,25 +1,43 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {SyrService} from '../../services/syr/syr.service';
 import {Country} from '../../model/syr/country';
-import {Observable, of} from 'rxjs';
+import {Observable, of, Subscription} from 'rxjs';
+import {DomainService} from '../../services/domain.service';
+import {ACCOUNTANT_HOME_ROUTER_URL} from '../accountant/accountant-home/accountant-home.component';
+
+export const SYR_ADMIN_ROUTER_URL = 'syr-admin';
 
 @Component({
   selector: 'app-syr-admin',
   templateUrl: './syr-admin.component.html',
   styleUrls: ['./syr-admin.component.css']
 })
-export class SyrAdminComponent implements OnInit {
+export class SyrAdminComponent implements OnInit, OnDestroy {
 
   countriesToMatch: { name: string; country: number }[] = [];
   allCountries: Country[] = [];
   fileToImport: File | null = null;
 
-  constructor(private syrService: SyrService, private router: Router) {
+  domainSubscription: Subscription | null = null;
+
+  constructor(private syrService: SyrService, private router: Router,
+              private route: ActivatedRoute,
+              private domainService: DomainService) {
+    this.domainService.registerToDomainChangesViaRouterUrl(SYR_ADMIN_ROUTER_URL, this.route);
+    this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
+    });
   }
 
   ngOnInit(): void {
+  }
+
+  ngOnDestroy(): void {
+    if (this.domainSubscription) {
+      this.domainSubscription.unsubscribe();
+    }
+    this.domainService.deregisterFromDomainChangesViaRouterUrl(SYR_ADMIN_ROUTER_URL);
   }
 
   fileChange(event: Event): void {

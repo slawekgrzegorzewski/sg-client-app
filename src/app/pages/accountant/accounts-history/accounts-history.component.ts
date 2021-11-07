@@ -1,26 +1,29 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {AccountsService} from '../../../services/accountant/accounts.service';
 import {ToastService} from '../../../services/toast.service';
 import {Account} from '../../../model/accountant/account';
-import {LoginService} from '../../../services/login.service';
 import {TransactionsService} from '../../../services/accountant/transations.service';
 import {Transaction} from '../../../model/accountant/transaction';
-import {take} from 'rxjs/operators';
-import {DomainService} from '../../../services/domain.service';
 import {ComparatorBuilder} from '../../../utils/comparator-builder';
+import {ActivatedRoute, Router} from '@angular/router';
+import {DomainService} from '../../../services/domain.service';
+import {Subscription} from 'rxjs';
+
+export const ACCOUNTANT_HISTORY_ROUTER_URL = 'accounts-history';
 
 @Component({
   selector: 'app-accounts-history',
   templateUrl: './accounts-history.component.html',
   styleUrls: ['./accounts-history.component.css']
 })
-export class AccountsHistoryComponent implements OnInit {
+export class AccountsHistoryComponent implements OnInit, OnDestroy {
 
   accounts: Account[] = [];
   selectedAccount: Account | null = null;
   allTransactions: Transaction[] = [];
   transactionsOfSelectedAccount: Transaction[] = [];
-  currentDomainName: string = '';
+
+  domainSubscription: Subscription | null = null;
 
   private static areAccountsEqual(a: Account | null, b: Account | null): boolean {
     if (!a || !b) {
@@ -32,17 +35,29 @@ export class AccountsHistoryComponent implements OnInit {
   constructor(private accountsService: AccountsService,
               private transactionsService: TransactionsService,
               private toastService: ToastService,
+              private router: Router,
+              private route: ActivatedRoute,
               private domainService: DomainService) {
+    this.domainService.registerToDomainChangesViaRouterUrl(ACCOUNTANT_HISTORY_ROUTER_URL, this.route);
+    this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
+      this.refreshData();
+    });
   }
 
   ngOnInit(): void {
     this.refreshData();
   }
 
+  ngOnDestroy(): void {
+    if (this.domainSubscription) {
+      this.domainSubscription.unsubscribe();
+    }
+    this.domainService.deregisterFromDomainChangesViaRouterUrl(ACCOUNTANT_HISTORY_ROUTER_URL);
+  }
+
   refreshData(): void {
     this.fetchAccounts();
     this.fetchTransactions();
-    this.currentDomainName = this.domainService.currentDomain?.name || '';
   }
 
   fetchAccounts(): void {

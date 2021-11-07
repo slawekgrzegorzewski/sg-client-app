@@ -1,56 +1,50 @@
-import {Component, ElementRef, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
 import {LoginService} from 'src/app/services/login.service';
 import {Router} from '@angular/router';
 import {DomainService} from '../../../services/domain.service';
 import {DetailedDomain, Domain} from '../../../model/domain';
 import {NgEventBus} from 'ng-event-bus';
+import {ApplicationsService} from '../../../services/applications.service';
+import {DATA_REFRESH_REQUEST_EVENT, NAVIGATION_RESIZE_EVENT} from '../../../app.module';
+import {AccountantSettingsService} from '../../../services/accountant/accountant-settings.service';
+import {AccountantSettings} from '../../../model/accountant/accountant-settings';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnDestroy {
 
   @ViewChild('navigation') navigation!: ElementRef;
   isLoggedIn = false;
-  availableApps: { app: string, routerLink: string }[] = [];
   invitations: Domain[] = [];
   availableDomains: DetailedDomain[] = [];
-
-  selectedAppInternal: string | null = null;
-
-  get selectedApp(): string | null {
-    return this.selectedAppInternal;
-  }
-
-  set selectedApp(value: string | null) {
-    this.selectedAppInternal = value;
-    const app = this.availableApps.find(v => v.app === value);
-    if (app) {
-      this.router.navigate([app.routerLink]);
-      this.onResize();
-    }
-  }
-
-  get currentDomainId(): number {
-    return this.loginService.currentDomainId;
-  }
-
-  set currentDomainId(value: number) {
-    this.loginService.currentDomainId = value;
-    this.onResize();
-  }
+  public accountantSettings: AccountantSettings | null = null;
+  private domainSubscription: Subscription;
 
   constructor(
     public loginService: LoginService,
     public domainService: DomainService,
     private router: Router,
-    public eventBus: NgEventBus
+    public eventBus: NgEventBus,
+    public applicationsService: ApplicationsService,
+    private accountantSettingsService: AccountantSettingsService
   ) {
-    this.loginService.loginSubject.subscribe(data => this.fetchData());
-    this.domainService.domainsChangeEvent.subscribe(domains => this.availableDomains = domains);
-    this.domainService.invitationChangeEvent.subscribe(domains => this.invitations = domains);
+    this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
+    this.fetchData();
+    this.domainService.onDomainsChange.subscribe(domains => this.availableDomains = domains);
+    this.domainService.onInvitationChange.subscribe(domains => this.invitations = domains);
+    this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
+      this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.domainSubscription) {
+      this.domainSubscription.unsubscribe();
+    }
   }
 
   public getTakenHeight(): number {
@@ -63,27 +57,7 @@ export class HeaderComponent {
 
   private fetchData(): void {
     this.isLoggedIn = this.loginService.isLoggedIn();
-    this.getAvailableApps();
-    this.selectApp();
     this.invitations = this.domainService.invitations;
-  }
-
-  private getAvailableApps(): void {
-    const apps = this.loginService.getAvailableApps();
-    this.availableApps = [];
-    apps.forEach((value, key) => this.availableApps.push({app: key, routerLink: value}));
-  }
-
-  private selectApp() {
-    if (this.availableApps && this.availableApps.length > 0) {
-      const path = this.router.url.substr(1);
-      const appFromPath = this.availableApps.find(app => app.routerLink === path);
-      if (appFromPath) {
-        this.selectedAppInternal = appFromPath.app;
-      } else {
-        this.selectedApp = this.availableApps[0].app;
-      }
-    }
   }
 
   toggleMenuBar(): void {
@@ -103,26 +77,6 @@ export class HeaderComponent {
     this.router.navigate(['/login']);
   }
 
-  isAccountant(): boolean {
-    return this.selectedApp !== null && this.loginService.isAccountant(this.selectedApp);
-  }
-
-  isChecker(): boolean {
-    return this.selectedApp !== null && this.loginService.isChecker(this.selectedApp);
-  }
-
-  isSYR(): boolean {
-    return this.selectedApp !== null && this.loginService.isSYR(this.selectedApp);
-  }
-
-  isSYRAdmin(): boolean {
-    return this.selectedApp !== null && this.loginService.isSYRAdmin(this.selectedApp);
-  }
-
-  isCubesApp(): boolean {
-    return this.selectedApp !== null && this.loginService.isCubesApp(this.selectedApp);
-  }
-
   acceptInvitation(domain: Domain): void {
     this.domainService.acceptInvitation(domain.id).subscribe(data => {
     });
@@ -134,6 +88,10 @@ export class HeaderComponent {
   }
 
   onResize() {
-    this.eventBus.cast('navigation:resize', {h: this.getTakenHeight(), w: this.getTakenWidth()});
+    this.eventBus.cast(NAVIGATION_RESIZE_EVENT, {h: this.getTakenHeight(), w: this.getTakenWidth()});
+  }
+
+  castRefreshRequest(): void {
+    this.eventBus.cast(DATA_REFRESH_REQUEST_EVENT);
   }
 }

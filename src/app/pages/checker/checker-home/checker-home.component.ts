@@ -1,24 +1,49 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {PageVersionsService} from '../../../services/checker/page-versions.service';
 import {PageVersion} from '../../../model/checker/page-version';
+import {Subscription} from 'rxjs';
+import {ActivatedRoute} from '@angular/router';
+import {DomainService} from '../../../services/domain.service';
+import {ACCOUNTANT_HOME_ROUTER_URL} from '../../accountant/accountant-home/accountant-home.component';
+
+export const CHECKER_HOME_ROUTER_URL = 'checker-home';
 
 @Component({
   selector: 'app-checker-home',
   templateUrl: './checker-home.component.html',
   styleUrls: ['./checker-home.component.css']
 })
-export class CheckerHomeComponent implements OnInit {
+export class CheckerHomeComponent implements OnInit, OnDestroy {
 
   versions: PageVersion[] = [];
   selectedVersion: PageVersion | null = null;
 
-  constructor(private pageVersionsService: PageVersionsService) {
+  domainSubscription: Subscription | null = null;
+
+  constructor(private pageVersionsService: PageVersionsService,
+              private route: ActivatedRoute,
+              private domainService: DomainService) {
+    this.domainService.registerToDomainChangesViaRouterUrl(CHECKER_HOME_ROUTER_URL, this.route);
+    this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
+      this.refreshData();
+    });
   }
 
   ngOnInit(): void {
+    this.refreshData();
+  }
+
+  private refreshData() {
     this.pageVersionsService.getAllPageVersions().subscribe(data => {
       this.versions = data.sort((a, b) => a.versionTime.getMilliseconds() - b.versionTime.getMilliseconds());
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.domainSubscription) {
+      this.domainSubscription.unsubscribe();
+    }
+    this.domainService.deregisterFromDomainChangesViaRouterUrl(CHECKER_HOME_ROUTER_URL);
   }
 
   switchSelection(version: PageVersion): void {

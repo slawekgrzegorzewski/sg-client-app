@@ -1,13 +1,18 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {HolidayCurrenciesService} from '../../../services/accountant/holiday-currencies.service';
 import {HolidayCurrencies} from 'src/app/model/accountant/holiday-currencies';
+import {Subscription} from 'rxjs';
+import {ActivatedRoute} from '@angular/router';
+import {DomainService} from '../../../services/domain.service';
+
+export const HOLIDAY_CURRENCIES_ROUTER_URL = 'holiday-currencies';
 
 @Component({
   selector: 'app-holiday-currencies',
   templateUrl: './holiday-currencies.component.html',
   styleUrls: ['./holiday-currencies.component.css']
 })
-export class HolidayCurrenciesComponent implements OnInit {
+export class HolidayCurrenciesComponent implements OnInit, OnDestroy {
 
   edit = false;
   holidayCurrencies: HolidayCurrencies | null = null;
@@ -66,12 +71,27 @@ export class HolidayCurrenciesComponent implements OnInit {
   plnInKun: number = 0;
   plnInEur: number = 0;
 
-  constructor(private holidayCurrenciesService: HolidayCurrenciesService) {
+  domainSubscription: Subscription | null = null;
+
+  constructor(private holidayCurrenciesService: HolidayCurrenciesService,
+              private route: ActivatedRoute,
+              private domainService: DomainService) {
+    this.domainService.registerToDomainChangesViaRouterUrl(HOLIDAY_CURRENCIES_ROUTER_URL, this.route);
+    this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
+      this.reset();
+    });
   }
 
   ngOnInit(): void {
     this.holidayCurrenciesService.currentDomain().subscribe(hc => this.holidayCurrencies = hc);
     this.reset();
+  }
+
+  ngOnDestroy(): void {
+    if (this.domainSubscription) {
+      this.domainSubscription.unsubscribe();
+    }
+    this.domainService.deregisterFromDomainChangesViaRouterUrl(HOLIDAY_CURRENCIES_ROUTER_URL);
   }
 
   setEditMode(): void {

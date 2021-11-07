@@ -1,16 +1,14 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
-import {EMPTY, Observable, Subject} from 'rxjs';
+import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {Router} from '@angular/router';
 import jwt_decode from 'jwt-decode';
-import {AccountantSettings} from '../model/accountant/accountant-settings';
 import {AccountantSettingsService} from './accountant/accountant-settings.service';
-
-export const ACCOUNTANT_APP = 'Accountant';
-export const CHECKER_APP = 'Checker';
-export const SYR_APP = 'SYR';
-export const CUBES_APP = 'Cubes';
+import {DomainService} from './domain.service';
+import {NgEventBus} from 'ng-event-bus';
+import {APP_LOGIN_STATUS_EVENT, APP_LOGIN_STATUS_REQUEST_EVENT, AppLoginStatus} from '../app.module';
+import {ACCOUNTANT_APP, CHECKER_APP, CUBES_APP, SYR_APP} from './applications.service';
 
 class TokenData {
   sub: string = '';
@@ -19,38 +17,37 @@ class TokenData {
   exp: Date = new Date(0);
 }
 
+type ChangePasswordRequest = {
+  uname: string;
+  oldpass: string;
+  authcode: string;
+  newpass: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class LoginService {
 
-  private readonly loginEndpoint = `${environment.serviceUrl}/login`;
   private readonly registerEndpoint = `${environment.serviceUrl}/register`;
-  loginSubject = new Subject<any>();
-  accountantSettings: AccountantSettings | null = null;
 
   constructor(
     private http: HttpClient,
     private accountantSettingsService: AccountantSettingsService,
-    private router: Router
+    private router: Router,
+    private domainService: DomainService,
+    private eventBus: NgEventBus
   ) {
-    if (this.isLoggedIn()) {
-      setTimeout(() => {
-        this.fetchAccountantSettings().subscribe(data => {
-          this.accountantSettings = data;
-          this.loginSubject.next(true);
-        }, error => this.logout());
-      }, 1);
-    } else {
-      setTimeout(() => this.loginSubject.next(false), 500);
-    }
+    this.eventBus.on(APP_LOGIN_STATUS_REQUEST_EVENT).subscribe(() => {
+      this.eventBus.cast(APP_LOGIN_STATUS_EVENT, new AppLoginStatus(this.isLoggedIn(), this.getDefaultDomain()));
+    });
   }
 
   authenticate(userObj: any): Observable<HttpResponse<string>> {
     const httpHeaders = new HttpHeaders({
       'x-tfa': userObj.authcode
     });
-    return this.http.post(this.loginEndpoint, {
+    return this.http.post(`${environment.serviceUrl}/login`, {
       name: userObj.uname,
       pass: userObj.upass
     }, {observe: 'response', headers: httpHeaders, responseType: 'text'});
@@ -71,8 +68,7 @@ export class LoginService {
     }, {observe: 'response', responseType: 'text'});
   }
 
-  changePassword(changePasswordObject: { uname: string; oldpass: string; authcode: string; newpass: string })
-    : Observable<HttpResponse<string>> {
+  changePassword(changePasswordObject: ChangePasswordRequest): Observable<HttpResponse<string>> {
     return this.http.post(`${this.registerEndpoint}/change-password`, {
       name: changePasswordObject.uname,
       oldpass: changePasswordObject.oldpass,
@@ -88,51 +84,25 @@ export class LoginService {
 
   logout(): void {
     localStorage.removeItem('token');
-    this.resetCurrentDomainId();
-    this.accountantSettings = null;
-    this.loginSubject.next(false);
+    this.domainService.resetCurrentDomainId();
+    this.eventBus.cast(APP_LOGIN_STATUS_EVENT, new AppLoginStatus(false, null));
     setTimeout(() => this.router.navigate(['/login']), 100);
   }
 
   login(token: string): void {
     localStorage.setItem('token', token);
     if (this.isLoggedIn()) {
-      this.fetchAccountantSettings().subscribe(data => {
-          this.accountantSettings = data;
-          this.loginSubject.next(true);
-          setTimeout(() => this.router.navigate(['/accountant-home']), 100);
-        },
-        error => {
-          this.logout();
-        });
+      this.eventBus.cast(APP_LOGIN_STATUS_EVENT, new AppLoginStatus(true, this.getDefaultDomain()));
+      setTimeout(() => this.router.navigate(['/']), 100);
+      ;
     }
   }
 
-  fetchAccountantSettings(): Observable<AccountantSettings> {
-    if (this.getAvailableApps().get(ACCOUNTANT_APP)) {
-      return this.accountantSettingsService.getForDomain();
-    } else {
-      return EMPTY;
-    }
-  }
-
-  getToken(): string | null {
+  public getToken(): string | null {
     return localStorage.getItem('token');
   }
 
-  isAdmin(): boolean {
-    const token = this.getToken();
-    if (token) {
-    try {
-      return jwt_decode<TokenData>(token).roles.includes('ACCOUNTANT_ADMIN');
-    } catch (Error) {
-      return false;
-    }
-    }
-    return false;
-  }
-
-  getUserId(): number {
+  public getUserId(): number {
     const token = this.getToken();
     if (token) {
       try {
@@ -145,7 +115,7 @@ export class LoginService {
     return Number.NaN;
   }
 
-  getUserName(): string {
+  public getUserName(): string {
     const token = this.getToken();
     if (token) {
       try {
@@ -159,30 +129,37 @@ export class LoginService {
     return '';
   }
 
-  getAvailableApps(): Map<string, string> {
-    const apps = new Map<string, string>();
+  public getAvailableApps(): string[] {
+    const apps: string[] = [];
     const token = this.getToken();
     if (token) {
       const roles = jwt_decode<TokenData>(token).roles;
       if (roles.includes('ACCOUNTANT_ADMIN') || roles.includes('ACCOUNTANT_USER')) {
-        apps.set(ACCOUNTANT_APP, 'accountant-home');
+        apps.push(ACCOUNTANT_APP);
       }
       if (roles.includes('CHECKER_ADMIN') || roles.includes('CHECKER_USER')) {
-        apps.set(CHECKER_APP, 'checker-home');
+        apps.push(CHECKER_APP);
       }
       if (roles.includes('SYR_ADMIN') || roles.includes('SYR_USER')) {
-        apps.set(SYR_APP, 'syr-home');
+        apps.push(SYR_APP);
       }
       if (roles.includes('CUBES')) {
-        apps.set(CUBES_APP, 'cubes-home');
+        apps.push(CUBES_APP);
       }
     }
     return apps;
   }
 
-  containsRole(role: string): boolean {
+  public containsRole(role: string): boolean {
     const token = this.getToken();
-    return token ? jwt_decode<TokenData>(token).roles.includes(role) : false;
+    if (token) {
+      try {
+        return jwt_decode<TokenData>(token).roles.includes(role);
+      } catch (Error) {
+        return false;
+      }
+    }
+    return false;
   }
 
   public getDefaultDomain(): number | null {
@@ -191,52 +168,5 @@ export class LoginService {
       return jwt_decode<TokenData>(token).defaultDomain;
     }
     return null;
-  }
-
-  isAccountant(app: string): boolean {
-    return app === ACCOUNTANT_APP;
-  }
-
-  isChecker(app: string): boolean {
-    return app === CHECKER_APP;
-  }
-
-  isSYR(app: string): boolean {
-    return app === SYR_APP;
-  }
-
-  isSYRAdmin(app: string): boolean {
-    return this.isSYR(app) && this.containsRole('SYR_ADMIN');
-  }
-
-  isCubesApp(app: string): boolean {
-    return app === CUBES_APP;
-  }
-
-  get currentDomainId(): number {
-    let item = localStorage.getItem('domain');
-    const defaultDomain = this.getDefaultDomain();
-    if (!item) {
-      if (defaultDomain) {
-        item = defaultDomain.toString();
-      }
-      if (item) {
-        localStorage.setItem('domain', item);
-      }
-    }
-    return Number(item);
-  }
-
-  set currentDomainId(value: number) {
-    if (value) {
-      localStorage.setItem('domain', value.toString());
-      window.location.reload();
-    } else {
-      this.resetCurrentDomainId();
-    }
-  }
-
-  resetCurrentDomainId(): void {
-    localStorage.removeItem('domain');
   }
 }

@@ -9,12 +9,12 @@ import {DomainService} from '../services/domain.service';
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
-  constructor(private loginService: LoginService, private router: Router) {
+  constructor(private loginService: LoginService, private domainService: DomainService) {
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (this.loginService.getToken()) {
-      const domainId = this.loginService.currentDomainId;
+      const domainId = this.domainService.currentDomainId;
       request = request.clone({
         setHeaders: {
           Authorization: `Bearer ${this.loginService.getToken()}`,
@@ -37,7 +37,6 @@ export class AuthInterceptor implements HttpInterceptor {
       }),
       catchError(err => {
         if (err instanceof HttpErrorResponse && err.status === 401) {
-          this.loginService.resetCurrentDomainId();
           this.loginService.logout();
         }
         return throwError(err);

@@ -8,7 +8,9 @@
 
   <div style="width: 50%;" class="sg-flex-column sg-flex-justify-space-between">
 
-    <div></div>
+    <div class="sg-flex-row sg-flex-wrap">
+      <div *ngFor="let historicalRecord of historicalRecords" style="margin-right: 5px">{{date(historicalRecord) | date: 'mm:ss.SS'}} | </div>
+    </div>
 
     <sg-timer [width]="clockWidth" #timer class="sg-flex-justify-self-center"></sg-timer>
 
@@ -19,7 +21,6 @@
   </div>
 
   <div style="width: 25%;" class="sg-flex-column">
-
     <div>
       <canvas baseChart #cubesRecordsChart='base-chart' style="position: relative"
               [datasets]="cubeRecordsLineChart.lineChartData"

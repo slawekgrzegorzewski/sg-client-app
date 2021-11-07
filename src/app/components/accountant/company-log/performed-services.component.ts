@@ -12,6 +12,7 @@ import {ComparatorBuilder} from '../../../utils/comparator-builder';
 import {SimplePerformedServicePayment} from '../../../model/accountant/simple-performed-service-payment';
 import {NgEventBus} from 'ng-event-bus';
 import {SizeService} from '../../../services/size.service';
+import {APP_SIZE_EVENT} from '../../../app.module';
 
 export type EditMode = 'edit' | 'create' | 'payment-selection' | ''
 export type PerformedServicesDisplayType = 'desktop' | 'mobile';
@@ -108,7 +109,7 @@ export class PerformedServicesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.eventBus.on('app:size').subscribe((event) => {
+    this.eventBus.on(APP_SIZE_EVENT).subscribe((event) => {
       this.availableHeight = event.data.height;
     });
   }

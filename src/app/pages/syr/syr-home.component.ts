@@ -1,19 +1,22 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {SyrService} from '../../services/syr/syr.service';
 import {Country} from '../../model/syr/country';
-import {Observable, of} from 'rxjs';
+import {Subscription} from 'rxjs';
 import {CountrySYR} from '../../model/syr/country-syr';
 import {SecretCountriesSYR} from '../../model/syr/secret-countries-syr';
 import {CountrySyrLineChart, SyrCell} from '../../model/syr/CountrySyrLineChart';
+import {DomainService} from '../../services/domain.service';
+
+export const SYR_HOME_ROUTER_URL = 'syr-home';
 
 @Component({
   selector: 'app-syr-home',
   templateUrl: './syr-home.component.html',
   styleUrls: ['./syr-home.component.css']
 })
-export class SyrHomeComponent implements OnInit {
+export class SyrHomeComponent implements OnInit, OnDestroy {
 
   private countryInternal: Country | null = null;
 
@@ -21,7 +24,7 @@ export class SyrHomeComponent implements OnInit {
     return this.countryInternal;
   }
 
-  set country(value: Country | null ) {
+  set country(value: Country | null) {
     this.countryInternal = value;
     this.refreshView();
   }
@@ -33,11 +36,26 @@ export class SyrHomeComponent implements OnInit {
 
   countrySyrLineChart: CountrySyrLineChart | null = null;
 
-  constructor(private syrService: SyrService, private router: Router) {
+  domainSubscription: Subscription | null = null;
+
+  constructor(private syrService: SyrService, private router: Router,
+              private route: ActivatedRoute,
+              private domainService: DomainService) {
+    this.domainService.registerToDomainChangesViaRouterUrl(SYR_HOME_ROUTER_URL, this.route);
+    this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
+      this.getData();
+    });
   }
 
   ngOnInit(): void {
     this.getData();
+  }
+
+  ngOnDestroy(): void {
+    if (this.domainSubscription) {
+      this.domainSubscription.unsubscribe();
+    }
+    this.domainService.deregisterFromDomainChangesViaRouterUrl(SYR_HOME_ROUTER_URL);
   }
 
   getData(): void {

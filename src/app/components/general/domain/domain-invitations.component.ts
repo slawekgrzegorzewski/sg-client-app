@@ -1,6 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Domain} from '../../../model/domain';
-import {DomainService} from '../../../services/domain.service';
 
 
 @Component({
@@ -10,7 +9,7 @@ import {DomainService} from '../../../services/domain.service';
 })
 export class DomainInvitationsComponent<T> implements OnInit {
 
-  constructor(private domainService: DomainService) {
+  constructor() {
   }
 
   @Input() invitations: Domain[] = [];

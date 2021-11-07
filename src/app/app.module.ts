@@ -78,12 +78,31 @@ import {SevenSegComponent} from './components/general/seven-seg/seven-seg.compon
 import {SevenSegDigitComponent} from './components/general/seven-seg/seven-seg-digit.component';
 import {SevenSegTimerDisplay} from './components/general/seven-seg/seven-seg-timer-display.component';
 import {SizeService} from './services/size.service';
+import {ApplicationsService} from './services/applications.service';
+import {DefaultApplicationComponent} from './components/general/applications/default-application.component';
 
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
   overrides = <any> {
     swipe: {direction: Hammer.DIRECTION_ALL},
   };
+}
+
+export const APP_LOGIN_STATUS_REQUEST_EVENT = 'app:getlogin';
+export const APP_LOGIN_STATUS_EVENT = 'app:login';
+export const APP_SIZE_EVENT = 'app:size';
+export const APP_GET_SIZE_EVENT = 'app:getsize';
+export const DATA_REFRESH_REQUEST_EVENT = 'data:refresh';
+export const NAVIGATION_RESIZE_EVENT = 'navigation:resize';
+
+export class AppLoginStatus {
+  public isLoggedId: boolean = false;
+  public defaultDomainId: number | null = null;
+
+  constructor(isLoggedId: boolean, defaultDomainId: number | null) {
+    this.isLoggedId = isLoggedId;
+    this.defaultDomainId = defaultDomainId;
+  }
 }
 
 @NgModule({
@@ -134,7 +153,8 @@ export class MyHammerConfig extends HammerGestureConfig {
     HolidayCurrenciesComponent,
     SevenSegComponent,
     SevenSegDigitComponent,
-    SevenSegTimerDisplay
+    SevenSegTimerDisplay,
+    DefaultApplicationComponent
   ],
   imports: [
     BrowserModule,
@@ -180,7 +200,8 @@ export class MyHammerConfig extends HammerGestureConfig {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig,
     },
-    SizeService
+    SizeService,
+    ApplicationsService
   ],
   bootstrap: [AppComponent]
 })

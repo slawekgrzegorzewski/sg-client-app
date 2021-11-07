@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {AccountsService} from '../../../services/accountant/accounts.service';
 import {ToastService} from '../../../services/toast.service';
 import {Account} from '../../../model/accountant/account';
@@ -11,7 +11,6 @@ import {Category} from '../../../model/accountant/billings/category';
 import {Income} from '../../../model/accountant/billings/income';
 import {Expense} from '../../../model/accountant/billings/expense';
 import {CategoriesService} from '../../../services/accountant/categories.service';
-import {DomainService} from '../../../services/domain.service';
 import {LoginService} from '../../../services/login.service';
 import {PerformedService} from '../../../model/accountant/performed-service';
 import {PerformedServicesService} from '../../../services/accountant/performed-services.service';
@@ -26,21 +25,26 @@ import {PerformedServicePaymentsService} from '../../../services/accountant/perf
 import {PerformedServicePayment} from '../../../model/accountant/performed-service-payment';
 import {CompanyLogHelper} from './company-log-helper';
 import {BillingPeriodsHelper} from './billing-periods-helper';
-import {forkJoin, Observable} from 'rxjs';
+import {forkJoin, Observable, Subscription} from 'rxjs';
 import {NgEventBus} from 'ng-event-bus';
 import {DatesUtils} from '../../../utils/dates-utils';
+import {ActivatedRoute, Router} from '@angular/router';
+import {DomainService} from '../../../services/domain.service';
+import {APP_SIZE_EVENT, DATA_REFRESH_REQUEST_EVENT} from '../../../app.module';
+import {AccountantSettings} from '../../../model/accountant/accountant-settings';
+import {AccountantSettingsService} from '../../../services/accountant/accountant-settings.service';
 
 export type ViewMode = 'desktop' | 'mobile';
 type MobileEditMode = 'display' | 'create-income' | 'create-expense' | 'create-performed-service';
+
+export const ACCOUNTANT_HOME_ROUTER_URL = 'accountant-home';
 
 @Component({
   selector: 'app-accounts-home',
   templateUrl: './accountant-home.component.html',
   styleUrls: ['./accountant-home.component.css']
 })
-export class AccountantHomeComponent implements OnInit {
-
-  currentDomainName: string | null = null;
+export class AccountantHomeComponent implements OnInit, OnDestroy {
 
   viewMode: ViewMode = 'desktop';
   mobileEditMode: MobileEditMode = 'display';
@@ -65,35 +69,54 @@ export class AccountantHomeComponent implements OnInit {
   private billingPeriodsHelper: BillingPeriodsHelper;
   private companyLogHelper: CompanyLogHelper;
 
+  domainSubscription: Subscription | null = null;
+  accountantSettings: AccountantSettings | null = null;
+
   constructor(private accountsService: AccountsService,
               private transactionsService: TransactionsService,
               private piggyBanksService: PiggyBanksService,
               private billingsService: BillingPeriodsService,
               private categoriesService: CategoriesService,
               private toastService: ToastService,
-              private domainService: DomainService,
               public loginService: LoginService,
               private performedServicesService: PerformedServicesService,
               private clientPaymentsService: ClientPaymentsService,
               private performedServicePaymentsService: PerformedServicePaymentsService,
               private servicesService: ServicesService,
               private clientsService: ClientsService,
-              private eventBus: NgEventBus) {
+              private eventBus: NgEventBus,
+              private router: Router,
+              private route: ActivatedRoute,
+              private domainService: DomainService,
+              private accountantSettingsService: AccountantSettingsService) {
     this.billingPeriodsHelper = new BillingPeriodsHelper(accountsService, categoriesService, piggyBanksService, billingsService);
     this.companyLogHelper = new CompanyLogHelper(performedServicePaymentsService, performedServicesService, clientPaymentsService, servicesService, clientsService);
+    this.domainService.registerToDomainChangesViaRouterUrl(ACCOUNTANT_HOME_ROUTER_URL, this.route);
+    this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
+      this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
+      this.refreshData();
+    });
   }
 
   ngOnInit(): void {
     this.onResize();
+    this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
     this.refreshData();
     this.categoriesService.currentDomainCategories().subscribe(data => this.categories = data);
-    this.eventBus.on('data:refresh').subscribe(() => {
+    this.eventBus.on(DATA_REFRESH_REQUEST_EVENT).subscribe(() => {
       this.refreshData();
       this.fetchCompanyData(this.currentCompanyDate || new Date());
     });
-    this.eventBus.on('app:size').subscribe(() => {
+    this.eventBus.on(APP_SIZE_EVENT).subscribe(() => {
       this.onResize();
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.domainSubscription) {
+      this.domainSubscription.unsubscribe();
+    }
+    this.domainService.deregisterFromDomainChangesViaRouterUrl(ACCOUNTANT_HOME_ROUTER_URL);
   }
 
   private onResize(): void {
@@ -122,7 +145,6 @@ export class AccountantHomeComponent implements OnInit {
       this.billingPeriodInfo = billingPeriodInfo;
       this.allCurrencies = currencies;
     });
-    this.currentDomainName = this.domainService.currentDomain?.name || '';
   }
 
   private calculateSavingsTotal(): void {

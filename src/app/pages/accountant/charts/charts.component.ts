@@ -1,17 +1,22 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BillingPeriodsService} from '../../../services/accountant/billing-periods.service';
 import {DatePipe} from '@angular/common';
 import {SavingsLineChart} from '../../../model/accountant/charts/SavingsLineChart';
 import {PiggyBank} from '../../../model/accountant/piggy-bank';
 import {PiggyBanksLineChart} from '../../../model/accountant/charts/PiggyBanksLineChart';
 import {BaseChartDirective} from 'ng2-charts';
+import {ActivatedRoute} from '@angular/router';
+import {DomainService} from '../../../services/domain.service';
+import {Subscription} from 'rxjs';
+
+export const CHARTS_ROUTER_URL = 'charts';
 
 @Component({
   selector: 'app-charts',
   templateUrl: './charts.component.html',
   styleUrls: ['./charts.component.css']
 })
-export class ChartsComponent implements OnInit {
+export class ChartsComponent implements OnInit, OnDestroy {
   private savingsData = new Map<Date, Map<string, number>>();
   private piggyBanksData = new Map<Date, PiggyBank[]>();
   savingsLineChart: SavingsLineChart | null = null;
@@ -22,11 +27,23 @@ export class ChartsComponent implements OnInit {
   @ViewChild('piggyBanksChart')
   public piggyBanksChart: BaseChartDirective | null = null;
 
+  domainSubscription: Subscription | null = null;
+
   constructor(private billingPeriodsService: BillingPeriodsService,
-              private datePipe: DatePipe) {
+              private datePipe: DatePipe,
+              private route: ActivatedRoute,
+              private domainService: DomainService) {
+    this.domainService.registerToDomainChangesViaRouterUrl(CHARTS_ROUTER_URL, this.route);
+    this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
+      this.refreshData();
+    });
   }
 
   ngOnInit(): void {
+    this.refreshData();
+  }
+
+  private refreshData() {
     this.billingPeriodsService.getHistoricalSavings(200).subscribe(
       data => {
         this.savingsData = data;
@@ -43,6 +60,13 @@ export class ChartsComponent implements OnInit {
           }
         });
       });
+  }
+
+  ngOnDestroy(): void {
+    if (this.domainSubscription) {
+      this.domainSubscription.unsubscribe();
+    }
+    this.domainService.deregisterFromDomainChangesViaRouterUrl(CHARTS_ROUTER_URL);
   }
 
   hideAllPiggyBanksDataSets(): void {

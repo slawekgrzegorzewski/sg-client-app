@@ -1,10 +1,10 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {LoginService} from 'src/app/services/login.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Account} from '../../model/accountant/account';
 import {ToastService} from '../../services/toast.service';
 import {AccountsService} from '../../services/accountant/accounts.service';
-import {Observable} from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
 import {PiggyBank} from '../../model/accountant/piggy-bank';
 import {PiggyBanksService} from '../../services/accountant/piggy-banks.service';
 import {Currency} from '../../model/accountant/currency';
@@ -27,9 +27,8 @@ import {Button} from '../../components/general/hoverable-buttons.component';
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.css']
 })
-export class SettingsComponent implements OnInit {
+export class SettingsComponent implements OnInit, OnDestroy {
 
-  private isLoggedIn = false;
   accountsInCurrentDomain: Account[] = [];
   otherDomainsAccounts = new Map<string, Account[]>();
   isEditAccount = false;
@@ -50,6 +49,8 @@ export class SettingsComponent implements OnInit {
     new Button({name: 'pokaż', action: this.showAccount(this), show: (account: Account | null) => account && !account.visible || false}),
     new Button({name: 'ukryj', action: this.hideAccount(this), show: (account: Account | null) => account && account.visible || false})
   ];
+  public accountantSettings: AccountantSettings | null = null;
+  private domainSubscription: Subscription;
 
   constructor(
     private accountsService: AccountsService,
@@ -57,22 +58,25 @@ export class SettingsComponent implements OnInit {
     private categoriesService: CategoriesService,
     private clientsService: ClientsService,
     private servicesService: ServicesService,
-    private domainsService: DomainService,
+    private domainService: DomainService,
     private piggyBanksService: PiggyBanksService,
     public loginService: LoginService,
     private modalService: NgbModal,
     private billingsService: BillingPeriodsService,
     private toastService: ToastService) {
-    this.loginService.loginSubject.subscribe(data => this.isLoggedIn = data);
+    this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
+      this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
+    });
   }
 
   ngOnInit(): void {
-    this.isLoggedIn = this.loginService.isLoggedIn();
     this.fetchData();
   }
 
-  loggedIn(): boolean {
-    return this.isLoggedIn;
+  ngOnDestroy(): void {
+    if (this.domainSubscription) {
+      this.domainSubscription.unsubscribe();
+    }
   }
 
   currentUserLogin(): string {
@@ -80,29 +84,24 @@ export class SettingsComponent implements OnInit {
   }
 
   isAdmin(): boolean {
-    return this.loginService.isAdmin();
+    return this.loginService.containsRole('ACCOUNTANT_ADMIN');
   }
 
   fetchData(): void {
-    if (!this.loggedIn()) {
-      this.accountsInCurrentDomain = [];
-      this.otherDomainsAccounts = new Map<string, Account[]>();
-      return;
-    }
-
     this.fetchAccounts();
     this.fetchPiggyBanks();
     this.fetchCurrencies();
     this.fetchCategories();
     this.fetchClients();
     this.fetchServices();
-    this.currentDomainName = this.domainsService.currentDomain?.name || '';
+    this.currentDomainName = this.domainService.currentDomain?.name || '';
     this.fetchDomains();
+    this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
   }
 
   private fetchAccounts(): void {
-    const currentDomain = this.loginService.currentDomainId;
-    const accounts: Observable<Account[]> = this.loginService.isAdmin() ?
+    const currentDomain = this.domainService.currentDomainId;
+    const accounts: Observable<Account[]> = this.loginService.containsRole('ACCOUNTANT_ADMIN') ?
       this.accountsService.allAccounts() : this.accountsService.currentDomainAccounts();
     accounts.subscribe(
       data => {
@@ -159,7 +158,7 @@ export class SettingsComponent implements OnInit {
   }
 
   private fetchDomains(): void {
-    this.domainsService.getAllDomains().subscribe(
+    this.domainService.getAllDomains().subscribe(
       data => this.userDomains = data
     );
   }
@@ -299,11 +298,11 @@ export class SettingsComponent implements OnInit {
   }
 
   createDomain(domain: DetailedDomain): void {
-    this.domainsService.create(domain.name).subscribe(data => this.fetchDomains());
+    this.domainService.create(domain.name).subscribe(data => this.fetchDomains());
   }
 
   updateDomain(domain: DetailedDomain): void {
-    this.domainsService.update(domain.toSimpleDomain()).subscribe(
+    this.domainService.update(domain.toSimpleDomain()).subscribe(
       data => this.userDomains = [...this.userDomains.filter(d => d.id !== data.id), data]
     );
   }
@@ -311,9 +310,9 @@ export class SettingsComponent implements OnInit {
   changeDomainUserAccess(data: { domain: DetailedDomain; user: string }): void {
     let newDomain: Observable<DetailedDomain>;
     if (data.domain.usersAccessLevel.get(data.user) === 'ADMIN') {
-      newDomain = this.domainsService.makeUserMember(data.domain.id, data.user);
+      newDomain = this.domainService.makeUserMember(data.domain.id, data.user);
     } else {
-      newDomain = this.domainsService.makeUserAdmin(data.domain.id, data.user);
+      newDomain = this.domainService.makeUserAdmin(data.domain.id, data.user);
     }
     newDomain.subscribe(
       changedDomain => this.refreshDomains(changedDomain),
@@ -322,7 +321,7 @@ export class SettingsComponent implements OnInit {
   }
 
   removeUserFromDomain(data: { domain: DetailedDomain; user: string }): void {
-    this.domainsService.removeUserFromDomain(data.domain.id, data.user).subscribe(
+    this.domainService.removeUserFromDomain(data.domain.id, data.user).subscribe(
       changedDomain => this.refreshDomains(changedDomain),
       error => this.toastService.showWarning(error.error, 'W czasie zmiany uprawnień domeny wystąpił błąd')
     );
@@ -337,7 +336,7 @@ export class SettingsComponent implements OnInit {
   }
 
   inviteUserToDomain(data: { domain: DetailedDomain; user: string }): void {
-    this.domainsService.inviteUserToDomain(data.domain.id, data.user).subscribe(
+    this.domainService.inviteUserToDomain(data.domain.id, data.user).subscribe(
       changedDomain => {
       },
       error => this.toastService.showWarning(error.error, 'W czasie tworzenia zaproszenia wystąpił błąd')
@@ -345,7 +344,7 @@ export class SettingsComponent implements OnInit {
   }
 
   leaveDomain(data: { domain: DetailedDomain; user: string }): void {
-    this.domainsService.removeUserFromDomain(data.domain.id, data.user).subscribe(
+    this.domainService.removeUserFromDomain(data.domain.id, data.user).subscribe(
       changedDomain => this.refreshDomains(changedDomain),
       error => this.toastService.showWarning(error.error, 'W czasie zmiany uprawnień domeny wystąpił błąd')
     );
@@ -353,7 +352,6 @@ export class SettingsComponent implements OnInit {
 
   updateIsCompany(settings: AccountantSettings): void {
     this.accountantSettingsService.setIsCompany(settings.company).subscribe(data => {
-      this.loginService.accountantSettings = data;
     });
   }
 }

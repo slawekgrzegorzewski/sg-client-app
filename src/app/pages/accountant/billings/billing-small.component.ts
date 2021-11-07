@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Account} from '../../../model/accountant/account';
 import {PiggyBank} from '../../../model/accountant/piggy-bank';
 import {Category} from '../../../model/accountant/billings/category';
@@ -10,29 +10,49 @@ import {Income} from '../../../model/accountant/billings/income';
 import {Expense} from '../../../model/accountant/billings/expense';
 import {CategoriesService} from '../../../services/accountant/categories.service';
 import {ComparatorBuilder} from '../../../utils/comparator-builder';
+import {DomainService} from '../../../services/domain.service';
+import {Subscription} from 'rxjs';
+import {ActivatedRoute} from '@angular/router';
+
+export const BILLING_SMALL_ROUTER_URL = 'billing-small';
 
 @Component({
   selector: 'app-billing-small',
   templateUrl: './billing-small.component.html',
   styleUrls: ['./billing-small.component.css']
 })
-export class BillingSmallComponent implements OnInit {
+export class BillingSmallComponent implements OnInit, OnDestroy {
 
   accounts: Account[] = [];
   piggyBanks: PiggyBank[] = [];
   categories: Category[] = [];
   billingPeriodInfo: BillingPeriodInfo | null = null;
 
+  domainSubscription: Subscription | null = null;
+
   constructor(private accountsService: AccountsService,
               private piggyBanksService: PiggyBanksService,
               private categoriesService: CategoriesService,
-              private billingsService: BillingPeriodsService
+              private billingsService: BillingPeriodsService,
+              private domainService: DomainService,
+              private route: ActivatedRoute
   ) {
+    this.domainService.registerToDomainChangesViaRouterUrl(BILLING_SMALL_ROUTER_URL, this.route);
+    this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
+      this.refreshData();
+    });
   }
 
   ngOnInit(): void {
     this.refreshData();
     this.categoriesService.currentDomainCategories().subscribe(data => this.categories = data);
+  }
+
+  ngOnDestroy(): void {
+    if (this.domainSubscription) {
+      this.domainSubscription.unsubscribe();
+    }
+    this.domainService.deregisterFromDomainChangesViaRouterUrl(BILLING_SMALL_ROUTER_URL);
   }
 
   refreshData(): void {
