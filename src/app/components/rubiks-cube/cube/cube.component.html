@@ -1,0 +1,6 @@
+<!--<app-cube-controls [cube]="cube" [(mode)]="mode"></app-cube-controls>-->
+<div class="cube-container">
+  <div class="cube" [ngStyle]="{'transform':'rotateX(' + cube.rotateX + 'deg) rotateY(' + cube.rotateY + 'deg)'}">
+    <app-side *ngFor="let side of cube.allSides()" class="side" [cube]="cube" [side]="side" [ngClass]="side.position"></app-side>
+  </div>
+</div>

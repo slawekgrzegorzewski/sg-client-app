@@ -80,6 +80,9 @@ import {SevenSegTimerDisplay} from './components/general/seven-seg/seven-seg-tim
 import {SizeService} from './services/size.service';
 import {ApplicationsService} from './services/applications.service';
 import {DefaultApplicationComponent} from './components/general/applications/default-application.component';
+import {SideComponent} from './components/rubiks-cube/side/side.component';
+import {CubeComponent} from './components/rubiks-cube/cube/cube.component';
+import {CubeControlsComponent} from './components/rubiks-cube/cube-controls/cube-controls.component';
 
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
@@ -154,7 +157,10 @@ export class AppLoginStatus {
     SevenSegComponent,
     SevenSegDigitComponent,
     SevenSegTimerDisplay,
-    DefaultApplicationComponent
+    DefaultApplicationComponent,
+    SideComponent,
+    CubeComponent,
+    CubeControlsComponent
   ],
   imports: [
     BrowserModule,

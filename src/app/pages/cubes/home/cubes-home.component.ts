@@ -1,10 +1,8 @@
-import {AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, HostListener, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {TimerComponent} from '../../../components/general/timer/timer.component';
 import {CubeRecordsService} from '../../../services/accountant/cube-records.service';
 import {CubeRecord, CubeStats, CubeType, CubeTypeSetting, cubeTypeSettings} from '../../../model/cubes/cube-record';
 import scramble from '../../../model/cubes/cube-scrambler';
-import {RubiksCube} from '../../../components/general/rubiks-cube/RubiksCube';
-import {classicMaterials} from '../../../components/general/rubiks-cube/types';
 import {ChartMode, CubeRecordsLineChart} from '../../../model/cubes/CubeRecordsLineChart';
 import {BaseChartDirective} from 'ng2-charts';
 import {NgEventBus} from 'ng-event-bus';
@@ -16,6 +14,7 @@ import {APP_GET_SIZE_EVENT, APP_SIZE_EVENT, DATA_REFRESH_REQUEST_EVENT} from '..
 import {Subscription} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
 import {DomainService} from '../../../services/domain.service';
+import {CubeComponent} from '../../../components/rubiks-cube/cube/cube.component';
 
 type DateStats = { sub30: number; sumOfAllSub30sTimes: number; all: number; sumOfAllTimes: number; };
 type PageState = 'CLEAR' | 'SCRAMBLING' | 'SCRAMBLED' | 'ONGOING' | 'STOPPED';
@@ -33,8 +32,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   currentState: PageState = 'CLEAR';
 
-  @ViewChild('rubikCubeCanvas', {static: true}) rubikCubeCanvas: ElementRef<HTMLCanvasElement> | null = null;
-  cube: RubiksCube | null = null;
+  @ViewChild('rubiksCube') rubiksCube: CubeComponent | null = null;
 
   _cubeRecordsChartType: ChartMode = 'MOVING_AVERAGE';
   get cubeRecordsChartType(): ChartMode {
@@ -127,7 +125,6 @@ export class CubesHomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.cube = new RubiksCube(this.rubikCubeCanvas!.nativeElement, classicMaterials, 100);
     this.refreshStats();
   }
 
@@ -289,110 +286,45 @@ export class CubesHomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.resetState('SCRAMBLING');
 
-    let promise = null;
-
     const turns = scramble({turns: 25});
     this.turns = turns.join(' ');
 
-    const algorithm = translateToAlgorithm(turns);
-    algorithm.push((cube, duration) => {
-      this.currentState = 'SCRAMBLED';
-      return Promise.resolve();
-    });
-    performAlgorithm(this.cube!, algorithm, promise);
+    performAlgorithm(this.rubiksCube!, turns);
+    this.currentState = 'SCRAMBLED';
 
 
-    function translateToAlgorithm(turns: string[]): ((cube: RubiksCube, duration?: number) => Promise<void>)[] {
-      const algorithm: ((cube: RubiksCube, duration?: number) => Promise<void>)[] = [];
+    function performAlgorithm(cube: CubeComponent, turns: string[]): void {
       for (const turn of turns) {
         const clockwise = !turn.includes('\'');
         const doubled = turn.includes('2');
-        const method = turnToMethod(turn, clockwise);
-
-        algorithm.push(method);
+        makeTurn(cube, turn, clockwise);
         if (doubled) {
-          algorithm.push(method);
+          makeTurn(cube, turn, clockwise);
         }
       }
-      return algorithm;
     }
 
-    function turnToMethod(turn: string, clockwise: boolean): (cube: RubiksCube, duration?: number) => Promise<void> {
+    function makeTurn(cube: CubeComponent, turn: string, clockwise: boolean): void {
       switch (turn.charAt(0)) {
         case 'F':
-          return (cube, duration) => {
-            return cube.F(clockwise, duration);
-          };
+          cube.f(clockwise);
+          break;
         case 'B':
-          return (cube, duration) => {
-            return cube.B(!clockwise, duration);
-          };
+          cube.b(clockwise);
+          break;
         case 'U':
-          return (cube, duration) => {
-            return cube.U(clockwise, duration);
-          };
+          cube.u(clockwise);
+          break;
         case 'D':
-          return (cube, duration) => {
-            return cube.D(!clockwise, duration);
-          };
+          cube.d(clockwise);
+          break;
         case 'L':
-          return (cube, duration) => {
-            return cube.L(!clockwise, duration);
-          };
+          cube.l(clockwise);
+          break;
         case 'R':
-          return (cube, duration) => {
-            return cube.R(clockwise, duration);
-          };
-        case 'f':
-          return (cube, duration) => {
-            return cube.f(clockwise, duration);
-          };
-        case 'b':
-          return (cube, duration) => {
-            return cube.b(!clockwise, duration);
-          };
-        case 'u':
-          return (cube, duration) => {
-            return cube.u(clockwise, duration);
-          };
-        case 'd':
-          return (cube, duration) => {
-            return cube.d(!clockwise, duration);
-          };
-        case 'l':
-          return (cube, duration) => {
-            return cube.l(!clockwise, duration);
-          };
-        case 'r':
-          return (cube, duration) => {
-            return cube.r(clockwise, duration);
-          };
-        case 'x':
-          return (cube, duration) => {
-            return cube.x(clockwise, duration);
-          };
-        case 'y':
-          return (cube, duration) => {
-            return cube.y(clockwise, duration);
-          };
-        case 'z':
-          return (cube, duration) => {
-            return cube.z(clockwise, duration);
-          };
-        default:
-          return (cube, duration) => Promise.resolve();
+          cube.r(clockwise);
+          break;
       }
-    }
-
-    function performAlgorithm(cube: RubiksCube, algorithm: ((cube: RubiksCube, duration?: number) => Promise<void>)[], promise: Promise<void> | null): Promise<void> | null {
-      for (const step of algorithm) {
-        if (!promise) {
-          promise = step(cube, 0.001);
-        } else {
-          promise = promise.then(r => step(cube, 0.001));
-        }
-      }
-      return promise;
     }
   }
 
@@ -441,7 +373,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.turns = '';
     this.timer!.stop();
     this.timer!.clear();
-    this.cube?.reset();
+    this.rubiksCube?.reset();
   }
 
   private createCubeRecordEntity(scrambleToSave: string): CubeRecord {

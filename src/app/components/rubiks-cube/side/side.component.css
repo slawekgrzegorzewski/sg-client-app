@@ -1,0 +1,44 @@
+.cell {
+  width: 33.33%;
+  height: 33.33%;
+  border: 1px solid;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.selected {
+  filter: brightness(50%);
+}
+
+.side {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.red {
+  background-color: #b71234;
+}
+
+.orange {
+  background-color: #ff5800;
+}
+
+.green {
+  background-color: #009b48;
+}
+
+.blue {
+  background-color: #0046ad;
+}
+
+.yellow {
+  background-color: #ffd500;
+}
+
+.white {
+  background-color: #ffffff;
+}
