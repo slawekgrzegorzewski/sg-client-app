@@ -27,7 +27,7 @@ export class Cube {
     this.right = new Side(Color.Red, SidePosition.Right);
     this.front = new Side(Color.Green, SidePosition.Front);
     this.back = new Side(Color.Blue, SidePosition.Back);
-    // select cell 0,0 from the front side by default
+    // select cell 0,0 from the front side by default]
     this.front.selectCell(0, 0);
     this.rotateX = -25;
     this.rotateY = -18;

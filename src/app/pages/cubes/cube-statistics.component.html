@@ -10,11 +10,9 @@
 
     <div class="sg-flex-row sg-flex-wrap">
       <div *ngFor="let historicalRecord of historicalRecords"
-           style="margin-right: 5px">{{date(historicalRecord) | date: 'mm:ss.SS'}} |
+           style="margin-right: 5px">{{historicalRecord | cubeRecordAsDate | date: 'mm:ss.SS'}} |
       </div>
     </div>
-
-    <sg-timer [width]="clockWidth" #timer class="sg-flex-justify-self-center"></sg-timer>
 
     <div class="sg-flex-justify-self-flex-end sg-flex-column sg-flex-justify-flex-start">
       <ng-container *ngTemplateOutlet="buttons"></ng-container>
@@ -35,12 +33,6 @@
       </canvas>
     </div>
 
-    <div *ngIf="isThreeByThree()" class="cube-container">
-      <app-cube #rubiksCube></app-cube>
-    </div>
-
-    <div *ngIf="isThreeByThree() && turns">{{turns}}</div>
-
   </div>
 </div>
 
@@ -48,27 +40,27 @@
   <div [style.height.px]="resultsSummaryHeight">
     <div class="row">
       <div class="col-8">Najszybsze ułożenie</div>
-      <div class="col-4">{{date(best) | date: 'mm:ss.SS'}}</div>
+      <div class="col-4">{{best | cubeRecordAsDate | date: 'mm:ss.SS'}}</div>
     </div>
     <div class="row">
       <div class="col-8">Najwolniejsze ułożenie</div>
-      <div class="col-4">{{date(worst) | date: 'mm:ss.SS'}}</div>
+      <div class="col-4">{{worst | cubeRecordAsDate | date: 'mm:ss.SS'}}</div>
     </div>
     <div class="row">
       <div class="col-8">Średnia</div>
-      <div class="col-4">{{date(avg) | date: 'mm:ss.SS'}}</div>
+      <div class="col-4">{{avg | cubeRecordAsDate | date: 'mm:ss.SS'}}</div>
     </div>
     <div class="row">
       <div class="col-8">Nalepsze Ao5</div>
-      <div class="col-4">{{date(bestAo5) | date: 'mm:ss.SS'}}</div>
+      <div class="col-4">{{bestAo5 | cubeRecordAsDate | date: 'mm:ss.SS'}}</div>
     </div>
     <div class="row">
       <div class="col-8">Nalepsze Ao{{movingAverageNumberOfElements}}</div>
-      <div class="col-4">{{date(bestAoN) | date: 'mm:ss.SS'}}</div>
+      <div class="col-4">{{bestAoN | cubeRecordAsDate | date: 'mm:ss.SS'}}</div>
     </div>
     <div class="row">
       <div class="col-8">Średnia z ostatnich {{movingAverageNumberOfElements}} elementów</div>
-      <div class="col-4">{{avgOfLastNElements | date: 'mm:ss.SS'}}</div>
+      <div class="col-4">{{avgOfLastNElements | cubeRecordAsDate | date: 'mm:ss.SS'}}</div>
     </div>
   </div>
 </ng-template>
@@ -91,7 +83,7 @@
           ({{ (record.value.sub30 * 100 / record.value.all) | number: '.0-2' }}%)
         </td>
         <td style="text-align: right">{{ record.value.all }} </td>
-        <td style="text-align: right">{{ date(record.value.sumOfAllTimes / record.value.all) | date: 'mm:ss.SS' }} </td>
+        <td style="text-align: right">{{ (record.value.sumOfAllTimes / record.value.all) | cubeRecordAsDate| date: 'mm:ss.SS' }} </td>
       </tr>
       </tbody>
     </table>
@@ -119,7 +111,7 @@
       <tbody>
       <tr *ngFor="let record of statsForSelectedCube">
         <td style="width: 175px;">{{ record.recordTime | localizedDate : 'yyyy-MM-dd HH:mm:ss' }}</td>
-        <td style="text-align: right; width: 50px;">{{ record.time | date : 'mm:ss.SS' }}</td>
+        <td style="text-align: right; width: 50px;">{{ record.time | cubeRecordAsDate | date : 'mm:ss.SS' }}</td>
         <td style="text-align: right; width: 50px;" *ngIf="movingAverageNumberOfElements < 5">
           {{record.averages.get(movingAverageNumberOfElements) | date : 'mm:ss.SS' }}
         </td>
@@ -136,56 +128,6 @@
 </ng-template>
 
 <ng-template #buttons>
-  <div class="sg-flex-row" *ngIf="rubiksCube">
-    <button *ngIf="isThreeByThree()" (click)="rubiksCube.u(true)"
-            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-      U
-    </button>
-    <button *ngIf="isThreeByThree()" (click)="rubiksCube.u(false)"
-            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-      U'
-    </button>
-    <button *ngIf="isThreeByThree()" (click)="rubiksCube.d(true)"
-            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-      D
-    </button>
-    <button *ngIf="isThreeByThree()" (click)="rubiksCube.d(false)"
-            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-      D'
-    </button>
-    <button *ngIf="isThreeByThree()" (click)="rubiksCube.f(true)"
-            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-      F
-    </button>
-    <button *ngIf="isThreeByThree()" (click)="rubiksCube.f(false)"
-            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-      F'
-    </button>
-    <button *ngIf="isThreeByThree()" (click)="rubiksCube.b(true)"
-            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-      B
-    </button>
-    <button *ngIf="isThreeByThree()" (click)="rubiksCube.b(false)"
-            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-      B'
-    </button>
-    <button *ngIf="isThreeByThree()" (click)="rubiksCube.l(true)"
-            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-      L
-    </button>
-    <button *ngIf="isThreeByThree()" (click)="rubiksCube.l(false)"
-            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-      L'
-    </button>
-    <button *ngIf="isThreeByThree()" (click)="rubiksCube.r(true)"
-            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-      R
-    </button>
-    <button *ngIf="isThreeByThree()" (click)="rubiksCube.r(false)"
-            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-      R'
-    </button>
-  </div>
   <div class="sg-flex-row">
     <div ngbDropdown class="d-inline-block">
       <button class="btn btn-outline-primary" id="cubeTypeDropdown" style="width: 100%" ngbDropdownToggle>
@@ -196,36 +138,6 @@
                 ngbDropdownItem>{{cubeTypeSettings.get(cubeType)?.name}}</button>
       </div>
     </div>
-    <button *ngIf="isThreeByThree()" (click)="scramble()"
-            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-      Scramble (s)
-    </button>
-    <button *ngIf="isThreeByThree() && turns" (click)="resetState()"
-            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-      Reset (r)
-    </button>
-  </div>
-  <div class="sg-flex-row">
-    <button *ngIf="currentState === 'CLEAR' || currentState === 'SCRAMBLED'" (click)="start()"
-            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-      Start (spacja)
-    </button>
-    <button *ngIf="currentState === 'STOPPED'" (click)="resume()"
-            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-      Wznów (shift + spacja)
-    </button>
-    <button *ngIf="currentState === 'ONGOING'" (click)="stop()"
-            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-      Stop (spacja)
-    </button>
-    <button *ngIf="currentState === 'STOPPED'" (click)="save()"
-            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-      Zapisz (enter)
-    </button>
-    <button *ngIf="currentState === 'STOPPED'" (click)="saveWithoutScramble()"
-            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
-      Zapisz bez scrambla (shift + enter)
-    </button>
   </div>
   <div class="sg-flex-row">
     <button (click)="cubeRecordsChartType = 'RAW'"

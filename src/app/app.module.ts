@@ -70,7 +70,7 @@ import {ClientPaymentEditComponent} from './components/accountant/company-log/cl
 import {PaymentSelectionComponent} from './components/accountant/company-log/payment-selection.component';
 import {CompanyLogComponent} from './components/accountant/company-log/company-log.component';
 import {TimerComponent} from './components/general/timer/timer.component';
-import {CubesHomeComponent} from './pages/cubes/home/cubes-home.component';
+import {CubesHomeComponent} from './pages/cubes/cubes-home.component';
 import {CubeRecordsService} from './services/accountant/cube-records.service';
 import {HolidayCurrenciesService} from './services/accountant/holiday-currencies.service';
 import {HolidayCurrenciesComponent} from './components/accountant/holiday-currencies/holiday-currencies.component';
@@ -83,6 +83,8 @@ import {DefaultApplicationComponent} from './components/general/applications/def
 import {SideComponent} from './components/rubiks-cube/side/side.component';
 import {CubeComponent} from './components/rubiks-cube/cube/cube.component';
 import {CubeControlsComponent} from './components/rubiks-cube/cube-controls/cube-controls.component';
+import {CubeStatisticsComponent} from './pages/cubes/cube-statistics.component';
+import {CuberRecordTimeToDatePipe} from './pipe/cuber-record-time-to-date-pipe';
 
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
@@ -122,6 +124,7 @@ export class AppLoginStatus {
     CreateTransactionsComponent,
     LocalizedDatePipe,
     HtmlNewLinePipe,
+    CuberRecordTimeToDatePipe,
     TransactionsListComponent,
     BillingElementsComponent,
     CreateBillingElementComponent,
@@ -160,7 +163,8 @@ export class AppLoginStatus {
     DefaultApplicationComponent,
     SideComponent,
     CubeComponent,
-    CubeControlsComponent
+    CubeControlsComponent,
+    CubeStatisticsComponent
   ],
   imports: [
     BrowserModule,

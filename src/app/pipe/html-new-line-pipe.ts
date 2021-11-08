@@ -7,7 +7,7 @@ import {SettingsService} from '../services/accountant/settings.service';
 })
 export class HtmlNewLinePipe implements PipeTransform {
 
-  constructor(private settingsService: SettingsService) {
+  constructor() {
   }
 
   transform(value: string): string {

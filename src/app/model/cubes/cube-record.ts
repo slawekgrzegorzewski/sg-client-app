@@ -1,4 +1,5 @@
 import {Domain} from '../domain';
+import {ComparatorBuilder} from '../../utils/comparator-builder';
 
 export type CubeType = 'TWO' | 'THREE' | 'FOUR' | 'FIVE' | 'SIX' | 'SEVEN' | 'MEGAMINX';
 export type CubeTypeSetting = { name: string, order: number };
@@ -13,6 +14,9 @@ export const cubeTypeSettings = new Map<CubeType, CubeTypeSetting>(
     ['MEGAMINX', {name: 'megaminx', order: 6}]
   ]
 );
+export const orderOfCubeTypes = [...cubeTypeSettings.entries()]
+  .sort(ComparatorBuilder.comparing<[string, CubeTypeSetting]>(v => v[1].order).build())
+  .map(v => v[0]);
 
 export type CubeRecordDTO = Omit<Partial<CubeRecord>, 'recordTime'> & { recordTime?: string };
 
@@ -36,10 +40,21 @@ export class CubeRecord {
     this.domain = new Domain(data.domain);
   }
 
+  public static date(time: number): Date {
+    return new Date(time * 1000);
+  }
+
+  public static dateToNumber(time: Date | null): number | null {
+    if (time === null) {
+      return null;
+    }
+    return time.getTime() / 1000;
+  }
+
 }
 
 export class CubeStats {
-  public time: Date = new Date(0);
+  public time: number = 0;
   public averages: Map<number, Date | null> = new Map<number, Date>();
   public recordTime: Date = new Date(0);
 }

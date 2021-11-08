@@ -13,12 +13,13 @@ import {CHARTS_ROUTER_URL, ChartsComponent} from './pages/accountant/charts/char
 import {CHECKER_HOME_ROUTER_URL, CheckerHomeComponent} from './pages/checker/checker-home/checker-home.component';
 import {SYR_HOME_ROUTER_URL, SyrHomeComponent} from './pages/syr/syr-home.component';
 import {SYR_ADMIN_ROUTER_URL, SyrAdminComponent} from './pages/syr/syr-admin.component';
-import {CUBES_HOME_ROUTER_URL, CubesHomeComponent} from './pages/cubes/home/cubes-home.component';
+import {CUBES_HOME_ROUTER_URL, CubesHomeComponent} from './pages/cubes/cubes-home.component';
 import {
   HOLIDAY_CURRENCIES_ROUTER_URL,
   HolidayCurrenciesComponent
 } from './components/accountant/holiday-currencies/holiday-currencies.component';
 import {DefaultApplicationComponent} from './components/general/applications/default-application.component';
+import {CUBES_STATISTICS_ROUTER_URL, CubeStatisticsComponent} from './pages/cubes/cube-statistics.component';
 
 const routes: Routes = [
   {path: 'login', component: LoginComponent, canActivate: [UserNotLoggedInGuard]},
@@ -53,6 +54,9 @@ const routes: Routes = [
 
   {path: CUBES_HOME_ROUTER_URL, redirectTo: `/${CUBES_HOME_ROUTER_URL}/`, pathMatch: 'full'},
   {path: `${CUBES_HOME_ROUTER_URL}/:domainId`, component: CubesHomeComponent, canActivate: [UserLoggedInGuard]},
+
+  {path: CUBES_STATISTICS_ROUTER_URL, redirectTo: `/${CUBES_STATISTICS_ROUTER_URL}/`, pathMatch: 'full'},
+  {path: `${CUBES_STATISTICS_ROUTER_URL}/:domainId`, component: CubeStatisticsComponent, canActivate: [UserLoggedInGuard]},
 
   {path: HOLIDAY_CURRENCIES_ROUTER_URL, redirectTo: `/${HOLIDAY_CURRENCIES_ROUTER_URL}/`, pathMatch: 'full'},
   {path: `${HOLIDAY_CURRENCIES_ROUTER_URL}/:domainId`, component: HolidayCurrenciesComponent, canActivate: [UserLoggedInGuard]},

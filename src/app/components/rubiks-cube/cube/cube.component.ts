@@ -1,4 +1,4 @@
-import {Component, HostListener, Input} from '@angular/core';
+import {Component, HostListener} from '@angular/core';
 import {Cube, Move} from '../../../utils/rubiks-cube/models';
 import {Direction, Mode, UserAction} from '../../../utils/rubiks-cube/enums';
 import {UserActionInterpreter} from '../../../utils/rubiks-cube/user-action-interpreter';
@@ -12,7 +12,7 @@ export class CubeComponent {
 
   cube: Cube = new Cube();
   mouseDown = false;
-  last: MouseEvent | null = null;
+  last: { clientY: number, clientX: number } | null = null;
   mode: Mode = Mode.Move;
 
   constructor() {
@@ -57,26 +57,25 @@ export class CubeComponent {
     this.cube.move(interpreter.resolve(code));
   }
 
-  @HostListener('window:keydown', ['$event']) onkeyUp(event: any) {
-    event.preventDefault();
+  @HostListener('window:keydown', ['$event.ctrlKey', '$event.keyCode']) onkeyUp(ctrlKey: boolean, keyCode: number) {
     // handle Ctrl + z
-    if (event.ctrlKey && event.keyCode === UserAction.Zkey) {
+    if (ctrlKey && keyCode === UserAction.Zkey) {
       this.cube.undo();
     }
-    this.performMove(event.keyCode);
+    this.performMove(keyCode);
     if (this.mode !== Mode.Move) {
       return;
     }
-    if (event.keyCode === UserAction.RightKey) {
+    if (keyCode === UserAction.RightKey) {
       this.cube.rotateY += 5;
     }
-    if (event.keyCode === UserAction.LeftKey) {
+    if (keyCode === UserAction.LeftKey) {
       this.cube.rotateY -= 5;
     }
-    if (event.keyCode === UserAction.DownKey) {
+    if (keyCode === UserAction.DownKey) {
       this.cube.rotateX += 5;
     }
-    if (event.keyCode === UserAction.UpKey) {
+    if (keyCode === UserAction.UpKey) {
       this.cube.rotateX -= 5;
     }
   }
@@ -85,22 +84,22 @@ export class CubeComponent {
     this.mouseDown = false;
   }
 
-  @HostListener('window:mousedown', ['$event']) onMousedown(event: MouseEvent) {
+  @HostListener('window:mousedown', ['$event.clientY', '$event.clientX']) onMousedown(clientY: number, clientX: number) {
     this.mouseDown = true;
-    this.last = event;
+    this.last = {clientY: clientY, clientX: clientX};
   }
 
-  @HostListener('window:mousemove', ['$event']) onMousemove(event: MouseEvent) {
-    event.preventDefault();
+  @HostListener('window:mousemove', ['$event.clientY', '$event.clientX']) onMousemove(clientY: number, clientX: number) {
     if (this.mode !== Mode.Move || !this.mouseDown) {
       return;
     }
-    this.cube.rotateX -= event.clientY - (this.last?.clientY || 0);
-    this.cube.rotateY += event.clientX - (this.last?.clientX || 0);
-    this.last = event;
+    this.cube.rotateX -= clientY - (this.last?.clientY || 0);
+    this.cube.rotateY += clientX - (this.last?.clientX || 0);
+    this.last =
+      this.last = {clientY: clientY, clientX: clientX};
   }
 
-  @HostListener('swipe', ['$event']) onTap(e: { direction: number }) {
-    this.performMove(e.direction);
+  @HostListener('swipe', ['$event.direction']) onTap(direction: number) {
+    this.performMove(direction);
   }
 }

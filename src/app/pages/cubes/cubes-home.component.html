@@ -1,0 +1,158 @@
+<div class="sg-flex-row" style="height: 100%;">
+
+  <div style="width: 25%;height: 100%;">
+    <h3 style="text-align: center">Dzisiejsze statystyki</h3>
+    <ng-container *ngTemplateOutlet="generalStats"></ng-container>
+    <ng-container *ngTemplateOutlet="detailedResultsTable"></ng-container>
+  </div>
+
+  <div style="width: 50%;" class="sg-flex-column sg-flex-justify-space-between">
+
+    <div class="sg-flex-row sg-flex-wrap">
+    </div>
+
+    <sg-timer [width]="clockWidth" #timer class="sg-flex-justify-self-center"></sg-timer>
+
+    <div class="sg-flex-justify-self-flex-end sg-flex-column sg-flex-justify-flex-start">
+      <ng-container *ngTemplateOutlet="buttons"></ng-container>
+    </div>
+
+  </div>
+
+  <div style="width: 25%;" class="sg-flex-column sg-flex-justify-flex-start">
+
+    <div *ngIf="isThreeByThree()" class="cube-container" #cubeContainer>
+      <app-cube #rubiksCube [style.--cube-size.px]="cubeAvailableSpace/2.5" [style.height.px]="cubeAvailableSpace"
+                [style.width.px]="cubeAvailableSpace" [style.padding-top.px]="cubeAvailableSpace / 5"></app-cube>
+    </div>
+
+    <div *ngIf="isThreeByThree() && turns">{{turns}}</div>
+
+  </div>
+</div>
+
+<ng-template #generalStats>
+  <div [style.height.px]="resultsSummaryHeight">
+    <div class="row">
+      <div class="col-8">Liczba ułożeń</div>
+      <div class="col-4">{{records.length}}</div>
+    </div>
+    <div class="row">
+      <div class="col-8">Średnia</div>
+      <div class="col-4">{{avg | cubeRecordAsDate | date: 'mm:ss.SS'}}</div>
+    </div>
+    <div class="row">
+      <div class="col-8">Średnia z ostatnich {{movingAverageNumberOfElements}} elementów</div>
+      <div class="col-4">{{avgOfLastNElements | cubeRecordAsDate | date: 'mm:ss.SS'}}</div>
+    </div>
+    <div class="row">
+      <div class="col-8">Najszybsze ułożenie</div>
+      <div class="col-4">{{best | cubeRecordAsDate | date: 'mm:ss.SS'}}</div>
+    </div>
+    <div class="row">
+      <div class="col-8">Najwolniejsze ułożenie</div>
+      <div class="col-4">{{worst | cubeRecordAsDate | date: 'mm:ss.SS'}}</div>
+    </div>
+    <div class="row">
+      <div class="col-8">Nalepsze Ao5</div>
+      <div class="col-4">{{bestAo5 | cubeRecordAsDate | date: 'mm:ss.SS'}}</div>
+    </div>
+    <div class="row">
+      <div class="col-8">Nalepsze Ao{{movingAverageNumberOfElements}}</div>
+      <div class="col-4">{{bestAoN | cubeRecordAsDate | date: 'mm:ss.SS'}}</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #detailedResultsTable>
+  <div class="table-fix-head" [style.height.px]="resultsTableHeight">
+    <table style="width: 100%;" class="table table-sm table-striped results-table">
+      <thead>
+      <tr>
+        <th style="width: 175px;">Data wyniku</th>
+        <th style="text-align: right; width: 50px;">Wynik</th>
+        <th style="text-align: right; width: 50px;" *ngIf="movingAverageNumberOfElements < 5">
+          Ao{{movingAverageNumberOfElements}}
+        </th>
+        <th style="text-align: right; width: 50px;">
+          Ao5
+        </th>
+        <th style="text-align: right; width: 50px;" *ngIf="movingAverageNumberOfElements > 5">
+          Ao{{movingAverageNumberOfElements}}
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let record of statsForSelectedCube">
+        <td style="width: 175px;">{{ record.recordTime | localizedDate : 'yyyy-MM-dd HH:mm:ss' }}</td>
+        <td style="text-align: right; width: 50px;">{{ record.time | cubeRecordAsDate | date : 'mm:ss.SS' }}</td>
+        <td style="text-align: right; width: 50px;" *ngIf="movingAverageNumberOfElements < 5">
+          {{record.averages.get(movingAverageNumberOfElements) | date : 'mm:ss.SS' }}
+        </td>
+        <td style="text-align: right; width: 50px;">
+          {{record.averages.get(5) | date : 'mm:ss.SS'}}
+        </td>
+        <td style="text-align: right; width: 50px;" *ngIf="movingAverageNumberOfElements > 5">
+          {{record.averages.get(movingAverageNumberOfElements) | date : 'mm:ss.SS'}}
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</ng-template>
+
+<ng-template #buttons>
+  <div class="sg-flex-row">
+    <div ngbDropdown class="d-inline-block">
+      <button class="btn btn-outline-primary" id="cubeTypeDropdown" style="width: 100%" ngbDropdownToggle>
+        {{ cubeTypeSettings.get(selectedCubeType)?.name }}
+      </button>
+      <div ngbDropdownMenu aria-labelledby="cubeTypeDropdown" style="width: 100%">
+        <button *ngFor=" let cubeType of cubeTypesOrdered" (click)="selectedCubeType = cubeType"
+                ngbDropdownItem>{{cubeTypeSettings.get(cubeType)?.name}}</button>
+      </div>
+    </div>
+    <button *ngIf="isThreeByThree()" (click)="scramble()"
+            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+      Scramble (s)
+    </button>
+    <button *ngIf="isThreeByThree()" (click)="resetState()"
+            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+      Reset (r)
+    </button>
+  </div>
+  <div class="sg-flex-row">
+    <button *ngIf="currentState === 'CLEAR' || currentState === 'SCRAMBLED'" (click)="start()"
+            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+      Start (spacja)
+    </button>
+    <button *ngIf="currentState === 'STOPPED'" (click)="resume()"
+            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+      Wznów (shift + spacja)
+    </button>
+    <button *ngIf="currentState === 'ONGOING'" (click)="stop()"
+            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+      Stop (spacja)
+    </button>
+    <button *ngIf="currentState === 'STOPPED'" (click)="save()"
+            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+      Zapisz (enter)
+    </button>
+    <button *ngIf="currentState === 'STOPPED'" (click)="saveWithoutScramble()"
+            class="btn btn-outline-primary sg-flex-fill-available-space-evenly">
+      Zapisz bez scrambla (shift + enter)
+    </button>
+  </div>
+  <div class="sg-flex-column" style="padding-bottom: 30px">
+    <div class="sg-flex-row">
+      <div class="form-group">
+        <label for="movingAverageElementsCount">Średnia ruchoma z {{movingAverageNumberOfElements}} elementów</label>
+        <input id="movingAverageElementsCount" [(ngModel)]="movingAverageNumberOfElements" type="number"
+               class="form-control"
+               max="300">
+      </div>
+    </div>
+    <input type="range" class="form-range" style="width: 100%"
+           [(ngModel)]="movingAverageNumberOfElements" max="300">
+  </div>
+</ng-template>

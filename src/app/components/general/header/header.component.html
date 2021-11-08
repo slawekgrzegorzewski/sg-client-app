@@ -62,6 +62,9 @@
       <li class="nav-item" [routerLinkActive]="['cubes-home']" *ngIf="isLoggedIn && applicationsService.isCubesApp()">
         <a class="nav-link" [routerLink]="['/cubes-home']">Kostki</a>
       </li>
+      <li class="nav-item" [routerLinkActive]="['cubes-statistics']" *ngIf="isLoggedIn && applicationsService.isCubesApp()">
+        <a class="nav-link" [routerLink]="['/cubes-statistics']">Statystyki</a>
+      </li>
       <li class="nav-item" *ngIf="isLoggedIn">
         <a class="nav-link" (click)="castRefreshRequest()">Odśwież dane</a>
       </li>
