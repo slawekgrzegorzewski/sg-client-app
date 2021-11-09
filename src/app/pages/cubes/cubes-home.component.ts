@@ -11,8 +11,8 @@ import {ActivatedRoute} from '@angular/router';
 import {DomainService} from '../../services/domain.service';
 import {CubeComponent} from '../../components/rubiks-cube/cube/cube.component';
 import {RubikCubeRecordStatistics} from '../../utils/rubiks-cube/rubik-cube-record-statistics';
+import {ViewMode} from '../../utils/view-mode';
 
-type DateStats = { sub30: number; sumOfAllSub30sTimes: number; all: number; sumOfAllTimes: number; };
 type PageState = 'CLEAR' | 'SCRAMBLING' | 'SCRAMBLED' | 'ONGOING' | 'STOPPED';
 
 export const CUBES_HOME_ROUTER_URL = 'cubes-home';
@@ -29,6 +29,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('rubiksCube') rubiksCube: CubeComponent | null = null;
 
   private _records: CubeRecord[] = [];
+  viewMode: ViewMode = 'desktop';
 
   get records(): CubeRecord[] {
     return this._records;
@@ -323,6 +324,11 @@ export class CubesHomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private sizeLayout(height: number, width: number): void {
+    if (window.innerWidth < 640) {
+      this.viewMode = 'mobile';
+    } else {
+      this.viewMode = 'desktop';
+    }
     this.resultsTableHeight = height - this.resultsSummaryHeight - 60;
     this.clockWidth = width / 2;
     this.cubeAvailableSpace = this.rubiksCubeContainer?.nativeElement?.offsetWidth;

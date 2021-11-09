@@ -33,8 +33,8 @@ import {DomainService} from '../../../services/domain.service';
 import {APP_SIZE_EVENT, DATA_REFRESH_REQUEST_EVENT} from '../../../app.module';
 import {AccountantSettings} from '../../../model/accountant/accountant-settings';
 import {AccountantSettingsService} from '../../../services/accountant/accountant-settings.service';
+import {ViewMode} from '../../../utils/view-mode';
 
-export type ViewMode = 'desktop' | 'mobile';
 type MobileEditMode = 'display' | 'create-income' | 'create-expense' | 'create-performed-service';
 
 export const ACCOUNTANT_HOME_ROUTER_URL = 'accountant-home';

@@ -1,4 +1,4 @@
-<div class="sg-flex-row" style="height: 100%;">
+<div *ngIf="viewMode==='desktop'" class="sg-flex-row" style="height: 100%;">
 
   <div style="width: 25%;height: 100%;">
     <h3 style="text-align: center">Dzisiejsze statystyki</h3>
@@ -11,7 +11,7 @@
     <div class="sg-flex-row sg-flex-wrap">
     </div>
 
-    <sg-timer [width]="clockWidth" #timer class="sg-flex-justify-self-center"></sg-timer>
+    <ng-container *ngTemplateOutlet="timerContainer"></ng-container>
 
     <div class="sg-flex-justify-self-flex-end sg-flex-column sg-flex-justify-flex-start">
       <ng-container *ngTemplateOutlet="buttons"></ng-container>
@@ -29,6 +29,15 @@
     <div *ngIf="isThreeByThree() && turns">{{turns}}</div>
 
   </div>
+</div>
+
+<div *ngIf="viewMode==='mobile'" class="sg-flex-column" style="height: 100%;">
+  <ng-container *ngTemplateOutlet="timerContainer"></ng-container>
+
+  <div class="sg-flex-justify-self-flex-end sg-flex-column sg-flex-justify-flex-start">
+    <ng-container *ngTemplateOutlet="buttons"></ng-container>
+  </div>
+
 </div>
 
 <ng-template #generalStats>
@@ -155,4 +164,8 @@
     <input type="range" class="form-range" style="width: 100%"
            [(ngModel)]="movingAverageNumberOfElements" max="300">
   </div>
+</ng-template>
+
+<ng-template #timerContainer>
+  <sg-timer [width]="clockWidth" #timer class="sg-flex-justify-self-center"></sg-timer>
 </ng-template>
