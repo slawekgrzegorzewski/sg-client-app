@@ -120,7 +120,11 @@ export class CompanyLogComponent implements OnInit {
   private moveToNextMonth(months: number): void {
     this.changeDay(
       months,
-      (date, numberOfUnits) => new Date(date.setMonth((date.getMonth() + numberOfUnits)))
+      (date, numberOfUnits) => {
+        const nextDate = new Date(date.setMonth((date.getMonth() + numberOfUnits)));
+        const now = new Date();
+        return now.getTime() > nextDate.getTime() ? nextDate : now;
+      }
     );
   }
 
