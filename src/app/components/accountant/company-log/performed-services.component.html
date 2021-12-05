@@ -120,7 +120,7 @@
 </ng-template>
 
 <ng-template #performedServicesTable>
-  <div #performedServicesTableContainer *ngIf="isNonEditMode()" class="table-fix-head" [style.height.px]="performedServicesTableHeight">
+  <div #performedServicesTableContainer *ngIf="isNonEditMode()" class="table-fix-head enable-vertical-scroll" [style.height.px]="performedServicesTableHeight">
     <table *ngIf="isNonEditMode()" style="width: 100%;">
       <ng-container *ngFor="let group of displayData">
         <tr *ngIf="isGrouped()" (click)="setGroupToDisplay(group)"

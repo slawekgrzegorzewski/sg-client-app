@@ -116,7 +116,7 @@ app-general-typeahead, app-date-picker {
 }
 
 .table-fix-head {
-  overflow: auto;
+  overflow-y: auto;
 }
 
 .table-fix-head thead th {
@@ -124,4 +124,8 @@ app-general-typeahead, app-date-picker {
   top: 0;
   z-index: 1;
   background: white;
+}
+
+.enable-vertical-scroll {
+  touch-action: pan-y !important;
 }

@@ -1,4 +1,5 @@
-<div [style.height.px]="getAvailableHeight()" class="sg-flex-column">
+<div [style.height.px]="getAvailableHeight()" class="sg-flex-column enable-vertical-scroll"
+     (tap)="onTap($event)">
   <app-header #navigation></app-header>
   <router-outlet></router-outlet>
 </div>

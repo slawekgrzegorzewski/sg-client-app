@@ -38,7 +38,7 @@
   </div>
 
   <div #clientPaymentsTableContainer *ngIf="isNonEditMode()" [style.height.px]="clientPaymentsTableContainerHeight"
-       class="table-fix-head">
+       class="table-fix-head enable-vertical-scroll">
     <table style="width: 100%;">
       <ng-container *ngFor="let group of displayData">
         <tr *ngIf="group.title" (click)="selectGroup(group)"

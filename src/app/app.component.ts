@@ -40,4 +40,10 @@ export class AppComponent implements AfterViewInit {
   getAvailableHeight(): number {
     return window.innerHeight;
   }
+
+  onTap(event: any) {
+    if (event.tapCount === 2) {
+      this.eventBus.cast(DATA_REFRESH_REQUEST_EVENT);
+    }
+  }
 }
