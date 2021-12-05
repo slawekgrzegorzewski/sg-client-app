@@ -2,17 +2,19 @@ import {Injectable} from '@angular/core';
 import {NgEventBus} from 'ng-event-bus';
 import {APP_GET_SIZE_EVENT, APP_SIZE_EVENT} from '../app.module';
 
+export type AppSize = { height: number, width: number, navigationHeight: number };
+
 @Injectable({
   providedIn: 'root'
 })
 export class SizeService {
 
-  private _size: { height: number, width: number } = {height: 0, width: 0};
-  get size(): { height: number; width: number } {
+  private _size: AppSize = {height: 0, width: 0, navigationHeight: 0};
+  get size(): AppSize {
     return this._size;
   }
 
-  set size(value: { height: number; width: number }) {
+  set size(value: AppSize) {
     this._size = value;
     this.eventBus.cast(APP_SIZE_EVENT, this.size);
   }

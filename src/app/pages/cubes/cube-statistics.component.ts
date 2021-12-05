@@ -11,6 +11,7 @@ import {Subscription} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
 import {DomainService} from '../../services/domain.service';
 import {DateStats, RubikCubeRecordStatistics} from '../../utils/rubiks-cube/rubik-cube-record-statistics';
+import {AppSize} from '../../services/size.service';
 
 export const CUBES_STATISTICS_ROUTER_URL = 'cubes-statistics';
 
@@ -102,7 +103,7 @@ export class CubeStatisticsComponent implements OnInit, AfterViewInit, OnDestroy
       this.refreshStats();
     });
     this.eventBus.on(APP_SIZE_EVENT).subscribe((event: any) => {
-      this.sizeLayout(event.data.height, event.data.width);
+      this.sizeLayout(event.data);
     });
     setTimeout(() => this.eventBus.cast(APP_GET_SIZE_EVENT), 1);
   }
@@ -176,9 +177,8 @@ export class CubeStatisticsComponent implements OnInit, AfterViewInit, OnDestroy
     }
   }
 
-  private sizeLayout(height: number, width: number): void {
-    console.log('sizeLayout');
-    this.resultsTableHeight = (height - this.resultsSummaryHeight) / 2;
+  private sizeLayout(size: AppSize): void {
+    this.resultsTableHeight = (size.height - this.resultsSummaryHeight - size.navigationHeight) / 2;
   }
 }
 

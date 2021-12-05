@@ -32,8 +32,9 @@ export class AppComponent implements AfterViewInit {
 
   private castSizeEvent() {
     this.sizeService.size = {
-      height: window.innerHeight - this.navigation.getTakenHeight(),
-      width: window.innerWidth
+      height: window.innerHeight,
+      width: window.innerWidth,
+      navigationHeight: this.navigation.getTakenHeight()
     }
   }
 

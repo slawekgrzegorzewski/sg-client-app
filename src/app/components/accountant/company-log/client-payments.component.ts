@@ -8,8 +8,9 @@ import {PaymentStatus} from '../../../model/accountant/payable';
 import {PayableGroup} from '../../../model/accountant/payable-groupper';
 import {ComparatorBuilder} from '../../../utils/comparator-builder';
 import {NgEventBus} from 'ng-event-bus';
-import {SizeService} from '../../../services/size.service';
+import {AppSize, SizeService} from '../../../services/size.service';
 import {APP_SIZE_EVENT} from '../../../app.module';
+import {MetaData} from 'ng-event-bus/lib/meta-data';
 
 export type EditMode = 'edit' | 'create' | '';
 export type GroupingButtonsPosition = 'head' | 'bottom';
@@ -75,7 +76,16 @@ export class ClientPaymentComponent implements OnInit {
   set clientPaymentsTableContainer(value: ElementRef | null | undefined) {
     this._clientPaymentsTableContainer = value;
     setTimeout(() => this.sizeLayout(), 1);
+  }
 
+  private _addCPButton: ElementRef | null | undefined = null;
+  @ViewChild('addCPButton') get addCPButton(): ElementRef | null | undefined {
+    return this._addCPButton;
+  }
+
+  set addCPButton(value: ElementRef | null | undefined) {
+    this._addCPButton = value;
+    setTimeout(() => this.sizeLayout(), 1);
   }
 
   private _availableHeight: number = 0;
@@ -91,8 +101,8 @@ export class ClientPaymentComponent implements OnInit {
   constructor(
     private eventBus: NgEventBus,
     private sizeService: SizeService) {
-    this.eventBus.on(APP_SIZE_EVENT).subscribe((event: any) => {
-      this.availableHeight = event.data.height;
+    this.eventBus.on<AppSize>(APP_SIZE_EVENT).subscribe((event: MetaData) => {
+      this.availableHeight = (event.data as AppSize).height;
     });
     this.availableHeight = sizeService.size.height;
   }
@@ -351,7 +361,9 @@ export class ClientPaymentComponent implements OnInit {
 
   private sizeLayout(): void {
     if (this.clientPaymentsTableContainer) {
-      const newHeight = this.availableHeight - this.clientPaymentsTableContainer.nativeElement.getBoundingClientRect().top;
+      const newHeight = this.availableHeight
+        - this.clientPaymentsTableContainer.nativeElement.getBoundingClientRect().top
+        - (this.addCPButton ? this.addCPButton.nativeElement.offsetHeight : 0);
       if (newHeight !== this.clientPaymentsTableContainerHeight) {
         this.clientPaymentsTableContainerHeight = newHeight;
       }

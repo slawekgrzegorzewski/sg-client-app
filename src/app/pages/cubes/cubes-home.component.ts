@@ -12,6 +12,7 @@ import {DomainService} from '../../services/domain.service';
 import {CubeComponent} from '../../components/rubiks-cube/cube/cube.component';
 import {RubikCubeRecordStatistics} from '../../utils/rubiks-cube/rubik-cube-record-statistics';
 import {ViewMode} from '../../utils/view-mode';
+import {AppSize} from '../../services/size.service';
 
 type PageState = 'CLEAR' | 'SCRAMBLING' | 'SCRAMBLED' | 'ONGOING' | 'STOPPED';
 
@@ -100,7 +101,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit, OnDestroy {
       this.refreshStats();
     });
     this.eventBus.on(APP_SIZE_EVENT).subscribe((event: any) => {
-      this.sizeLayout(event.data.height, event.data.width);
+      this.sizeLayout(event.data);
     });
     setTimeout(() => this.eventBus.cast(APP_GET_SIZE_EVENT), 1);
   }
@@ -323,14 +324,14 @@ export class CubesHomeComponent implements OnInit, AfterViewInit, OnDestroy {
     return cubeRecord;
   }
 
-  private sizeLayout(height: number, width: number): void {
+  private sizeLayout(appSize: AppSize): void {
     if (window.innerWidth < 640) {
       this.viewMode = 'mobile';
     } else {
       this.viewMode = 'desktop';
     }
-    this.resultsTableHeight = height - this.resultsSummaryHeight - 60;
-    this.clockWidth = width / 2;
+    this.resultsTableHeight = appSize.height - this.resultsSummaryHeight - appSize.navigationHeight - 60;
+    this.clockWidth = appSize.width / 2;
     this.cubeAvailableSpace = this.rubiksCubeContainer?.nativeElement?.offsetWidth;
   }
 }

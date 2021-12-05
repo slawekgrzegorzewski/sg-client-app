@@ -38,6 +38,16 @@ export class PerformedServicesComponent implements OnInit {
     setTimeout(() => this.sizeLayout(), 1);
   }
 
+  private _addPSButton: ElementRef | null | undefined = null;
+  @ViewChild('addPSButton') get addPSButton(): ElementRef | null | undefined {
+    return this._addPSButton;
+  }
+
+  set addPSButton(value: ElementRef | null | undefined) {
+    this._addPSButton = value;
+    setTimeout(() => this.sizeLayout(), 1);
+  }
+
   private _availableHeight: number = 0;
   get availableHeight(): number {
     return this._availableHeight;
@@ -379,7 +389,9 @@ export class PerformedServicesComponent implements OnInit {
 
   private sizeLayout(): void {
     if (this.performedServicesTableContainer) {
-      const newHeight = this.availableHeight - this.performedServicesTableContainer.nativeElement.getBoundingClientRect().top;
+      const newHeight = this.availableHeight
+      - this.performedServicesTableContainer.nativeElement.getBoundingClientRect().top
+      - (this.addPSButton ? this.addPSButton?.nativeElement.offsetHeight : 0);
       if (newHeight !== this.performedServicesTableHeight) {
         this.performedServicesTableHeight = newHeight;
       }
