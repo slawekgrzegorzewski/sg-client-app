@@ -1,6 +1,6 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {SettingsComponent} from './pages/settings/settings.component';
+import {SETTINGS_ROUTER_URL, SettingsComponent} from './pages/settings/settings.component';
 import {LoginComponent} from './pages/login/login.component';
 import {RegisterComponent} from './pages/register/register.component';
 import {UserLoggedInGuard} from './guards/AuthGuard/user-logged-in-guard.service';
@@ -26,7 +26,9 @@ const routes: Routes = [
   {path: 'register/:type', component: RegisterComponent, canActivate: [UserNotLoggedInGuard]},
 
   {path: 'change-password/:type', component: RegisterComponent, canActivate: [UserLoggedInGuard]},
-  {path: 'settings', component: SettingsComponent, canActivate: [UserLoggedInGuard]},
+
+  {path: SETTINGS_ROUTER_URL, redirectTo: `/${SETTINGS_ROUTER_URL}/`, pathMatch: 'full'},
+  {path: `${SETTINGS_ROUTER_URL}/:domainId`, component: SettingsComponent, canActivate: [UserLoggedInGuard]},
 
   {path: ACCOUNTANT_HOME_ROUTER_URL, redirectTo: `/${ACCOUNTANT_HOME_ROUTER_URL}/`, pathMatch: 'full'},
   {path: `${ACCOUNTANT_HOME_ROUTER_URL}/:domainId`, component: AccountantHomeComponent, canActivate: [UserLoggedInGuard]},

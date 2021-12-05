@@ -13,6 +13,7 @@ import {SYR_HOME_ROUTER_URL} from '../pages/syr/syr-home.component';
 import {SYR_ADMIN_ROUTER_URL} from '../pages/syr/syr-admin.component';
 import {CUBES_HOME_ROUTER_URL} from '../pages/cubes/cubes-home.component';
 import {CUBES_STATISTICS_ROUTER_URL} from '../pages/cubes/cube-statistics.component';
+import {SETTINGS_ROUTER_URL} from '../pages/settings/settings.component';
 
 export const ACCOUNTANT_APP = 'Accountant';
 export const CHECKER_APP = 'Checker';
@@ -29,7 +30,7 @@ export class ApplicationConfig {
 
 export const APPLICATIONS_CONFIG = new Map<string, ApplicationConfig>([
   [ACCOUNTANT_APP, new ApplicationConfig([ACCOUNTANT_HOME_ROUTER_URL, ACCOUNTANT_HISTORY_ROUTER_URL, HOLIDAY_CURRENCIES_ROUTER_URL,
-    BILLING_SMALL_ROUTER_URL, PIGGY_BANKS_SMALL_ROUTER_URL, CHARTS_ROUTER_URL])],
+    BILLING_SMALL_ROUTER_URL, PIGGY_BANKS_SMALL_ROUTER_URL, CHARTS_ROUTER_URL, SETTINGS_ROUTER_URL])],
   [CHECKER_APP, new ApplicationConfig([CHECKER_HOME_ROUTER_URL])],
   [SYR_APP, new ApplicationConfig([SYR_HOME_ROUTER_URL, SYR_ADMIN_ROUTER_URL])],
   [CUBES_APP, new ApplicationConfig([CUBES_HOME_ROUTER_URL, CUBES_STATISTICS_ROUTER_URL])],

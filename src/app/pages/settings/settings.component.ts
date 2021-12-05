@@ -21,6 +21,10 @@ import {Service} from '../../model/accountant/service';
 import {ServicesService} from '../../services/accountant/services.service';
 import {ComparatorBuilder} from '../../utils/comparator-builder';
 import {Button} from '../../components/general/hoverable-buttons.component';
+import {ActivatedRoute} from '@angular/router';
+import {ACCOUNTANT_HOME_ROUTER_URL} from '../accountant/accountant-home/accountant-home.component';
+
+export const SETTINGS_ROUTER_URL = 'settings';
 
 @Component({
   selector: 'app-accounts',
@@ -63,7 +67,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
     public loginService: LoginService,
     private modalService: NgbModal,
     private billingsService: BillingPeriodsService,
-    private toastService: ToastService) {
+    private toastService: ToastService,
+    private route: ActivatedRoute) {
+
+    this.domainService.registerToDomainChangesViaRouterUrl(SETTINGS_ROUTER_URL, this.route);
     this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
       this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
     });
@@ -77,6 +84,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
     if (this.domainSubscription) {
       this.domainSubscription.unsubscribe();
     }
+    this.domainService.deregisterFromDomainChangesViaRouterUrl(SETTINGS_ROUTER_URL);
   }
 
   currentUserLogin(): string {
