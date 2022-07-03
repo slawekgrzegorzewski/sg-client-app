@@ -85,6 +85,9 @@ import {CubeComponent} from './components/rubiks-cube/cube/cube.component';
 import {CubeControlsComponent} from './components/rubiks-cube/cube-controls/cube-controls.component';
 import {CubeStatisticsComponent} from './pages/cubes/cube-statistics.component';
 import {CuberRecordTimeToDatePipe} from './pipe/cuber-record-time-to-date-pipe';
+import {NodrigenService} from './services/banks/nodrigen.service';
+import {NodrigenComponent} from './components/nodrigen/nodrigen.component';
+import {BanksService} from './services/banks/banks.service';
 
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
@@ -164,7 +167,8 @@ export class AppLoginStatus {
     SideComponent,
     CubeComponent,
     CubeControlsComponent,
-    CubeStatisticsComponent
+    CubeStatisticsComponent,
+    NodrigenComponent
   ],
   imports: [
     BrowserModule,
@@ -211,7 +215,9 @@ export class AppLoginStatus {
       useClass: MyHammerConfig,
     },
     SizeService,
-    ApplicationsService
+    ApplicationsService,
+    NodrigenService,
+    BanksService
   ],
   bootstrap: [AppComponent]
 })

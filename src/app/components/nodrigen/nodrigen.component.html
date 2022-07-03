@@ -1,0 +1,58 @@
+<div class="sg-flex-column">
+  <h5>Dostęp udzielony</h5>
+  <div *ngFor="let permission of permissionsGranted" class="sg-flex-column" style="margin-bottom: 30px">
+    <h6>{{permission.institutionId}}</h6>
+    <div style="padding-top: 10px; padding-left: 30px">
+      <ng-container *ngIf="permission.bankAccounts.length > 0; else noAccounts">
+        <h6>Dnia {{permission.givenAt | localizedDate: "dd MMMM yyyy" | titlecase}} udzielono dostępu do następujących
+          kont</h6>
+        <table>
+          <tr>
+            <th style="padding-right: 20px">IBAN</th>
+            <th style="padding-right: 20px">Typ</th>
+            <th style="padding-right: 20px">Waluta</th>
+            <th style="padding-right: 20px">Właściciel</th>
+          </tr>
+          <ng-container *ngFor="let bankAccount of permission.bankAccounts">
+            <tr>
+              <td>{{bankAccount.iban}}</td>
+              <td>{{bankAccount.product}}</td>
+              <td>{{bankAccount.currency}}</td>
+              <td>{{bankAccount.owner}}</td>
+            </tr>
+          </ng-container>
+        </table>
+      </ng-container>
+      <ng-template #noAccounts>
+        Brak udostpęnionych kont
+      </ng-template>
+    </div>
+  </div>
+</div>
+
+<div class="sg-flex-column">
+  <h5>Prośby o dostęp</h5>
+  <div *ngFor="let permission of permissionsToProcess" class="sg-flex-row">
+    <div>{{permission.institutionId}}</div>
+    <a [href]="permission.confirmationLink">Potwierdź</a>
+  </div>
+</div>
+
+
+<button *ngIf="institutions.length >0" (click)="institutions = []" class="btn btn-outline-primary">Anuluj</button>
+<div class="sg-flex-wrap">
+  <div *ngFor="let institution of institutions"
+       (click)="createPermissions(institution.id, institution.transaction_total_days)" class="sg-flex-column"
+       style="padding: 10px;">
+    <div>{{institution.name}}</div>
+    <div>{{institution.bic}}</div>
+    <div>{{institution.transaction_total_days}}</div>
+    <img [src]="institution.logo" [alt]="institution.name" style="max-height: 200px;max-width: 200px"/>
+  </div>
+</div>
+
+<button *ngIf="institutions.length === 0" (click)="showListOfInstitutions()" class="btn btn-outline-primary">Dodaj
+</button>
+
+<button class="btn btn-link btn-sm" (click)="fetchAllTransactions()">pobierz transakcje</button>
+<button class="btn btn-link btn-sm" (click)="fetchAllBalances()">pobierz salda</button>

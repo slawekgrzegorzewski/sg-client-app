@@ -10,34 +10,47 @@
 
       </app-multi-currency-total>
     </div>
-    <div (mouseleave)="setOverAccount()">
-      <table #table style="width: 100%">
-        <tr *ngIf="adminMode">
-          <td><b>Nazwa</b></td>
-          <td><b>Widoczne</b></td>
-          <td><b>Stan</b></td>
-        </tr>
-        <tr #row *ngFor="let account of accounts"
-            (mouseenter)="setOverAccount({account: account, row: row})"
-            (click)="select(account);"
+    <table #table style="width: 100%">
+      <tr *ngIf="adminMode">
+        <th style="padding-right: 10px">Nazwa</th>
+        <th style="padding-right: 10px">Widoczne</th>
+        <th style="padding-right: 10px">Saldo</th>
+        <th style="padding-right: 10px">Powiązane konto bankowe</th>
+      </tr>
+      <ng-container *ngFor="let account of accounts">
+        <tr #row (click)="select(account);"
             class="domain-row sg-row-hoverable" [class.selected]="account === selectedAccount">
           <td>{{account.name}}</td>
           <td *ngIf="adminMode">
             <input type="checkbox" [ngModel]="account.visible" disabled>
           </td>
           <td style="text-align: right">{{account.currentBalance | currency: account.currency :undefined:'1.2-2' }}</td>
+          <td style="text-align: right"><span
+            *ngIf="account.bankAccount">{{account.bankAccount.iban}} {{account.bankAccount.bic}}</span></td>
         </tr>
-      </table>
-      <div #utilBox style="position: fixed;"
-           [ngStyle]="{'top.px': utilBoxTop, 'left.px': utilBoxLeft, 'visibility': utilBoxVisibility}">
-        <span *ngFor="let button of buttons">
-          <button *ngIf="button.show(this.overElement)" class="btn btn-primary btn-sm"
-                  (click)="button.action(buttonClicked());">
-            {{button.name}}
-          </button>
-        </span>
-      </div>
-    </div>
+        <ng-container *ngIf="account === selectedAccount && adminMode">
+          <tr class="selected">
+            <td colspan="4" style="text-align: right">
+              <select *ngIf="!selectedAccount.bankAccount && bankAccountsAvailableToAssign.length > 0" [(ngModel)]="selectedBankAccount">
+                <option *ngFor="let bankAccount of bankAccountsAvailableToAssign" [ngValue]="bankAccount">{{bankAccount.iban}} - {{bankAccount.currency}}</option>
+              </select>
+              <button class="btn btn-link btn-sm"
+                      (click)="deleteAccountEvent.emit(selectedAccount)">usuń
+              </button>
+              <button class="btn btn-link btn-sm"
+                      (click)="renameAccountEvent.emit(selectedAccount)">zmień nazwę
+              </button>
+              <button class="btn btn-link btn-sm" *ngIf="selectedAccount && !selectedAccount.visible || false"
+                      (click)="changeAccountVisibilityEvent.emit(selectedAccount)">pokaż
+              </button>
+              <button class="btn btn-link btn-sm" *ngIf="selectedAccount && selectedAccount.visible || false"
+                      (click)="changeAccountVisibilityEvent.emit(selectedAccount)">ukryj
+              </button>
+            </td>
+          </tr>
+        </ng-container>
+      </ng-container>
+    </table>
   </div>
 </div>
 

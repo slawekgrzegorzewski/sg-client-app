@@ -1,10 +1,10 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {LoginService} from 'src/app/services/login.service';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbNav, NgbNavItem} from '@ng-bootstrap/ng-bootstrap';
 import {Account} from '../../model/accountant/account';
 import {ToastService} from '../../services/toast.service';
 import {AccountsService} from '../../services/accountant/accounts.service';
-import {Observable, Subscription} from 'rxjs';
+import {forkJoin, Observable, Subscription} from 'rxjs';
 import {PiggyBank} from '../../model/accountant/piggy-bank';
 import {PiggyBanksService} from '../../services/accountant/piggy-banks.service';
 import {Currency} from '../../model/accountant/currency';
@@ -20,9 +20,10 @@ import {AccountantSettings} from '../../model/accountant/accountant-settings';
 import {Service} from '../../model/accountant/service';
 import {ServicesService} from '../../services/accountant/services.service';
 import {ComparatorBuilder} from '../../utils/comparator-builder';
-import {Button} from '../../components/general/hoverable-buttons.component';
 import {ActivatedRoute} from '@angular/router';
-import {ACCOUNTANT_HOME_ROUTER_URL} from '../accountant/accountant-home/accountant-home.component';
+import {BanksService} from '../../services/banks/banks.service';
+import {BankAccount} from '../../model/banks/bank-account';
+import {$e} from 'codelyzer/angular/styles/chars';
 
 export const SETTINGS_ROUTER_URL = 'settings';
 
@@ -34,6 +35,7 @@ export const SETTINGS_ROUTER_URL = 'settings';
 export class SettingsComponent implements OnInit, OnDestroy {
 
   accountsInCurrentDomain: Account[] = [];
+  bankAccountsAvailableToAssign: BankAccount[] = [];
   otherDomainsAccounts = new Map<string, Account[]>();
   isEditAccount = false;
   accountToEdit: Account | null = null;
@@ -47,18 +49,18 @@ export class SettingsComponent implements OnInit, OnDestroy {
   clients: Client[] = [];
   services: Service[] = [];
   userDomains: DetailedDomain[] = [];
-  buttons = [
-    new Button({name: 'usuń', action: this.deleteAccount(this)}),
-    new Button({name: 'zmień nazwę', action: this.rename(this)}),
-    new Button({name: 'pokaż', action: this.showAccount(this), show: (account: Account | null) => account && !account.visible || false}),
-    new Button({name: 'ukryj', action: this.hideAccount(this), show: (account: Account | null) => account && account.visible || false})
-  ];
   public accountantSettings: AccountantSettings | null = null;
+
   private domainSubscription: Subscription;
+  @ViewChild('nav')
+  nav: NgbNav | null = null;
+  @ViewChild('bankAccess')
+  bankAccessNavItem: NgbNavItem | null = null;
 
   constructor(
     private accountsService: AccountsService,
     private accountantSettingsService: AccountantSettingsService,
+    private banksService: BanksService,
     private categoriesService: CategoriesService,
     private clientsService: ClientsService,
     private servicesService: ServicesService,
@@ -77,7 +79,13 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.fetchData();
+    this.route.queryParams.subscribe(queryParams => {
+      if (queryParams.hasOwnProperty('ref')) {
+        setTimeout(() => this.nav?.select(this.bankAccessNavItem?.id), 500);
+      } else {
+        this.fetchData();
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -111,13 +119,13 @@ export class SettingsComponent implements OnInit, OnDestroy {
     const currentDomain = this.domainService.currentDomainId;
     const accounts: Observable<Account[]> = this.loginService.containsRole('ACCOUNTANT_ADMIN') ?
       this.accountsService.allAccounts() : this.accountsService.currentDomainAccounts();
-    accounts.subscribe(
-      data => {
-        const accountsFromData = data.map(d => new Account(d));
-        this.accountsInCurrentDomain = data.filter(a => a.domain.id === currentDomain).sort(
+    forkJoin([accounts, this.banksService.getBankAccountsNotAssignedToAnyAccount()]).subscribe(
+      ([accounts, bankAccounts]) => {
+        const accountsFromData = accounts.map(d => new Account(d));
+        this.accountsInCurrentDomain = accounts.filter(a => a.domain.id === currentDomain).sort(
           ComparatorBuilder.comparing<Account>(a => a.currency).thenComparing(a => a.name).build()
         );
-        this.otherDomainsAccounts = data.filter(a => a.domain.id !== currentDomain).reduce(
+        this.otherDomainsAccounts = accounts.filter(a => a.domain.id !== currentDomain).reduce(
           (map, acc) => map.set(acc.domain.name, [...map.get(acc.domain.name) || [], acc]),
           new Map<string, Account[]>()
         );
@@ -126,9 +134,11 @@ export class SettingsComponent implements OnInit, OnDestroy {
             .sort(ComparatorBuilder.comparing<Account>(a => a.currency).thenComparing(a => a.name).build());
           this.otherDomainsAccounts.set(domainName, domains);
         }
+        this.bankAccountsAvailableToAssign = bankAccounts;
       },
       err => {
         this.accountsInCurrentDomain = [];
+        this.bankAccountsAvailableToAssign = [];
         this.otherDomainsAccounts = new Map<string, Account[]>();
         this.toastService.showWarning('Current data has been cleared out.', 'Can not obtain data!');
       }
@@ -171,26 +181,18 @@ export class SettingsComponent implements OnInit, OnDestroy {
     );
   }
 
-  rename(that: SettingsComponent): (a: Account) => void {
-    return (a: Account) => {
-      that.editAccount(a);
-    };
+  rename(a: Account): void {
+    this.editAccount(a);
   }
 
-  showAccount(that: SettingsComponent): (a: Account) => void {
-    return (a: Account) => {
-      a.visible = true;
-      this.accountsService.update(a).subscribe(a => {
-      });
-    };
+  changeAccountVisibility(account: Account): void {
+    account.visible = !account.visible;
+    this.accountsService.update(account).subscribe(a => {
+    });
   }
 
-  hideAccount(that: SettingsComponent): (a: Account) => void {
-    return (a: Account) => {
-      a.visible = false;
-      this.accountsService.update(a).subscribe(a => {
-      });
-    };
+  assignBankAccountToAnAccount($event: [Account, BankAccount]) {
+    this.callAndCloseEditAndFetchData(this.banksService.assignBankAccountToAnAccount($event[0], $event[1]));
   }
 
   editAccount(account: Account): void {
@@ -203,30 +205,28 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.isEditAccount = true;
   }
 
-  deleteAccount(that: SettingsComponent): (account: Account) => void {
-    return (account: Account) => {
-      that.accountToDelete = account;
-      that.accountBeingDeletedDescription = account.name;
-      this.showAccountDeletionConfirmation = true;
-    };
+  deleteAccount(account: Account): void {
+    this.accountToDelete = account;
+    this.accountBeingDeletedDescription = account.name;
+    this.showAccountDeletionConfirmation = true;
   }
 
   saveAccount(account: Account): void {
     if (this.accountToEdit) {
       this.accountToEdit.name = account.name;
-      this.callAccountsService(this.accountsService.update(this.accountToEdit));
+      this.callAndCloseEditAndFetchData(this.accountsService.update(this.accountToEdit));
     } else {
-      this.callAccountsService(this.accountsService.create(new Account(account)));
+      this.callAndCloseEditAndFetchData(this.accountsService.create(new Account(account)));
     }
   }
 
   deleteAccountMethod(): void {
     if (this.accountToDelete) {
-      this.callAccountsService(this.accountsService.delete(this.accountToDelete));
+      this.callAndCloseEditAndFetchData(this.accountsService.delete(this.accountToDelete));
     }
   }
 
-  private callAccountsService(result: Observable<any>): void {
+  private callAndCloseEditAndFetchData(result: Observable<any>): void {
     result.subscribe(
       data => {
         this.closeEdit();

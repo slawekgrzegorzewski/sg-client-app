@@ -1,6 +1,7 @@
 import {Domain} from '../domain';
 import {Balance, WithBalance} from './with-balance';
 import {Currency} from './currency';
+import {BankAccount} from '../banks/bank-account';
 
 export class Account implements WithBalance {
   public id: number;
@@ -9,6 +10,7 @@ export class Account implements WithBalance {
   public currentBalance: number;
   public balanceIndex: number;
   public visible: boolean;
+  bankAccount: BankAccount | null;
   public domain: Domain;
 
   constructor(data?: Partial<Account>) {
@@ -21,6 +23,7 @@ export class Account implements WithBalance {
     this.currentBalance = data.currentBalance || 0;
     this.balanceIndex = data.balanceIndex || 0;
     this.visible = data.visible || false;
+    this.bankAccount = data.bankAccount ? new BankAccount(data.bankAccount) : null;
     this.domain = new Domain(data.domain);
   }
 

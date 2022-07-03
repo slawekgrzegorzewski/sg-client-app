@@ -7,8 +7,12 @@
           <div *ngIf="!isEditAccount && !showAccountDeletionConfirmation">
             <app-domain-accounts [domain]="currentDomainName"
                                  [accounts]="accountsInCurrentDomain"
-                                 [buttons]="buttons"
-                                 [adminMode]="true">
+                                 [bankAccountsAvailableToAssign]="bankAccountsAvailableToAssign"
+                                 [adminMode]="true"
+                                 (deleteAccountEvent)="deleteAccount($event)"
+                                 (renameAccountEvent)="rename($event)"
+                                 (changeAccountVisibilityEvent)="changeAccountVisibility($event)"
+                                 (bankAccountAssignedEvent)="assignBankAccountToAnAccount($event)">
             </app-domain-accounts>
 
             <button type="button" class="btn btn-primary" (click)="fetchData()">Odśwież</button>
@@ -124,6 +128,12 @@
             ></app-domains>
           </div>
         </div>
+      </ng-template>
+    </li>
+    <li ngbNavItem #bankAccess="ngbNavItem">
+      <a ngbNavLink>Banki</a>
+      <ng-template ngbNavContent>
+        <nodrigen></nodrigen>
       </ng-template>
     </li>
   </ul>

@@ -2,6 +2,7 @@ import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} f
 import {Account} from '../../../model/accountant/account';
 import {Button} from '../../general/hoverable-buttons.component';
 import {ComparatorBuilder} from '../../../utils/comparator-builder';
+import {BankAccount} from '../../../model/banks/bank-account';
 
 @Component({
   selector: 'app-domain-accounts',
@@ -13,10 +14,27 @@ export class DomainAccountsComponent implements OnInit {
   @Input() domain: string | null = null;
   @Input() buttons: Button<Account>[] = [];
   @Input() adminMode = false;
+  @Input() bankAccountsAvailableToAssign: BankAccount[] = [];
   @Output() selectionChanged = new EventEmitter<Account | null>();
+
+  @Output() deleteAccountEvent = new EventEmitter<Account>();
+  @Output() renameAccountEvent = new EventEmitter<Account>();
+  @Output() changeAccountVisibilityEvent = new EventEmitter<Account>();
+  @Output() bankAccountAssignedEvent = new EventEmitter<[Account, BankAccount]>();
 
   private internalAccounts: Account[] = [];
   selectedAccount: Account | null = null;
+  private _selectedBankAccount: BankAccount | null = null;
+  get selectedBankAccount(): BankAccount | null {
+    return this._selectedBankAccount;
+  }
+
+  set selectedBankAccount(value: BankAccount | null) {
+    this._selectedBankAccount = value;
+    if(this.selectedAccount !== null && this.selectedAccount.bankAccount === null && this.selectedBankAccount !== null){
+      this.bankAccountAssignedEvent.emit([this.selectedAccount, this.selectedBankAccount]);
+    }
+  }
 
   @Input() set accounts(value: Account[]) {
     this.internalAccounts = (value || []).sort(
@@ -31,12 +49,6 @@ export class DomainAccountsComponent implements OnInit {
   }
 
   totalBalancesPerCurrency: Map<string, number> = new Map<string, number>();
-
-  @ViewChild('utilBox') utilBox: ElementRef | null = null;
-  overElement: Account | null = null;
-  utilBoxTop: number = 0;
-  utilBoxLeft: number = 0;
-  utilBoxVisibility = 'hidden';
 
   constructor() {
   }
@@ -69,27 +81,8 @@ export class DomainAccountsComponent implements OnInit {
     this.selectionChanged.emit(this.selectedAccount);
   }
 
-  setOverAccount(selectionInfo?: { account: Account, row: HTMLTableRowElement }): void {
-    if (!selectionInfo) {
-      this.overElement = null;
-      this.utilBoxVisibility = 'hidden';
-    } else {
-      this.overElement = selectionInfo.account;
-      const adjustment = (selectionInfo.row.offsetHeight - this.utilBox?.nativeElement.offsetHeight) / 2;
-      this.utilBoxTop = selectionInfo.row.getBoundingClientRect().top + adjustment;
-      this.utilBoxLeft = selectionInfo.row.getBoundingClientRect().left + selectionInfo.row.clientWidth;
-      this.utilBoxVisibility = 'visible';
-    }
-  }
-
   select(account: Account): void {
     this.selectedAccount = account;
     this.selectionChanged.emit(account);
-  }
-
-  buttonClicked(): Account {
-    const acc = this.overElement!;
-    this.setOverAccount();
-    return acc;
   }
 }

@@ -89,7 +89,7 @@ export class DomainService {
               this.onCurrentDomainChange.emit(this.currentDomain);
             }
           } else {
-            this.router.navigate([this.router.url, this.currentDomainId]);
+            this.router.navigate([this.router.url, this.currentDomainId], {queryParamsHandling: 'preserve'});
           }
         }
       });

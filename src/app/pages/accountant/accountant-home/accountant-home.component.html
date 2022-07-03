@@ -49,7 +49,9 @@
     style="height: 100%">
   </app-create-billing-element>
   <app-domain-accounts *ngIf="mobileEditMode==='display'"
-                       [accounts]="accounts"></app-domain-accounts>
+                       [accounts]="accounts">
+
+  </app-domain-accounts>
   <ng-container *ngIf="mobileEditMode==='display'">
     <ng-container *ngTemplateOutlet="stats"></ng-container>
   </ng-container>
