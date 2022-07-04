@@ -8,7 +8,9 @@
     <app-transactions-list [allAccounts]="accounts"
                            [account]="selectedAccount"
                            [transactions]="transactionsOfSelectedAccount"
+                           [transactionsToImport]="transactionsOfSelectedAccountToImport"
                            (transactionAction)="refreshData()"
+                           (matchTransactions)="matchTransactions($event[0], $event[1], $event[2])"
                            style="flex-grow: 1; margin-left: 50px">
     </app-transactions-list>
   </div>

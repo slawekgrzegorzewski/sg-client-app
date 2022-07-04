@@ -16,33 +16,68 @@
     </div>
   </div>
 
-  <table>
-    <ng-container *ngFor="let transaction of displayingTransactions">
-      <tr #row
-          (click)="selectTransaction(transaction)"
-          [class.sg-row-selected]="selectedTransaction && transaction.id === selectedTransaction.id"
-          class="sg-row-hoverable">
-        <td>{{transaction.timeOfTransaction | localizedDate:'y-MM-dd'}}</td>
-        <td *ngIf="transaction.source.id === account.id" class="money-cell">
-          -{{transaction.debit | currency: transaction.source.currency}}
-        </td>
-        <td *ngIf="transaction.destination.id === account.id" class="money-cell">
-          {{transaction.credit | currency: transaction.destination.currency}}
-        </td>
-        <td [innerHTML]="transaction.description | htmlNewLine" class="description-cell"></td>
-      </tr>
-      <tr *ngIf="showActionRow(transaction)">
-        <td class="action-cell" colspan="3">
-          <button (click)="openPredefinedTransferCreationDialog(selectedTransaction!)" class="btn btn-link btn-small">
-            Przekaż te pieniądze na inne konto
-          </button>
-        </td>
-      </tr>
-    </ng-container>
-  </table>
-  <button (click)="openIncomeCreationDialog()" class="btn btn-outline-primary">Uznanie</button>
-  <button (click)="openExpenseCreationDialog()" class="btn btn-outline-primary">Obciążenie</button>
-  <button (click)="openTransferCreationDialog()" class="btn btn-outline-primary">Transfer wewnętrzny</button>
+  <div class="sg-flex-row">
+    <div>
+      <table>
+        <ng-container *ngFor="let transaction of displayingTransactions">
+          <tr #row
+              (click)="selectTransaction(transaction)"
+              [class.sg-row-selected]="selectedTransaction && transaction.id === selectedTransaction.id"
+              class="sg-row-hoverable">
+            <td>{{transaction.timeOfTransaction | localizedDate:'y-MM-dd'}}</td>
+            <td *ngIf="transaction.source.id === account.id" class="money-cell">
+              -{{transaction.debit | currency: transaction.source.currency}}
+            </td>
+            <td *ngIf="transaction.destination.id === account.id" class="money-cell">
+              {{transaction.credit | currency: transaction.destination.currency}}
+            </td>
+            <td [innerHTML]="transaction.description | htmlNewLine" class="description-cell"></td>
+          </tr>
+          <tr *ngIf="showActionRow(transaction)">
+            <td class="action-cell" colspan="3">
+              <button (click)="openPredefinedTransferCreationDialog(selectedTransaction!)"
+                      class="btn btn-link btn-small">
+                Przekaż te pieniądze na inne konto
+              </button>
+            </td>
+          </tr>
+        </ng-container>
+      </table>
+      <button (click)="openIncomeCreationDialog()" class="btn btn-outline-primary">Uznanie</button>
+      <button (click)="openExpenseCreationDialog()" class="btn btn-outline-primary">Obciążenie</button>
+      <button (click)="openTransferCreationDialog()" class="btn btn-outline-primary">Transfer wewnętrzny</button>
+    </div>
+    <div>
+      <button *ngIf="selectedTransaction && selectedTransactionToImport && selectedTransactionToImport.credit > 0 && selectedTransactionToImport.debit == 0
+                      && selectedTransaction.credit > 0 && selectedTransaction.debit == 0"
+              (click)="matchAsCredit()" class="btn btn-outline-primary">Uznanie
+      </button>
+      <button *ngIf="selectedTransaction && selectedTransactionToImport && selectedTransactionToImport.debit > 0 && selectedTransactionToImport.credit == 0
+                      && selectedTransaction.debit > 0 && selectedTransaction.credit == 0"
+              (click)="matchAsDebit()" class="btn btn-outline-primary">Obciążenie
+      </button>
+      <button *ngIf="selectedTransaction && selectedTransactionToImport && selectedTransactionToImport.debit > 0 && selectedTransactionToImport.credit > 0" (click)="matchInternalTransfer()"
+              class="btn btn-outline-primary">Transfer wewnętrzny
+      </button>
+      <table>
+        <ng-container *ngFor="let transactionToImport of displayingTransactionsToImport">
+          <tr #row
+              (click)="selectTransactionToImport(transactionToImport)"
+              [class.sg-row-selected]="selectedTransactionToImport && transactionToImport.id === selectedTransactionToImport.id"
+              class="sg-row-hoverable">
+            <td>{{transactionToImport.timeOfTransaction | localizedDate:'y-MM-dd'}}</td>
+            <td *ngIf="transactionToImport.sourceId === account.id" class="money-cell">
+              -{{transactionToImport.debit | currency: account.currency}}
+            </td>
+            <td *ngIf="transactionToImport.destinationId === account.id" class="money-cell">
+              {{transactionToImport.credit | currency: account.currency}}
+            </td>
+            <td [innerHTML]="transactionToImport.description | htmlNewLine" class="description-cell"></td>
+          </tr>
+        </ng-container>
+      </table>
+    </div>
+  </div>
 </div>
 
 <div *ngIf="account && transferCreationMode">

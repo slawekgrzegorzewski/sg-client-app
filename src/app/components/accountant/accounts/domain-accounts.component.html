@@ -25,7 +25,7 @@
             <input type="checkbox" [ngModel]="account.visible" disabled>
           </td>
           <td style="text-align: right">{{account.currentBalance | currency: account.currency :undefined:'1.2-2' }}</td>
-          <td style="text-align: right"><span
+          <td *ngIf="adminMode" style="text-align: right"><span
             *ngIf="account.bankAccount">{{account.bankAccount.iban}} {{account.bankAccount.bic}}</span></td>
         </tr>
         <ng-container *ngIf="account === selectedAccount && adminMode">

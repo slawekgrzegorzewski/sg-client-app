@@ -3,9 +3,9 @@ import {environment} from '../../../environments/environment';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {Account} from '../../model/accountant/account';
 import {NodrigenInstitution} from '../../model/banks/nodrigen/nodrigen-institution';
 import {NodrigenPermission} from '../../model/banks/nodrigen/nodrigen-permission';
+import {MatchingMode, NodrigenTransactionToImport} from '../../model/banks/nodrigen/nodrigen-transaction-to-import';
 
 @Injectable({
   providedIn: 'root'
@@ -46,5 +46,17 @@ export class NodrigenService {
 
   confirmPermission(reference: string): Observable<string> {
     return this.http.put(`${this.endpoint}/permissions`, reference, {responseType: 'text'});
+  }
+
+  getNodrigenTransactionsToImport(): Observable<NodrigenTransactionToImport[]> {
+    return this.http.get<NodrigenTransactionToImport[]>(`${this.endpoint}/nodrigen_transaction_to_import`)
+      .pipe(map((data: NodrigenTransactionToImport[]) => data.map(d => new NodrigenTransactionToImport(d))));
+  }
+
+  matchNodrigenTransactionsToImport(nodrigenTransaction: number, financialTransaction: number, matchingMode: MatchingMode): Observable<NodrigenTransactionToImport[]> {
+    return this.http.put<NodrigenTransactionToImport[]>(
+      `${this.endpoint}/nodrigen_transaction_to_import/${nodrigenTransaction}/${financialTransaction}/${matchingMode}`,
+      null)
+      .pipe(map((data: NodrigenTransactionToImport[]) => data.map(d => new NodrigenTransactionToImport(d))));
   }
 }

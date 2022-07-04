@@ -3,6 +3,7 @@ import {TransactionType} from '../../../model/accountant/transaction-type';
 import {Account} from '../../../model/accountant/account';
 import {Transaction} from '../../../model/accountant/transaction';
 import {ComparatorBuilder} from '../../../utils/comparator-builder';
+import {MatchingMode, NodrigenTransactionToImport} from '../../../model/banks/nodrigen/nodrigen-transaction-to-import';
 
 @Component({
   selector: 'app-transactions-list',
@@ -19,11 +20,15 @@ export class TransactionsListComponent {
   creatingTransactionAmount: number = 0;
   creatingTransactionFieldDescription: string = '';
   selectedTransaction: Transaction | null = null;
+  selectedTransactionToImport: NodrigenTransactionToImport | null = null;
   transactionsInternal: Transaction[] = [];
+  transactionsToImportInternal: NodrigenTransactionToImport[] = [];
   displayingTransactions: Transaction[] = [];
+  displayingTransactionsToImport: NodrigenTransactionToImport[] = [];
   internalAllAccounts: Account[] = [];
   accountsToSelect: Account[] = [];
   @Output() transactionAction = new EventEmitter<any>();
+  @Output() matchTransactions = new EventEmitter<[number, number, MatchingMode]>();
   private internalAccount: Account | null = null;
 
   constructor() {
@@ -44,6 +49,15 @@ export class TransactionsListComponent {
 
   @Input() set transactions(value: Transaction[]) {
     this.transactionsInternal = value.sort(ComparatorBuilder.comparingByDateDays<Transaction>(t => t.timeOfTransaction).build());
+    this.filterDisplayingTransactions();
+  }
+
+  get transactionsToImport(): NodrigenTransactionToImport[] {
+    return this.transactionsToImportInternal;
+  }
+
+  @Input() set transactionsToImport(value: NodrigenTransactionToImport[]) {
+    this.transactionsToImportInternal = value.sort(ComparatorBuilder.comparingByDateDays<NodrigenTransactionToImport>(t => t.timeOfTransaction).build());
     this.filterDisplayingTransactions();
   }
 
@@ -124,13 +138,15 @@ export class TransactionsListComponent {
   private filterDisplayingTransactions(): void {
     this.displayingTransactions = this.transactions
       .filter(t => TransactionsListComponent.isForTheSameMonth(t.timeOfTransaction, this.displayingMonth));
+    this.displayingTransactionsToImport = this.transactionsToImport
+      .filter(t => TransactionsListComponent.isForTheSameMonth(t.timeOfTransaction, this.displayingMonth));
 
     this.prevMonthToDisplay = new Date(this.displayingMonth.getTime());
     this.prevMonthToDisplay = new Date(this.prevMonthToDisplay.setMonth(this.prevMonthToDisplay.getMonth() - 1));
     this.nextMonthToDisplay = new Date(this.displayingMonth.getTime());
     this.nextMonthToDisplay = new Date(this.nextMonthToDisplay.setMonth(this.nextMonthToDisplay.getMonth() + 1));
 
-    if (this.transactions.length == 0) {
+    if (this.transactions.length == 0 && this.transactionsToImport.length == 0) {
       this.prevMonthToDisplay = null;
       this.nextMonthToDisplay = null;
     } else if (TransactionsListComponent.isForTheSameMonth(this.transactions[0].timeOfTransaction, this.displayingMonth)) {
@@ -139,7 +155,6 @@ export class TransactionsListComponent {
     if (TransactionsListComponent.isForTheSameMonth(new Date(), this.displayingMonth)) {
       this.nextMonthToDisplay = null;
     }
-
   }
 
   private static isForTheSameMonth(timeOfTransaction: Date, displayingMonth: Date) {
@@ -160,5 +175,28 @@ export class TransactionsListComponent {
     } else {
       this.selectedTransaction = transaction;
     }
+  }
+
+  selectTransactionToImport(transactionToImport: NodrigenTransactionToImport): void {
+    if (this.selectedTransactionToImport && this.selectedTransactionToImport.id === transactionToImport.id) {
+      this.selectedTransactionToImport = null;
+    } else {
+      this.selectedTransactionToImport = transactionToImport;
+    }
+  }
+
+  matchAsCredit() {
+    this.matchTransactions.emit([this.selectedTransactionToImport!.creditNodrigenTransactionId, this.selectedTransaction!.id, MatchingMode.CREDIT]);
+    this.selectTransactionToImport(this.selectedTransactionToImport!);
+  }
+
+  matchAsDebit() {
+    this.matchTransactions.emit([this.selectedTransactionToImport!.debitNodrigenTransactionId, this.selectedTransaction!.id, MatchingMode.DEBIT]);
+    this.selectTransactionToImport(this.selectedTransactionToImport!);
+  }
+
+  matchInternalTransfer() {
+    this.matchTransactions.emit([this.selectedTransactionToImport!.debitNodrigenTransactionId, this.selectedTransaction!.id, MatchingMode.BOTH]);
+    this.selectTransactionToImport(this.selectedTransactionToImport!);
   }
 }
