@@ -27,6 +27,8 @@ const routes: Routes = [
 
   {path: 'change-password/:type', component: RegisterComponent, canActivate: [UserLoggedInGuard]},
 
+  {path: '', redirectTo: `/`, pathMatch: 'full'},
+
   {path: SETTINGS_ROUTER_URL, redirectTo: `/${SETTINGS_ROUTER_URL}/`, pathMatch: 'full'},
   {path: `${SETTINGS_ROUTER_URL}/:domainId`, component: SettingsComponent, canActivate: [UserLoggedInGuard]},
 

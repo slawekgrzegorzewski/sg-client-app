@@ -4,6 +4,7 @@ import {Account} from '../../../model/accountant/account';
 import {Transaction} from '../../../model/accountant/transaction';
 import {ComparatorBuilder} from '../../../utils/comparator-builder';
 import {MatchingMode, NodrigenTransactionToImport} from '../../../model/banks/nodrigen/nodrigen-transaction-to-import';
+import {DatesUtils} from '../../../utils/dates-utils';
 
 @Component({
   selector: 'app-transactions-list',
@@ -30,6 +31,8 @@ export class TransactionsListComponent {
   @Output() transactionAction = new EventEmitter<any>();
   @Output() matchTransactions = new EventEmitter<[number, number, MatchingMode]>();
   private internalAccount: Account | null = null;
+  matchingCandidates: Transaction[] = [];
+  selectedMatchingCandidate: Transaction | null = null;
 
   constructor() {
   }
@@ -169,11 +172,21 @@ export class TransactionsListComponent {
       && this.selectedTransaction.destination.id === this.account.id;
   }
 
-  selectTransaction(transaction: Transaction): void {
-    if (this.selectedTransaction && this.selectedTransaction.id === transaction.id) {
+  selectTransaction(transaction: Transaction | undefined): void {
+    if (!transaction) {
+      this.selectedTransaction = null;
+    } else if (this.selectedTransaction && this.selectedTransaction.id === transaction.id) {
       this.selectedTransaction = null;
     } else {
       this.selectedTransaction = transaction;
+    }
+  }
+
+  selectMatchingCandidate(transaction: Transaction): void {
+    if (this.selectedMatchingCandidate && this.selectedMatchingCandidate.id === transaction.id) {
+      this.selectedMatchingCandidate = null;
+    } else {
+      this.selectedMatchingCandidate = transaction;
     }
   }
 
@@ -182,21 +195,43 @@ export class TransactionsListComponent {
       this.selectedTransactionToImport = null;
     } else {
       this.selectedTransactionToImport = transactionToImport;
+
+      this.matchingCandidates = this.displayingTransactions
+        .filter(transaction => DatesUtils.compareDatesOnly(transaction.timeOfTransaction, transactionToImport.timeOfTransaction) == 0)
+        .filter(transaction => {
+          if (transactionToImport.credit == 0 && transaction.credit === 0) {
+            return transactionToImport.debit === transaction.debit;
+          }
+          if (transactionToImport.debit == 0 && transaction.debit === 0) {
+            return transactionToImport.credit === transaction.credit;
+          }
+          return false;
+        });
+      if (this.matchingCandidates.length > 0) {
+        this.selectMatchingCandidate(this.matchingCandidates[0]);
+      }
+
     }
   }
 
   matchAsCredit() {
-    this.matchTransactions.emit([this.selectedTransactionToImport!.creditNodrigenTransactionId, this.selectedTransaction!.id, MatchingMode.CREDIT]);
+    this.matchTransactions.emit([this.selectedTransactionToImport!.creditNodrigenTransactionId, this.selectedMatchingCandidate!.id, MatchingMode.CREDIT]);
     this.selectTransactionToImport(this.selectedTransactionToImport!);
+    this.selectMatchingCandidate(this.selectedMatchingCandidate!);
+    this.matchingCandidates = [];
   }
 
   matchAsDebit() {
-    this.matchTransactions.emit([this.selectedTransactionToImport!.debitNodrigenTransactionId, this.selectedTransaction!.id, MatchingMode.DEBIT]);
+    this.matchTransactions.emit([this.selectedTransactionToImport!.debitNodrigenTransactionId, this.selectedMatchingCandidate!.id, MatchingMode.DEBIT]);
     this.selectTransactionToImport(this.selectedTransactionToImport!);
+    this.selectMatchingCandidate(this.selectedMatchingCandidate!);
+    this.matchingCandidates = [];
   }
 
   matchInternalTransfer() {
-    this.matchTransactions.emit([this.selectedTransactionToImport!.debitNodrigenTransactionId, this.selectedTransaction!.id, MatchingMode.BOTH]);
+    this.matchTransactions.emit([this.selectedTransactionToImport!.debitNodrigenTransactionId, this.selectedMatchingCandidate!.id, MatchingMode.BOTH]);
     this.selectTransactionToImport(this.selectedTransactionToImport!);
+    this.selectMatchingCandidate(this.selectedMatchingCandidate!);
+    this.matchingCandidates = [];
   }
 }

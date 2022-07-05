@@ -1,5 +1,56 @@
-<div *ngIf="account && !transferCreationMode">
+<div *ngIf="selectedTransactionToImport && matchingCandidates.length > 0">
 
+  <div class="sg-flex-row" *ngIf="account">
+    <div>
+      <div *ngFor="let matchingCandidate of matchingCandidates" style="margin-right: 30px"
+           (click)="selectMatchingCandidate(matchingCandidate)"
+           [class.sg-row-selected]="selectedMatchingCandidate && matchingCandidate.id === selectedMatchingCandidate.id"
+           class="sg-row-hoverable">
+        <td>{{matchingCandidate.timeOfTransaction | localizedDate:'y-MM-dd'}}</td>
+        <td *ngIf="matchingCandidate.source.id === account.id" class="money-cell">
+          -{{matchingCandidate.debit | currency: matchingCandidate.source.currency}}
+        </td>
+        <td *ngIf="matchingCandidate.destination.id === account.id" class="money-cell">
+          {{matchingCandidate.credit | currency: matchingCandidate.destination.currency}}
+        </td>
+        <td [innerHTML]="matchingCandidate.description | htmlNewLine" class="description-cell"></td>
+      </div>
+    </div>
+    <div>
+      <div class="sg-row-hoverable sg-row-selected">
+        <td>{{selectedTransactionToImport.timeOfTransaction | localizedDate:'y-MM-dd'}}</td>
+        <td *ngIf="selectedTransactionToImport.sourceId === account.id" class="money-cell">
+          -{{selectedTransactionToImport.debit | currency: account.currency}}
+        </td>
+        <td *ngIf="selectedTransactionToImport.destinationId === account.id" class="money-cell">
+          {{selectedTransactionToImport.credit | currency: account.currency}}
+        </td>
+        <td [innerHTML]="selectedTransactionToImport.description | htmlNewLine" class="description-cell"></td>
+      </div>
+    </div>
+  </div>
+
+  <button *ngIf="selectedMatchingCandidate && selectedTransactionToImport && selectedTransactionToImport.credit > 0 && selectedTransactionToImport.debit == 0
+                      && selectedMatchingCandidate.credit > 0 && selectedMatchingCandidate.debit == 0"
+          (click)="matchAsCredit()" class="btn btn-outline-primary">Uznanie
+  </button>
+  <button *ngIf="selectedMatchingCandidate && selectedTransactionToImport && selectedTransactionToImport.debit > 0 && selectedTransactionToImport.credit == 0
+                      && selectedMatchingCandidate.debit > 0 && selectedMatchingCandidate.credit == 0"
+          (click)="matchAsDebit()" class="btn btn-outline-primary">Obciążenie
+  </button>
+  <button
+    *ngIf="selectedMatchingCandidate && selectedTransactionToImport && selectedTransactionToImport.debit > 0 && selectedTransactionToImport.credit > 0"
+    (click)="matchInternalTransfer()"
+    class="btn btn-outline-primary">Transfer wewnętrzny
+  </button>
+  <button
+    (click)="matchingCandidates = []"
+    class="btn btn-outline-primary">Anuluj
+  </button>
+</div>
+
+
+<div *ngIf="account && !transferCreationMode && !(selectedTransactionToImport && matchingCandidates.length > 0)">
   <div class="month-navigation sg-flex-row sg-flex-justify-space-between">
     <div class="sg-flex-auto">
       <button *ngIf="prevMonthToDisplay" (click)="goBackInHistory()" class="btn btn-link btn-small">
@@ -48,17 +99,6 @@
       <button (click)="openTransferCreationDialog()" class="btn btn-outline-primary">Transfer wewnętrzny</button>
     </div>
     <div>
-      <button *ngIf="selectedTransaction && selectedTransactionToImport && selectedTransactionToImport.credit > 0 && selectedTransactionToImport.debit == 0
-                      && selectedTransaction.credit > 0 && selectedTransaction.debit == 0"
-              (click)="matchAsCredit()" class="btn btn-outline-primary">Uznanie
-      </button>
-      <button *ngIf="selectedTransaction && selectedTransactionToImport && selectedTransactionToImport.debit > 0 && selectedTransactionToImport.credit == 0
-                      && selectedTransaction.debit > 0 && selectedTransaction.credit == 0"
-              (click)="matchAsDebit()" class="btn btn-outline-primary">Obciążenie
-      </button>
-      <button *ngIf="selectedTransaction && selectedTransactionToImport && selectedTransactionToImport.debit > 0 && selectedTransactionToImport.credit > 0" (click)="matchInternalTransfer()"
-              class="btn btn-outline-primary">Transfer wewnętrzny
-      </button>
       <table>
         <ng-container *ngFor="let transactionToImport of displayingTransactionsToImport">
           <tr #row

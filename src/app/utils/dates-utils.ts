@@ -58,4 +58,8 @@ export class DatesUtils {
     newDate.setUTCHours(0, 0, 0, 0);
     return newDate;
   }
+
+  public static compareDatesOnly(date: Date, other: Date): number {
+    return ComparatorBuilder.comparingByDateDays<Date>(d => d).build()(date, other);
+  }
 }
