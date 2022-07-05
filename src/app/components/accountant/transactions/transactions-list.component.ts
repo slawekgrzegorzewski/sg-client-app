@@ -150,10 +150,16 @@ export class TransactionsListComponent {
     this.nextMonthToDisplay = new Date(this.displayingMonth.getTime());
     this.nextMonthToDisplay = new Date(this.nextMonthToDisplay.setMonth(this.nextMonthToDisplay.getMonth() + 1));
 
+
+    function isFirstTransactionOnTheListForTheMonth(transactions: (Transaction | NodrigenTransactionToImport)[], month: Date) {
+      return transactions.length > 0 && TransactionsListComponent.isForTheSameMonth(transactions[0].timeOfTransaction, month);
+    }
+
     if (this.transactions.length == 0 && this.transactionsToImport.length == 0) {
       this.prevMonthToDisplay = null;
       this.nextMonthToDisplay = null;
-    } else if (TransactionsListComponent.isForTheSameMonth(this.transactions[0].timeOfTransaction, this.displayingMonth)) {
+    } else if (isFirstTransactionOnTheListForTheMonth(this.transactions, this.displayingMonth)
+      && isFirstTransactionOnTheListForTheMonth(this.transactionsToImport, this.displayingMonth)) {
       this.prevMonthToDisplay = null;
     }
     if (TransactionsListComponent.isForTheSameMonth(new Date(), this.displayingMonth)) {
