@@ -1,3 +1,5 @@
+import {DatePipe} from '@angular/common';
+
 export type TBasicComparable = string | number | boolean | undefined | null;
 
 export type TKeyExtractor<T> = (t: T) => TBasicComparable;
@@ -91,19 +93,31 @@ export class ComparatorBuilder<T> {
   }
 
   public static comparingByDateDays<T>(keyExtractor: TKeyDateExtractor<T>): ComparatorBuilder<T> {
-    return new ComparatorBuilder<T>(ComparatorBuilder.convertToNumberExtractorByDays(keyExtractor));
+    return new ComparatorBuilder<T>(ComparatorBuilder.convertToStringExtractorByDays(keyExtractor));
+  }
+
+  public static comparingByYearMonth<T>(keyExtractor: TKeyDateExtractor<T>): ComparatorBuilder<T> {
+    return new ComparatorBuilder<T>(ComparatorBuilder.convertToStringExtractorByYearMonth(keyExtractor));
   }
 
   public static comparingByDate<T>(keyExtractor: TKeyDateExtractor<T>): ComparatorBuilder<T> {
     return new ComparatorBuilder<T>(ComparatorBuilder.convertToNumberExtractor(keyExtractor));
   }
 
-  private static convertToNumberExtractorByDays<T>(keyExtractor: TKeyDateExtractor<T>): TKeyExtractor<T> {
-    return t => {
+  private static convertToStringExtractorByYearMonth<T>(keyExtractor: TKeyDateExtractor<T>): TKeyExtractor<T> {
+    return this.dateToStringConverter(keyExtractor, 'yyyy-MM');
+  }
+
+  private static convertToStringExtractorByDays<T>(keyExtractor: TKeyDateExtractor<T>): TKeyExtractor<T> {
+    return this.dateToStringConverter(keyExtractor, 'yyyy-MM-dd');
+  }
+
+  private static dateToStringConverter<T>(keyExtractor: TKeyDateExtractor<T>, format: string) {
+    return (t: T) => {
       if (t) {
         const date = keyExtractor(t);
         if (date) {
-          return Math.floor(date.getTime() / 1000 / 3600 / 24);
+          return new DatePipe('pl-PL').transform(date, format);
         }
       }
       return null;
@@ -128,14 +142,14 @@ export class ComparatorBuilder<T> {
   public inverse = (): ComparatorBuilder<T> => {
     this.inverseFlag = true;
     return this;
-  }
+  };
 
   public desc = (): ComparatorBuilder<T> => {
     if (this.lastExtractor) {
       this.lastExtractor.order = Order.DESC;
     }
     return this;
-  }
+  };
 
   /**
    * See {@link NullMode}. </br>
@@ -146,22 +160,22 @@ export class ComparatorBuilder<T> {
   public definingNullAs = (nullMode: NullMode): ComparatorBuilder<T> => {
     this.nullMode = nullMode;
     return this;
-  }
+  };
 
   public thenComparing = (nextExtractor: TKeyExtractor<T>): ComparatorBuilder<T> => {
     const keyExtractor = new KeyExtractor<T>(nextExtractor);
     this.extractors.push(keyExtractor);
     this.lastExtractor = keyExtractor;
     return this;
-  }
+  };
 
   public thenComparingByDateDays = (nextExtractor: TKeyDateExtractor<T>): ComparatorBuilder<T> => {
-    return this.thenComparing(ComparatorBuilder.convertToNumberExtractorByDays(nextExtractor));
-  }
+    return this.thenComparing(ComparatorBuilder.convertToStringExtractorByDays(nextExtractor));
+  };
 
   public thenComparingByDate = (nextExtractor: TKeyDateExtractor<T>): ComparatorBuilder<T> => {
     return this.thenComparing(ComparatorBuilder.convertToNumberExtractor(nextExtractor));
-  }
+  };
 
   public build(): CompareFunction<T> {
     if (this.extractors.length === 0) {
@@ -205,5 +219,5 @@ export class ComparatorBuilder<T> {
       res = this.compare(t1, t2, extractors, depth + 1);
     }
     return res;
-  }
+  };
 }

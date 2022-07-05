@@ -5,6 +5,7 @@ import {Transaction} from '../../../model/accountant/transaction';
 import {ComparatorBuilder} from '../../../utils/comparator-builder';
 import {MatchingMode, NodrigenTransactionToImport} from '../../../model/banks/nodrigen/nodrigen-transaction-to-import';
 import {DatesUtils} from '../../../utils/dates-utils';
+import {DatePipe} from '@angular/common';
 
 @Component({
   selector: 'app-transactions-list',
@@ -160,9 +161,8 @@ export class TransactionsListComponent {
     }
   }
 
-  private static isForTheSameMonth(timeOfTransaction: Date, displayingMonth: Date) {
-    return timeOfTransaction.getFullYear() === displayingMonth.getFullYear()
-      && timeOfTransaction.getMonth() === displayingMonth.getMonth();
+  private static isForTheSameMonth(date: Date, other: Date) {
+    return ComparatorBuilder.comparingByYearMonth<Date>(d => d).build()(date, other) == 0;
   }
 
   showActionRow(transaction: Transaction): boolean {
@@ -196,17 +196,20 @@ export class TransactionsListComponent {
     } else {
       this.selectedTransactionToImport = transactionToImport;
 
-      this.matchingCandidates = this.displayingTransactions
-        .filter(transaction => DatesUtils.compareDatesOnly(transaction.timeOfTransaction, transactionToImport.timeOfTransaction) == 0)
-        .filter(transaction => {
-          if (transactionToImport.credit == 0 && transaction.credit === 0) {
-            return transactionToImport.debit === transaction.debit;
-          }
-          if (transactionToImport.debit == 0 && transaction.debit === 0) {
-            return transactionToImport.credit === transaction.credit;
-          }
-          return false;
-        });
+      this.matchingCandidates =
+        this.displayingTransactions
+          .filter(transaction => {
+            return DatesUtils.compareDatesOnly(transaction.timeOfTransaction, transactionToImport.timeOfTransaction) == 0;
+          })
+          .filter(transaction => {
+            if (transactionToImport.credit == 0 && transaction.credit === 0) {
+              return transactionToImport.debit === transaction.debit;
+            }
+            if (transactionToImport.debit == 0 && transaction.debit === 0) {
+              return transactionToImport.credit === transaction.credit;
+            }
+            return false;
+          });
       if (this.matchingCandidates.length > 0) {
         this.selectMatchingCandidate(this.matchingCandidates[0]);
       }
