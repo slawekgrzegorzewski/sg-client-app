@@ -59,4 +59,11 @@ export class NodrigenService {
       null)
       .pipe(map((data: NodrigenTransactionToImport[]) => data.map(d => new NodrigenTransactionToImport(d))));
   }
+
+  matchNodrigenTransactionsToImportWithInternal(nodrigenTransactions: [number, number], financialTransaction: number) {
+    return this.http.put<NodrigenTransactionToImport[]>(
+      `${this.endpoint}/nodrigen_transactions_to_import/${nodrigenTransactions[0]}/${nodrigenTransactions[1]}/${financialTransaction}`,
+      null)
+      .pipe(map((data: NodrigenTransactionToImport[]) => data.map(d => new NodrigenTransactionToImport(d))));
+  }
 }

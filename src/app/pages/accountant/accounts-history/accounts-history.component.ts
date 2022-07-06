@@ -26,23 +26,8 @@ export class AccountsHistoryComponent implements OnInit, OnDestroy {
   allTransactionsToImport: NodrigenTransactionToImport[] = [];
 
   transactionsOfSelectedAccount: Transaction[] = [];
-  transactionsOfSelectedAccountToImport: NodrigenTransactionToImport[] = [];
 
   domainSubscription: Subscription | null = null;
-
-  private static areAccountsEqual(a: Account | null, b: Account | null): boolean {
-    if (!a || !b) {
-      return false;
-    }
-    return a.id === b.id;
-  }
-
-  private static areAccountIdsEqual(a: number | null, b: number | null): boolean {
-    if (!a || !b) {
-      return false;
-    }
-    return a === b;
-  }
 
   constructor(private accountsService: AccountsService,
               private transactionsService: TransactionsService,
@@ -89,14 +74,12 @@ export class AccountsHistoryComponent implements OnInit, OnDestroy {
         this.allTransactionsToImport = nodrigenTransactionToImport;
 
         this.transactionsOfSelectedAccount = this.filterTransactionsForSelectedAccount();
-        this.transactionsOfSelectedAccountToImport = this.filterTransactionsToImportForSelectedAccount();
       },
       error => {
         this.toastService.showWarning('Could not obtain transactions information.');
         this.allTransactions = [];
         this.allTransactionsToImport = [];
         this.transactionsOfSelectedAccount = [];
-        this.transactionsOfSelectedAccountToImport = [];
       }
     );
   }
@@ -113,36 +96,23 @@ export class AccountsHistoryComponent implements OnInit, OnDestroy {
       .sort((a, b) => a.timeOfTransaction.getTime() - b.timeOfTransaction.getTime());
   }
 
-  private filterTransactionsToImportForSelectedAccount(): NodrigenTransactionToImport[] {
-    if (!this.selectedAccount) {
-      return [];
-    }
-    if (!this.allTransactionsToImport) {
-      return [];
-    }
-    return this.allTransactionsToImport
-      .filter(t => this.isTransactionRelatedToSelectedAccountId(t.sourceId, t.destinationId))
-      .sort((a, b) => a.timeOfTransaction.getTime() - b.timeOfTransaction.getTime());
-  }
-
   private isTransactionRelatedToSelectedAccount(source: any, destiantion: any): boolean {
-    return AccountsHistoryComponent.areAccountsEqual(source, this.selectedAccount)
-      || AccountsHistoryComponent.areAccountsEqual(destiantion, this.selectedAccount);
-  }
-
-  private isTransactionRelatedToSelectedAccountId(source: number, destiantion: number): boolean {
-    return AccountsHistoryComponent.areAccountIdsEqual(source, this.selectedAccount?.id || 0)
-      || AccountsHistoryComponent.areAccountIdsEqual(destiantion, this.selectedAccount?.id || 0);
+    return Account.areAccountsEqual(source, this.selectedAccount)
+      || Account.areAccountsEqual(destiantion, this.selectedAccount);
   }
 
   selectAccount(account: Account | null): void {
     this.selectedAccount = account;
     this.transactionsOfSelectedAccount = this.filterTransactionsForSelectedAccount();
-    this.transactionsOfSelectedAccountToImport = this.filterTransactionsToImportForSelectedAccount();
   }
 
   matchTransactions(nodrigenTransactionToImport: number, transaction: number, matchingMode: MatchingMode) {
     this.nodrigenService.matchNodrigenTransactionsToImport(nodrigenTransactionToImport, transaction, matchingMode)
+      .subscribe(value => this.fetchTransactions(), value => this.fetchTransactions());
+  }
+
+  matchInternalTransactions(nodrigenTransactionsToImport: [number, number], transaction: number) {
+    this.nodrigenService.matchNodrigenTransactionsToImportWithInternal(nodrigenTransactionsToImport, transaction)
       .subscribe(value => this.fetchTransactions(), value => this.fetchTransactions());
   }
 }

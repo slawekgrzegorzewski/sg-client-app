@@ -3,7 +3,7 @@ import {BankAccount} from '../bank-account';
 import {SimplePerformedServicePayment} from '../../accountant/simple-performed-service-payment';
 
 export enum MatchingMode {
-  CREDIT='CREDIT', DEBIT='DEBIT', BOTH='BOTH'
+  CREDIT = 'CREDIT', DEBIT = 'DEBIT', BOTH = 'BOTH'
 }
 
 export class NodrigenTransactionToImport {
@@ -38,5 +38,21 @@ export class NodrigenTransactionToImport {
     this.debitBankAccountId = data.debitBankAccountId || 0;
     this.creditNodrigenTransactionId = data.creditNodrigenTransactionId || 0;
     this.debitNodrigenTransactionId = data.debitNodrigenTransactionId || 0;
+  }
+
+  public isCredit(): boolean {
+    return this.credit > 0 && this.debit == 0;
+  }
+
+  public isDebit(): boolean {
+    return this.credit == 0 && this.debit > 0;
+  }
+
+  public isCreditOrDebitTransaction() {
+    return this.isDebit() !== this.isCredit();
+  }
+
+  public isInternalTransfer(): boolean {
+    return this.credit > 0 && this.debit > 0;
   }
 }

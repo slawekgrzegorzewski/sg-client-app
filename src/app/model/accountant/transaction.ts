@@ -28,4 +28,16 @@ export class Transaction {
     this.credit = data.credit || 0;
     this.timeOfTransaction = data.timeOfTransaction && new Date(data.timeOfTransaction) || new Date();
   }
+
+  public isCredit(): boolean {
+    return this.credit > 0 && this.debit == 0;
+  }
+
+  public isDebit(): boolean {
+    return this.credit == 0 && this.debit > 0;
+  }
+
+  public isInternalTransfer(): boolean {
+    return this.credit > 0 && this.debit > 0;
+  }
 }

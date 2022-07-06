@@ -1,52 +1,69 @@
 <div *ngIf="selectedTransactionToImport && matchingCandidates.length > 0">
 
-  <div class="sg-flex-row" *ngIf="account">
-    <div>
-      <div *ngFor="let matchingCandidate of matchingCandidates" style="margin-right: 30px"
-           (click)="selectMatchingCandidate(matchingCandidate)"
-           [class.sg-row-selected]="selectedMatchingCandidate && matchingCandidate.id === selectedMatchingCandidate.id"
-           class="sg-row-hoverable">
-        <td>{{matchingCandidate.timeOfTransaction | localizedDate:'y-MM-dd'}}</td>
-        <td *ngIf="matchingCandidate.source.id === account.id" class="money-cell">
-          -{{matchingCandidate.debit | currency: matchingCandidate.source.currency}}
-        </td>
-        <td *ngIf="matchingCandidate.destination.id === account.id" class="money-cell">
-          {{matchingCandidate.credit | currency: matchingCandidate.destination.currency}}
-        </td>
-        <td [innerHTML]="matchingCandidate.description | htmlNewLine" class="description-cell"></td>
+  <div class="sg-flex-column" *ngIf="account">
+    <div class="sg-flex-row">
+      <div>
+        <div *ngFor="let matchingCandidate of matchingCandidates" style="margin-right: 30px"
+             (click)="selectMatchingCandidate(matchingCandidate)"
+             [class.sg-row-selected]="selectedMatchingCandidate && matchingCandidate.id === selectedMatchingCandidate.id"
+             class="sg-row-hoverable">
+          <td>{{matchingCandidate.timeOfTransaction | localizedDate:'y-MM-dd'}}</td>
+          <td *ngIf="matchingCandidate.source.id === account.id" class="money-cell">
+            -{{matchingCandidate.debit | currency: matchingCandidate.source.currency}}
+          </td>
+          <td *ngIf="matchingCandidate.destination.id === account.id" class="money-cell">
+            {{matchingCandidate.credit | currency: matchingCandidate.destination.currency}}
+          </td>
+          <td [innerHTML]="matchingCandidate.description | htmlNewLine" class="description-cell"></td>
+        </div>
+      </div>
+      <div class="sg-flex-column">
+        <div class="sg-row-hoverable sg-row-selected">
+          <td>{{selectedTransactionToImport.timeOfTransaction | localizedDate:'y-MM-dd'}}</td>
+          <td *ngIf="selectedTransactionToImport.sourceId === account.id" class="money-cell">
+            -{{selectedTransactionToImport.debit | currency: account.currency}}
+          </td>
+          <td *ngIf="selectedTransactionToImport.destinationId === account.id" class="money-cell">
+            {{selectedTransactionToImport.credit | currency: account.currency}}
+          </td>
+          <td [innerHTML]="selectedTransactionToImport.description | htmlNewLine" class="description-cell"></td>
+        </div>
+        <div class="sg-flex-column" style="border: #343a40 dashed thin">
+          <div *ngFor="let candidate of matchingCandidatesForInternalTransfers"
+               (click)="selectMatchingCandidateForInternalTransfers(candidate)"
+               [class.sg-row-selected]="selectedMatchingCandidateForInternalTransfers && candidate.id === selectedMatchingCandidateForInternalTransfers.id"
+               class="sg-row-hoverable">
+            <td>{{candidate.timeOfTransaction | localizedDate:'y-MM-dd'}}</td>
+            <td *ngIf="selectedTransactionToImport.sourceId === account.id" class="money-cell">
+              {{candidate.credit | currency: account.currency}}
+            </td>
+            <td *ngIf="selectedTransactionToImport.destinationId === account.id" class="money-cell">
+              {{candidate.debit | currency: account.currency}}
+            </td>
+            <td [innerHTML]="candidate.description | htmlNewLine" class="description-cell"></td>
+          </div>
+        </div>
       </div>
     </div>
-    <div>
-      <div class="sg-row-hoverable sg-row-selected">
-        <td>{{selectedTransactionToImport.timeOfTransaction | localizedDate:'y-MM-dd'}}</td>
-        <td *ngIf="selectedTransactionToImport.sourceId === account.id" class="money-cell">
-          -{{selectedTransactionToImport.debit | currency: account.currency}}
-        </td>
-        <td *ngIf="selectedTransactionToImport.destinationId === account.id" class="money-cell">
-          {{selectedTransactionToImport.credit | currency: account.currency}}
-        </td>
-        <td [innerHTML]="selectedTransactionToImport.description | htmlNewLine" class="description-cell"></td>
-      </div>
+    <div class="sg-flex-justify-flex-end">
+      <button *ngIf="selectedMatchingCandidate && selectedTransactionToImport && selectedTransactionToImport.credit > 0 && selectedTransactionToImport.debit == 0
+                      && selectedMatchingCandidate.credit > 0 && selectedMatchingCandidate.debit == 0"
+              (click)="matchAsCredit()" class="btn btn-outline-primary">Uznanie
+      </button>
+      <button *ngIf="selectedMatchingCandidate && selectedTransactionToImport && selectedTransactionToImport.debit > 0 && selectedTransactionToImport.credit == 0
+                      && selectedMatchingCandidate.debit > 0 && selectedMatchingCandidate.credit == 0"
+              (click)="matchAsDebit()" class="btn btn-outline-primary">Obciążenie
+      </button>
+      <button *ngIf="internalTransferCanBePerformed()"
+              (click)="matchInternalTransfer()"
+              class="btn btn-outline-primary">Transfer wewnętrzny
+      </button>
+      <button
+        (click)="cancelMatching()"
+        class="btn btn-outline-primary">Anuluj
+      </button>
     </div>
   </div>
-
-  <button *ngIf="selectedMatchingCandidate && selectedTransactionToImport && selectedTransactionToImport.credit > 0 && selectedTransactionToImport.debit == 0
-                      && selectedMatchingCandidate.credit > 0 && selectedMatchingCandidate.debit == 0"
-          (click)="matchAsCredit()" class="btn btn-outline-primary">Uznanie
-  </button>
-  <button *ngIf="selectedMatchingCandidate && selectedTransactionToImport && selectedTransactionToImport.debit > 0 && selectedTransactionToImport.credit == 0
-                      && selectedMatchingCandidate.debit > 0 && selectedMatchingCandidate.credit == 0"
-          (click)="matchAsDebit()" class="btn btn-outline-primary">Obciążenie
-  </button>
-  <button
-    *ngIf="selectedMatchingCandidate && selectedTransactionToImport && selectedTransactionToImport.debit > 0 && selectedTransactionToImport.credit > 0"
-    (click)="matchInternalTransfer()"
-    class="btn btn-outline-primary">Transfer wewnętrzny
-  </button>
-  <button
-    (click)="matchingCandidates = []"
-    class="btn btn-outline-primary">Anuluj
-  </button>
 </div>
 
 

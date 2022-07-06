@@ -36,4 +36,18 @@ export class Account implements WithBalance {
       this.currency = (this.currency as Currency).code;
     }
   }
+
+  public static areAccountsEqual(a: Account | null, b: Account | null): boolean {
+    if (!a || !b) {
+      return false;
+    }
+    return this.areAccountIdsEqual(a.id, b.id);
+  }
+
+  public static areAccountIdsEqual(a: number | null, b: number | null): boolean {
+    if (!a || !b) {
+      return false;
+    }
+    return a === b;
+  }
 }
