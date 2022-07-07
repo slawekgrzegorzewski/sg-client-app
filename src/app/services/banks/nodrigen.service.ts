@@ -5,7 +5,7 @@ import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {NodrigenInstitution} from '../../model/banks/nodrigen/nodrigen-institution';
 import {NodrigenPermission} from '../../model/banks/nodrigen/nodrigen-permission';
-import {MatchingMode, NodrigenTransactionToImport} from '../../model/banks/nodrigen/nodrigen-transaction-to-import';
+import {MatchingMode, BankTransactionToImport} from '../../model/banks/nodrigen/bank-transaction-to-import';
 
 @Injectable({
   providedIn: 'root'
@@ -48,22 +48,23 @@ export class NodrigenService {
     return this.http.put(`${this.endpoint}/permissions`, reference, {responseType: 'text'});
   }
 
-  getNodrigenTransactionsToImport(): Observable<NodrigenTransactionToImport[]> {
-    return this.http.get<NodrigenTransactionToImport[]>(`${this.endpoint}/nodrigen_transaction_to_import`)
-      .pipe(map((data: NodrigenTransactionToImport[]) => data.map(d => new NodrigenTransactionToImport(d))));
+  getNodrigenTransactionsToImport(): Observable<BankTransactionToImport[]> {
+    return this.http.get<BankTransactionToImport[]>(`${this.endpoint}/nodrigen_transaction_to_import`)
+      .pipe(map((data: BankTransactionToImport[]) => data.map(d => new BankTransactionToImport(d))));
   }
 
-  matchNodrigenTransactionsToImport(nodrigenTransaction: number, financialTransaction: number, matchingMode: MatchingMode): Observable<NodrigenTransactionToImport[]> {
-    return this.http.put<NodrigenTransactionToImport[]>(
+  matchNodrigenTransactionsToImport(nodrigenTransaction: number, financialTransaction: number, matchingMode: MatchingMode): Observable<BankTransactionToImport[]> {
+    return this.http.put<BankTransactionToImport[]>(
       `${this.endpoint}/nodrigen_transaction_to_import/${nodrigenTransaction}/${financialTransaction}/${matchingMode}`,
       null)
-      .pipe(map((data: NodrigenTransactionToImport[]) => data.map(d => new NodrigenTransactionToImport(d))));
+      .pipe(map((data: BankTransactionToImport[]) => data.map(d => new BankTransactionToImport(d))));
   }
 
   matchNodrigenTransactionsToImportWithInternal(nodrigenTransactions: [number, number], financialTransaction: number) {
-    return this.http.put<NodrigenTransactionToImport[]>(
+    return this.http.put<BankTransactionToImport[]>(
       `${this.endpoint}/nodrigen_transactions_to_import/${nodrigenTransactions[0]}/${nodrigenTransactions[1]}/${financialTransaction}`,
       null)
-      .pipe(map((data: NodrigenTransactionToImport[]) => data.map(d => new NodrigenTransactionToImport(d))));
+      .pipe(map((data: BankTransactionToImport[]) => data.map(d => new BankTransactionToImport(d))));
   }
+
 }

@@ -88,6 +88,7 @@ import {CuberRecordTimeToDatePipe} from './pipe/cuber-record-time-to-date-pipe';
 import {NodrigenService} from './services/banks/nodrigen.service';
 import {NodrigenComponent} from './components/nodrigen/nodrigen.component';
 import {BanksService} from './services/banks/banks.service';
+import {TransactionsImportComponent} from './pages/accountant/transactions-import/transactions-import.component';
 
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
@@ -168,7 +169,8 @@ export class AppLoginStatus {
     CubeComponent,
     CubeControlsComponent,
     CubeStatisticsComponent,
-    NodrigenComponent
+    NodrigenComponent,
+    TransactionsImportComponent
   ],
   imports: [
     BrowserModule,

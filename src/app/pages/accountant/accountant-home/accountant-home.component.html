@@ -81,18 +81,21 @@
       <app-domain-accounts *ngIf="accounts && accounts.length > 0" [accounts]="accounts">
       </app-domain-accounts>
     </div>
-    <app-browse-billing-elements
-      [accounts]="accounts"
-      [categories]="categories"
-      [piggyBanks]="piggyBanks"
-      [billingPeriodInfo]="billingPeriodInfo"
-      (dateSelected)="refreshData($event)"
-      (finishBillingPeriod)="finishBillingPeriod($event)"
-      (createBillingPeriod)="createBillingPeriod($event)"
-      (createElementEvent)="createBillingPeriodElement($event[1], $event[2])"
-      (updatePiggyBankEvent)="updatePiggyBank($event)"
-      class="sg-flex-fill-available-space-evenly billing"
-    ></app-browse-billing-elements>
+    <div class="sg-flex-column sg-flex-fill-available-space-evenly billing">
+      <app-browse-billing-elements
+        [accounts]="accounts"
+        [categories]="categories"
+        [piggyBanks]="piggyBanks"
+        [billingPeriodInfo]="billingPeriodInfo"
+        (dateSelected)="refreshData($event)"
+        (finishBillingPeriod)="finishBillingPeriod($event)"
+        (createBillingPeriod)="createBillingPeriod($event)"
+        (createElementEvent)="createBillingPeriodElement($event[1], $event[2])"
+        (updatePiggyBankEvent)="updatePiggyBank($event)"
+      ></app-browse-billing-elements>
+
+      <app-transactions-import class="sg-flex-fill-available-space-evenly billing"></app-transactions-import>
+    </div>
     <app-piggy-banks
       [title]="'Skarbonki'"
       [adminMode]="false"

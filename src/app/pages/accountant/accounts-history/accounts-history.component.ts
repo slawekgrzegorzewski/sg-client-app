@@ -7,9 +7,8 @@ import {Transaction} from '../../../model/accountant/transaction';
 import {ComparatorBuilder} from '../../../utils/comparator-builder';
 import {ActivatedRoute, Router} from '@angular/router';
 import {DomainService} from '../../../services/domain.service';
-import {forkJoin, Observable, Subscription} from 'rxjs';
-import {MatchingMode, NodrigenTransactionToImport} from '../../../model/banks/nodrigen/nodrigen-transaction-to-import';
-import {NodrigenService} from '../../../services/banks/nodrigen.service';
+import {Subscription} from 'rxjs';
+
 
 export const ACCOUNTANT_HISTORY_ROUTER_URL = 'accounts-history';
 
@@ -23,7 +22,6 @@ export class AccountsHistoryComponent implements OnInit, OnDestroy {
   accounts: Account[] = [];
   selectedAccount: Account | null = null;
   allTransactions: Transaction[] = [];
-  allTransactionsToImport: NodrigenTransactionToImport[] = [];
 
   transactionsOfSelectedAccount: Transaction[] = [];
 
@@ -31,7 +29,6 @@ export class AccountsHistoryComponent implements OnInit, OnDestroy {
 
   constructor(private accountsService: AccountsService,
               private transactionsService: TransactionsService,
-              private nodrigenService: NodrigenService,
               private toastService: ToastService,
               private router: Router,
               private route: ActivatedRoute,
@@ -68,17 +65,14 @@ export class AccountsHistoryComponent implements OnInit, OnDestroy {
   }
 
   fetchTransactions(): void {
-    forkJoin([this.transactionsService.domainTransactions(),this.nodrigenService.getNodrigenTransactionsToImport()]).subscribe(
-      ([transactions, nodrigenTransactionToImport]) => {
+    this.transactionsService.domainTransactions().subscribe(
+      (transactions) => {
         this.allTransactions = transactions;
-        this.allTransactionsToImport = nodrigenTransactionToImport;
-
         this.transactionsOfSelectedAccount = this.filterTransactionsForSelectedAccount();
       },
       error => {
         this.toastService.showWarning('Could not obtain transactions information.');
         this.allTransactions = [];
-        this.allTransactionsToImport = [];
         this.transactionsOfSelectedAccount = [];
       }
     );
@@ -104,15 +98,5 @@ export class AccountsHistoryComponent implements OnInit, OnDestroy {
   selectAccount(account: Account | null): void {
     this.selectedAccount = account;
     this.transactionsOfSelectedAccount = this.filterTransactionsForSelectedAccount();
-  }
-
-  matchTransactions(nodrigenTransactionToImport: number, transaction: number, matchingMode: MatchingMode) {
-    this.nodrigenService.matchNodrigenTransactionsToImport(nodrigenTransactionToImport, transaction, matchingMode)
-      .subscribe(value => this.fetchTransactions(), value => this.fetchTransactions());
-  }
-
-  matchInternalTransactions(nodrigenTransactionsToImport: [number, number], transaction: number) {
-    this.nodrigenService.matchNodrigenTransactionsToImportWithInternal(nodrigenTransactionsToImport, transaction)
-      .subscribe(value => this.fetchTransactions(), value => this.fetchTransactions());
   }
 }

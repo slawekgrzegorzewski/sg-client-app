@@ -1,12 +1,13 @@
 import {Domain} from '../../domain';
 import {BankAccount} from '../bank-account';
 import {SimplePerformedServicePayment} from '../../accountant/simple-performed-service-payment';
+import {Account} from '../../accountant/account';
 
 export enum MatchingMode {
   CREDIT = 'CREDIT', DEBIT = 'DEBIT', BOTH = 'BOTH'
 }
 
-export class NodrigenTransactionToImport {
+export class BankTransactionToImport {
   id: number;
   domain: Domain;
   conversionRate: number;
@@ -14,14 +15,14 @@ export class NodrigenTransactionToImport {
   debit: number;
   description: string;
   timeOfTransaction: Date;
-  destinationId: number;
-  sourceId: number;
+  destinationAccount: Account | null;
+  sourceAccount: Account | null;
   creditBankAccountId: number;
   debitBankAccountId: number;
   creditNodrigenTransactionId: number;
   debitNodrigenTransactionId: number;
 
-  constructor(data?: Partial<NodrigenTransactionToImport>) {
+  constructor(data?: Partial<BankTransactionToImport>) {
     if (!data) {
       data = {};
     }
@@ -32,8 +33,8 @@ export class NodrigenTransactionToImport {
     this.debit = data.debit || 0;
     this.description = data.description || '';
     this.timeOfTransaction = data.timeOfTransaction && new Date(data.timeOfTransaction) || new Date();
-    this.destinationId = data.destinationId || 0;
-    this.sourceId = data.sourceId || 0;
+    this.destinationAccount = data.destinationAccount && new Account(data.destinationAccount) || null;
+    this.sourceAccount = data.sourceAccount && new Account(data.sourceAccount) || null;
     this.creditBankAccountId = data.creditBankAccountId || 0;
     this.debitBankAccountId = data.debitBankAccountId || 0;
     this.creditNodrigenTransactionId = data.creditNodrigenTransactionId || 0;

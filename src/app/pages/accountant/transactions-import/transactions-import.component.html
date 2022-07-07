@@ -1,0 +1,29 @@
+<ng-container *ngIf="transactionsToImport.length > 0">
+  <h4>Nowe transakcje z banku do zaimportowania</h4>
+
+  <table>
+    <ng-container *ngFor="let transactionToImport of transactionsToImport">
+      <tr class="sg-row-hoverable">
+        <td>
+          Od: <span *ngIf="transactionToImport.sourceAccount">{{transactionToImport.sourceAccount.name}}</span>
+          <br/>
+          Do: <span
+          *ngIf="transactionToImport.destinationAccount"> {{transactionToImport.destinationAccount.name}}</span>
+        </td>
+        <td>
+          <span
+            *ngIf="transactionToImport.sourceAccount">{{transactionToImport.debit | currency: transactionToImport.sourceAccount.currency}}</span>
+          <br/>
+          <span
+            *ngIf="transactionToImport.destinationAccount">{{transactionToImport.credit | currency: transactionToImport.destinationAccount.currency}}</span>
+        </td>
+        <td>
+          <ng-container *ngIf="transactionToImport.conversionRate !== 1">
+            Kurs: <br/> {{transactionToImport.conversionRate}}
+          </ng-container>
+        </td>
+        <td> {{transactionToImport.description}} </td>
+      </tr>
+    </ng-container>
+  </table>
+</ng-container>

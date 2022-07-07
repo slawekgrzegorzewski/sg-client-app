@@ -3,7 +3,7 @@ import {TransactionType} from '../../../model/accountant/transaction-type';
 import {Account} from '../../../model/accountant/account';
 import {Transaction} from '../../../model/accountant/transaction';
 import {ComparatorBuilder} from '../../../utils/comparator-builder';
-import {MatchingMode, NodrigenTransactionToImport} from '../../../model/banks/nodrigen/nodrigen-transaction-to-import';
+import {MatchingMode, BankTransactionToImport} from '../../../model/banks/nodrigen/bank-transaction-to-import';
 import {DatesUtils} from '../../../utils/dates-utils';
 
 @Component({
@@ -21,22 +21,12 @@ export class TransactionsListComponent {
   creatingTransactionAmount: number = 0;
   creatingTransactionFieldDescription: string = '';
   selectedTransaction: Transaction | null = null;
-  selectedTransactionToImport: NodrigenTransactionToImport | null = null;
   transactionsInternal: Transaction[] = [];
-  allTransactionsToImportInternal: NodrigenTransactionToImport[] = [];
   displayingTransactions: Transaction[] = [];
-  transactionsToImportForAccount: NodrigenTransactionToImport[] = [];
-  displayingTransactionsToImport: NodrigenTransactionToImport[] = [];
   internalAllAccounts: Account[] = [];
   accountsToSelect: Account[] = [];
   @Output() transactionAction = new EventEmitter<any>();
-  @Output() matchTransactions = new EventEmitter<[number, number, MatchingMode]>();
-  @Output() matchInternalTransactions = new EventEmitter<[[number, number], number]>();
   private internalAccount: Account | null = null;
-  matchingCandidates: Transaction[] = [];
-  selectedMatchingCandidate: Transaction | null = null;
-  matchingCandidatesForInternalTransfers: NodrigenTransactionToImport[] = [];
-  selectedMatchingCandidateForInternalTransfers: NodrigenTransactionToImport | null = null;
 
   constructor() {
   }
@@ -59,15 +49,6 @@ export class TransactionsListComponent {
     this.filterDisplayingTransactions();
   }
 
-  get allTransactionsToImport(): NodrigenTransactionToImport[] {
-    return this.allTransactionsToImportInternal;
-  }
-
-  @Input() set allTransactionsToImport(value: NodrigenTransactionToImport[]) {
-    this.allTransactionsToImportInternal = value.sort(ComparatorBuilder.comparingByDateDays<NodrigenTransactionToImport>(t => t.timeOfTransaction).build());
-    this.filterDisplayingTransactions();
-  }
-
   @Input() get allAccounts(): Account[] {
     return this.internalAllAccounts;
   }
@@ -84,7 +65,6 @@ export class TransactionsListComponent {
 
   set account(value: Account | null) {
     this.internalAccount = value;
-    this.transactionsToImportForAccount = this.filterTransactionsToImportForSelectedAccount();
     this.accountsToSelect = this.filterAccountsOtherThanSelectedOne();
     this.displayingMonth = new Date();
   }
@@ -144,10 +124,7 @@ export class TransactionsListComponent {
   }
 
   private filterDisplayingTransactions(): void {
-    this.transactionsToImportForAccount = this.filterTransactionsToImportForSelectedAccount();
     this.displayingTransactions = this.transactions
-      .filter(t => TransactionsListComponent.isForTheSameMonth(t.timeOfTransaction, this.displayingMonth));
-    this.displayingTransactionsToImport = this.transactionsToImportForAccount
       .filter(t => TransactionsListComponent.isForTheSameMonth(t.timeOfTransaction, this.displayingMonth));
 
     this.prevMonthToDisplay = new Date(this.displayingMonth.getTime());
@@ -156,15 +133,14 @@ export class TransactionsListComponent {
     this.nextMonthToDisplay = new Date(this.nextMonthToDisplay.setMonth(this.nextMonthToDisplay.getMonth() + 1));
 
 
-    function isFirstTransactionOnTheListForTheMonth(transactions: (Transaction | NodrigenTransactionToImport)[], month: Date) {
+    function isFirstTransactionOnTheListForTheMonth(transactions: (Transaction | BankTransactionToImport)[], month: Date) {
       return transactions.length > 0 && TransactionsListComponent.isForTheSameMonth(transactions[0].timeOfTransaction, month);
     }
 
-    if (this.transactions.length == 0 && this.transactionsToImportForAccount.length == 0) {
+    if (this.transactions.length == 0) {
       this.prevMonthToDisplay = null;
       this.nextMonthToDisplay = null;
-    } else if (isFirstTransactionOnTheListForTheMonth(this.transactions, this.displayingMonth)
-      && isFirstTransactionOnTheListForTheMonth(this.transactionsToImportForAccount, this.displayingMonth)) {
+    } else if (isFirstTransactionOnTheListForTheMonth(this.transactions, this.displayingMonth)) {
       this.prevMonthToDisplay = null;
     }
     if (TransactionsListComponent.isForTheSameMonth(new Date(), this.displayingMonth)) {
@@ -191,128 +167,5 @@ export class TransactionsListComponent {
     } else {
       this.selectedTransaction = transaction;
     }
-  }
-
-  selectMatchingCandidate(transaction: Transaction): void {
-    if (this.selectedMatchingCandidate && this.selectedMatchingCandidate.id === transaction.id) {
-      this.selectedMatchingCandidate = null;
-    } else {
-      this.selectedMatchingCandidate = transaction;
-      if (this.selectedMatchingCandidate.credit > 0 && this.selectedMatchingCandidate.debit > 0) {
-        this.matchingCandidatesForInternalTransfers = this.allTransactionsToImport
-          .filter(t => {
-            if (DatesUtils.compareDatesOnly(t.timeOfTransaction, this.selectedTransactionToImport!.timeOfTransaction) !== 0) {
-              return false;
-            }
-            if (this.selectedTransactionToImport!.isCredit()) {
-              return t.isDebit() && t.debit == this.selectedTransactionToImport!.credit;
-            } else if (this.selectedTransactionToImport!.isDebit()) {
-              return t.isCredit() && t.credit == this.selectedTransactionToImport!.debit;
-            } else {
-              return false;
-            }
-          });
-      }
-    }
-  }
-
-  selectMatchingCandidateForInternalTransfers(candidate: NodrigenTransactionToImport): void {
-    if (this.selectedMatchingCandidateForInternalTransfers && this.selectedMatchingCandidateForInternalTransfers.id === candidate.id) {
-      this.selectedMatchingCandidateForInternalTransfers = null;
-    } else {
-      this.selectedMatchingCandidateForInternalTransfers = candidate;
-    }
-  }
-
-  selectTransactionToImport(transactionToImport: NodrigenTransactionToImport): void {
-
-    function compareDebitOrCredit(transaction: NodrigenTransactionToImport, other: Transaction) {
-      if (transaction.isDebit()) {
-        return other.debit === transaction.debit;
-      }
-      if (transaction.isCredit()) {
-        return other.credit === transaction.credit;
-      }
-      return false;
-    }
-
-    if (this.selectedTransactionToImport && this.selectedTransactionToImport.id === transactionToImport.id) {
-      this.selectedTransactionToImport = null;
-    } else {
-      this.selectedTransactionToImport = transactionToImport;
-      if (this.selectedTransactionToImport.isCreditOrDebitTransaction()) {
-        this.matchingCandidates = this.displayingTransactions
-          .filter(transaction => DatesUtils.compareDatesOnly(transaction.timeOfTransaction, transactionToImport.timeOfTransaction) == 0)
-          .filter(transaction => compareDebitOrCredit(transactionToImport, transaction));
-      } else {
-
-      }
-
-      if (this.matchingCandidates.length > 0) {
-        this.selectMatchingCandidate(this.matchingCandidates[0]);
-      }
-
-    }
-  }
-
-  matchAsCredit() {
-    this.matchTransactions.emit([this.selectedTransactionToImport!.creditNodrigenTransactionId, this.selectedMatchingCandidate!.id, MatchingMode.CREDIT]);
-    this.selectTransactionToImport(this.selectedTransactionToImport!);
-    this.selectMatchingCandidate(this.selectedMatchingCandidate!);
-    this.matchingCandidates = [];
-  }
-
-  matchAsDebit() {
-    this.matchTransactions.emit([this.selectedTransactionToImport!.debitNodrigenTransactionId, this.selectedMatchingCandidate!.id, MatchingMode.DEBIT]);
-    this.selectTransactionToImport(this.selectedTransactionToImport!);
-    this.selectMatchingCandidate(this.selectedMatchingCandidate!);
-    this.matchingCandidates = [];
-  }
-
-  matchInternalTransfer() {
-    const firstId = (this.selectedTransactionToImport!.isCredit()
-      ? this.selectedTransactionToImport!.creditNodrigenTransactionId
-      : this.selectedTransactionToImport!.debitNodrigenTransactionId);
-    const secondId = (this.selectedMatchingCandidateForInternalTransfers!.isCredit()
-      ? this.selectedMatchingCandidateForInternalTransfers!.creditNodrigenTransactionId
-      : this.selectedMatchingCandidateForInternalTransfers!.debitNodrigenTransactionId);
-    this.matchInternalTransactions.emit([
-      [firstId, secondId],
-      this.selectedMatchingCandidate!.id]);
-    this.selectTransactionToImport(this.selectedTransactionToImport!);
-    this.selectMatchingCandidate(this.selectedMatchingCandidate!);
-    this.matchingCandidates = [];
-  }
-
-  private filterTransactionsToImportForSelectedAccount(): NodrigenTransactionToImport[] {
-    if (!this.account) {
-      return [];
-    }
-    if (!this.allTransactionsToImport) {
-      return [];
-    }
-    return this.allTransactionsToImport
-      .filter(t => this.isTransactionRelatedToSelectedAccountId(t.sourceId, t.destinationId))
-      .sort((a, b) => a.timeOfTransaction.getTime() - b.timeOfTransaction.getTime());
-  }
-
-  private isTransactionRelatedToSelectedAccountId(source: number, destiantion: number): boolean {
-    return Account.areAccountIdsEqual(source, this.account?.id || 0)
-      || Account.areAccountIdsEqual(destiantion, this.account?.id || 0);
-  }
-
-  public internalTransferCanBePerformed(): boolean {
-    return this.selectedMatchingCandidate !== null
-      && this.selectedTransactionToImport !== null
-      && this.selectedMatchingCandidateForInternalTransfers !== null
-      && this.selectedMatchingCandidate.isInternalTransfer()
-      && ((this.selectedTransactionToImport.isDebit() && this.selectedMatchingCandidateForInternalTransfers.isCredit())
-        || (this.selectedTransactionToImport.isCredit() && this.selectedMatchingCandidateForInternalTransfers.isDebit()));
-  }
-
-  cancelMatching() {
-    this.matchingCandidates = [];
-    this.matchingCandidatesForInternalTransfers = [];
-    this.selectedMatchingCandidateForInternalTransfers = null;
   }
 }
