@@ -30,7 +30,6 @@
               "src/assets"
             ],
             "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/styles.css"
             ],
             "scripts": []
@@ -56,7 +55,7 @@
                 }
               ],
               "outputHashing": "all",
-              "buildOptimizer": false
+              "buildOptimizer": true
             },
             "mac": {
               "buildOptimizer": false,
