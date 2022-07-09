@@ -42,13 +42,8 @@
 </div>
 <app-create-billing-element *ngIf="billingPeriod && mode === EDIT_VIEW" class="sg-flex-column"
                             [elementType]="elementType!"
-                            [categories]="categories"
-                            [userAccounts]="userAccounts"
-                            [billingPeriod]="billingPeriod"
-                            [piggyBanks]="piggyBanks"
                             (editEvent)="createElement($event[0], $event[1], $event[2])"
 >
-
 </app-create-billing-element>
 
 <ng-template #detailedRows let-elements='rows' let-showcategorypart='showcategory'

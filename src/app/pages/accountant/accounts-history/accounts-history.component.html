@@ -1,12 +1,9 @@
 <div class="history-container">
-  <app-domain-accounts [accounts]="accounts"
-                       (selectionChanged)="selectAccount($event)">
-  </app-domain-accounts>
+  <app-domain-accounts (selectionChanged)="selectAccount($event)"></app-domain-accounts>
 
   <div class="sg-flex-column">
     <h5 style="text-align: center">Historia dla zaznaczonego konta</h5>
-    <app-transactions-list [allAccounts]="accounts"
-                           [account]="selectedAccount"
+    <app-transactions-list [account]="selectedAccount"
                            [transactions]="transactionsOfSelectedAccount"
                            (transactionAction)="refreshData()"
                            style="flex-grow: 1; margin-left: 50px">

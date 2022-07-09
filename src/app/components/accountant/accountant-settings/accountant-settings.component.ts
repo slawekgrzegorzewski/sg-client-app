@@ -1,5 +1,7 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {AccountantSettings} from '../../../model/accountant/accountant-settings';
+import {DomainService} from '../../../services/domain.service';
+import {AccountantSettingsService} from '../../../services/accountant/accountant-settings.service';
 
 @Component({
   selector: 'app-accountant-settings',
@@ -10,18 +12,27 @@ export class AccountantSettingsComponent implements OnInit {
 
   @Input() accountantSettings: AccountantSettings | null = null;
 
-  @Output() isCompanyUpdateEvent = new EventEmitter<AccountantSettings>();
-
-  constructor() {
+  constructor(
+    private accountantSettingsService: AccountantSettingsService,
+    private domainService: DomainService) {
   }
 
   ngOnInit(): void {
+    this.getSettings();
+    this.domainService.onCurrentDomainChange.subscribe((domain) => {
+      this.getSettings();
+    });
+  }
+
+  private getSettings() {
+    this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
   }
 
   changeIsCompany(): void {
     if (this.accountantSettings) {
       this.accountantSettings.company = !this.accountantSettings.company;
-      this.isCompanyUpdateEvent.emit(this.accountantSettings);
+      this.accountantSettingsService.setIsCompany(this.accountantSettings.company).subscribe(data => {
+      });
     }
   }
 }

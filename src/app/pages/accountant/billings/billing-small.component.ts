@@ -1,15 +1,11 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Account} from '../../../model/accountant/account';
 import {PiggyBank} from '../../../model/accountant/piggy-bank';
-import {Category} from '../../../model/accountant/billings/category';
 import {BillingPeriod, BillingPeriodInfo} from '../../../model/accountant/billings/billing-period';
 import {AccountsService} from '../../../services/accountant/accounts.service';
 import {PiggyBanksService} from '../../../services/accountant/piggy-banks.service';
 import {BillingPeriodsService} from '../../../services/accountant/billing-periods.service';
 import {Income} from '../../../model/accountant/billings/income';
 import {Expense} from '../../../model/accountant/billings/expense';
-import {CategoriesService} from '../../../services/accountant/categories.service';
-import {ComparatorBuilder} from '../../../utils/comparator-builder';
 import {DomainService} from '../../../services/domain.service';
 import {Subscription} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
@@ -23,16 +19,13 @@ export const BILLING_SMALL_ROUTER_URL = 'billing-small';
 })
 export class BillingSmallComponent implements OnInit, OnDestroy {
 
-  accounts: Account[] = [];
   piggyBanks: PiggyBank[] = [];
-  categories: Category[] = [];
   billingPeriodInfo: BillingPeriodInfo | null = null;
 
   domainSubscription: Subscription | null = null;
 
   constructor(private accountsService: AccountsService,
               private piggyBanksService: PiggyBanksService,
-              private categoriesService: CategoriesService,
               private billingsService: BillingPeriodsService,
               private domainService: DomainService,
               private route: ActivatedRoute
@@ -45,7 +38,6 @@ export class BillingSmallComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.refreshData();
-    this.categoriesService.currentDomainCategories().subscribe(data => this.categories = data);
   }
 
   ngOnDestroy(): void {
@@ -56,17 +48,7 @@ export class BillingSmallComponent implements OnInit, OnDestroy {
   }
 
   refreshData(): void {
-    this.fetchAccounts();
     this.fetchPiggyBanks();
-  }
-
-  fetchAccounts(): void {
-    this.accountsService.currentDomainAccounts().subscribe(
-      data => this.accounts = data.sort(
-        ComparatorBuilder.comparing<Account>(a => a.currency).thenComparing(a => a.name).build()
-      ),
-      error => this.accounts = []
-    );
   }
 
   fetchBillingPeriod(date: Date): void {

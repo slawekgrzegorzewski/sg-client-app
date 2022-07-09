@@ -56,7 +56,7 @@ export class ChartsComponent implements OnInit, OnDestroy {
         this.piggyBanksLineChart = new PiggyBanksLineChart(data, this.datePipe);
         this.piggyBanksLineChart.updateChart.subscribe(d => {
           if (this.piggyBanksChart) {
-            this.piggyBanksChart.chart.update();
+            this.piggyBanksChart.chart!.update();
           }
         });
       });
@@ -86,7 +86,7 @@ export class ChartsComponent implements OnInit, OnDestroy {
     this.piggyBanksChart!.chart!.data!.datasets!.forEach(value => {
       value.hidden = false;
     });
-    this.piggyBanksChart!.chart.update();
+    this.piggyBanksChart!.chart!.update();
   }
 
   private isPiggyBankChartSet() {

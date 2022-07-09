@@ -1,17 +1,19 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {TransactionType} from '../../../model/accountant/transaction-type';
 import {Account} from '../../../model/accountant/account';
 import {Transaction} from '../../../model/accountant/transaction';
 import {ComparatorBuilder} from '../../../utils/comparator-builder';
 import {MatchingMode, BankTransactionToImport} from '../../../model/banks/nodrigen/bank-transaction-to-import';
 import {DatesUtils} from '../../../utils/dates-utils';
+import {AccountsService} from '../../../services/accountant/accounts.service';
+import {DomainService} from '../../../services/domain.service';
 
 @Component({
   selector: 'app-transactions-list',
   templateUrl: './transactions-list.component.html',
   styleUrls: ['./transactions-list.component.css']
 })
-export class TransactionsListComponent {
+export class TransactionsListComponent implements OnInit {
 
   displayingMonthInternal = new Date();
   prevMonthToDisplay: Date | null = null;
@@ -28,7 +30,18 @@ export class TransactionsListComponent {
   @Output() transactionAction = new EventEmitter<any>();
   private internalAccount: Account | null = null;
 
-  constructor() {
+  constructor(private accountsService: AccountsService,
+              private domainService: DomainService) {
+    domainService.onCurrentDomainChange.subscribe(domain => this.getAccounts());
+  }
+
+  ngOnInit(): void {
+    this.getAccounts();
+  }
+
+  private getAccounts() {
+    this.accountsService.currentDomainAccounts()
+      .subscribe(accounts => this.allAccounts = accounts);
   }
 
   get displayingMonth(): Date {
@@ -49,7 +62,7 @@ export class TransactionsListComponent {
     this.filterDisplayingTransactions();
   }
 
-  @Input() get allAccounts(): Account[] {
+  get allAccounts(): Account[] {
     return this.internalAllAccounts;
   }
 

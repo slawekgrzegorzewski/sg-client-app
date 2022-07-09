@@ -41,17 +41,10 @@
   <app-create-billing-element
     *ngIf="(mobileEditMode === 'create-expense' || mobileEditMode === 'create-income') && billingPeriodInfo && billingPeriodInfo.result"
     [elementType]="mobileEditMode === 'create-expense' ? 'expense' : 'income'"
-    [categories]="categories"
-    [userAccounts]="accounts"
-    [billingPeriod]="billingPeriodInfo.result"
-    [piggyBanks]="piggyBanks"
     (editEvent)="createBillingPeriodElement($event[0], $event[1], $event[2])"
     style="height: 100%">
   </app-create-billing-element>
-  <app-domain-accounts *ngIf="mobileEditMode==='display'"
-                       [accounts]="accounts">
-
-  </app-domain-accounts>
+  <app-domain-accounts *ngIf="mobileEditMode==='display'"></app-domain-accounts>
   <ng-container *ngIf="mobileEditMode==='display'">
     <ng-container *ngTemplateOutlet="stats"></ng-container>
   </ng-container>
@@ -78,14 +71,10 @@
   <div class="sg-flex-row sg-flex-justify-space-around sg-flex-wrap">
     <div class="sg-flex-column sg-flex-fill-available-space-evenly savings">
       <ng-container *ngTemplateOutlet="stats"></ng-container>
-      <app-domain-accounts *ngIf="accounts && accounts.length > 0" [accounts]="accounts">
-      </app-domain-accounts>
+      <app-domain-accounts></app-domain-accounts>
     </div>
     <div class="sg-flex-column sg-flex-fill-available-space-evenly billing">
       <app-browse-billing-elements
-        [accounts]="accounts"
-        [categories]="categories"
-        [piggyBanks]="piggyBanks"
         [billingPeriodInfo]="billingPeriodInfo"
         (dateSelected)="refreshData($event)"
         (finishBillingPeriod)="finishBillingPeriod($event)"

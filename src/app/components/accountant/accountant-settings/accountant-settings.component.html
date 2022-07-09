@@ -1,4 +1,5 @@
-<div *ngIf="accountantSettings" class="form-group row">
+<div class="sg-flex-column form-group row" *ngIf="accountantSettings">
+  <h5 class="sg-text-center">Ustawienia</h5>
   <label class="col-form-label">Dla firmy
     <input type="checkbox" [checked]="accountantSettings.company" (change)="changeIsCompany()">
   </label>

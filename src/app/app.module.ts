@@ -41,7 +41,7 @@ import {AccountsHistoryComponent} from './pages/accountant/accounts-history/acco
 import {BillingSmallComponent} from './pages/accountant/billings/billing-small.component';
 import {BrowseBillingElementsComponent} from './components/accountant/billing-periods/browse-billing-elements.component';
 import {PiggyBanksSmallComponent} from './pages/accountant/piggy-banks/piggy-banks-small.component';
-import {ChartsModule} from 'ng2-charts';
+import {NgChartsModule} from 'ng2-charts';
 import {ChartsComponent} from './pages/accountant/charts/charts.component';
 import {HomeComponent} from './pages/home/home.component';
 import {CheckerHomeComponent} from './pages/checker/checker-home/checker-home.component';
@@ -89,10 +89,11 @@ import {NodrigenService} from './services/banks/nodrigen.service';
 import {NodrigenComponent} from './components/nodrigen/nodrigen.component';
 import {BanksService} from './services/banks/banks.service';
 import {TransactionsImportComponent} from './pages/accountant/transactions-import/transactions-import.component';
+import {TransactionRowComponent} from './pages/accountant/transactions-import/row/transaction-row.component';
 
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
-  overrides = <any> {
+  override overrides = <any> {
     swipe: {direction: Hammer.DIRECTION_ALL},
   };
 }
@@ -170,7 +171,8 @@ export class AppLoginStatus {
     CubeControlsComponent,
     CubeStatisticsComponent,
     NodrigenComponent,
-    TransactionsImportComponent
+    TransactionsImportComponent,
+    TransactionRowComponent
   ],
   imports: [
     BrowserModule,
@@ -179,8 +181,8 @@ export class AppLoginStatus {
     HttpClientModule,
     ReactiveFormsModule,
     NgbModule,
-    ChartsModule,
-    HammerModule
+    HammerModule,
+    NgChartsModule
   ],
   providers: [
     LoginService,

@@ -74,7 +74,7 @@
 
         <div class="sg-flex-row sg-flex-justify-self-flex-end" style="margin-top: auto;">
           <button type="button" class="btn btn-outline-primary sg-flex-fill-available-space-evenly" *ngIf="forAccountId"
-                  [disabled]="amount?.errors?.required || !isAllowed()"
+                  [disabled]="amount?.errors?.['required'] || !isAllowed()"
                   (click)="add()">
             Stwórz
           </button>

@@ -1,0 +1,36 @@
+<div class="sg-flex-column" *ngIf="transactionToImport">
+  <div class="sg-flex-row transaction-row">
+    <div class="sg-flex-column accounts-column">
+      <div>
+        Od:
+        <ng-container *ngIf="transactionToImport.sourceAccount">
+          {{transactionToImport.sourceAccount.name}}
+        </ng-container>
+      </div>
+      <div>
+        Do:
+        <ng-container *ngIf="transactionToImport.destinationAccount">
+          {{transactionToImport.destinationAccount.name}}
+        </ng-container>
+      </div>
+    </div>
+    <div class="sg-flex-column amounts-column">
+      <div *ngIf="transactionToImport.sourceAccount">
+        {{transactionToImport.debit | currency: transactionToImport.sourceAccount.currency}}
+      </div>
+      <div *ngIf="transactionToImport.destinationAccount">
+        {{transactionToImport.credit | currency: transactionToImport.destinationAccount.currency}}
+      </div>
+    </div>
+    <div class="sg-flex-column rate-column" *ngIf="transactionToImport.conversionRate !== 1">
+        <div>Kurs:</div>
+        <div>{{transactionToImport.conversionRate}}</div>
+    </div>
+    <div class="sg-flex-column date-column">
+      <div>Data:</div>
+      <div>{{transactionToImport.timeOfTransaction | localizedDate: 'dd MMMM'}}</div>
+    </div>
+  </div>
+
+  <div class="description-row text-primary">{{transactionToImport.description}}</div>
+</div>

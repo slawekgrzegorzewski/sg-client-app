@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {LoginService} from 'src/app/services/login.service';
+import {NgModel} from '@angular/forms';
 
 @Component({
   selector: 'app-login',
@@ -35,4 +36,7 @@ export class LoginComponent implements OnInit {
     }
   }
 
+  validate(uname: NgModel, upass: NgModel, authcode: NgModel) {
+    return uname?.errors === null &&  upass?.errors === null && authcode?.errors === null;
+  }
 }

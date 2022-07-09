@@ -1,5 +1,4 @@
 import {AccountsService} from '../../../services/accountant/accounts.service';
-import {CategoriesService} from '../../../services/accountant/categories.service';
 import {PiggyBanksService} from '../../../services/accountant/piggy-banks.service';
 import {BillingPeriodsService} from '../../../services/accountant/billing-periods.service';
 import {ComparatorBuilder} from '../../../utils/comparator-builder';
@@ -16,7 +15,6 @@ export class BillingPeriodsHelper {
 
   constructor(
     private accountsService: AccountsService,
-    private categoriesService: CategoriesService,
     private piggyBanksService: PiggyBanksService,
     private billingsService: BillingPeriodsService,
   ) {

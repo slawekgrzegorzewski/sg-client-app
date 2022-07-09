@@ -1,6 +1,6 @@
-import {ChartDataSets, ChartOptions, ChartType} from 'chart.js';
-import {Color, Label} from 'ng2-charts';
-import * as pluginAnnotations from 'chartjs-plugin-annotation';
+import {Chart, ChartConfiguration, ChartType} from 'chart.js';
+
+import {default as Annotation} from 'chartjs-plugin-annotation';
 
 export class SyrCell {
   private nameInternal: string;
@@ -22,79 +22,67 @@ export class SyrCell {
 
 export class CountrySyrLineChart {
 
-  public lineChartData: ChartDataSets[];
-  public lineChartLabels: Label[];
-  public lineChartOptions: (ChartOptions & { annotation: pluginAnnotations.AnnotationConfig }) = {
+  public lineChartData: ChartConfiguration['data'] = {
+    datasets: [],
+    labels: []
+  };
+
+  public lineChartOptions: ChartConfiguration['options'] = {
+
     responsive: true,
     maintainAspectRatio: true,
+    elements: {
+      line: {
+        tension: 0.5
+      }
+    },
     scales: {
       // We use this empty structure as a placeholder for dynamic theming.
-      xAxes: [{}],
-      yAxes: [
+      x: {},
+      'y-axis-0':
         {
-          id: 'y-axis-0',
           position: 'left',
-          ticks: {
-            beginAtZero: true
-          }
-        }
-      ]
-    },
-    annotation: {
-      annotations: [
-        {
-          type: 'line',
-          mode: 'vertical',
-          scaleID: 'x-axis-0',
-          value: 'March',
-          borderColor: 'orange',
-          borderWidth: 2,
-          label: {
-            enabled: true,
-            fontColor: 'orange',
-            content: 'LineAnno'
-          }
         },
-      ],
+      'y-axis-1': {
+        position: 'right',
+        grid: {
+          color: 'rgba(255,0,0,0.3)',
+        },
+        ticks: {
+          color: 'red'
+        }
+      }
     },
-    legend: {
-      position: 'bottom'
+
+    plugins: {
+      legend: {display: true},
+      annotation: {
+        annotations: [
+          {
+            type: 'line',
+            scaleID: 'x-axis-0',
+            value: 'March',
+            borderColor: 'orange',
+            borderWidth: 2,
+            label: {
+              position: 'center',
+              enabled: true,
+              color: 'orange',
+              content: 'LineAnno',
+              font: {
+                weight: 'bold'
+              }
+            }
+          }
+        ]
+      }
     }
   };
-  public lineChartLegend = true;
+
   public lineChartType: ChartType = 'line';
-  public lineChartPlugins = [pluginAnnotations];
-  public lineChartColors: Color[] = [
-    { // grey
-      backgroundColor: 'rgba(148,159,177,0.2)',
-      borderColor: 'rgba(148,159,177,1)',
-      pointBackgroundColor: 'rgba(148,159,177,1)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(148,159,177,0.8)'
-    },
-    { // dark grey
-      backgroundColor: 'rgba(77,83,96,0.2)',
-      borderColor: 'rgba(77,83,96,1)',
-      pointBackgroundColor: 'rgba(77,83,96,1)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(77,83,96,1)'
-    },
-    { // red
-      backgroundColor: 'rgba(255,0,0,0.3)',
-      borderColor: 'red',
-      pointBackgroundColor: 'rgba(148,159,177,1)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(148,159,177,0.8)'
-    }
-  ];
 
   constructor(data: Map<string, Map<number, SyrCell[]>>) {
-
-    this.lineChartData = [];
-    this.lineChartLabels = [];
+    Chart.register(Annotation);
 
     let years: number[] = [];
     data.forEach(countryData => {
@@ -108,7 +96,6 @@ export class CountrySyrLineChart {
 
     const lines = new Map<string, (number | null)[]>();
     years.forEach(year => {
-      this.lineChartLabels.push('' + year);
       data.forEach((countryData, countryName) => {
         const yearStats = countryData.get(year);
         if (yearStats) {
@@ -131,7 +118,7 @@ export class CountrySyrLineChart {
       });
     });
     for (const line of lines.keys()) {
-      this.lineChartData.push({data: lines.get(line), label: line, lineTension: 0});
+      this.lineChartData.datasets.push({data: lines.get(line) || [], label: line});
     }
   }
 

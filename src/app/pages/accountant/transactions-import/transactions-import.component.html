@@ -1,29 +1,49 @@
-<ng-container *ngIf="transactionsToImport.length > 0">
-  <h4>Nowe transakcje z banku do zaimportowania</h4>
+<ng-template [ngTemplateOutlet]="list" *ngIf="!transactionToImport">
 
-  <table>
+</ng-template>
+<ng-template [ngTemplateOutlet]="importPart" *ngIf="transactionToImport && !importMode">
+
+</ng-template>
+<ng-template [ngTemplateOutlet]="createDebit" *ngIf="transactionToImport && importMode === 'CREDIT'">
+
+</ng-template>
+
+<ng-template #list>
+  <ng-container *ngIf="transactionsToImport.length > 0">
+    <h4>Nowe transakcje z banku do zaimportowania</h4>
+
     <ng-container *ngFor="let transactionToImport of transactionsToImport">
-      <tr class="sg-row-hoverable">
-        <td>
-          Od: <span *ngIf="transactionToImport.sourceAccount">{{transactionToImport.sourceAccount.name}}</span>
-          <br/>
-          Do: <span
-          *ngIf="transactionToImport.destinationAccount"> {{transactionToImport.destinationAccount.name}}</span>
-        </td>
-        <td>
-          <span
-            *ngIf="transactionToImport.sourceAccount">{{transactionToImport.debit | currency: transactionToImport.sourceAccount.currency}}</span>
-          <br/>
-          <span
-            *ngIf="transactionToImport.destinationAccount">{{transactionToImport.credit | currency: transactionToImport.destinationAccount.currency}}</span>
-        </td>
-        <td>
-          <ng-container *ngIf="transactionToImport.conversionRate !== 1">
-            Kurs: <br/> {{transactionToImport.conversionRate}}
-          </ng-container>
-        </td>
-        <td> {{transactionToImport.description}} </td>
-      </tr>
+      <app-transactions-row [transactionToImport]="transactionToImport" (click)="select(transactionToImport)"
+                            class="sg-row-hoverable">
+
+      </app-transactions-row>
     </ng-container>
-  </table>
-</ng-container>
+  </ng-container>
+</ng-template>
+
+<ng-template #importPart>
+  <div class="sg-flex-column">
+    <h5 class="sg-flex-justify-self-center">Importujesz następującą transakcję</h5>
+    <app-transactions-row [transactionToImport]="transactionToImport"></app-transactions-row>
+    <div class="sg-flex-justify-flex-end">
+      <button class="btn btn-link btn-small" (click)="transactionToImport = null">Anuluj</button>
+    </div>
+
+    <h6>Powyższą transakcję można zaimportować jako:</h6>
+    <div *ngIf="transactionMayBeDebit(transactionToImport)"
+         (click)="importMode = 'CREDIT'">
+      Wydatek
+    </div>
+
+  </div>
+</ng-template>
+
+<ng-template #createDebit>
+  <div class="sg-flex-column">
+    <app-create-billing-element class="sg-flex-column"
+                                [elementType]="'expense'"
+                                (editEvent)="createElement($event[0], $event[1], $event[2])"
+    ></app-create-billing-element>
+
+  </div>
+</ng-template>

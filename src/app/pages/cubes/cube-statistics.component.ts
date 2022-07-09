@@ -131,7 +131,7 @@ export class CubeStatisticsComponent implements OnInit, AfterViewInit, OnDestroy
       ? rubikCubeRecordStatistics.getLastNCubeRecords().map(cr => cr.time)
       : rubikCubeRecordStatistics.movingAverageOfN;
     this.cubeRecordsLineChart = new CubeRecordsLineChart(chartData.filter(cr => cr !== null), this.cubeRecordsChartType);
-    this.cubeRecordsLineChart.updateChart.subscribe(d => this.cubesRecordsChart!.chart.update());
+    this.cubeRecordsLineChart.updateChart.subscribe(d => this.cubesRecordsChart!.chart!.update());
     this.statsByDates = rubikCubeRecordStatistics.dailyStatistics;
     this.worst = rubikCubeRecordStatistics.worst;
     this.best = rubikCubeRecordStatistics.best;

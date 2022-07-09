@@ -199,10 +199,10 @@ export class CreateTransactionsComponent implements OnInit {
 
   isTransferNotAllowed(transferAmount: NgModel, transferDescription: NgModel): boolean {
     return [
-      transferAmount?.errors?.required,
+      transferAmount?.errors?.['required'],
       transferAmount?.value < 0,
       !this.isIncome() && transferAmount?.value > (this.account?.currentBalance || 0),
-      transferDescription?.errors?.required,
+      transferDescription?.errors?.['required'],
       (this.isTransfer() || this.isTransferWithConversion()) && !this.targetAccount,
       this.isTransferWithConversion() && !this.targetAmount
     ].some(b => b);

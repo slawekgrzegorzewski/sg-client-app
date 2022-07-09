@@ -5,9 +5,7 @@
       <ng-template ngbNavContent>
         <div class="sg-flex-row sg-flex-justify-center">
           <div *ngIf="!isEditAccount && !showAccountDeletionConfirmation">
-            <app-domain-accounts [domain]="currentDomainName"
-                                 [accounts]="accountsInCurrentDomain"
-                                 [bankAccountsAvailableToAssign]="bankAccountsAvailableToAssign"
+            <app-domain-accounts [bankAccountsAvailableToAssign]="bankAccountsAvailableToAssign"
                                  [adminMode]="true"
                                  (deleteAccountEvent)="deleteAccount($event)"
                                  (renameAccountEvent)="rename($event)"
@@ -37,16 +35,14 @@
           </div>
         </div>
 
-        <div class="sg-flex-row sg-flex-justify-center" *ngIf="isAdmin() && otherDomainsAccounts">
-          <div class="sg-flex-column" *ngIf="otherDomainsAccounts.size > 0">
-            <app-domain-accounts *ngFor="let user of otherDomainsAccounts | keyvalue"
-                                 [domain]="user.key"
-                                 [accounts]="user.value"
-                                 [adminMode]="true">
+        <div class="sg-flex-row sg-flex-justify-center" *ngIf="isAdmin() && otherDomains">
+          <div class="sg-flex-column" *ngIf="otherDomains.length > 0">
+            <app-domain-accounts *ngFor="let domain of otherDomains"
+                                 [domain]="domain" [adminMode]="true">
             </app-domain-accounts>
             <button type="button" class="btn btn-primary" (click)="fetchData()">Odśwież</button>
           </div>
-          <div class="sg-flex-column" *ngIf="otherDomainsAccounts.size === 0">
+          <div class="sg-flex-column" *ngIf="otherDomains.length === 0">
             <div>Brak kont</div>
             <button type="button" class="btn btn-primary" (click)="fetchData()">Odśwież</button>
           </div>
@@ -106,14 +102,7 @@
       <a ngbNavLink>Domeny</a>
       <ng-template ngbNavContent>
         <div class="sg-flex-row sg-flex-justify-center">
-          <div class="sg-flex-column">
-            <h5 class="sg-text-center">Ustawienia accountant</h5>
-            <app-accountant-settings
-              [accountantSettings]="accountantSettings"
-              (isCompanyUpdateEvent)="updateIsCompany($event)"
-            >
-            </app-accountant-settings>
-          </div>
+          <app-accountant-settings></app-accountant-settings>
           <div class="sg-flex-column">
             <h5 class="sg-text-center">Domeny</h5>
             <app-domains

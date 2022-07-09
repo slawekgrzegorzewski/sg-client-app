@@ -1,6 +1,6 @@
-<div class="sg-flex-row sg-flex-justify-center">
+<div class="sg-flex-row sg-flex-justify-center" *ngIf="accounts && accounts.length > 0">
   <div style="padding:10px; width: 320px;" class="sg-flex-column">
-    <h5 *ngIf="showTitle && domain" style="text-align: center">Konta w domenie {{domain}}</h5>
+    <h5 *ngIf="showTitle && domain" style="text-align: center">Konta w domenie {{domain.name}}</h5>
     <h5 *ngIf="showTitle && !domain" style="text-align: center">Konta w bieżącej domenie</h5>
     <div style="margin-left: auto; margin-right: 10px; width: 65%">
       <app-multi-currency-total
@@ -31,8 +31,10 @@
         <ng-container *ngIf="account === selectedAccount && adminMode">
           <tr class="selected">
             <td colspan="4" style="text-align: right">
-              <select *ngIf="!selectedAccount.bankAccount && bankAccountsAvailableToAssign.length > 0" [(ngModel)]="selectedBankAccount">
-                <option *ngFor="let bankAccount of bankAccountsAvailableToAssign" [ngValue]="bankAccount">{{bankAccount.iban}} - {{bankAccount.currency}}</option>
+              <select *ngIf="!selectedAccount.bankAccount && bankAccountsAvailableToAssign.length > 0"
+                      [(ngModel)]="selectedBankAccount">
+                <option *ngFor="let bankAccount of bankAccountsAvailableToAssign"
+                        [ngValue]="bankAccount">{{bankAccount.iban}} - {{bankAccount.currency}}</option>
               </select>
               <button class="btn btn-link btn-sm"
                       (click)="deleteAccountEvent.emit(selectedAccount)">usuń

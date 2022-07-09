@@ -28,10 +28,10 @@
                required/>
       </div>
     </div>
-    <button *ngIf="editElement.id" [disabled]="name?.errors?.required"
+    <button *ngIf="editElement.id" [disabled]="name?.errors?.['required']"
             (click)="update()" class="btn btn-primary">Zapisz
     </button>
-    <button *ngIf="!editElement.id" [disabled]="name?.errors?.required"
+    <button *ngIf="!editElement.id" [disabled]="name?.errors?.['required']"
             (click)="create()" class="btn btn-primary">Stwórz
     </button>
     <button (click)="reset()" class="btn btn-primary">Anuluj</button>

@@ -1,13 +1,9 @@
 <div class="sg-flex-charts">
   <div *ngIf="savingsLineChart" class="sg-chart">
     <canvas baseChart #savingsChart='base-chart'
-            [datasets]="savingsLineChart.lineChartData"
-            [labels]="savingsLineChart.lineChartLabels"
+            [data]="savingsLineChart.lineChartData"
             [options]="savingsLineChart.lineChartOptions"
-            [colors]="savingsLineChart.lineChartColors"
-            [legend]="savingsLineChart.lineChartLegend"
-            [chartType]="savingsLineChart.lineChartType"
-            [plugins]="savingsLineChart.lineChartPlugins">
+            [type]="savingsLineChart.lineChartType">
 
     </canvas>
   </div>
@@ -17,13 +13,9 @@
       <button (click)="showAllPiggyBanksDataSets()" class="btn btn-outline-primary" style="width: 50%;">Pokaż wszystkie wykresy</button>
     </div>
     <canvas baseChart #piggyBanksChart='base-chart'
-            [datasets]="piggyBanksLineChart.lineChartData"
-            [labels]="piggyBanksLineChart.lineChartLabels"
+            [data]="piggyBanksLineChart.lineChartData"
             [options]="piggyBanksLineChart.lineChartOptions"
-            [colors]="piggyBanksLineChart.lineChartColors"
-            [legend]="piggyBanksLineChart.lineChartLegend"
-            [chartType]="piggyBanksLineChart.lineChartType"
-            [plugins]="piggyBanksLineChart.lineChartPlugins">
+            [type]="piggyBanksLineChart.lineChartType">
 
     </canvas>
   </div>

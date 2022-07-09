@@ -4,13 +4,9 @@
 
 <div *ngIf="countrySyrLineChart" class="sg-chart">
   <canvas baseChart #savingsChart='base-chart'
-          [datasets]="countrySyrLineChart.lineChartData"
-          [labels]="countrySyrLineChart.lineChartLabels"
+          [data]="countrySyrLineChart.lineChartData"
           [options]="countrySyrLineChart.lineChartOptions"
-          [colors]="countrySyrLineChart.lineChartColors"
-          [legend]="countrySyrLineChart.lineChartLegend"
-          [chartType]="countrySyrLineChart.lineChartType"
-          [plugins]="countrySyrLineChart.lineChartPlugins">
+          [type]="countrySyrLineChart.lineChartType">
 
   </canvas>
 </div>

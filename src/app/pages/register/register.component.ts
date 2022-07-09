@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {LoginService} from 'src/app/services/login.service';
 import {ActivatedRoute, Router} from '@angular/router';
+import {NgModel} from '@angular/forms';
 
 @Component({
   selector: 'app-register',
@@ -110,5 +111,15 @@ export class RegisterComponent implements OnInit {
 
   isChangePassword(): boolean {
     return this.type === 'change-password';
+  }
+
+  validate(uname: NgModel, upass: NgModel, newpass: NgModel, uconfirmnewpass: NgModel, authcode: NgModel, newpass2: NgModel) {
+    return uname?.errors === null && upass?.errors === null && newpass?.errors === null && uconfirmnewpass?.errors === null
+      && authcode?.errors === null && newpass.value === uconfirmnewpass.value;
+
+  }
+
+  validate2(uname: NgModel, upass: NgModel, uconfirmpass: NgModel) {
+    return uname?.errors === null && upass?.errors === null && uconfirmpass?.errors === null && upass.value === uconfirmpass.value;
   }
 }

@@ -32,9 +32,6 @@ export class BrowseBillingElementsComponent implements OnInit {
     }
   }
 
-  @Input() accounts: Account[] = [];
-  @Input() piggyBanks: PiggyBank[] = [];
-  @Input() categories: Category[] = [];
   @Input() minRowHeight = 40;
 
   @Output() dateSelected = new EventEmitter<Date>();

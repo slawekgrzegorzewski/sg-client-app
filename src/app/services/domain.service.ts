@@ -1,9 +1,9 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {forkJoin, Observable} from 'rxjs';
+import {firstValueFrom, forkJoin, mergeMap, Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {DetailedDomain, Domain} from '../model/domain';
-import {filter, map, tap} from 'rxjs/operators';
+import {filter, map, share, tap} from 'rxjs/operators';
 import {ActivatedRoute, ActivationEnd, Router} from '@angular/router';
 import {NgEventBus} from 'ng-event-bus';
 import {APP_LOGIN_STATUS_EVENT, APP_LOGIN_STATUS_REQUEST_EVENT, AppLoginStatus} from '../app.module';
@@ -19,9 +19,11 @@ const DOMAIN_KEY = 'domain';
 export class DomainService {
 
   private readonly endpoint = `${environment.serviceUrl}/domains`;
+  private getAllDomainsObservable: Observable<DetailedDomain[]> | null = null;
+  private getOtherDomainsObservable: Observable<DetailedDomain[]> | null = null;
+  private getInvitationsObservable: Observable<Domain[]> | null = null;
 
   onCurrentDomainChange = new EventEmitter<DetailedDomain | null>();
-  onDomainsChange = new EventEmitter<DetailedDomain[]>();
   onInvitationChange = new EventEmitter<Domain[]>();
 
   availableDomains: DetailedDomain[] = [];
@@ -36,8 +38,12 @@ export class DomainService {
     return this.findDomain(domainId);
   }
 
-  private findDomain(domainId: number) {
-    return (this.availableDomains || []).find(d => d.id === domainId) || null;
+  private async findDomain(domainId: number) {
+
+    firstValueFrom(this.getAllDomains()
+      .pipe(
+        map(domains => domains.filter(d => d.id === domainId) || null)
+      ));
   }
 
   get currentDomainId(): number {
@@ -110,25 +116,35 @@ export class DomainService {
   }
 
   private refreshData(): void {
-    if (this.isLoggedIn) {
-      forkJoin([this.getAllDomains(), this.getInvitations()])
-        .subscribe(([domains, invitations]) => {
-          this.availableDomains = domains;
-          this.invitations = invitations;
-          this.onDomainsChange.emit(this.availableDomains);
-          this.onInvitationChange.emit(this.invitations);
-        });
-    } else {
-      this.availableDomains = [];
-      this.invitations = [];
-      this.onDomainsChange.emit(this.availableDomains);
-      this.onInvitationChange.emit(this.invitations);
-    }
+    this.getAllDomainsObservable = null;
+    this.getOtherDomainsObservable = null;
+  }
+
+  private refreshInvitationData() {
+    this.getInvitationsObservable = null;
   }
 
   getAllDomains(): Observable<DetailedDomain[]> {
-    return this.http.get<DetailedDomain[]>(this.endpoint, {responseType: 'json'})
-      .pipe(map((r: DetailedDomain[]) => r.map(r1 => new DetailedDomain(r1))));
+    if (this.getAllDomainsObservable === null) {
+      this.getAllDomainsObservable = this.http.get<DetailedDomain[]>(this.endpoint, {responseType: 'json'})
+        .pipe(
+          map((r: DetailedDomain[]) => r.map(r1 => new DetailedDomain(r1))),
+          share()
+        );
+    }
+    return this.getAllDomainsObservable;
+  }
+
+  getOtherDomains(): Observable<DetailedDomain[]> {
+    if (this.getOtherDomainsObservable === null) {
+      this.getOtherDomainsObservable = this.http.get<DetailedDomain[]>(this.endpoint, {responseType: 'json'})
+        .pipe(
+          map((r: DetailedDomain[]) => r.map(r1 => new DetailedDomain(r1))),
+          map(domains => domains.filter(domain => domain.id !== this.currentDomainId)),
+          share()
+        );
+    }
+    return this.getOtherDomainsObservable;
   }
 
   create(name: string): Observable<Domain> {
@@ -164,8 +180,14 @@ export class DomainService {
   }
 
   getInvitations(): Observable<Domain[]> {
-    return this.http.get<Partial<Domain>[]>(`${this.endpoint}/invitations`, {responseType: 'json'})
-      .pipe(map((data: Partial<Domain>[]) => data.map(d => new Domain(d))));
+    if (this.getInvitationsObservable === null) {
+      this.getInvitationsObservable = this.http.get<Partial<Domain>[]>(`${this.endpoint}/invitations`, {responseType: 'json'})
+        .pipe(
+          map((data: Partial<Domain>[]) => data.map(d => new Domain(d))),
+          share()
+        );
+    }
+    return this.getInvitationsObservable;
   }
 
   removeUserFromDomain(domainId: number, userLogin: string): Observable<DetailedDomain> {
@@ -178,16 +200,16 @@ export class DomainService {
 
   inviteUserToDomain(domainId: number, userLogin: string): Observable<object> {
     return this.http.post(`${this.endpoint}/invite/${domainId}/${userLogin}`, {observe: 'response'})
-      .pipe(tap(d => this.refreshData()));
+      .pipe(tap(d => this.refreshInvitationData()));
   }
 
   acceptInvitation(domainId: number): Observable<object> {
     return this.http.post(`${this.endpoint}/invitations/accept/${domainId}`, {observe: 'response'})
-      .pipe(tap(d => this.refreshData()));
+      .pipe(tap(d => this.refreshInvitationData()));
   }
 
   rejectInvitation(domainId: number): Observable<object> {
     return this.http.post(`${this.endpoint}/invitations/reject/${domainId}`, {observe: 'response'})
-      .pipe(tap(d => this.refreshData()));
+      .pipe(tap(d => this.refreshInvitationData()));
   }
 }

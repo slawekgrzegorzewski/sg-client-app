@@ -1,98 +1,81 @@
-import {ChartDataSets, ChartOptions, ChartType} from 'chart.js';
-import {Color, Label} from 'ng2-charts';
-import * as pluginAnnotations from 'chartjs-plugin-annotation';
-import {EventEmitter} from '@angular/core';
-import {CubeRecord} from './cube-record';
-import {ComparatorBuilder} from '../../utils/comparator-builder';
+import {Component, EventEmitter, ViewChild} from '@angular/core';
+import {Chart, ChartConfiguration, ChartEvent, ChartType} from 'chart.js';
+import {BaseChartDirective} from 'ng2-charts';
+
+import {default as Annotation} from 'chartjs-plugin-annotation';
 
 export type ChartMode = 'RAW' | 'MOVING_AVERAGE'
 
 export class CubeRecordsLineChart {
 
   public updateChart = new EventEmitter<any>();
-  public lineChartData: ChartDataSets[];
-  public lineChartLabels: Label[];
-  public lineChartOptions: (ChartOptions & { annotation: pluginAnnotations.AnnotationConfig }) = {
-    responsive: true,
-    maintainAspectRatio: true,
-    aspectRatio: 1,
+  public lineChartData: ChartConfiguration['data'] = {
+    datasets: [],
+    labels: []
+  };
+  public lineChartOptions: ChartConfiguration['options'] = {
+    elements: {
+      line: {
+        tension: 0.5
+      }
+    },
     scales: {
       // We use this empty structure as a placeholder for dynamic theming.
-      xAxes: [{}],
-      yAxes: [
+      x: {},
+      'y-axis-0':
         {
-          id: 'y-axis-0',
           position: 'left',
-          ticks: {
-            beginAtZero: true
-          }
-        }
-      ]
-    },
-    annotation: {
-      annotations: [
-        {
-          type: 'line',
-          mode: 'vertical',
-          scaleID: 'x-axis-0',
-          value: 'March',
-          borderColor: 'orange',
-          borderWidth: 2,
-          label: {
-            enabled: true,
-            fontColor: 'orange',
-            content: 'LineAnno'
-          }
         },
-      ],
-    },
-    legend: {
-      position: 'bottom',
-      align: 'start',
-      onClick: (event, legendItem) => {
-        if (legendItem.datasetIndex) {
-          const hidden = this.lineChartData[legendItem.datasetIndex].hidden;
-          this.lineChartData[legendItem.datasetIndex].hidden = !hidden;
-          this.updateChart.emit();
+      'y-axis-1': {
+        position: 'right',
+        grid: {
+          color: 'rgba(255,0,0,0.3)',
+        },
+        ticks: {
+          color: 'red'
         }
+      }
+    },
+
+    plugins: {
+      legend: { display: true },
+      annotation: {
+        annotations: [
+          {
+            type: 'line',
+            scaleID: 'x',
+            value: 'March',
+            borderColor: 'orange',
+            borderWidth: 2,
+            label: {
+              position: 'center',
+              enabled: true,
+              color: 'orange',
+              content: 'LineAnno',
+              font: {
+                weight: 'bold'
+              }
+            }
+          },
+        ],
       }
     }
   };
-  public lineChartLegend = true;
   public lineChartType: ChartType = 'line';
-  public lineChartPlugins = [pluginAnnotations];
-  public lineChartColors: Color[] = [
-    { // grey
-      backgroundColor: 'rgba(148,159,177,0.2)',
-      borderColor: 'rgba(148,159,177,1)',
-      pointBackgroundColor: 'rgba(148,159,177,1)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(148,159,177,0.8)'
-    },
-    { // red
-      backgroundColor: 'rgba(255,0,0,0.3)',
-      borderColor: 'red',
-      pointBackgroundColor: 'rgba(148,159,177,1)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(148,159,177,0.8)'
-    }
-  ];
 
   constructor(data: (number | null)[], mode: ChartMode) {
+    Chart.register(Annotation);
     switch (mode) {
       case 'RAW':
-        this.lineChartData = [{data: data, label: 'Results'}];
+        this.lineChartData = {datasets: [{data: data || [], label: 'Results'}]};
         break;
       case 'MOVING_AVERAGE':
-        this.lineChartData = [{data: data, label: 'Moving average'}];
+        this.lineChartData = {datasets: [{data: data || [], label: 'Moving average'}]};
         break;
     }
-    this.lineChartLabels = data.map(r => '');
   }
 
   hideAllDataSets(): void {
-    this.lineChartData.forEach(value => value.hidden = true);
+    this.lineChartData.datasets.forEach(value => value.hidden = true);
   }
 }

@@ -38,10 +38,10 @@
       </textarea>
       </div>
     </div>
-    <button *ngIf="categoryToEdit.id" [disabled]="name?.errors?.required || description?.errors?.required"
+    <button *ngIf="categoryToEdit.id" [disabled]="name?.errors?.['required'] || description?.errors?.['required']"
             (click)="update()" class="btn btn-primary">Zapisz
     </button>
-    <button *ngIf="!categoryToEdit.id" [disabled]="name?.errors?.required || description?.errors?.required"
+    <button *ngIf="!categoryToEdit.id" [disabled]="name?.errors?.['required'] || description?.errors?.['required']"
             (click)="create()" class="btn btn-primary">Stwórz
     </button>
     <button (click)="reset()" class="btn btn-primary">Anuluj</button>

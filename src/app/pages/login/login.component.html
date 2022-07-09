@@ -10,7 +10,7 @@
              #authcode="ngModel" [(ngModel)]="userObject.authcode" placeholder="Hasło OTP"
              title="Wpisz hasło OTP odczytane z aplikacji do uwierzytelniania dwuetapowego" required>
       <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit"
-              [disabled]="uname?.errors?.required || upass?.errors?.required || authcode?.errors?.required">
+              [disabled]="!validate(uname, upass, authcode)">
         Sign in
       </button>
       <p style="text-align:center;">Nie masz jeszcze konta? <a [routerLink]="['/register']">Zarejestruj się tutaj</a></p>

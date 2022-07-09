@@ -27,7 +27,7 @@ export class NodrigenComponent implements OnInit {
   ngOnInit(): void {
     this.route.queryParams.subscribe(queryParams => {
       if (queryParams.hasOwnProperty('ref')) {
-        this.nodrigenService.confirmPermission(queryParams.ref)
+        this.nodrigenService.confirmPermission(queryParams['ref'])
           .subscribe(value => this.removeRefFromQueryParams(), value => this.removeRefFromQueryParams());
       } else {
         this.getPermissions();

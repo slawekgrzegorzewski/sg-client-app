@@ -3,15 +3,18 @@
     <img id="profile-img" class="profile-img-card" src="../../../assets/images/avatar_2x.png" alt=""/>
     <form class="form-signin" *ngIf="isRegister() && qrUrl === null" (ngSubmit)="registerUser()" #registerForm="ngForm">
       <input type="text" id="uname" class="form-control" name="uname" #uname="ngModel" [(ngModel)]="userObject.uname"
-             placeholder="Nazwa użytkownika" title="Wprowadź nazwę użytkownika używaną do logowania" autocomplete="off" required autofocus>
+             placeholder="Nazwa użytkownika" title="Wprowadź nazwę użytkownika używaną do logowania" autocomplete="off"
+             required autofocus>
       <input type="password" id="upass" class="form-control" name="upass" placeholder="Hasło"
-             title="Wprowadź hasło używane do logowania" #upass="ngModel" autocomplete="off" [(ngModel)]="userObject.upass"
+             title="Wprowadź hasło używane do logowania" #upass="ngModel" autocomplete="off"
+             [(ngModel)]="userObject.upass"
              required>
       <input type="password" id="confirmpass" class="form-control" name="confirmpass" placeholder="Powtórzenie hasła"
-             title="Wprowadź ponownie to samo hasło w celu wykluczenia pomyłki" #uconfirmpass="ngModel" autocomplete="off" [(ngModel)]="confirmPass"
+             title="Wprowadź ponownie to samo hasło w celu wykluczenia pomyłki" #uconfirmpass="ngModel"
+             autocomplete="off" [(ngModel)]="confirmPass"
              required>
       <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit"
-              [disabled]="(uname?.errors?.required || upass?.errors?.required || uconfirmpass?.errors?.required) || (upass.value !== uconfirmpass.value)">
+              [disabled]="!validate2(uname, upass, uconfirmpass)">
         Załóż konto
       </button>
     </form>
@@ -22,16 +25,18 @@
       <img class="qr-code-img" [src]="qrUrl" alt=""/>
       <input type="password" id="token" class="form-control" name="token"
              placeholder="Zeskanuj kod QR i przepisz hasło"
-             title="Wpisz hasło OTP odczytane z aplikacji do uwierzytelniania dwuetapowego" #secretTo2FA="ngModel" [(ngModel)]="userObject.secretFor2FA">
+             title="Wpisz hasło OTP odczytane z aplikacji do uwierzytelniania dwuetapowego" #secretTo2FA="ngModel"
+             [(ngModel)]="userObject.secretFor2FA">
       <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit"
-              [disabled]="secretTo2FA?.errors?.required">
+              [disabled]="secretTo2FA?.errors !== null">
         Wprowadź OTP
       </button>
     </form>
     <form class="form-signin" *ngIf="isChangePassword()" (ngSubmit)="changePassword()" #changePasswordForm="ngForm">
       <input type="text" id="unameToChange" class="form-control" name="uname" #uname="ngModel"
              [(ngModel)]="changePasswordObject.uname"
-             placeholder="Nazwa użytkownika" title="Wprowadź nazwę użytkownika używaną do logowania" autocomplete="off" required autofocus>
+             placeholder="Nazwa użytkownika" title="Wprowadź nazwę użytkownika używaną do logowania" autocomplete="off"
+             required autofocus>
       <input type="password" id="oldUpass" class="form-control" name="upass" placeholder="Hasło"
              title="Wprowadź hasło używane do tej pory do logowania" #upass="ngModel" autocomplete="off"
              [(ngModel)]="changePasswordObject.oldpass"
@@ -45,11 +50,12 @@
              required>
       <input type="password" id="newUpassConfirmation" class="form-control" name="confirmnewpass"
              placeholder="Potwierdzenie nowgo hasła"
-             title="Wprowadź ponownie to samo hasło w celu wykluczenia pomyłki" #uconfirmnewpass="ngModel" autocomplete="off"
+             title="Wprowadź ponownie to samo hasło w celu wykluczenia pomyłki" #uconfirmnewpass="ngModel"
+             autocomplete="off"
              [(ngModel)]="confirmNewPass"
              required>
       <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit"
-              [disabled]="uname?.errors?.required || upass?.errors?.required  || newpass?.errors?.required || uconfirmnewpass?.errors?.required || authcode?.errors?.required || newpass.value !== uconfirmnewpass.value">
+              [disabled]="!validate(uname, upass, newpass, uconfirmnewpass, authcode, newpass)">
         Zmień
       </button>
     </form>

@@ -1,96 +1,72 @@
-import {ChartDataSets, ChartOptions, ChartType} from 'chart.js';
-import {Color, Label} from 'ng2-charts';
-import * as pluginAnnotations from 'chartjs-plugin-annotation';
-import {DatePipe} from '@angular/common';
+import {Component, EventEmitter, ViewChild} from '@angular/core';
+import {Chart, ChartConfiguration, ChartEvent, ChartType} from 'chart.js';
+import {BaseChartDirective} from 'ng2-charts';
+
+import {default as Annotation} from 'chartjs-plugin-annotation';
 import {PiggyBank} from '../piggy-bank';
-import {EventEmitter} from '@angular/core';
+import {DatePipe} from '@angular/common';
 import {ComparatorBuilder} from '../../../utils/comparator-builder';
 
 export class PiggyBanksLineChart {
 
   public updateChart = new EventEmitter<any>();
-  public lineChartData: ChartDataSets[];
-  public lineChartLabels: Label[];
-  public lineChartOptions: (ChartOptions & { annotation: pluginAnnotations.AnnotationConfig }) = {
-    responsive: true,
-    maintainAspectRatio: true,
-    aspectRatio: screen.width < 600 ? 0.5 : 1.5,
+  public lineChartData: ChartConfiguration['data'] = {
+    datasets: [],
+    labels: []
+  };
+  public lineChartOptions: ChartConfiguration['options'] = {
+    elements: {
+      line: {
+        tension: 0.5
+      }
+    },
     scales: {
       // We use this empty structure as a placeholder for dynamic theming.
-      xAxes: [{}],
-      yAxes: [
+      x: {},
+      'y-axis-0':
         {
-          id: 'y-axis-0',
           position: 'left',
-          ticks: {
-            beginAtZero: true
-          }
-        }
-      ]
-    },
-    annotation: {
-      annotations: [
-        {
-          type: 'line',
-          mode: 'vertical',
-          scaleID: 'x-axis-0',
-          value: 'March',
-          borderColor: 'orange',
-          borderWidth: 2,
-          label: {
-            enabled: true,
-            fontColor: 'orange',
-            content: 'LineAnno'
-          }
         },
-      ],
-    },
-    legend: {
-      position: 'bottom',
-      align: 'start',
-      onClick: (event, legendItem) => {
-        if (legendItem.datasetIndex) {
-          const hidden = this.lineChartData[legendItem.datasetIndex].hidden;
-          this.lineChartData[legendItem.datasetIndex].hidden = !hidden;
-          this.updateChart.emit();
+      'y-axis-1': {
+        position: 'right',
+        grid: {
+          color: 'rgba(255,0,0,0.3)',
+        },
+        ticks: {
+          color: 'red'
         }
+      }
+    },
+
+    plugins: {
+      legend: {display: true},
+      annotation: {
+        annotations: [
+          {
+            type: 'line',
+            scaleID: 'x',
+            value: 'March',
+            borderColor: 'orange',
+            borderWidth: 2,
+            label: {
+              position: 'center',
+              enabled: true,
+              color: 'orange',
+              content: 'LineAnno',
+              font: {
+                weight: 'bold'
+              }
+            }
+          },
+        ],
       }
     }
   };
-  public lineChartLegend = true;
   public lineChartType: ChartType = 'line';
-  public lineChartPlugins = [pluginAnnotations];
-  public lineChartColors: Color[] = [
-    { // grey
-      backgroundColor: 'rgba(148,159,177,0.2)',
-      borderColor: 'rgba(148,159,177,1)',
-      pointBackgroundColor: 'rgba(148,159,177,1)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(148,159,177,0.8)'
-    },
-    { // dark grey
-      backgroundColor: 'rgba(77,83,96,0.2)',
-      borderColor: 'rgba(77,83,96,1)',
-      pointBackgroundColor: 'rgba(77,83,96,1)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(77,83,96,1)'
-    },
-    { // red
-      backgroundColor: 'rgba(255,0,0,0.3)',
-      borderColor: 'red',
-      pointBackgroundColor: 'rgba(148,159,177,1)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(148,159,177,0.8)'
-    }
-  ];
 
   constructor(data: Map<Date, PiggyBank[]>, datePipe: DatePipe) {
 
-    this.lineChartData = [];
-    this.lineChartLabels = [];
+    Chart.register(Annotation);
 
     let dates: Date[] = [];
     const piggyBanksNames = new Set<string>();
@@ -103,7 +79,6 @@ export class PiggyBanksLineChart {
     const dataPerPiggyName = new Map<string, (number | null)[]>();
     dates.forEach(d => {
       let dateLabel = datePipe.transform(d, 'yyyy-MM') || '';
-      this.lineChartLabels.push(dateLabel);
       const dateData = data.get(d) || [];
       for (const piggyBank of dateData) {
         const key = this.descriptionOfPiggyBank(piggyBank);
@@ -120,7 +95,7 @@ export class PiggyBanksLineChart {
       });
     });
     Array.from(piggyBanksNames).sort((a, b) => a.localeCompare(b))
-      .forEach(piggyBankName => this.lineChartData.push({data: dataPerPiggyName.get(piggyBankName), label: piggyBankName}));
+      .forEach(piggyBankName => this.lineChartData.datasets.push({data: dataPerPiggyName.get(piggyBankName) || [], label: piggyBankName}));
   }
 
   private descriptionOfPiggyBank(piggyBank: PiggyBank): string {
@@ -128,6 +103,6 @@ export class PiggyBanksLineChart {
   }
 
   hideAllDataSets(): void {
-    this.lineChartData.forEach(value => value.hidden = true);
+    this.lineChartData.datasets.forEach(value => value.hidden = true);
   }
 }

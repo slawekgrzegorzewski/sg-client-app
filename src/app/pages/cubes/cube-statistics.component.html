@@ -23,13 +23,9 @@
   <div style="width: 25%;" class="sg-flex-column">
     <div>
       <canvas baseChart #cubesRecordsChart='base-chart' style="position: relative"
-              [datasets]="cubeRecordsLineChart.lineChartData"
-              [labels]="cubeRecordsLineChart.lineChartLabels"
+              [data]="cubeRecordsLineChart.lineChartData"
               [options]="cubeRecordsLineChart.lineChartOptions"
-              [colors]="cubeRecordsLineChart.lineChartColors"
-              [legend]="cubeRecordsLineChart.lineChartLegend"
-              [chartType]="cubeRecordsLineChart.lineChartType"
-              [plugins]="cubeRecordsLineChart.lineChartPlugins">
+              [type]="cubeRecordsLineChart.lineChartType">
       </canvas>
     </div>
 

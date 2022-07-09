@@ -7,11 +7,8 @@ import {PiggyBank} from '../../../model/accountant/piggy-bank';
 import {TransactionsService} from '../../../services/accountant/transations.service';
 import {BillingPeriodsService} from '../../../services/accountant/billing-periods.service';
 import {BillingPeriodInfo} from '../../../model/accountant/billings/billing-period';
-import {Category} from '../../../model/accountant/billings/category';
 import {Income} from '../../../model/accountant/billings/income';
 import {Expense} from '../../../model/accountant/billings/expense';
-import {CategoriesService} from '../../../services/accountant/categories.service';
-import {LoginService} from '../../../services/login.service';
 import {PerformedService} from '../../../model/accountant/performed-service';
 import {PerformedServicesService} from '../../../services/accountant/performed-services.service';
 import {Service} from '../../../model/accountant/service';
@@ -51,7 +48,6 @@ export class AccountantHomeComponent implements OnInit, OnDestroy {
 
   accounts: Account[] = [];
   piggyBanks: PiggyBank[] = [];
-  categories: Category[] = [];
 
   performedServices: PerformedService[] = [];
   clientPayments: ClientPayment[] = [];
@@ -76,9 +72,7 @@ export class AccountantHomeComponent implements OnInit, OnDestroy {
               private transactionsService: TransactionsService,
               private piggyBanksService: PiggyBanksService,
               private billingsService: BillingPeriodsService,
-              private categoriesService: CategoriesService,
               private toastService: ToastService,
-              public loginService: LoginService,
               private performedServicesService: PerformedServicesService,
               private clientPaymentsService: ClientPaymentsService,
               private performedServicePaymentsService: PerformedServicePaymentsService,
@@ -89,7 +83,7 @@ export class AccountantHomeComponent implements OnInit, OnDestroy {
               private route: ActivatedRoute,
               private domainService: DomainService,
               private accountantSettingsService: AccountantSettingsService) {
-    this.billingPeriodsHelper = new BillingPeriodsHelper(accountsService, categoriesService, piggyBanksService, billingsService);
+    this.billingPeriodsHelper = new BillingPeriodsHelper(accountsService, piggyBanksService, billingsService);
     this.companyLogHelper = new CompanyLogHelper(performedServicePaymentsService, performedServicesService, clientPaymentsService, servicesService, clientsService);
     this.domainService.registerToDomainChangesViaRouterUrl(ACCOUNTANT_HOME_ROUTER_URL, this.route);
     this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
@@ -102,7 +96,6 @@ export class AccountantHomeComponent implements OnInit, OnDestroy {
     this.onResize();
     this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
     this.refreshData();
-    this.categoriesService.currentDomainCategories().subscribe(data => this.categories = data);
     this.eventBus.on(DATA_REFRESH_REQUEST_EVENT).subscribe(() => {
       this.refreshData();
       this.fetchCompanyData(this.currentCompanyDate || new Date());
@@ -133,7 +126,7 @@ export class AccountantHomeComponent implements OnInit, OnDestroy {
     }
     forkJoin([
       this.billingPeriodsHelper.fetchData(date),
-      this.accountsService.possibleCurrencies()
+      this.accountsService.currencies()
     ]).subscribe((
       [[accounts, piggyBanks, historicalSavings, billingPeriodInfo], currencies]
         : [readonly [Account[], PiggyBank[], Map<Date, Map<string, number>>, BillingPeriodInfo | null], Currency[]]) => {

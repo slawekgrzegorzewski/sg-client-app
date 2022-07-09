@@ -50,9 +50,6 @@ export class BillingElementsComponent implements OnInit {
 
   @Input() title = '';
 
-  @Input() userAccounts: Account[] = [];
-  @Input() categories: Category[] = [];
-  @Input() piggyBanks: PiggyBank[] = [];
   @Input() editable = false;
   @Input() minRowHeight = 0;
   @Output() createElementEvent = new EventEmitter<[Income | Expense, number]>();

@@ -26,12 +26,13 @@
                #name="ngModel"
                [(ngModel)]="editElement.name"
                required/>
+               required/>
       </div>
     </div>
-    <button *ngIf="editElement.id" [disabled]="name?.errors?.required"
+    <button *ngIf="editElement.id" [disabled]="name?.errors !== null"
             (click)="update()" class="btn btn-primary">Zapisz
     </button>
-    <button *ngIf="!editElement.id" [disabled]="name?.errors?.required"
+    <button *ngIf="!editElement.id" [disabled]="name?.errors !== null"
             (click)="create()" class="btn btn-primary">Stwórz
     </button>
     <button (click)="reset()" class="btn btn-primary">Anuluj</button>

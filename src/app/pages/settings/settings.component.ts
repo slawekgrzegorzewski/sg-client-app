@@ -12,7 +12,7 @@ import {BillingPeriodsService} from '../../services/accountant/billing-periods.s
 import {Category} from '../../model/accountant/billings/category';
 import {CategoriesService} from '../../services/accountant/categories.service';
 import {DomainService} from '../../services/domain.service';
-import {DetailedDomain} from '../../model/domain';
+import {DetailedDomain, Domain} from '../../model/domain';
 import {Client} from '../../model/accountant/client';
 import {ClientsService} from '../../services/accountant/clients.service';
 import {AccountantSettingsService} from '../../services/accountant/accountant-settings.service';
@@ -24,6 +24,8 @@ import {ActivatedRoute} from '@angular/router';
 import {BanksService} from '../../services/banks/banks.service';
 import {BankAccount} from '../../model/banks/bank-account';
 import {$e} from 'codelyzer/angular/styles/chars';
+import {NgEventBus} from 'ng-event-bus';
+import {keyframes} from '@angular/animations';
 
 export const SETTINGS_ROUTER_URL = 'settings';
 
@@ -34,15 +36,13 @@ export const SETTINGS_ROUTER_URL = 'settings';
 })
 export class SettingsComponent implements OnInit, OnDestroy {
 
-  accountsInCurrentDomain: Account[] = [];
   bankAccountsAvailableToAssign: BankAccount[] = [];
-  otherDomainsAccounts = new Map<string, Account[]>();
+  otherDomains: Domain[] = [];
   isEditAccount = false;
   accountToEdit: Account | null = null;
   accountToDelete: Account | null = null;
   showAccountDeletionConfirmation = false;
   accountBeingDeletedDescription = '';
-  currentDomainName = '';
   piggyBanks: PiggyBank[] = [];
   allCurrencies: Currency[] = [];
   categories: Category[] = [];
@@ -65,6 +65,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
     private clientsService: ClientsService,
     private servicesService: ServicesService,
     private domainService: DomainService,
+    private eventBus: NgEventBus,
     private piggyBanksService: PiggyBanksService,
     public loginService: LoginService,
     private modalService: NgbModal,
@@ -76,6 +77,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
       this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
     });
+    this.eventBus.on(AccountantSettingsService.ACCOUNTANT_SETTINGS_CHANGED).subscribe((metaData) => {
+      this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
+    });
+    this.domainService.getOtherDomains().subscribe(domains => this.otherDomains = domains);
   }
 
   ngOnInit(): void {
@@ -110,39 +115,20 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.fetchCategories();
     this.fetchClients();
     this.fetchServices();
-    this.currentDomainName = this.domainService.currentDomain?.name || '';
     this.fetchDomains();
     this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
   }
 
   private fetchAccounts(): void {
-    const currentDomain = this.domainService.currentDomainId;
-    const accounts: Observable<Account[]> = this.loginService.containsRole('ACCOUNTANT_ADMIN') ?
-      this.accountsService.allAccounts() : this.accountsService.currentDomainAccounts();
-    forkJoin([accounts, this.banksService.getBankAccountsNotAssignedToAnyAccount()]).subscribe(
-      ([accounts, bankAccounts]) => {
-        const accountsFromData = accounts.map(d => new Account(d));
-        this.accountsInCurrentDomain = accounts.filter(a => a.domain.id === currentDomain).sort(
-          ComparatorBuilder.comparing<Account>(a => a.currency).thenComparing(a => a.name).build()
-        );
-        this.otherDomainsAccounts = accounts.filter(a => a.domain.id !== currentDomain).reduce(
-          (map, acc) => map.set(acc.domain.name, [...map.get(acc.domain.name) || [], acc]),
-          new Map<string, Account[]>()
-        );
-        for (const domainName of this.otherDomainsAccounts.keys()) {
-          const domains = (this.otherDomainsAccounts.get(domainName) || [])
-            .sort(ComparatorBuilder.comparing<Account>(a => a.currency).thenComparing(a => a.name).build());
-          this.otherDomainsAccounts.set(domainName, domains);
-        }
+    this.banksService.getBankAccountsNotAssignedToAnyAccount().subscribe({
+      next: (bankAccounts) => {
         this.bankAccountsAvailableToAssign = bankAccounts;
       },
-      err => {
-        this.accountsInCurrentDomain = [];
+      error: err => {
         this.bankAccountsAvailableToAssign = [];
-        this.otherDomainsAccounts = new Map<string, Account[]>();
         this.toastService.showWarning('Current data has been cleared out.', 'Can not obtain data!');
       }
-    );
+    });
   }
 
   private fetchPiggyBanks(): void {
@@ -152,7 +138,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   private fetchCurrencies(): void {
-    this.accountsService.possibleCurrencies().subscribe(data => {
+    this.accountsService.currencies().subscribe(data => {
       this.allCurrencies = data.sort((a, b) => a.code.localeCompare(b.code));
     });
   }
@@ -356,10 +342,5 @@ export class SettingsComponent implements OnInit, OnDestroy {
       changedDomain => this.refreshDomains(changedDomain),
       error => this.toastService.showWarning(error.error, 'W czasie zmiany uprawnień domeny wystąpił błąd')
     );
-  }
-
-  updateIsCompany(settings: AccountantSettings): void {
-    this.accountantSettingsService.setIsCompany(settings.company).subscribe(data => {
-    });
   }
 }

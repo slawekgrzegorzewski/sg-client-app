@@ -19,7 +19,6 @@ export const ACCOUNTANT_HISTORY_ROUTER_URL = 'accounts-history';
 })
 export class AccountsHistoryComponent implements OnInit, OnDestroy {
 
-  accounts: Account[] = [];
   selectedAccount: Account | null = null;
   allTransactions: Transaction[] = [];
 
@@ -51,17 +50,7 @@ export class AccountsHistoryComponent implements OnInit, OnDestroy {
   }
 
   refreshData(): void {
-    this.fetchAccounts();
     this.fetchTransactions();
-  }
-
-  fetchAccounts(): void {
-    this.accountsService.currentDomainAccounts().subscribe(
-      data => this.accounts = data.sort(
-        ComparatorBuilder.comparing<Account>(a => a.currency).thenComparing(a => a.name).build()
-      ),
-      error => this.accounts = []
-    );
   }
 
   fetchTransactions(): void {

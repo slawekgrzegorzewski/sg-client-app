@@ -92,6 +92,7 @@ export class HeaderComponent implements OnDestroy {
   }
 
   castRefreshRequest(): void {
+    this.fetchData();
     this.eventBus.cast(DATA_REFRESH_REQUEST_EVENT);
   }
 }
