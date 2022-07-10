@@ -34,7 +34,7 @@ export class ChartsComponent implements OnInit, OnDestroy {
               private route: ActivatedRoute,
               private domainService: DomainService) {
     this.domainService.registerToDomainChangesViaRouterUrl(CHARTS_ROUTER_URL, this.route);
-    this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
+    this.domainSubscription = this.domainService.currentDomainChangeEvent.subscribe((domain) => {
       this.refreshData();
     });
   }

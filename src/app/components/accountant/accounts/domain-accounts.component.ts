@@ -65,7 +65,7 @@ export class DomainAccountsComponent implements OnInit {
   totalBalancesPerCurrency: Map<string, number> = new Map<string, number>();
 
   constructor(private accountsService: AccountsService, private domainService: DomainService) {
-    this.domainService.onCurrentDomainChange.subscribe(domain => {
+    this.domainService.currentDomainChangeEvent.subscribe(domain => {
       if (this.domain === null) {
         this.getAccountsForDomain();
       }

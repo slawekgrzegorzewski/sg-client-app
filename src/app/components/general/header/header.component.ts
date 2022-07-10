@@ -1,11 +1,16 @@
-import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {LoginService} from 'src/app/services/login.service';
 import {Router} from '@angular/router';
 import {DomainService} from '../../../services/domain.service';
 import {DetailedDomain, Domain} from '../../../model/domain';
 import {NgEventBus} from 'ng-event-bus';
 import {ApplicationsService} from '../../../services/applications.service';
-import {DATA_REFRESH_REQUEST_EVENT, NAVIGATION_RESIZE_EVENT} from '../../../app.module';
+import {
+  DATA_REFRESH_REQUEST_EVENT,
+  DOMAINS_CHANGED,
+  INVITATIONS_CHANGED,
+  NAVIGATION_RESIZE_EVENT, SELECTED_DOMAIN_CHANGED
+} from '../../../app.module';
 import {AccountantSettingsService} from '../../../services/accountant/accountant-settings.service';
 import {AccountantSettings} from '../../../model/accountant/accountant-settings';
 import {Subscription} from 'rxjs';
@@ -15,14 +20,13 @@ import {Subscription} from 'rxjs';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent implements OnDestroy {
+export class HeaderComponent implements OnInit {
 
   @ViewChild('navigation') navigation!: ElementRef;
   isLoggedIn = false;
   invitations: Domain[] = [];
   availableDomains: DetailedDomain[] = [];
   public accountantSettings: AccountantSettings | null = null;
-  private domainSubscription: Subscription;
 
   constructor(
     public loginService: LoginService,
@@ -32,19 +36,20 @@ export class HeaderComponent implements OnDestroy {
     public applicationsService: ApplicationsService,
     private accountantSettingsService: AccountantSettingsService
   ) {
-    this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
-    this.fetchData();
-    this.domainService.onDomainsChange.subscribe(domains => this.availableDomains = domains);
-    this.domainService.onInvitationChange.subscribe(domains => this.invitations = domains);
-    this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
+
+    this.eventBus.on(DOMAINS_CHANGED)
+      .subscribe(md => this.domainService.getAllDomains().subscribe(domains => this.availableDomains = domains));
+
+    this.eventBus.on(INVITATIONS_CHANGED)
+      .subscribe(md => this.domainService.getInvitations().subscribe(invitations => this.invitations = invitations));
+
+    this.eventBus.on(SELECTED_DOMAIN_CHANGED).subscribe((md) => {
       this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
     });
   }
 
-  ngOnDestroy(): void {
-    if (this.domainSubscription) {
-      this.domainSubscription.unsubscribe();
-    }
+  ngOnInit(): void {
+    this.fetchData();
   }
 
   public getTakenHeight(): number {
@@ -57,7 +62,9 @@ export class HeaderComponent implements OnDestroy {
 
   private fetchData(): void {
     this.isLoggedIn = this.loginService.isLoggedIn();
-    this.invitations = this.domainService.invitations;
+    this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
+    this.domainService.getAllDomains().subscribe(domains => this.availableDomains = domains)
+    this.domainService.getInvitations().subscribe(invitations => this.invitations = invitations);
   }
 
   toggleMenuBar(): void {

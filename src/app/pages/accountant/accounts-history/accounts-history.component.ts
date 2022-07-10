@@ -33,7 +33,7 @@ export class AccountsHistoryComponent implements OnInit, OnDestroy {
               private route: ActivatedRoute,
               private domainService: DomainService) {
     this.domainService.registerToDomainChangesViaRouterUrl(ACCOUNTANT_HISTORY_ROUTER_URL, this.route);
-    this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
+    this.domainSubscription = this.domainService.currentDomainChangeEvent.subscribe((domain) => {
       this.refreshData();
     });
   }

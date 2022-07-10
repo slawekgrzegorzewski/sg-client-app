@@ -23,7 +23,7 @@ export class PiggyBanksSmallComponent implements OnInit, OnDestroy {
               private domainService: DomainService
   ) {
     this.domainService.registerToDomainChangesViaRouterUrl(PIGGY_BANKS_SMALL_ROUTER_URL, this.route);
-    this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
+    this.domainSubscription = this.domainService.currentDomainChangeEvent.subscribe((domain) => {
       this.refreshData();
     });
   }

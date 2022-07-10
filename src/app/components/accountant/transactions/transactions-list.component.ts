@@ -32,7 +32,7 @@ export class TransactionsListComponent implements OnInit {
 
   constructor(private accountsService: AccountsService,
               private domainService: DomainService) {
-    domainService.onCurrentDomainChange.subscribe(domain => this.getAccounts());
+    domainService.currentDomainChangeEvent.subscribe(domain => this.getAccounts());
   }
 
   ngOnInit(): void {

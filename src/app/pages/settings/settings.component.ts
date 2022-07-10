@@ -74,7 +74,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute) {
 
     this.domainService.registerToDomainChangesViaRouterUrl(SETTINGS_ROUTER_URL, this.route);
-    this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
+    this.domainSubscription = this.domainService.currentDomainChangeEvent.subscribe((domain) => {
       this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
     });
     this.eventBus.on(AccountantSettingsService.ACCOUNTANT_SETTINGS_CHANGED).subscribe((metaData) => {

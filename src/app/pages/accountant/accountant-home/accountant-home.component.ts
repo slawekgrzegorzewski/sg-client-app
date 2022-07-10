@@ -86,7 +86,7 @@ export class AccountantHomeComponent implements OnInit, OnDestroy {
     this.billingPeriodsHelper = new BillingPeriodsHelper(accountsService, piggyBanksService, billingsService);
     this.companyLogHelper = new CompanyLogHelper(performedServicePaymentsService, performedServicesService, clientPaymentsService, servicesService, clientsService);
     this.domainService.registerToDomainChangesViaRouterUrl(ACCOUNTANT_HOME_ROUTER_URL, this.route);
-    this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
+    this.domainSubscription = this.domainService.currentDomainChangeEvent.subscribe((domain) => {
       this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
       this.refreshData();
     });

@@ -31,7 +31,7 @@ export class BillingSmallComponent implements OnInit, OnDestroy {
               private route: ActivatedRoute
   ) {
     this.domainService.registerToDomainChangesViaRouterUrl(BILLING_SMALL_ROUTER_URL, this.route);
-    this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
+    this.domainSubscription = this.domainService.currentDomainChangeEvent.subscribe((domain) => {
       this.refreshData();
     });
   }

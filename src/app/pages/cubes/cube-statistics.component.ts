@@ -93,7 +93,7 @@ export class CubeStatisticsComponent implements OnInit, AfterViewInit, OnDestroy
               private route: ActivatedRoute,
               private domainService: DomainService) {
     this.domainService.registerToDomainChangesViaRouterUrl(CUBES_STATISTICS_ROUTER_URL, this.route);
-    this.domainSubscription = this.domainService.onCurrentDomainChange.subscribe((domain) => {
+    this.domainSubscription = this.domainService.currentDomainChangeEvent.subscribe((domain) => {
       this.refreshStats();
     });
   }

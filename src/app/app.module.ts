@@ -102,8 +102,11 @@ export const APP_LOGIN_STATUS_REQUEST_EVENT = 'app:getlogin';
 export const APP_LOGIN_STATUS_EVENT = 'app:login';
 export const APP_SIZE_EVENT = 'app:size';
 export const APP_GET_SIZE_EVENT = 'app:getsize';
+export const DOMAINS_CHANGED = 'domain:change'
 export const DATA_REFRESH_REQUEST_EVENT = 'data:refresh';
+export const INVITATIONS_CHANGED = 'invitations:changed';
 export const NAVIGATION_RESIZE_EVENT = 'navigation:resize';
+export const SELECTED_DOMAIN_CHANGED = 'domain:selected:changed';
 
 export class AppLoginStatus {
   public isLoggedId: boolean = false;

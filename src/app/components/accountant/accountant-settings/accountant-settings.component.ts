@@ -19,7 +19,7 @@ export class AccountantSettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.getSettings();
-    this.domainService.onCurrentDomainChange.subscribe((domain) => {
+    this.domainService.currentDomainChangeEvent.subscribe((domain) => {
       this.getSettings();
     });
   }
