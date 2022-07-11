@@ -40,6 +40,7 @@ export class DataPickerComponent implements ControlValueAccessor {
   };
   propagateTouched: (_: Date) => void = (d: Date) => {
   };
+  @Input() disabled: boolean = false;
 
   registerOnChange(fn: (_: Date) => void): void {
     this.propagateChange = fn;

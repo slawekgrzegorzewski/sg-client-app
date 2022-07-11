@@ -6,6 +6,8 @@ import {Country} from '../../model/syr/country';
 import {Observable, of, Subscription} from 'rxjs';
 import {DomainService} from '../../services/domain.service';
 import {ACCOUNTANT_HOME_ROUTER_URL} from '../accountant/accountant-home/accountant-home.component';
+import {SELECTED_DOMAIN_CHANGED} from '../../app.module';
+import {NgEventBus} from 'ng-event-bus';
 
 export const SYR_ADMIN_ROUTER_URL = 'syr-admin';
 
@@ -24,9 +26,10 @@ export class SyrAdminComponent implements OnInit, OnDestroy {
 
   constructor(private syrService: SyrService, private router: Router,
               private route: ActivatedRoute,
-              private domainService: DomainService) {
+              private domainService: DomainService,
+              private eventBus: NgEventBus) {
     this.domainService.registerToDomainChangesViaRouterUrl(SYR_ADMIN_ROUTER_URL, this.route);
-    this.domainSubscription = this.domainService.currentDomainChangeEvent.subscribe((domain) => {
+    this.domainSubscription = this.eventBus.on(SELECTED_DOMAIN_CHANGED).subscribe((domain) => {
     });
   }
 
@@ -50,9 +53,9 @@ export class SyrAdminComponent implements OnInit, OnDestroy {
     }
   }
 
-  countriesForTypeAhead(): () => Observable<Country[]> {
+  countriesForTypeAhead(): () => Country[] {
     const that = this;
-    return () => of(that.allCountries);
+    return () => that.allCountries;
   }
 
   importSYR(): void {

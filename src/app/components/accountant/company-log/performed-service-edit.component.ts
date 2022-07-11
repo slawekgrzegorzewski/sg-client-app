@@ -69,12 +69,12 @@ export class PerformedServiceEditComponent implements OnInit {
       && this.performedService.date !== null;
   }
 
-  servicesForTypeAhead(): () => Observable<Service[]> {
+  servicesForTypeAhead(): () => Service[] {
     const that = this;
-    return () => of(that.services);
+    return () => that.services;
   }
 
-  clientsForTypeAhead(): () => Observable<Client[]> {
+  clientsForTypeAhead(): () => Client[] {
     const that = this;
     const clientsOccurrences: Map<number, number> = new Map<number, number>();
     that.performedServices.filter(ps => ps.date.getMonth() >= new Date().getMonth() - 1).forEach(ps => {
@@ -87,11 +87,11 @@ export class PerformedServiceEditComponent implements OnInit {
       }
       return a.name.localeCompare(b.name);
     });
-    return () => of(clientsToShow);
+    return () => clientsToShow;
   }
 
-  currenciesForTypeAhead(): () => Observable<Currency[]> {
+  currenciesForTypeAhead(): () => Currency[] {
     const that = this;
-    return () => of(that.allCurrencies);
+    return () => that.allCurrencies;
   }
 }

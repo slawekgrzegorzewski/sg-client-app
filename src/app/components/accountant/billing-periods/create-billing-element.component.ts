@@ -33,7 +33,7 @@ export class CreateBillingElementComponent implements OnInit {
   availableCurrencies: string[] = [];
   piggyBanks: PiggyBank[] = [];
   piggyBank: PiggyBank | null = null;
-  billingElement: Income | Expense | null = null;
+  @Input() billingElement: Income | Expense | null = null;
   piggyBanksForSelectedAccount: string[] | null = null;
 
   get elementDate(): Date | null {
@@ -73,6 +73,17 @@ export class CreateBillingElementComponent implements OnInit {
     this.filterPiggyBanks();
   }
 
+  private _account: Account | null = null;
+
+  get account(): Account | null {
+    return this._account;
+  }
+
+  @Input() set account(value: Account | null) {
+    this._account = value;
+    this.selectedAccount = value;
+  }
+
   forAccountIdInternal: number | null = null;
 
   get forAccountId(): number | null {
@@ -97,11 +108,19 @@ export class CreateBillingElementComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.elementType === INCOME) {
-      this.billingElement = new Income();
-      this.billingElement.incomeDate = new Date();
+      if (this.billingElement === null) {
+        this.billingElement = new Income();
+        this.billingElement.incomeDate = new Date();
+      } else if (!(this.billingElement instanceof Income)) {
+        throw 'billing element should be an income';
+      }
     } else if (this.elementType === EXPENSE) {
-      this.billingElement = new Expense();
-      this.billingElement.expenseDate = new Date();
+      if (this.billingElement === null) {
+        this.billingElement = new Expense();
+        this.billingElement.expenseDate = new Date();
+      } else if (!(this.billingElement instanceof Expense)) {
+        throw 'billing element should be an income';
+      }
     } else {
       this.billingElement = null;
     }
@@ -174,18 +193,18 @@ export class CreateBillingElementComponent implements OnInit {
       && (this.isIncome() || this.billingElement.amount <= this.selectedAccount.currentBalance);
   }
 
-  categoriesForTypeAhead(): () => Observable<Category[]> {
+  categoriesForTypeAhead(): () => Category[] {
     const that = this;
-    return () => of(that.categories.sort((a, b) => a.name.localeCompare(b.name)));
+    return () => that.categories.sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  piggyBanksForTypeAhead(): () => Observable<PiggyBank[]> {
+  piggyBanksForTypeAhead(): () => PiggyBank[] {
     const that = this;
-    return () => of(
+    return () =>
       that.piggyBanks
         .filter(pb => that.selectedAccount && pb.currency === that.selectedAccount.currency)
         .sort((a, b) => a.name.localeCompare(b.name))
-    );
+    ;
   }
 
   getCurrencySymbol(currency: string): string {

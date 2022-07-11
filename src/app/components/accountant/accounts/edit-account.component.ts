@@ -61,8 +61,8 @@ export class EditAccountComponent implements OnInit {
     return this.entity !== null && this.entity.id > 0;
   }
 
-  currenciesForTypeAhead(): () => Observable<Currency[]> {
+  currenciesForTypeAhead(): () => Currency[] {
     const that = this;
-    return () => of(that.currencies);
+    return () => that.currencies;
   }
 }

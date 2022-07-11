@@ -4,7 +4,16 @@
 <ng-template [ngTemplateOutlet]="importPart" *ngIf="transactionToImport && !importMode">
 
 </ng-template>
-<ng-template [ngTemplateOutlet]="createDebit" *ngIf="transactionToImport && importMode === 'CREDIT'">
+<ng-template [ngTemplateOutlet]="createDebit"
+             *ngIf="transactionToImport && (importMode === 'DEBIT' || importMode === 'CREDIT')">
+
+</ng-template>
+<ng-template [ngTemplateOutlet]="createTransfer"
+             *ngIf="transactionToImport && otherTransactionForTransfer && (importMode === 'TRANSFER')">
+
+</ng-template>
+<ng-template [ngTemplateOutlet]="mutuallyCancelTransactions"
+             *ngIf="transactionToImport && otherTransactionForTransfer && (importMode === 'MUTUALLY_CANCELLING')">
 
 </ng-template>
 
@@ -31,8 +40,20 @@
 
     <h6>Powyższą transakcję można zaimportować jako:</h6>
     <div *ngIf="transactionMayBeDebit(transactionToImport)"
-         (click)="importMode = 'CREDIT'">
+         (click)="importMode = 'DEBIT'">
       Wydatek
+    </div>
+    <div *ngIf="transactionMayBeCredit(transactionToImport)"
+         (click)="importMode = 'CREDIT'">
+      Dochód
+    </div>
+    <div *ngIf="transactionMayBeTransfer(transactionToImport)"
+         (click)="importMode = 'TRANSFER'">
+      Przekaz wewnętrzny
+    </div>
+    <div *ngIf="transactionMayBeTransfer(transactionToImport)"
+         (click)="importMode = 'MUTUALLY_CANCELLING'">
+      Transakcje znoszące się
     </div>
 
   </div>
@@ -41,9 +62,21 @@
 <ng-template #createDebit>
   <div class="sg-flex-column">
     <app-create-billing-element class="sg-flex-column"
-                                [elementType]="'expense'"
+                                [elementType]="importMode === 'DEBIT' ? 'expense' : 'income'"
+                                [billingElement]="elementToCreate"
+                                [account]="getAccountForBillingElement()"
                                 (editEvent)="createElement($event[0], $event[1], $event[2])"
     ></app-create-billing-element>
 
   </div>
+</ng-template>
+
+<ng-template #createTransfer>
+</ng-template>
+
+<ng-template #mutuallyCancelTransactions>
+  <app-transactions-row [transactionToImport]="transactionToImport"></app-transactions-row>
+  <app-transactions-row [transactionToImport]="otherTransactionForTransfer"></app-transactions-row>
+  <button class="btn btn-sm btn-link" (click)="cancelMutualCancellation()">Cofnij</button>
+  <button class="btn btn-sm btn-link" (click)="mutuallyCancelBothTransactions()">Anuluj wzajemnie</button>
 </ng-template>

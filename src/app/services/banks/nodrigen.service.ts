@@ -1,11 +1,13 @@
 import {Injectable} from '@angular/core';
 import {environment} from '../../../environments/environment';
 import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {Observable, tap} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {NodrigenInstitution} from '../../model/banks/nodrigen/nodrigen-institution';
 import {NodrigenPermission} from '../../model/banks/nodrigen/nodrigen-permission';
 import {MatchingMode, BankTransactionToImport} from '../../model/banks/nodrigen/bank-transaction-to-import';
+import {NgEventBus} from 'ng-event-bus';
+import {BILLING_PERIOD_CHANGED, PIGGY_BANKS_CHANGED} from '../../app.module';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +17,7 @@ export class NodrigenService {
   private readonly endpoint = `${environment.serviceUrl}/nodrigen`;
 
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private eventBus: NgEventBus) {
   }
 
   listInstitutions(country: string): Observable<NodrigenInstitution[]> {
@@ -67,4 +69,20 @@ export class NodrigenService {
       .pipe(map((data: BankTransactionToImport[]) => data.map(d => new BankTransactionToImport(d))));
   }
 
+  mutuallyCancelTransactions(transactionToImport: BankTransactionToImport, otherTransactionForTransfer: BankTransactionToImport) {
+    const firstId = transactionToImport.credit > 0
+      ? transactionToImport.creditNodrigenTransactionId
+      : transactionToImport.debitNodrigenTransactionId;
+    const secondId = otherTransactionForTransfer.credit > 0
+      ? otherTransactionForTransfer.creditNodrigenTransactionId
+      : otherTransactionForTransfer.debitNodrigenTransactionId;
+    return this.http.put<BankTransactionToImport[]>(`${this.endpoint}/nodrigen_transactions_to_mutually_cancel/${firstId}/${secondId}`, null)
+      .pipe(
+        map((data: BankTransactionToImport[]) => data.map(d => new BankTransactionToImport(d))),
+        tap(data => {
+          this.eventBus.cast(BILLING_PERIOD_CHANGED);
+          this.eventBus.cast(PIGGY_BANKS_CHANGED);
+        })
+      );
+  }
 }

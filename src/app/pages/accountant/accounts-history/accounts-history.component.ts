@@ -8,6 +8,8 @@ import {ComparatorBuilder} from '../../../utils/comparator-builder';
 import {ActivatedRoute, Router} from '@angular/router';
 import {DomainService} from '../../../services/domain.service';
 import {Subscription} from 'rxjs';
+import {SELECTED_DOMAIN_CHANGED} from '../../../app.module';
+import {NgEventBus} from 'ng-event-bus';
 
 
 export const ACCOUNTANT_HISTORY_ROUTER_URL = 'accounts-history';
@@ -31,9 +33,10 @@ export class AccountsHistoryComponent implements OnInit, OnDestroy {
               private toastService: ToastService,
               private router: Router,
               private route: ActivatedRoute,
-              private domainService: DomainService) {
+              private domainService: DomainService,
+              private eventBus: NgEventBus) {
     this.domainService.registerToDomainChangesViaRouterUrl(ACCOUNTANT_HISTORY_ROUTER_URL, this.route);
-    this.domainSubscription = this.domainService.currentDomainChangeEvent.subscribe((domain) => {
+    this.domainSubscription = this.eventBus.on(SELECTED_DOMAIN_CHANGED).subscribe((domain) => {
       this.refreshData();
     });
   }

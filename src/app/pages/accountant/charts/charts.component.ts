@@ -8,6 +8,8 @@ import {BaseChartDirective} from 'ng2-charts';
 import {ActivatedRoute} from '@angular/router';
 import {DomainService} from '../../../services/domain.service';
 import {Subscription} from 'rxjs';
+import {SELECTED_DOMAIN_CHANGED} from '../../../app.module';
+import {NgEventBus} from 'ng-event-bus';
 
 export const CHARTS_ROUTER_URL = 'charts';
 
@@ -32,9 +34,10 @@ export class ChartsComponent implements OnInit, OnDestroy {
   constructor(private billingPeriodsService: BillingPeriodsService,
               private datePipe: DatePipe,
               private route: ActivatedRoute,
-              private domainService: DomainService) {
+              private domainService: DomainService,
+              private eventBus: NgEventBus) {
     this.domainService.registerToDomainChangesViaRouterUrl(CHARTS_ROUTER_URL, this.route);
-    this.domainSubscription = this.domainService.currentDomainChangeEvent.subscribe((domain) => {
+    this.domainSubscription = this.eventBus.on(SELECTED_DOMAIN_CHANGED).subscribe((domain) => {
       this.refreshData();
     });
   }

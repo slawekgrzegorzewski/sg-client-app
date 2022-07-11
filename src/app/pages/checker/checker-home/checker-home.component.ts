@@ -5,6 +5,8 @@ import {Subscription} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
 import {DomainService} from '../../../services/domain.service';
 import {ACCOUNTANT_HOME_ROUTER_URL} from '../../accountant/accountant-home/accountant-home.component';
+import {SELECTED_DOMAIN_CHANGED} from '../../../app.module';
+import {NgEventBus} from 'ng-event-bus';
 
 export const CHECKER_HOME_ROUTER_URL = 'checker-home';
 
@@ -22,9 +24,10 @@ export class CheckerHomeComponent implements OnInit, OnDestroy {
 
   constructor(private pageVersionsService: PageVersionsService,
               private route: ActivatedRoute,
-              private domainService: DomainService) {
+              private domainService: DomainService,
+              private eventBus: NgEventBus) {
     this.domainService.registerToDomainChangesViaRouterUrl(CHECKER_HOME_ROUTER_URL, this.route);
-    this.domainSubscription = this.domainService.currentDomainChangeEvent.subscribe((domain) => {
+    this.domainSubscription = this.eventBus.on(SELECTED_DOMAIN_CHANGED).subscribe((domain) => {
       this.refreshData();
     });
   }

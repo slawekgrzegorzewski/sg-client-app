@@ -15,16 +15,19 @@
       </div>
     </div>
     <div class="sg-flex-column amounts-column">
-      <div *ngIf="transactionToImport.sourceAccount">
+      <div *ngIf="transactionToImport.sourceAccount; else empty">
         {{transactionToImport.debit | currency: transactionToImport.sourceAccount.currency}}
       </div>
-      <div *ngIf="transactionToImport.destinationAccount">
+      <div *ngIf="transactionToImport.destinationAccount; else empty">
         {{transactionToImport.credit | currency: transactionToImport.destinationAccount.currency}}
       </div>
+      <ng-template #empty>
+        <div>&nbsp;</div>
+      </ng-template>
     </div>
     <div class="sg-flex-column rate-column" *ngIf="transactionToImport.conversionRate !== 1">
-        <div>Kurs:</div>
-        <div>{{transactionToImport.conversionRate}}</div>
+      <div>Kurs:</div>
+      <div>{{transactionToImport.conversionRate}}</div>
     </div>
     <div class="sg-flex-column date-column">
       <div>Data:</div>

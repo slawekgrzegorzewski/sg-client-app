@@ -29,8 +29,6 @@ export class DomainService {
   private getOtherDomainsObservable: Observable<DetailedDomain[]> | null = null;
   private getInvitationsObservable: Observable<Domain[]> | null = null;
 
-  currentDomainChangeEvent = new EventEmitter<DetailedDomain | null>();
-
   private isLoggedIn: boolean = false;
   private defaultDomainId: number | null = null;
   private componentRegistration: ComponentRegistration | null = null;

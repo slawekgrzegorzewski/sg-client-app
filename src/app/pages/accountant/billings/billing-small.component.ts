@@ -9,6 +9,8 @@ import {Expense} from '../../../model/accountant/billings/expense';
 import {DomainService} from '../../../services/domain.service';
 import {Subscription} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
+import {SELECTED_DOMAIN_CHANGED} from '../../../app.module';
+import {NgEventBus} from 'ng-event-bus';
 
 export const BILLING_SMALL_ROUTER_URL = 'billing-small';
 
@@ -28,10 +30,11 @@ export class BillingSmallComponent implements OnInit, OnDestroy {
               private piggyBanksService: PiggyBanksService,
               private billingsService: BillingPeriodsService,
               private domainService: DomainService,
-              private route: ActivatedRoute
+              private route: ActivatedRoute,
+              private eventBus: NgEventBus
   ) {
     this.domainService.registerToDomainChangesViaRouterUrl(BILLING_SMALL_ROUTER_URL, this.route);
-    this.domainSubscription = this.domainService.currentDomainChangeEvent.subscribe((domain) => {
+    this.domainSubscription = this.eventBus.on(SELECTED_DOMAIN_CHANGED).subscribe((domain) => {
       this.refreshData();
     });
   }

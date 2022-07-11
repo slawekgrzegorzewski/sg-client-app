@@ -4,6 +4,8 @@ import {PiggyBanksService} from '../../../services/accountant/piggy-banks.servic
 import {Subscription} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
 import {DomainService} from '../../../services/domain.service';
+import {SELECTED_DOMAIN_CHANGED} from '../../../app.module';
+import {NgEventBus} from 'ng-event-bus';
 
 export const PIGGY_BANKS_SMALL_ROUTER_URL = 'piggy-banks-small';
 
@@ -20,10 +22,11 @@ export class PiggyBanksSmallComponent implements OnInit, OnDestroy {
 
   constructor(private piggyBanksService: PiggyBanksService,
               private route: ActivatedRoute,
-              private domainService: DomainService
+              private domainService: DomainService,
+              private eventBus: NgEventBus
   ) {
     this.domainService.registerToDomainChangesViaRouterUrl(PIGGY_BANKS_SMALL_ROUTER_URL, this.route);
-    this.domainSubscription = this.domainService.currentDomainChangeEvent.subscribe((domain) => {
+    this.domainSubscription = this.eventBus.on(SELECTED_DOMAIN_CHANGED).subscribe((domain) => {
       this.refreshData();
     });
   }

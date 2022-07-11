@@ -7,6 +7,8 @@ import {AccountsService} from '../../../services/accountant/accounts.service';
 import {Domain} from '../../../model/domain';
 import {DomainService} from '../../../services/domain.service';
 import {Subscription} from 'rxjs';
+import {NgEventBus} from 'ng-event-bus';
+import {SELECTED_DOMAIN_CHANGED} from '../../../app.module';
 
 @Component({
   selector: 'app-domain-accounts',
@@ -64,8 +66,10 @@ export class DomainAccountsComponent implements OnInit {
 
   totalBalancesPerCurrency: Map<string, number> = new Map<string, number>();
 
-  constructor(private accountsService: AccountsService, private domainService: DomainService) {
-    this.domainService.currentDomainChangeEvent.subscribe(domain => {
+  constructor(private accountsService: AccountsService,
+              private domainService: DomainService,
+              private eventBus: NgEventBus) {
+    this.eventBus.on(SELECTED_DOMAIN_CHANGED).subscribe(domain => {
       if (this.domain === null) {
         this.getAccountsForDomain();
       }

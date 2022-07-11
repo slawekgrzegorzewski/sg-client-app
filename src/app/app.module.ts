@@ -107,6 +107,8 @@ export const DATA_REFRESH_REQUEST_EVENT = 'data:refresh';
 export const INVITATIONS_CHANGED = 'invitations:changed';
 export const NAVIGATION_RESIZE_EVENT = 'navigation:resize';
 export const SELECTED_DOMAIN_CHANGED = 'domain:selected:changed';
+export const PIGGY_BANKS_CHANGED = 'piggy-bank:changed';
+export const BILLING_PERIOD_CHANGED = 'billing-period:changed';
 
 export class AppLoginStatus {
   public isLoggedId: boolean = false;

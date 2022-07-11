@@ -8,6 +8,8 @@ import {CountrySYR} from '../../model/syr/country-syr';
 import {SecretCountriesSYR} from '../../model/syr/secret-countries-syr';
 import {CountrySyrLineChart, SyrCell} from '../../model/syr/CountrySyrLineChart';
 import {DomainService} from '../../services/domain.service';
+import {SELECTED_DOMAIN_CHANGED} from '../../app.module';
+import {NgEventBus} from 'ng-event-bus';
 
 export const SYR_HOME_ROUTER_URL = 'syr-home';
 
@@ -40,9 +42,10 @@ export class SyrHomeComponent implements OnInit, OnDestroy {
 
   constructor(private syrService: SyrService, private router: Router,
               private route: ActivatedRoute,
-              private domainService: DomainService) {
+              private domainService: DomainService,
+              private eventBus: NgEventBus) {
     this.domainService.registerToDomainChangesViaRouterUrl(SYR_HOME_ROUTER_URL, this.route);
-    this.domainSubscription = this.domainService.currentDomainChangeEvent.subscribe((domain) => {
+    this.domainSubscription = this.eventBus.on(SELECTED_DOMAIN_CHANGED).subscribe((domain) => {
       this.getData();
     });
   }

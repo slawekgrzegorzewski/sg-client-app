@@ -18,7 +18,7 @@ import {ForTypeahead} from '../../model/accountant/for-typeahead';
 export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit, ControlValueAccessor {
 
   @Input() id: string | null = null;
-  @Input() dataProvider: (() => Observable<T[]>) | null = null;
+  @Input() dataProvider: (() => T[]) | null = null;
   private internalValue: T | null = null;
 
   get value(): T | null {
@@ -75,6 +75,7 @@ export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit
 
     return merge(debouncedText, inputFocus, clicksWithClosedPopup).pipe(
       map((term: string) => {
+        this.loadData();
         return (term === ''
           ? this.values
           : this.values.filter(c => c.getTypeaheadDescription().toLowerCase().indexOf(term.toLowerCase()) > -1))
@@ -119,17 +120,8 @@ export class GeneralTypeaheadComponent<T extends ForTypeahead> implements OnInit
 
   private loadData(): void {
     if (this.dataProvider) {
-      this.dataProvider().subscribe({
-          next: data => {
-            this.allValues = data;
-            this.filterData();
-          },
-          error: err => {
-            this.values = [];
-            this.toastService.showWarning('No values available.', 'Can not obtain available values!');
-          }
-        }
-      );
+      this.allValues = this.dataProvider();
+      this.filterData();
     }
   }
 

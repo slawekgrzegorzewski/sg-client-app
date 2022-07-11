@@ -2,6 +2,8 @@ import {Component, Input, OnInit} from '@angular/core';
 import {AccountantSettings} from '../../../model/accountant/accountant-settings';
 import {DomainService} from '../../../services/domain.service';
 import {AccountantSettingsService} from '../../../services/accountant/accountant-settings.service';
+import {NgEventBus} from 'ng-event-bus';
+import {SELECTED_DOMAIN_CHANGED} from '../../../app.module';
 
 @Component({
   selector: 'app-accountant-settings',
@@ -14,12 +16,13 @@ export class AccountantSettingsComponent implements OnInit {
 
   constructor(
     private accountantSettingsService: AccountantSettingsService,
-    private domainService: DomainService) {
+    private domainService: DomainService,
+    private eventBus: NgEventBus) {
   }
 
   ngOnInit(): void {
     this.getSettings();
-    this.domainService.currentDomainChangeEvent.subscribe((domain) => {
+    this.eventBus.on(SELECTED_DOMAIN_CHANGED).subscribe((domain) => {
       this.getSettings();
     });
   }

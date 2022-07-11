@@ -27,10 +27,17 @@ import {NgEventBus} from 'ng-event-bus';
 import {DatesUtils} from '../../../utils/dates-utils';
 import {ActivatedRoute, Router} from '@angular/router';
 import {DomainService} from '../../../services/domain.service';
-import {APP_SIZE_EVENT, DATA_REFRESH_REQUEST_EVENT} from '../../../app.module';
+import {
+  APP_SIZE_EVENT,
+  BILLING_PERIOD_CHANGED,
+  DATA_REFRESH_REQUEST_EVENT,
+  PIGGY_BANKS_CHANGED,
+  SELECTED_DOMAIN_CHANGED
+} from '../../../app.module';
 import {AccountantSettings} from '../../../model/accountant/accountant-settings';
 import {AccountantSettingsService} from '../../../services/accountant/accountant-settings.service';
 import {ViewMode} from '../../../utils/view-mode';
+import {debounceTime} from 'rxjs/operators';
 
 type MobileEditMode = 'display' | 'create-income' | 'create-expense' | 'create-performed-service';
 
@@ -86,10 +93,17 @@ export class AccountantHomeComponent implements OnInit, OnDestroy {
     this.billingPeriodsHelper = new BillingPeriodsHelper(accountsService, piggyBanksService, billingsService);
     this.companyLogHelper = new CompanyLogHelper(performedServicePaymentsService, performedServicesService, clientPaymentsService, servicesService, clientsService);
     this.domainService.registerToDomainChangesViaRouterUrl(ACCOUNTANT_HOME_ROUTER_URL, this.route);
-    this.domainSubscription = this.domainService.currentDomainChangeEvent.subscribe((domain) => {
+    this.domainSubscription = this.eventBus.on(SELECTED_DOMAIN_CHANGED).subscribe((domain) => {
       this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
       this.refreshData();
     });
+    this.eventBus.on(PIGGY_BANKS_CHANGED)
+      .subscribe(md => this.refreshData());
+    this.eventBus.on(BILLING_PERIOD_CHANGED)
+      .subscribe(md => this.refreshData());
+    forkJoin([this.eventBus.on(PIGGY_BANKS_CHANGED), this.eventBus.on(BILLING_PERIOD_CHANGED)])
+      .pipe(debounceTime(200))
+      .subscribe(md => this.refreshData());
   }
 
   ngOnInit(): void {

@@ -4,6 +4,8 @@ import {HolidayCurrencies} from 'src/app/model/accountant/holiday-currencies';
 import {Subscription} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
 import {DomainService} from '../../../services/domain.service';
+import {NgEventBus} from 'ng-event-bus';
+import {SELECTED_DOMAIN_CHANGED} from '../../../app.module';
 
 export const HOLIDAY_CURRENCIES_ROUTER_URL = 'holiday-currencies';
 
@@ -75,9 +77,10 @@ export class HolidayCurrenciesComponent implements OnInit, OnDestroy {
 
   constructor(private holidayCurrenciesService: HolidayCurrenciesService,
               private route: ActivatedRoute,
-              private domainService: DomainService) {
+              private domainService: DomainService,
+              private eventBus: NgEventBus) {
     this.domainService.registerToDomainChangesViaRouterUrl(HOLIDAY_CURRENCIES_ROUTER_URL, this.route);
-    this.domainSubscription = this.domainService.currentDomainChangeEvent.subscribe((domain) => {
+    this.domainSubscription = this.eventBus.on(SELECTED_DOMAIN_CHANGED).subscribe(domain => {
       this.reset();
     });
   }

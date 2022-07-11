@@ -1,13 +1,14 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
-import {Observable} from 'rxjs';
-import {map, share, tap} from 'rxjs/operators';
+import {forkJoin, Observable} from 'rxjs';
+import {debounceTime, map, share, tap} from 'rxjs/operators';
 import {PiggyBank} from '../../model/accountant/piggy-bank';
 import {CurrencyPipe} from '@angular/common';
 import {Refreshable} from '../refreshable';
 import {NgEventBus} from 'ng-event-bus';
 import {supportsNpm} from '@angular/cli/utilities/package-manager';
+import {BILLING_PERIOD_CHANGED, PIGGY_BANKS_CHANGED} from '../../app.module';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,7 @@ export class PiggyBanksService extends Refreshable {
 
   constructor(private http: HttpClient, private currencyPipe: CurrencyPipe, eventBus: NgEventBus) {
     super(eventBus);
+    this.eventBus.on(PIGGY_BANKS_CHANGED).subscribe(md => this.refreshData());
   }
 
   private currentDomainPiggyBanksObservable: Observable<PiggyBank[]> | null = null;

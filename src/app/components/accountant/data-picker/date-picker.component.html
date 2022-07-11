@@ -1,1 +1,8 @@
-<input [id]="id" [(ngModel)]="data" #d="ngbDatepicker" (click)="d.toggle()" class="form-control" ngbDatepicker>
+<input
+  [id]="id"
+  [(ngModel)]="data"
+  [disabled]="disabled"
+  #d="ngbDatepicker"
+  (click)="d.toggle()"
+  class="form-control"
+  ngbDatepicker>

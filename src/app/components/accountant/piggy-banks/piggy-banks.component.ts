@@ -208,9 +208,9 @@ export class PiggyBanksComponent implements OnInit {
     return this.isGeneralEditMode() && !PiggyBanksComponent.isEmptyString(this.editElement?.name || '');
   }
 
-  currenciesForTypeAhead(): () => Observable<Currency[]> {
+  currenciesForTypeAhead(): () => Currency[] {
     const that = this;
-    return () => of(that.allCurrencies);
+    return () => that.allCurrencies;
   }
 
   getCurrencySymbol(currency: string): string {

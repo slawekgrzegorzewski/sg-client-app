@@ -7,6 +7,8 @@ import {MatchingMode, BankTransactionToImport} from '../../../model/banks/nodrig
 import {DatesUtils} from '../../../utils/dates-utils';
 import {AccountsService} from '../../../services/accountant/accounts.service';
 import {DomainService} from '../../../services/domain.service';
+import {NgEventBus} from 'ng-event-bus';
+import {SELECTED_DOMAIN_CHANGED} from '../../../app.module';
 
 @Component({
   selector: 'app-transactions-list',
@@ -31,8 +33,9 @@ export class TransactionsListComponent implements OnInit {
   private internalAccount: Account | null = null;
 
   constructor(private accountsService: AccountsService,
-              private domainService: DomainService) {
-    domainService.currentDomainChangeEvent.subscribe(domain => this.getAccounts());
+              private domainService: DomainService,
+              private eventBus: NgEventBus) {
+    this.eventBus.on(SELECTED_DOMAIN_CHANGED).subscribe(domain => this.getAccounts());
   }
 
   ngOnInit(): void {

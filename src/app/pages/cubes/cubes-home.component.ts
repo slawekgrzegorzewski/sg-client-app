@@ -5,7 +5,7 @@ import {CubeRecord, CubeStats, CubeType, cubeTypeSettings, orderOfCubeTypes} fro
 import scramble from '../../model/cubes/cube-scrambler';
 import {NgEventBus} from 'ng-event-bus';
 import {ComparatorBuilder} from '../../utils/comparator-builder';
-import {APP_GET_SIZE_EVENT, APP_SIZE_EVENT, DATA_REFRESH_REQUEST_EVENT} from '../../app.module';
+import {APP_GET_SIZE_EVENT, APP_SIZE_EVENT, DATA_REFRESH_REQUEST_EVENT, SELECTED_DOMAIN_CHANGED} from '../../app.module';
 import {Subscription} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
 import {DomainService} from '../../services/domain.service';
@@ -91,7 +91,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit, OnDestroy {
               private route: ActivatedRoute,
               private domainService: DomainService) {
     this.domainService.registerToDomainChangesViaRouterUrl(CUBES_HOME_ROUTER_URL, this.route);
-    this.domainSubscription = this.domainService.currentDomainChangeEvent.subscribe((domain) => {
+    this.domainSubscription = this.eventBus.on(SELECTED_DOMAIN_CHANGED).subscribe((domain) => {
       this.refreshStats();
     });
   }

@@ -7,8 +7,11 @@ import {Expense} from '../../model/accountant/billings/expense';
 import {Income} from '../../model/accountant/billings/income';
 import {PiggyBank} from '../../model/accountant/piggy-bank';
 import {DatesUtils} from '../../utils/dates-utils';
-import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {forkJoin, Observable, tap} from 'rxjs';
+import {debounceTime, map} from 'rxjs/operators';
+import {BankTransactionToImport} from '../../model/banks/nodrigen/bank-transaction-to-import';
+import {BILLING_PERIOD_CHANGED, PIGGY_BANKS_CHANGED} from '../../app.module';
+import {NgEventBus} from 'ng-event-bus';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +24,10 @@ export class BillingPeriodsService {
   constructor(private http: HttpClient,
               private datePipe: DatePipe,
               private currencyPipe: CurrencyPipe,
+              private eventBus: NgEventBus,
               @Inject(LOCALE_ID) private defaultLocale: string) {
+
+    this.eventBus.on(BILLING_PERIOD_CHANGED).subscribe(md => /*this.refreshData()*/{});
   }
 
 
@@ -64,6 +70,21 @@ export class BillingPeriodsService {
     } else {
       return this.http.put<string>(`${this.billingEndpoint}/expense/${accountId}`, element);
     }
+  }
+
+  createBillingElementWithImportingBankTransaction(element: Income | Expense, accountId: number, bankTransactionToImport: BankTransactionToImport): Observable<string> {
+    let observable : Observable<string> | null = null;
+    if (element instanceof Income) {
+      observable = this.http.put<string>(`${this.billingEndpoint}/income/${accountId}/${bankTransactionToImport.creditNodrigenTransactionId}`, element);
+    } else {
+      observable = this.http.put<string>(`${this.billingEndpoint}/expense/${accountId}/${bankTransactionToImport.debitNodrigenTransactionId}`, element);
+    }
+    observable
+      .pipe(tap(data => {
+        this.eventBus.cast(BILLING_PERIOD_CHANGED);
+        this.eventBus.cast(PIGGY_BANKS_CHANGED);
+      }));
+    return observable;
   }
 
 
