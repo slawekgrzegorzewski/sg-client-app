@@ -2,13 +2,13 @@ import {Inject, Injectable, LOCALE_ID} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
 import {Account} from '../../model/accountant/account';
-import {Observable, of, throwError} from 'rxjs';
+import {Observable} from 'rxjs';
 import {map, share, tap} from 'rxjs/operators';
 import {Currency} from '../../model/accountant/currency';
 import {SettingsService} from './settings.service';
 import {Refreshable} from '../refreshable';
-import {DomainService} from '../domain.service';
 import {NgEventBus} from 'ng-event-bus';
+import {ACCOUNTS_CHANGED} from '../../app.module';
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +27,7 @@ export class AccountsService extends Refreshable {
               eventBus: NgEventBus,
               @Inject(LOCALE_ID) private defaultLocale: string) {
     super(eventBus);
+    this.eventBus.on(ACCOUNTS_CHANGED).subscribe(md => this.refreshData());
   }
 
 

@@ -6,9 +6,8 @@ import {BankAccount} from '../../../model/banks/bank-account';
 import {AccountsService} from '../../../services/accountant/accounts.service';
 import {Domain} from '../../../model/domain';
 import {DomainService} from '../../../services/domain.service';
-import {Subscription} from 'rxjs';
 import {NgEventBus} from 'ng-event-bus';
-import {SELECTED_DOMAIN_CHANGED} from '../../../app.module';
+import {ACCOUNTS_CHANGED, SELECTED_DOMAIN_CHANGED} from '../../../app.module';
 
 @Component({
   selector: 'app-domain-accounts',
@@ -74,6 +73,9 @@ export class DomainAccountsComponent implements OnInit {
         this.getAccountsForDomain();
       }
     });
+    this.eventBus.on(ACCOUNTS_CHANGED).subscribe(
+      value => this.getAccountsForDomain()
+    )
   }
 
   ngOnInit(): void {

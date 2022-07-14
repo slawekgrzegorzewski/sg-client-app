@@ -7,10 +7,10 @@ import {Expense} from '../../model/accountant/billings/expense';
 import {Income} from '../../model/accountant/billings/income';
 import {PiggyBank} from '../../model/accountant/piggy-bank';
 import {DatesUtils} from '../../utils/dates-utils';
-import {forkJoin, Observable, tap} from 'rxjs';
-import {debounceTime, map} from 'rxjs/operators';
+import {Observable, tap} from 'rxjs';
+import {map} from 'rxjs/operators';
 import {BankTransactionToImport} from '../../model/banks/nodrigen/bank-transaction-to-import';
-import {BILLING_PERIOD_CHANGED, PIGGY_BANKS_CHANGED} from '../../app.module';
+import {ACCOUNTS_CHANGED, BILLING_PERIOD_CHANGED} from '../../app.module';
 import {NgEventBus} from 'ng-event-bus';
 
 @Injectable({
@@ -27,7 +27,8 @@ export class BillingPeriodsService {
               private eventBus: NgEventBus,
               @Inject(LOCALE_ID) private defaultLocale: string) {
 
-    this.eventBus.on(BILLING_PERIOD_CHANGED).subscribe(md => /*this.refreshData()*/{});
+    this.eventBus.on(BILLING_PERIOD_CHANGED).subscribe(md => /*this.refreshData()*/ {
+    });
   }
 
 
@@ -73,20 +74,26 @@ export class BillingPeriodsService {
   }
 
   createBillingElementWithImportingBankTransaction(element: Income | Expense, accountId: number, bankTransactionToImport: BankTransactionToImport): Observable<string> {
-    let observable : Observable<string> | null = null;
+    let observable: Observable<string> | null = null;
     if (element instanceof Income) {
-      observable = this.http.put<string>(`${this.billingEndpoint}/income/${accountId}/${bankTransactionToImport.creditNodrigenTransactionId}`, element);
+      observable = this.http.put(
+        `${this.billingEndpoint}/income/${accountId}/${bankTransactionToImport.creditNodrigenTransactionId}`,
+        element,
+        {responseType: 'text'});
     } else {
-      observable = this.http.put<string>(`${this.billingEndpoint}/expense/${accountId}/${bankTransactionToImport.debitNodrigenTransactionId}`, element);
+      observable = this.http.put(
+        `${this.billingEndpoint}/expense/${accountId}/${bankTransactionToImport.debitNodrigenTransactionId}`,
+        element,
+        {responseType: 'text'});
     }
-    observable
-      .pipe(tap(data => {
-        this.eventBus.cast(BILLING_PERIOD_CHANGED);
-        this.eventBus.cast(PIGGY_BANKS_CHANGED);
-      }));
-    return observable;
+    return observable.pipe(tap(data => this.onUpdate()));
   }
 
+
+  private onUpdate() {
+    this.eventBus.cast(BILLING_PERIOD_CHANGED);
+    this.eventBus.cast(ACCOUNTS_CHANGED);
+  }
 
   getHistoricalSavings(noOfMonths: number): Observable<Map<Date, Map<string, number>>> {
     const url = `${this.summariesEndpoint}/savings/${noOfMonths}`;

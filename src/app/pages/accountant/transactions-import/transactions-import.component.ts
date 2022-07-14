@@ -116,8 +116,8 @@ export class TransactionsImportComponent implements OnInit {
     }
     forkJoin(requests)
       .subscribe({
-        next: (success: any) => this.refreshData(),
-        error: (error: any) => this.refreshData()
+        next: (success) => this.refreshData(),
+        error: (error) => this.refreshData()
       });
   }
 

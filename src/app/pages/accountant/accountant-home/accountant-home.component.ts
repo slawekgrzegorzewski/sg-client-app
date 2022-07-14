@@ -22,12 +22,14 @@ import {PerformedServicePaymentsService} from '../../../services/accountant/perf
 import {PerformedServicePayment} from '../../../model/accountant/performed-service-payment';
 import {CompanyLogHelper} from './company-log-helper';
 import {BillingPeriodsHelper} from './billing-periods-helper';
-import {forkJoin, Observable, Subscription} from 'rxjs';
+import {forkJoin, mergeWith, Observable, Subscription} from 'rxjs';
+import {debounceTime} from 'rxjs/operators';
 import {NgEventBus} from 'ng-event-bus';
 import {DatesUtils} from '../../../utils/dates-utils';
 import {ActivatedRoute, Router} from '@angular/router';
 import {DomainService} from '../../../services/domain.service';
 import {
+  ACCOUNTS_CHANGED,
   APP_SIZE_EVENT,
   BILLING_PERIOD_CHANGED,
   DATA_REFRESH_REQUEST_EVENT,
@@ -37,7 +39,6 @@ import {
 import {AccountantSettings} from '../../../model/accountant/accountant-settings';
 import {AccountantSettingsService} from '../../../services/accountant/accountant-settings.service';
 import {ViewMode} from '../../../utils/view-mode';
-import {debounceTime} from 'rxjs/operators';
 
 type MobileEditMode = 'display' | 'create-income' | 'create-expense' | 'create-performed-service';
 
@@ -97,13 +98,17 @@ export class AccountantHomeComponent implements OnInit, OnDestroy {
       this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
       this.refreshData();
     });
-    this.eventBus.on(PIGGY_BANKS_CHANGED)
-      .subscribe(md => this.refreshData());
-    this.eventBus.on(BILLING_PERIOD_CHANGED)
-      .subscribe(md => this.refreshData());
-    forkJoin([this.eventBus.on(PIGGY_BANKS_CHANGED), this.eventBus.on(BILLING_PERIOD_CHANGED)])
-      .pipe(debounceTime(200))
-      .subscribe(md => this.refreshData());
+
+    this.eventBus.on(ACCOUNTS_CHANGED)
+      .pipe(
+        mergeWith(this.eventBus.on(PIGGY_BANKS_CHANGED)),
+        mergeWith(this.eventBus.on(BILLING_PERIOD_CHANGED)),
+        debounceTime(200),
+      ).subscribe({
+      next: md => {
+        this.refreshData();
+      }
+    });
   }
 
   ngOnInit(): void {

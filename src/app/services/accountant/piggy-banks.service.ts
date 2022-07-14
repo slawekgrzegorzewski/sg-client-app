@@ -1,14 +1,13 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
-import {forkJoin, Observable} from 'rxjs';
-import {debounceTime, map, share, tap} from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {map, share, tap} from 'rxjs/operators';
 import {PiggyBank} from '../../model/accountant/piggy-bank';
 import {CurrencyPipe} from '@angular/common';
 import {Refreshable} from '../refreshable';
 import {NgEventBus} from 'ng-event-bus';
-import {supportsNpm} from '@angular/cli/utilities/package-manager';
-import {BILLING_PERIOD_CHANGED, PIGGY_BANKS_CHANGED} from '../../app.module';
+import {PIGGY_BANKS_CHANGED} from '../../app.module';
 
 @Injectable({
   providedIn: 'root'
@@ -41,7 +40,12 @@ export class PiggyBanksService extends Refreshable {
 
   update(piggyBank: PiggyBank): Observable<string> {
     return this.http.patch(this.endpoint, piggyBank, {responseType: 'text'})
-      .pipe(tap(data => this.refreshData()));
+      .pipe(tap(data => this.onUpdate()));
+  }
+
+  private onUpdate() {
+    this.refreshData();
+    this.eventBus.cast(PIGGY_BANKS_CHANGED);
   }
 
   protected refreshData(): void {
