@@ -4,12 +4,18 @@
 <ng-template [ngTemplateOutlet]="importPart" *ngIf="transactionToImport && !importMode">
 
 </ng-template>
-<ng-template [ngTemplateOutlet]="createDebit"
+<ng-template [ngTemplateOutlet]="createCreditDebit"
              *ngIf="transactionToImport && (importMode === 'DEBIT' || importMode === 'CREDIT')">
 
 </ng-template>
+
 <ng-template [ngTemplateOutlet]="createTransfer"
-             *ngIf="transactionToImport && otherTransactionForTransfer && (importMode === 'TRANSFER')">
+             *ngIf="transactionToImport && otherTransactionForTransfer && (importMode === 'TRANSFER' || importMode === 'TRANSFER_WITH_CONVERSION')">
+
+</ng-template>
+
+<ng-template [ngTemplateOutlet]="createCashWithdrawal"
+             *ngIf="transactionToImport && (importMode === 'CASH_WITHDRAWAL')">
 
 </ng-template>
 <ng-template [ngTemplateOutlet]="mutuallyCancelTransactions"
@@ -43,6 +49,10 @@
          (click)="importMode = 'DEBIT'">
       Wydatek
     </div>
+    <div *ngIf="transactionMayBeDebit(transactionToImport)"
+         (click)="importMode = 'CASH_WITHDRAWAL'">
+      Wypłata gotówkowa
+    </div>
     <div *ngIf="transactionMayBeCredit(transactionToImport)"
          (click)="importMode = 'CREDIT'">
       Dochód
@@ -50,6 +60,10 @@
     <div *ngIf="transactionMayBeTransfer(transactionToImport)"
          (click)="importMode = 'TRANSFER'">
       Przekaz wewnętrzny
+    </div>
+    <div *ngIf="transactionMayBeTransferWithConversion(transactionToImport)"
+         (click)="importMode = 'TRANSFER_WITH_CONVERSION'">
+      Przekaz wewnętrzny z wymianą walut
     </div>
     <div *ngIf="transactionMayBeMutuallyCancellation(transactionToImport)"
          (click)="importMode = 'MUTUALLY_CANCELLING'">
@@ -59,7 +73,7 @@
   </div>
 </ng-template>
 
-<ng-template #createDebit>
+<ng-template #createCreditDebit>
   <div class="sg-flex-column">
     <app-create-billing-element class="sg-flex-column"
                                 [elementType]="importMode === 'DEBIT' ? 'expense' : 'income'"
@@ -76,6 +90,18 @@
                           [sourceAccount]="transactionToImport.sourceAccount"
                           [destinationAccount]="otherTransactionForTransfer.destinationAccount"
                           [involvedBankTransactions]="[transactionToImport.debitNodrigenTransactionId, otherTransactionForTransfer.creditNodrigenTransactionId]"
+                          [transactionType]="transactionToCreateType"
+                          [amount]="transactionToImport.debit"
+                          [description]="transactionToImport.description"
+                          [conversionRate]="conversionRate">
+  </app-create-transaction>
+</ng-template>
+
+<ng-template #createCashWithdrawal>
+  <app-create-transaction *ngIf="transactionToImport && !otherTransactionForTransfer && transactionToCreateType"
+                          [sourceAccount]="transactionToImport.sourceAccount"
+                          [destinationAccounts]="cashAccounts"
+                          [involvedBankTransactions]="[transactionToImport.debitNodrigenTransactionId]"
                           [transactionType]="transactionToCreateType"
                           [amount]="transactionToImport.debit"
                           [description]="transactionToImport.description">

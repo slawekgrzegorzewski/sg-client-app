@@ -42,13 +42,17 @@ export class TransactionsService {
   }
 
   transferWithBankTransactions(account: Account, targetAccount: Account, amount: number, description: string, involvedBankTransactions: number[]): Observable<Transaction> {
-    return this.http.post<TransactionDTO>(
-      `${this.endpoint}/transfer/${account.id}/${targetAccount.id}/${amount}/${involvedBankTransactions[0]}/${involvedBankTransactions[1]}`,
-      description,
-      {responseType: 'json'})
+    let url = `${this.endpoint}/transfer${involvedBankTransactions.length > 1 ? '' : '_cash'}/${account.id}/${targetAccount.id}/${amount}/${involvedBankTransactions[0]}`;
+    if (involvedBankTransactions.length > 1) {
+      url = `${url}/${involvedBankTransactions[1]}`;
+    }
+    return this.http.post<TransactionDTO>(url, description, {responseType: 'json'})
       .pipe(
         map(d => new Transaction(d)),
-        tap(d => {this.eventBus.cast(ACCOUNTS_CHANGED); this.eventBus.cast(TRANSACTIONS_TO_IMPORT_CHANGED);})
+        tap(d => {
+          this.eventBus.cast(ACCOUNTS_CHANGED);
+          this.eventBus.cast(TRANSACTIONS_TO_IMPORT_CHANGED);
+        })
       );
   }
 
@@ -64,14 +68,17 @@ export class TransactionsService {
 
   transferWithConversionWithBankTransactions(account: Account, targetAccount: Account, amount: number, targetAmount: number, description: string,
                                              rate: number, involvedBankTransactions: number[]): Observable<Transaction> {
-    return this.http.post<TransactionDTO>(
-      `${this.endpoint}/transfer_with_conversion/${account.id}/${targetAccount.id}/${amount}/${targetAmount}/${rate}/${involvedBankTransactions[0]}/${involvedBankTransactions[1]}`,
-      description,
-      {responseType: 'json'}
-    )
+    let url = `${this.endpoint}/transfer${involvedBankTransactions.length > 1 ? '' : '_cash'}_with_conversion/${account.id}/${targetAccount.id}/${amount}/${targetAmount}/${rate}/${involvedBankTransactions[0]}`;
+    if (involvedBankTransactions.length > 1) {
+      url = `${url}/${involvedBankTransactions[1]}`;
+    }
+    return this.http.post<TransactionDTO>(url, description, {responseType: 'json'})
       .pipe(
         map(d => new Transaction(d)),
-        tap(d => {this.eventBus.cast(ACCOUNTS_CHANGED); this.eventBus.cast(TRANSACTIONS_TO_IMPORT_CHANGED);})
+        tap(d => {
+          this.eventBus.cast(ACCOUNTS_CHANGED);
+          this.eventBus.cast(TRANSACTIONS_TO_IMPORT_CHANGED);
+        })
       );
   }
 }
