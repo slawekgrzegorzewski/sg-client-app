@@ -47,8 +47,8 @@
 
 <div *ngIf="account && transferCreationMode">
   <app-create-transaction
-    [account]="account"
-    [targetAccounts]="accountsToSelect"
+    [sourceAccount]="account"
+    [destinationAccounts]="accountsToSelect"
     [transactionType]="creatingTransactionType"
     [amount]="creatingTransactionAmount"
     [description]="creatingTransactionFieldDescription"

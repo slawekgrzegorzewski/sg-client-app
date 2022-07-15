@@ -1,36 +1,27 @@
 <div class="creating-transaction-main">
   <h5>Enter transaction details</h5>
-  <form #createTransactionForm="ngForm" class="needs-validation" *ngIf="account">
+  <form #createTransactionForm="ngForm" class="needs-validation" *ngIf="sourceAccount">
+
     <div class="form-group row">
-      <label for="account" class="col-4 col-form-label">{{accountLabel()}}</label>
-      <div class="col-8">
-        <input id="account" name="account" readonly class="form-control-plaintext" value="{{account.name}}">
-      </div>
+      <ng-template *ngIf="sourceAccounts.length === 0 && sourceAccount" [ngTemplateOutlet]="sourceAccountReadonly">
+
+      </ng-template>
+      <ng-template *ngIf="sourceAccounts.length > 0" [ngTemplateOutlet]="listOfSourceAccounts"></ng-template>
     </div>
+
     <div class="form-group row" *ngIf="isTransfer() || isTransferWithConversion()">
-      <label for="destinationAccount" class="col-4 col-form-label">To</label>
-      <div class="col-8">
-        <select id="destinationAccount" name="destinationAccount" class="form-control"
-                #accountName="ngModel" [(ngModel)]="targetAccountId" required ngbAutofocus>
-          <option *ngFor="let account of targetAccounts" [value]="account.id">{{account.name}}</option>
-        </select>
-      </div>
+      <ng-template *ngIf="destinationAccounts.length === 0 && destinationAccount"
+                   [ngTemplateOutlet]="destinationAccountReadonly">
+
+      </ng-template>
+      <ng-template *ngIf="destinationAccounts.length > 0" [ngTemplateOutlet]="listOfDestinationAccounts"></ng-template>
     </div>
     <div class="form-group row">
-      <label for="transferAmount" class="col-4 col-form-label">Amount</label>
-      <div class="col-5">
-        <input id="transferAmount" name="accountCurrency" type="number" min=0
-               [readonly]="isPredefined() ? 'readonly' : null"
-               class="form-control" #transferAmount="ngModel" [(ngModel)]="amount" required/>
-      </div>
-      <div class="form-control col-3">
-        <span *ngIf="!isTransferWithConversion()">{{account.currency}}</span>
-        <span *ngIf="isTransferWithConversion() && !targetAccount && !targetAmount">{{account.currency}} -> XXX ?</span>
-        <span *ngIf="isTransferWithConversion() && targetAccount && !targetAmount">{{account.currency}}
-          -> XXX {{targetAccount.currency}}</span>
-        <span *ngIf="isTransferWithConversion() && targetAccount && targetAmount">{{account.currency}}
-          -> {{targetAmount}} {{targetAccount.currency}}</span>
-      </div>
+
+      <ng-container *ngIf="isAmountReadonly(); else amountInput">
+        <ng-template [ngTemplateOutlet]="amountReadonly"></ng-template>
+      </ng-container>
+
     </div>
     <div class="form-group row" *ngIf="isTransferWithConversion()">
       <label for="currencyRate" class="col-4 col-form-label">Rate</label>
@@ -48,10 +39,65 @@
     </div>
     <div class="form-group row">
       <button type="button" class="btn btn-outline-dark" (click)="createTransaction()"
-              [disabled]="isTransferNotAllowed(transferAmount, transferDescription)">
+              [disabled]="isTransferNotAllowed()">
         Create
       </button>
       <button type="button" class="btn btn-outline-dark" (click)="cancel()">Cancel</button>
     </div>
   </form>
 </div>
+
+<ng-template #sourceAccountReadonly>
+  <label for="sourceAccountReadonly" class="col-2 col-form-label">Z</label>
+  <div class="col-10">
+    <input id="sourceAccountReadonly" class="form-control" type="text" [value]="sourceAccount!.name" disabled>
+  </div>
+</ng-template>
+
+<ng-template #listOfSourceAccounts>
+  <label for="listOfSourceAccounts" class="col-2 col-form-label">Z</label>
+  <div class="col-10">
+    <select id="listOfSourceAccounts" name="sourceAccount" class="form-control"
+            #accountName="ngModel" [(ngModel)]="sourceAccountId" required ngbAutofocus>
+      <option *ngFor="let account of sourceAccountsToDisplay" [value]="account.id">{{account.name}}</option>
+    </select>
+  </div>
+</ng-template>
+
+<ng-template #destinationAccountReadonly>
+  <label for="destinationAccountReadonly" class="col-2 col-form-label">Na</label>
+  <div class="col-10">
+    <input id="destinationAccountReadonly" class="form-control" type="text" [value]="destinationAccount!.name" disabled>
+  </div>
+</ng-template>
+
+<ng-template #listOfDestinationAccounts>
+  <label for="destinationAccountList" class="col-2 col-form-label">Na</label>
+  <div class="col-10">
+    <select id="destinationAccountList" name="destinationAccount" class="form-control"
+            #accountName="ngModel" [(ngModel)]="destinationAccountId" required ngbAutofocus>
+      <option *ngFor="let account of destinationAccountsToDisplay" [value]="account.id">{{account.name}}</option>
+    </select>
+  </div>
+</ng-template>
+
+<ng-template #amountReadonly>
+  <label for="amountReadonly" class="col-4 col-form-label">Amount</label>
+  <div class="col-3">
+    <input id="amountReadonly" name="amountReadonly" type="text" class="form-control" [value]="amount" disabled/>
+  </div>
+  <div class="col-5">
+    <input [value]="conversionDescription()" class="form-control" type="text" disabled>
+  </div>
+</ng-template>
+
+<ng-template #amountInput>
+  <label for="transferAmount" class="col-4 col-form-label">Amount</label>
+  <div class="col-3">
+    <input id="transferAmount" name="transferAmount" type="number" min=0
+           class="form-control" #transferAmount="ngModel" [(ngModel)]="amount" required/>
+  </div>
+  <div class="col-5">
+    <input [value]="conversionDescription()" class="form-control" type="text" disabled>
+  </div>
+</ng-template>

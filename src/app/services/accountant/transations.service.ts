@@ -4,7 +4,9 @@ import {environment} from '../../../environments/environment';
 import {Account} from '../../model/accountant/account';
 import {Observable} from 'rxjs';
 import {Transaction, TransactionDTO} from '../../model/accountant/transaction';
-import {map} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
+import {NgEventBus} from 'ng-event-bus';
+import {ACCOUNTS_CHANGED, TRANSACTIONS_TO_IMPORT_CHANGED} from '../../app.module';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +15,7 @@ export class TransactionsService {
 
   private readonly endpoint = `${environment.serviceUrl}/transactions`;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private eventBus: NgEventBus) {
   }
 
   domainTransactions(): Observable<Transaction[]> {
@@ -39,6 +41,17 @@ export class TransactionsService {
       .pipe(map(d => new Transaction(d)));
   }
 
+  transferWithBankTransactions(account: Account, targetAccount: Account, amount: number, description: string, involvedBankTransactions: number[]): Observable<Transaction> {
+    return this.http.post<TransactionDTO>(
+      `${this.endpoint}/transfer/${account.id}/${targetAccount.id}/${amount}/${involvedBankTransactions[0]}/${involvedBankTransactions[1]}`,
+      description,
+      {responseType: 'json'})
+      .pipe(
+        map(d => new Transaction(d)),
+        tap(d => {this.eventBus.cast(ACCOUNTS_CHANGED); this.eventBus.cast(TRANSACTIONS_TO_IMPORT_CHANGED);})
+      );
+  }
+
   transferWithConversion(account: Account, targetAccount: Account, amount: number, targetAmount: number, description: string,
                          rate: number): Observable<Transaction> {
     return this.http.post<TransactionDTO>(
@@ -47,5 +60,18 @@ export class TransactionsService {
       {responseType: 'json'}
     )
       .pipe(map(d => new Transaction(d)));
+  }
+
+  transferWithConversionWithBankTransactions(account: Account, targetAccount: Account, amount: number, targetAmount: number, description: string,
+                                             rate: number, involvedBankTransactions: number[]): Observable<Transaction> {
+    return this.http.post<TransactionDTO>(
+      `${this.endpoint}/transfer_with_conversion/${account.id}/${targetAccount.id}/${amount}/${targetAmount}/${rate}/${involvedBankTransactions[0]}/${involvedBankTransactions[1]}`,
+      description,
+      {responseType: 'json'}
+    )
+      .pipe(
+        map(d => new Transaction(d)),
+        tap(d => {this.eventBus.cast(ACCOUNTS_CHANGED); this.eventBus.cast(TRANSACTIONS_TO_IMPORT_CHANGED);})
+      );
   }
 }

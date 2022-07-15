@@ -2,6 +2,7 @@ import {Domain} from '../../domain';
 import {BankAccount} from '../bank-account';
 import {SimplePerformedServicePayment} from '../../accountant/simple-performed-service-payment';
 import {Account} from '../../accountant/account';
+import {DatesUtils} from '../../../utils/dates-utils';
 
 export enum MatchingMode {
   CREDIT = 'CREDIT', DEBIT = 'DEBIT', BOTH = 'BOTH'
@@ -55,5 +56,9 @@ export class BankTransactionToImport {
 
   public isInternalTransfer(): boolean {
     return this.credit > 0 && this.debit > 0;
+  }
+
+  public static compareDates(first: BankTransactionToImport, second: BankTransactionToImport): number {
+    return DatesUtils.compareDatesOnly(first.timeOfTransaction, second.timeOfTransaction);
   }
 }

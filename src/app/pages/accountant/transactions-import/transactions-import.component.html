@@ -51,7 +51,7 @@
          (click)="importMode = 'TRANSFER'">
       Przekaz wewnętrzny
     </div>
-    <div *ngIf="transactionMayBeTransfer(transactionToImport)"
+    <div *ngIf="transactionMayBeMutuallyCancellation(transactionToImport)"
          (click)="importMode = 'MUTUALLY_CANCELLING'">
       Transakcje znoszące się
     </div>
@@ -72,11 +72,19 @@
 </ng-template>
 
 <ng-template #createTransfer>
+  <app-create-transaction *ngIf="transactionToImport && otherTransactionForTransfer && transactionToCreateType"
+                          [sourceAccount]="transactionToImport.sourceAccount"
+                          [destinationAccount]="otherTransactionForTransfer.destinationAccount"
+                          [involvedBankTransactions]="[transactionToImport.debitNodrigenTransactionId, otherTransactionForTransfer.creditNodrigenTransactionId]"
+                          [transactionType]="transactionToCreateType"
+                          [amount]="transactionToImport.debit"
+                          [description]="transactionToImport.description">
+  </app-create-transaction>
 </ng-template>
 
 <ng-template #mutuallyCancelTransactions>
   <app-transactions-row [transactionToImport]="transactionToImport"></app-transactions-row>
   <app-transactions-row [transactionToImport]="otherTransactionForTransfer"></app-transactions-row>
-  <button class="btn btn-sm btn-link" (click)="cancelMutualCancellation()">Cofnij</button>
+  <button class="btn btn-sm btn-link" (click)="clearImport()">Cofnij</button>
   <button class="btn btn-sm btn-link" (click)="mutuallyCancelBothTransactions()">Anuluj wzajemnie</button>
 </ng-template>

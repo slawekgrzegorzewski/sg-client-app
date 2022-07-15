@@ -7,7 +7,7 @@ import {NodrigenInstitution} from '../../model/banks/nodrigen/nodrigen-instituti
 import {NodrigenPermission} from '../../model/banks/nodrigen/nodrigen-permission';
 import {MatchingMode, BankTransactionToImport} from '../../model/banks/nodrigen/bank-transaction-to-import';
 import {NgEventBus} from 'ng-event-bus';
-import {BILLING_PERIOD_CHANGED, PIGGY_BANKS_CHANGED} from '../../app.module';
+import {BILLING_PERIOD_CHANGED, PIGGY_BANKS_CHANGED, TRANSACTIONS_TO_IMPORT_CHANGED} from '../../app.module';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +15,7 @@ import {BILLING_PERIOD_CHANGED, PIGGY_BANKS_CHANGED} from '../../app.module';
 export class NodrigenService {
 
   private readonly endpoint = `${environment.serviceUrl}/nodrigen`;
+  private transactionsToImport: Observable<any> | null = null;
 
 
   constructor(private http: HttpClient, private eventBus: NgEventBus) {
@@ -51,22 +52,11 @@ export class NodrigenService {
   }
 
   getNodrigenTransactionsToImport(): Observable<BankTransactionToImport[]> {
-    return this.http.get<BankTransactionToImport[]>(`${this.endpoint}/nodrigen_transaction_to_import`)
-      .pipe(map((data: BankTransactionToImport[]) => data.map(d => new BankTransactionToImport(d))));
-  }
-
-  matchNodrigenTransactionsToImport(nodrigenTransaction: number, financialTransaction: number, matchingMode: MatchingMode): Observable<BankTransactionToImport[]> {
-    return this.http.put<BankTransactionToImport[]>(
-      `${this.endpoint}/nodrigen_transaction_to_import/${nodrigenTransaction}/${financialTransaction}/${matchingMode}`,
-      null)
-      .pipe(map((data: BankTransactionToImport[]) => data.map(d => new BankTransactionToImport(d))));
-  }
-
-  matchNodrigenTransactionsToImportWithInternal(nodrigenTransactions: [number, number], financialTransaction: number) {
-    return this.http.put<BankTransactionToImport[]>(
-      `${this.endpoint}/nodrigen_transactions_to_import/${nodrigenTransactions[0]}/${nodrigenTransactions[1]}/${financialTransaction}`,
-      null)
-      .pipe(map((data: BankTransactionToImport[]) => data.map(d => new BankTransactionToImport(d))));
+    if (this.transactionsToImport === null) {
+      this.transactionsToImport = this.http.get<BankTransactionToImport[]>(`${this.endpoint}/nodrigen_transaction_to_import`)
+        .pipe(map((data: BankTransactionToImport[]) => data.map(d => new BankTransactionToImport(d))));
+    }
+    return this.transactionsToImport;
   }
 
   mutuallyCancelTransactions(transactionToImport: BankTransactionToImport, otherTransactionForTransfer: BankTransactionToImport) {
@@ -76,13 +66,12 @@ export class NodrigenService {
     const secondId = otherTransactionForTransfer.credit > 0
       ? otherTransactionForTransfer.creditNodrigenTransactionId
       : otherTransactionForTransfer.debitNodrigenTransactionId;
-    return this.http.put<BankTransactionToImport[]>(`${this.endpoint}/nodrigen_transactions_to_mutually_cancel/${firstId}/${secondId}`, null)
-      .pipe(
-        map((data: BankTransactionToImport[]) => data.map(d => new BankTransactionToImport(d))),
-        tap(data => {
-          this.eventBus.cast(BILLING_PERIOD_CHANGED);
-          this.eventBus.cast(PIGGY_BANKS_CHANGED);
-        })
-      );
+    return this.http.put<void>(`${this.endpoint}/nodrigen_transactions_to_mutually_cancel/${firstId}/${secondId}`, null)
+      .pipe(tap(value => this.refreshTransactionsToImport()));
+  }
+
+  private refreshTransactionsToImport() {
+    this.transactionsToImport = null;
+    this.eventBus.cast(TRANSACTIONS_TO_IMPORT_CHANGED);
   }
 }

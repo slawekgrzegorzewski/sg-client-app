@@ -110,6 +110,7 @@ export const SELECTED_DOMAIN_CHANGED = 'domain:selected:changed';
 export const PIGGY_BANKS_CHANGED = 'piggy-bank:changed';
 export const BILLING_PERIOD_CHANGED = 'billing-period:changed';
 export const ACCOUNTS_CHANGED = 'accounts:changed';
+export const TRANSACTIONS_TO_IMPORT_CHANGED = 'transactions-to-import:changed';
 
 export class AppLoginStatus {
   public isLoggedId: boolean = false;
