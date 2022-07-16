@@ -63,4 +63,8 @@ export class NodrigenComponent implements OnInit {
     this.banksService.fetchAllBalances().subscribe(v => {
     });
   }
+
+  updateDateFromProvider(externalId: string) {
+    this.nodrigenService.fetchBankAccountData(externalId).subscribe();
+  }
 }

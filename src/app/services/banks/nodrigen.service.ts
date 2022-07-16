@@ -74,4 +74,8 @@ export class NodrigenService {
     this.transactionsToImport = null;
     this.eventBus.cast(TRANSACTIONS_TO_IMPORT_CHANGED);
   }
+
+  fetchBankAccountData(externalId: string) {
+    return this.http.post<void>(`${this.endpoint}/fetch/${externalId}`, {});
+  }
 }

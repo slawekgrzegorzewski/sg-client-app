@@ -12,6 +12,7 @@
             <th style="padding-right: 20px">Typ</th>
             <th style="padding-right: 20px">Waluta</th>
             <th style="padding-right: 20px">Właściciel</th>
+            <th style="padding-right: 20px">Akcje</th>
           </tr>
           <ng-container *ngFor="let bankAccount of permission.bankAccounts">
             <tr>
@@ -19,6 +20,7 @@
               <td>{{bankAccount.product}}</td>
               <td>{{bankAccount.currency}}</td>
               <td>{{bankAccount.owner}}</td>
+              <td><button class="btn btn-sm btn-link" (click)="updateDateFromProvider(bankAccount.externalId)">Pobierz dane</button></td>
             </tr>
           </ng-container>
         </table>
