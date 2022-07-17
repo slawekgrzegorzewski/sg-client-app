@@ -26,7 +26,7 @@ import {BankAccount} from '../../model/banks/bank-account';
 import {$e} from 'codelyzer/angular/styles/chars';
 import {NgEventBus} from 'ng-event-bus';
 import {keyframes} from '@angular/animations';
-import {SELECTED_DOMAIN_CHANGED} from '../../app.module';
+import {ACCOUNTANT_SETTINGS_CHANGED, SELECTED_DOMAIN_CHANGED} from '../../utils/event-bus-events';
 
 export const SETTINGS_ROUTER_URL = 'settings';
 
@@ -78,7 +78,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.domainSubscription = this.eventBus.on(SELECTED_DOMAIN_CHANGED).subscribe((domain) => {
       this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
     });
-    this.eventBus.on(AccountantSettingsService.ACCOUNTANT_SETTINGS_CHANGED).subscribe((metaData) => {
+    this.eventBus.on(ACCOUNTANT_SETTINGS_CHANGED).subscribe((metaData) => {
       this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
     });
     this.domainService.getOtherDomains().subscribe(domains => this.otherDomains = domains);

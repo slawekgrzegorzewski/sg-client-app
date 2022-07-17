@@ -1,4 +1,4 @@
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
@@ -9,11 +9,12 @@ import {NgEventBus} from 'ng-event-bus';
 import {
   APP_LOGIN_STATUS_EVENT,
   APP_LOGIN_STATUS_REQUEST_EVENT,
-  AppLoginStatus,
   DOMAINS_CHANGED,
-  INVITATIONS_CHANGED, SELECTED_DOMAIN_CHANGED
-} from '../app.module';
+  INVITATIONS_CHANGED,
+  SELECTED_DOMAIN_CHANGED
+} from '../utils/event-bus-events';
 import {MetaData} from 'ng-event-bus/lib/meta-data';
+import {AppLoginStatus} from '../utils/app-login-status';
 
 export type ComponentRegistration = { component: string, route: ActivatedRoute };
 

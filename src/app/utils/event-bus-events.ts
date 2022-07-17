@@ -1,0 +1,14 @@
+export const ACCOUNTANT_SETTINGS_CHANGED = 'accountant:settings:change';
+export const APP_LOGIN_STATUS_REQUEST_EVENT = 'app:getlogin';
+export const APP_LOGIN_STATUS_EVENT = 'app:login';
+export const APP_SIZE_EVENT = 'app:size';
+export const APP_GET_SIZE_EVENT = 'app:getsize';
+export const DOMAINS_CHANGED = 'domain:change';
+export const DATA_REFRESH_REQUEST_EVENT = 'data:refresh';
+export const INVITATIONS_CHANGED = 'invitations:changed';
+export const NAVIGATION_RESIZE_EVENT = 'navigation:resize';
+export const SELECTED_DOMAIN_CHANGED = 'domain:selected:changed';
+export const PIGGY_BANKS_CHANGED = 'piggy-bank:changed';
+export const BILLING_PERIOD_CHANGED = 'billing-period:changed';
+export const ACCOUNTS_CHANGED = 'accounts:changed';
+export const TRANSACTIONS_TO_IMPORT_CHANGED = 'transactions-to-import:changed';

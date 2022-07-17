@@ -1,6 +1,5 @@
-import * as Hammer from 'hammerjs';
-import {BrowserModule, HAMMER_GESTURE_CONFIG, HammerGestureConfig, HammerModule} from '@angular/platform-browser';
-import {Injectable, LOCALE_ID, NgModule} from '@angular/core';
+import {BrowserModule, HAMMER_GESTURE_CONFIG, HammerModule} from '@angular/platform-browser';
+import {LOCALE_ID, NgModule} from '@angular/core';
 
 import {AppComponent} from './app.component';
 import {HeaderComponent} from './components/general/header/header.component';
@@ -90,37 +89,7 @@ import {NodrigenComponent} from './components/nodrigen/nodrigen.component';
 import {BanksService} from './services/banks/banks.service';
 import {TransactionsImportComponent} from './pages/accountant/transactions-import/transactions-import.component';
 import {TransactionRowComponent} from './pages/accountant/transactions-import/row/transaction-row.component';
-
-@Injectable()
-export class MyHammerConfig extends HammerGestureConfig {
-  override overrides = <any> {
-    swipe: {direction: Hammer.DIRECTION_ALL},
-  };
-}
-
-export const APP_LOGIN_STATUS_REQUEST_EVENT = 'app:getlogin';
-export const APP_LOGIN_STATUS_EVENT = 'app:login';
-export const APP_SIZE_EVENT = 'app:size';
-export const APP_GET_SIZE_EVENT = 'app:getsize';
-export const DOMAINS_CHANGED = 'domain:change'
-export const DATA_REFRESH_REQUEST_EVENT = 'data:refresh';
-export const INVITATIONS_CHANGED = 'invitations:changed';
-export const NAVIGATION_RESIZE_EVENT = 'navigation:resize';
-export const SELECTED_DOMAIN_CHANGED = 'domain:selected:changed';
-export const PIGGY_BANKS_CHANGED = 'piggy-bank:changed';
-export const BILLING_PERIOD_CHANGED = 'billing-period:changed';
-export const ACCOUNTS_CHANGED = 'accounts:changed';
-export const TRANSACTIONS_TO_IMPORT_CHANGED = 'transactions-to-import:changed';
-
-export class AppLoginStatus {
-  public isLoggedId: boolean = false;
-  public defaultDomainId: number | null = null;
-
-  constructor(isLoggedId: boolean, defaultDomainId: number | null) {
-    this.isLoggedId = isLoggedId;
-    this.defaultDomainId = defaultDomainId;
-  }
-}
+import {MyHammerConfig} from './services/my-hammer-config.service';
 
 @NgModule({
   declarations: [
@@ -215,7 +184,6 @@ export class AppLoginStatus {
     DomainService,
     CategoriesService,
     ClientsService,
-    AccountantSettingsService,
     ServicesService,
     PerformedServicesService,
     ClientPaymentsService,
@@ -228,7 +196,8 @@ export class AppLoginStatus {
     SizeService,
     ApplicationsService,
     NodrigenService,
-    BanksService
+    BanksService,
+    AccountantSettingsService
   ],
   bootstrap: [AppComponent]
 })

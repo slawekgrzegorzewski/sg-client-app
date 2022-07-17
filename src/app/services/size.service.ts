@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {NgEventBus} from 'ng-event-bus';
-import {APP_GET_SIZE_EVENT, APP_SIZE_EVENT} from '../app.module';
+import {APP_GET_SIZE_EVENT, APP_SIZE_EVENT} from '../utils/event-bus-events';
 
 export type AppSize = { height: number, width: number, navigationHeight: number };
 

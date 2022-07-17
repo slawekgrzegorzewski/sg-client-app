@@ -1,5 +1,5 @@
-import {DATA_REFRESH_REQUEST_EVENT} from '../app.module';
 import {NgEventBus} from 'ng-event-bus';
+import {DATA_REFRESH_REQUEST_EVENT} from '../utils/event-bus-events';
 
 export abstract class Refreshable {
   constructor(protected eventBus: NgEventBus) {

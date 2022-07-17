@@ -3,7 +3,7 @@ import {AccountantSettings} from '../../../model/accountant/accountant-settings'
 import {DomainService} from '../../../services/domain.service';
 import {AccountantSettingsService} from '../../../services/accountant/accountant-settings.service';
 import {NgEventBus} from 'ng-event-bus';
-import {SELECTED_DOMAIN_CHANGED} from '../../../app.module';
+import {SELECTED_DOMAIN_CHANGED} from '../../../utils/event-bus-events';
 
 @Component({
   selector: 'app-accountant-settings',
@@ -34,7 +34,8 @@ export class AccountantSettingsComponent implements OnInit {
   changeIsCompany(): void {
     if (this.accountantSettings) {
       this.accountantSettings.company = !this.accountantSettings.company;
-      this.accountantSettingsService.setIsCompany(this.accountantSettings.company).subscribe(data => {
+      this.accountantSettingsService.setIsCompany(this.accountantSettings.company)
+        .subscribe(data => {
       });
     }
   }

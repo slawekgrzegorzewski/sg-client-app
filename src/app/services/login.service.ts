@@ -7,8 +7,9 @@ import jwt_decode from 'jwt-decode';
 import {AccountantSettingsService} from './accountant/accountant-settings.service';
 import {DomainService} from './domain.service';
 import {NgEventBus} from 'ng-event-bus';
-import {APP_LOGIN_STATUS_EVENT, APP_LOGIN_STATUS_REQUEST_EVENT, AppLoginStatus} from '../app.module';
+import {APP_LOGIN_STATUS_EVENT, APP_LOGIN_STATUS_REQUEST_EVENT} from '../utils/event-bus-events';
 import {ACCOUNTANT_APP, CHECKER_APP, CUBES_APP, SYR_APP} from './applications.service';
+import {AppLoginStatus} from '../utils/app-login-status';
 
 class TokenData {
   sub: string = '';
