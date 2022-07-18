@@ -9,7 +9,7 @@ import {Expense} from '../../../model/accountant/billings/expense';
 import {DomainService} from '../../../services/domain.service';
 import {Subscription} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
-import {SELECTED_DOMAIN_CHANGED} from '../../../app.module';
+import {SELECTED_DOMAIN_CHANGED} from '../../../utils/event-bus-events';
 import {NgEventBus} from 'ng-event-bus';
 
 export const BILLING_SMALL_ROUTER_URL = 'billing-small';

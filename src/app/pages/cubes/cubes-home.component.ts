@@ -5,7 +5,7 @@ import {CubeRecord, CubeStats, CubeType, cubeTypeSettings, orderOfCubeTypes} fro
 import scramble from '../../model/cubes/cube-scrambler';
 import {NgEventBus} from 'ng-event-bus';
 import {ComparatorBuilder} from '../../utils/comparator-builder';
-import {APP_GET_SIZE_EVENT, APP_SIZE_EVENT, DATA_REFRESH_REQUEST_EVENT, SELECTED_DOMAIN_CHANGED} from '../../app.module';
+import {APP_GET_SIZE_EVENT, APP_SIZE_EVENT, DATA_REFRESH_REQUEST_EVENT, SELECTED_DOMAIN_CHANGED} from '../../utils/event-bus-events';
 import {Subscription} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
 import {DomainService} from '../../services/domain.service';

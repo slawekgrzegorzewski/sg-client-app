@@ -7,7 +7,7 @@ import {AccountsService} from '../../../services/accountant/accounts.service';
 import {Domain} from '../../../model/domain';
 import {DomainService} from '../../../services/domain.service';
 import {NgEventBus} from 'ng-event-bus';
-import {ACCOUNTS_CHANGED, SELECTED_DOMAIN_CHANGED} from '../../../app.module';
+import {ACCOUNTS_CHANGED, SELECTED_DOMAIN_CHANGED} from '../../../utils/event-bus-events';
 
 @Component({
   selector: 'app-domain-accounts',

@@ -10,7 +10,7 @@ import {DatesUtils} from '../../utils/dates-utils';
 import {Observable, tap} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {BankTransactionToImport} from '../../model/banks/nodrigen/bank-transaction-to-import';
-import {ACCOUNTS_CHANGED, BILLING_PERIOD_CHANGED} from '../../app.module';
+import {ACCOUNTS_CHANGED, BILLING_PERIOD_CHANGED} from '../../utils/event-bus-events';
 import {NgEventBus} from 'ng-event-bus';
 
 @Injectable({

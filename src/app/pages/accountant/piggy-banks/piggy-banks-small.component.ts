@@ -4,7 +4,7 @@ import {PiggyBanksService} from '../../../services/accountant/piggy-banks.servic
 import {Subscription} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
 import {DomainService} from '../../../services/domain.service';
-import {SELECTED_DOMAIN_CHANGED} from '../../../app.module';
+import {SELECTED_DOMAIN_CHANGED} from '../../../utils/event-bus-events';
 import {NgEventBus} from 'ng-event-bus';
 
 export const PIGGY_BANKS_SMALL_ROUTER_URL = 'piggy-banks-small';

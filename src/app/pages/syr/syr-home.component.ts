@@ -8,7 +8,7 @@ import {CountrySYR} from '../../model/syr/country-syr';
 import {SecretCountriesSYR} from '../../model/syr/secret-countries-syr';
 import {CountrySyrLineChart, SyrCell} from '../../model/syr/CountrySyrLineChart';
 import {DomainService} from '../../services/domain.service';
-import {SELECTED_DOMAIN_CHANGED} from '../../app.module';
+import {SELECTED_DOMAIN_CHANGED} from '../../utils/event-bus-events';
 import {NgEventBus} from 'ng-event-bus';
 
 export const SYR_HOME_ROUTER_URL = 'syr-home';

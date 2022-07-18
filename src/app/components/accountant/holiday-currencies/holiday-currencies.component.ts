@@ -5,7 +5,7 @@ import {Subscription} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
 import {DomainService} from '../../../services/domain.service';
 import {NgEventBus} from 'ng-event-bus';
-import {SELECTED_DOMAIN_CHANGED} from '../../../app.module';
+import {SELECTED_DOMAIN_CHANGED} from '../../../utils/event-bus-events';
 
 export const HOLIDAY_CURRENCIES_ROUTER_URL = 'holiday-currencies';
 

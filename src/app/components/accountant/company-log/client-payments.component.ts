@@ -9,7 +9,7 @@ import {PayableGroup} from '../../../model/accountant/payable-groupper';
 import {ComparatorBuilder} from '../../../utils/comparator-builder';
 import {NgEventBus} from 'ng-event-bus';
 import {AppSize, SizeService} from '../../../services/size.service';
-import {APP_SIZE_EVENT} from '../../../app.module';
+import {APP_SIZE_EVENT} from '../../../utils/event-bus-events';
 import {MetaData} from 'ng-event-bus/lib/meta-data';
 
 export type EditMode = 'edit' | 'create' | '';

@@ -8,7 +8,7 @@ import {Currency} from '../../model/accountant/currency';
 import {SettingsService} from './settings.service';
 import {Refreshable} from '../refreshable';
 import {NgEventBus} from 'ng-event-bus';
-import {ACCOUNTS_CHANGED} from '../../app.module';
+import {ACCOUNTS_CHANGED} from '../../utils/event-bus-events';
 
 @Injectable({
   providedIn: 'root'

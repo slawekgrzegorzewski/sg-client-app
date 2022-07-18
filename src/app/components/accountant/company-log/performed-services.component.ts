@@ -12,7 +12,7 @@ import {ComparatorBuilder} from '../../../utils/comparator-builder';
 import {SimplePerformedServicePayment} from '../../../model/accountant/simple-performed-service-payment';
 import {NgEventBus} from 'ng-event-bus';
 import {SizeService} from '../../../services/size.service';
-import {APP_SIZE_EVENT} from '../../../app.module';
+import {APP_SIZE_EVENT} from '../../../utils/event-bus-events';
 
 export type EditMode = 'edit' | 'create' | 'payment-selection' | ''
 export type PerformedServicesDisplayType = 'desktop' | 'mobile';
@@ -390,8 +390,8 @@ export class PerformedServicesComponent implements OnInit {
   private sizeLayout(): void {
     if (this.performedServicesTableContainer) {
       const newHeight = this.availableHeight
-      - this.performedServicesTableContainer.nativeElement.getBoundingClientRect().top
-      - (this.addPSButton ? this.addPSButton?.nativeElement.offsetHeight : 0);
+        - this.performedServicesTableContainer.nativeElement.getBoundingClientRect().top
+        - (this.addPSButton ? this.addPSButton?.nativeElement.offsetHeight : 0);
       if (newHeight !== this.performedServicesTableHeight) {
         this.performedServicesTableHeight = newHeight;
       }

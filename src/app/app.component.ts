@@ -2,7 +2,7 @@ import {AfterViewInit, Component, HostListener, ViewChild} from '@angular/core';
 import {NgEventBus} from 'ng-event-bus';
 import {HeaderComponent} from './components/general/header/header.component';
 import {SizeService} from './services/size.service';
-import {DATA_REFRESH_REQUEST_EVENT, NAVIGATION_RESIZE_EVENT} from './app.module';
+import {DATA_REFRESH_REQUEST_EVENT, NAVIGATION_RESIZE_EVENT} from './utils/event-bus-events';
 
 @Component({
   selector: 'app-root',
@@ -35,7 +35,7 @@ export class AppComponent implements AfterViewInit {
       height: window.innerHeight,
       width: window.innerWidth,
       navigationHeight: this.navigation.getTakenHeight()
-    }
+    };
   }
 
   getAvailableHeight(): number {

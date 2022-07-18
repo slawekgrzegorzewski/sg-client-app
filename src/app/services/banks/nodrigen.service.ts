@@ -7,7 +7,7 @@ import {NodrigenInstitution} from '../../model/banks/nodrigen/nodrigen-instituti
 import {NodrigenPermission} from '../../model/banks/nodrigen/nodrigen-permission';
 import {MatchingMode, BankTransactionToImport} from '../../model/banks/nodrigen/bank-transaction-to-import';
 import {NgEventBus} from 'ng-event-bus';
-import {BILLING_PERIOD_CHANGED, PIGGY_BANKS_CHANGED, TRANSACTIONS_TO_IMPORT_CHANGED} from '../../app.module';
+import {TRANSACTIONS_TO_IMPORT_CHANGED} from '../../utils/event-bus-events';
 
 @Injectable({
   providedIn: 'root'

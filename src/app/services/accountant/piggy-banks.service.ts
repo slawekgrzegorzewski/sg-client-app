@@ -7,7 +7,7 @@ import {PiggyBank} from '../../model/accountant/piggy-bank';
 import {CurrencyPipe} from '@angular/common';
 import {Refreshable} from '../refreshable';
 import {NgEventBus} from 'ng-event-bus';
-import {PIGGY_BANKS_CHANGED} from '../../app.module';
+import {PIGGY_BANKS_CHANGED} from '../../utils/event-bus-events';
 
 @Injectable({
   providedIn: 'root'

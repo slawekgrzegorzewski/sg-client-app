@@ -9,8 +9,9 @@ import {
   DATA_REFRESH_REQUEST_EVENT,
   DOMAINS_CHANGED,
   INVITATIONS_CHANGED,
-  NAVIGATION_RESIZE_EVENT, SELECTED_DOMAIN_CHANGED
-} from '../../../app.module';
+  NAVIGATION_RESIZE_EVENT,
+  SELECTED_DOMAIN_CHANGED
+} from '../../../utils/event-bus-events';
 import {AccountantSettingsService} from '../../../services/accountant/accountant-settings.service';
 import {AccountantSettings} from '../../../model/accountant/accountant-settings';
 import {Subscription} from 'rxjs';

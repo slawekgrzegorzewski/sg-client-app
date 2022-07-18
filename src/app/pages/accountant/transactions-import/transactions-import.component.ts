@@ -11,7 +11,7 @@ import {PiggyBanksService} from '../../../services/accountant/piggy-banks.servic
 import {Account} from '../../../model/accountant/account';
 import {TransactionType} from '../../../model/accountant/transaction-type';
 import {NgEventBus} from 'ng-event-bus';
-import {TRANSACTIONS_TO_IMPORT_CHANGED} from '../../../app.module';
+import {TRANSACTIONS_TO_IMPORT_CHANGED} from '../../../utils/event-bus-events';
 import {AccountsService} from '../../../services/accountant/accounts.service';
 
 

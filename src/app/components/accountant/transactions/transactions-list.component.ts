@@ -8,7 +8,7 @@ import {DatesUtils} from '../../../utils/dates-utils';
 import {AccountsService} from '../../../services/accountant/accounts.service';
 import {DomainService} from '../../../services/domain.service';
 import {NgEventBus} from 'ng-event-bus';
-import {SELECTED_DOMAIN_CHANGED} from '../../../app.module';
+import {SELECTED_DOMAIN_CHANGED} from '../../../utils/event-bus-events';
 
 @Component({
   selector: 'app-transactions-list',

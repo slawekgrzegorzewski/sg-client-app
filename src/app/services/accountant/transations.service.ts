@@ -6,7 +6,7 @@ import {Observable} from 'rxjs';
 import {Transaction, TransactionDTO} from '../../model/accountant/transaction';
 import {map, tap} from 'rxjs/operators';
 import {NgEventBus} from 'ng-event-bus';
-import {ACCOUNTS_CHANGED, TRANSACTIONS_TO_IMPORT_CHANGED} from '../../app.module';
+import {ACCOUNTS_CHANGED, TRANSACTIONS_TO_IMPORT_CHANGED} from '../../utils/event-bus-events';
 
 @Injectable({
   providedIn: 'root'

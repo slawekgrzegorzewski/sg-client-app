@@ -29,13 +29,12 @@ import {DatesUtils} from '../../../utils/dates-utils';
 import {ActivatedRoute, Router} from '@angular/router';
 import {DomainService} from '../../../services/domain.service';
 import {
-  ACCOUNTS_CHANGED,
-  APP_SIZE_EVENT,
+  ACCOUNTS_CHANGED, APP_SIZE_EVENT,
   BILLING_PERIOD_CHANGED,
   DATA_REFRESH_REQUEST_EVENT,
   PIGGY_BANKS_CHANGED,
   SELECTED_DOMAIN_CHANGED
-} from '../../../app.module';
+} from '../../../utils/event-bus-events';
 import {AccountantSettings} from '../../../model/accountant/accountant-settings';
 import {AccountantSettingsService} from '../../../services/accountant/accountant-settings.service';
 import {ViewMode} from '../../../utils/view-mode';

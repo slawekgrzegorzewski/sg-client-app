@@ -3,10 +3,9 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {SyrService} from '../../services/syr/syr.service';
 import {Country} from '../../model/syr/country';
-import {Observable, of, Subscription} from 'rxjs';
+import {Subscription} from 'rxjs';
 import {DomainService} from '../../services/domain.service';
-import {ACCOUNTANT_HOME_ROUTER_URL} from '../accountant/accountant-home/accountant-home.component';
-import {SELECTED_DOMAIN_CHANGED} from '../../app.module';
+import {SELECTED_DOMAIN_CHANGED} from '../../utils/event-bus-events';
 import {NgEventBus} from 'ng-event-bus';
 
 export const SYR_ADMIN_ROUTER_URL = 'syr-admin';

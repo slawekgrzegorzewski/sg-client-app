@@ -4,8 +4,7 @@ import {PageVersion} from '../../../model/checker/page-version';
 import {Subscription} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
 import {DomainService} from '../../../services/domain.service';
-import {ACCOUNTANT_HOME_ROUTER_URL} from '../../accountant/accountant-home/accountant-home.component';
-import {SELECTED_DOMAIN_CHANGED} from '../../../app.module';
+import {SELECTED_DOMAIN_CHANGED} from '../../../utils/event-bus-events';
 import {NgEventBus} from 'ng-event-bus';
 
 export const CHECKER_HOME_ROUTER_URL = 'checker-home';
