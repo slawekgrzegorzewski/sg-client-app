@@ -254,15 +254,18 @@ export class TransactionsImportComponent implements OnInit {
       return;
     }
 
-    const requests: Observable<any>[] = [
-      this.billingsService.createBillingElementWithImportingBankTransaction(elementToCreate, accountIdForElement, this.transactionToImport!)
-    ];
-    if (piggyBankToUpdate) {
-      requests.push(this.piggyBanksService.update(piggyBankToUpdate));
-    }
-    forkJoin(requests)
+    this.billingsService.createBillingElementWithImportingBankTransaction(elementToCreate, accountIdForElement, this.transactionToImport!)
       .subscribe({
-        next: (success) => this.refreshData(),
+        next: (success) => {
+          if (piggyBankToUpdate) {
+            this.piggyBanksService.update(piggyBankToUpdate).subscribe({
+              next: () => this.refreshData(),
+              error: () => this.refreshData()
+            });
+          } else {
+            this.refreshData();
+          }
+        },
         error: (error) => this.refreshData()
       });
   }
