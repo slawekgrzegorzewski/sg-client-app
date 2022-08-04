@@ -22,6 +22,10 @@
              *ngIf="transactionToImport && otherTransactionForTransfer && (importMode === 'MUTUALLY_CANCELLING')">
 
 </ng-template>
+<ng-template [ngTemplateOutlet]="ignoreTransaction"
+             *ngIf="transactionToImport && importMode === 'IGNORE'">
+
+</ng-template>
 
 <ng-template #list>
   <ng-container *ngIf="transactionsToImport.length > 0">
@@ -69,6 +73,10 @@
          (click)="importMode = 'MUTUALLY_CANCELLING'">
       Transakcje znoszące się
     </div>
+    <div *ngIf="transactionMayBeIgnored(transactionToImport)"
+         (click)="importMode = 'IGNORE'">
+      Ignoruj tą transakcję
+    </div>
 
   </div>
 </ng-template>
@@ -113,4 +121,11 @@
   <app-transactions-row [transactionToImport]="otherTransactionForTransfer"></app-transactions-row>
   <button class="btn btn-sm btn-link" (click)="clearImport()">Cofnij</button>
   <button class="btn btn-sm btn-link" (click)="mutuallyCancelBothTransactions()">Anuluj wzajemnie</button>
+</ng-template>
+
+<ng-template #ignoreTransaction>
+  <div>Na pewno zignorwać tą transakcję</div>
+  <app-transactions-row [transactionToImport]="transactionToImport"></app-transactions-row>
+  <button class="btn btn-sm btn-link" (click)="clearImport()">Nie</button>
+  <button class="btn btn-sm btn-link" (click)="ignore()">Tak</button>
 </ng-template>

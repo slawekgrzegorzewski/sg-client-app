@@ -70,6 +70,11 @@ export class NodrigenService {
       .pipe(tap(value => this.refreshTransactionsToImport()));
   }
 
+  ignoreTransaction(transactionToIgnore: BankTransactionToImport) {
+    return this.http.put<void>(`${this.endpoint}/nodrigen_ignore_transaction/${transactionToIgnore.nodrigenTransactionId}`, null)
+      .pipe(tap(value => this.refreshTransactionsToImport()));
+  }
+
   private refreshTransactionsToImport() {
     this.transactionsToImport = null;
     this.eventBus.cast(TRANSACTIONS_TO_IMPORT_CHANGED);

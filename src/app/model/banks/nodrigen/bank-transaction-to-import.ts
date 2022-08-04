@@ -22,6 +22,7 @@ export class BankTransactionToImport {
   debitBankAccountId: number;
   creditNodrigenTransactionId: number;
   debitNodrigenTransactionId: number;
+  nodrigenTransactionId: number;
 
   constructor(data?: Partial<BankTransactionToImport>) {
     if (!data) {
@@ -40,6 +41,7 @@ export class BankTransactionToImport {
     this.debitBankAccountId = data.debitBankAccountId || 0;
     this.creditNodrigenTransactionId = data.creditNodrigenTransactionId || 0;
     this.debitNodrigenTransactionId = data.debitNodrigenTransactionId || 0;
+    this.nodrigenTransactionId = data.nodrigenTransactionId || 0;
   }
 
   public isCredit(): boolean {

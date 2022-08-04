@@ -15,7 +15,14 @@ import {TRANSACTIONS_TO_IMPORT_CHANGED} from '../../../utils/event-bus-events';
 import {AccountsService} from '../../../services/accountant/accounts.service';
 
 
-export type ImportMode = 'DEBIT' | 'CREDIT' | 'TRANSFER' | 'MUTUALLY_CANCELLING' | 'CASH_WITHDRAWAL' | 'TRANSFER_WITH_CONVERSION';
+export type ImportMode =
+  'DEBIT'
+  | 'CREDIT'
+  | 'TRANSFER'
+  | 'MUTUALLY_CANCELLING'
+  | 'CASH_WITHDRAWAL'
+  | 'TRANSFER_WITH_CONVERSION'
+  | 'IGNORE';
 
 @Component({
   selector: 'app-transactions-import',
@@ -75,6 +82,10 @@ export class TransactionsImportComponent implements OnInit {
         this.accountsService.currentDomainAccounts().subscribe(
           data => this.cashAccounts = data.filter(d => d.bankAccount === null)
         );
+        break;
+      case 'IGNORE':
+        this.elementToCreate = null;
+        this.otherTransactionForTransfer = null;
         break;
     }
   }
@@ -145,6 +156,10 @@ export class TransactionsImportComponent implements OnInit {
 
   transactionMayBeMutuallyCancellation(transaction: BankTransactionToImport | null) {
     return this.getOtherTransactionForMutualCancellation(transaction) !== null;
+  }
+
+  transactionMayBeIgnored(transaction: BankTransactionToImport | null) {
+    return (transaction?.credit || 0) === 0 && (transaction?.debit || 0) === 0;
   }
 
   private getOtherTransactionForTransfer(transaction: BankTransactionToImport | null): BankTransactionToImport | null {
@@ -281,6 +296,12 @@ export class TransactionsImportComponent implements OnInit {
   mutuallyCancelBothTransactions() {
     if (this.transactionToImport !== null && this.otherTransactionForTransfer !== null) {
       this.nodrigenService.mutuallyCancelTransactions(this.transactionToImport, this.otherTransactionForTransfer).subscribe();
+    }
+  }
+
+  ignore() {
+    if (this.transactionToImport !== null) {
+      this.nodrigenService.ignoreTransaction(this.transactionToImport).subscribe();
     }
   }
 }
