@@ -13,6 +13,7 @@ import {TransactionType} from '../../../model/accountant/transaction-type';
 import {NgEventBus} from 'ng-event-bus';
 import {TRANSACTIONS_TO_IMPORT_CHANGED} from '../../../utils/event-bus-events';
 import {AccountsService} from '../../../services/accountant/accounts.service';
+import {Domain} from '../../../model/domain';
 
 
 export type ImportMode =
@@ -22,6 +23,7 @@ export type ImportMode =
   | 'MUTUALLY_CANCELLING'
   | 'CASH_WITHDRAWAL'
   | 'TRANSFER_WITH_CONVERSION'
+  | 'SINGLE_TRANSFER_WITH_CONVERSION'
   | 'IGNORE';
 
 @Component({
@@ -75,6 +77,35 @@ export class TransactionsImportComponent implements OnInit {
           this.transactionToImport = this.otherTransactionForTransfer;
           this.otherTransactionForTransfer = localCopyOfTransactionToImport;
         }
+        this.conversionRate = (this.otherTransactionForTransfer?.credit || 0) / (this.transactionToImport?.debit || 1);
+        break;
+      case 'SINGLE_TRANSFER_WITH_CONVERSION':
+        this.transactionToCreateType = TransactionType.TRANSFER_FROM_BANK_TRANSACTIONS;
+        let t = this.transactionToImport;
+        this.transactionToImport = new BankTransactionToImport({
+          id: t?.id,
+          domain: t?.domain,
+          conversionRate: t?.conversionRate,
+          debit: t?.debit,
+          description: t?.description,
+          timeOfTransaction: t?.timeOfTransaction,
+          sourceAccount: t?.sourceAccount,
+          debitBankAccountId: t?.debitBankAccountId,
+          debitNodrigenTransactionId: t?.debitNodrigenTransactionId,
+          nodrigenTransactionId: t?.nodrigenTransactionId
+        });
+        this.otherTransactionForTransfer = new BankTransactionToImport({
+          id: t?.id,
+          domain: t?.domain,
+          conversionRate: t?.conversionRate,
+          credit: t?.credit,
+          description: t?.description,
+          timeOfTransaction: t?.timeOfTransaction,
+          destinationAccount: t?.destinationAccount,
+          creditBankAccountId: t?.creditBankAccountId,
+          creditNodrigenTransactionId: t?.creditNodrigenTransactionId,
+          nodrigenTransactionId: t?.nodrigenTransactionId
+        });
         this.conversionRate = (this.otherTransactionForTransfer?.credit || 0) / (this.transactionToImport?.debit || 1);
         break;
       case 'CASH_WITHDRAWAL':
@@ -154,6 +185,11 @@ export class TransactionsImportComponent implements OnInit {
     return this.getOtherTransactionForTransferWithConversion(transaction) !== null;
   }
 
+  transactionMayBeSingleTransferWithConversion(transaction: BankTransactionToImport | null) {
+    return transaction?.sourceAccount && transaction?.destinationAccount &&
+      transaction?.sourceAccount.currency !== transaction?.destinationAccount.currency;
+  }
+
   transactionMayBeMutuallyCancellation(transaction: BankTransactionToImport | null) {
     return this.getOtherTransactionForMutualCancellation(transaction) !== null;
   }
@@ -181,7 +217,7 @@ export class TransactionsImportComponent implements OnInit {
       otherTransactionForTransfer = null;
     } else {
       const correspondingAccounts = this.getCorrespondingAccounts(transaction, otherTransactionForTransfer);
-      if (correspondingAccounts[0].id === correspondingAccounts[1].id) {
+      if (correspondingAccounts[0].id === correspondingAccounts[1]?.id) {
         otherTransactionForTransfer = null;
       }
     }

@@ -10,7 +10,7 @@
 </ng-template>
 
 <ng-template [ngTemplateOutlet]="createTransfer"
-             *ngIf="transactionToImport && otherTransactionForTransfer && (importMode === 'TRANSFER' || importMode === 'TRANSFER_WITH_CONVERSION')">
+             *ngIf="transactionToImport && otherTransactionForTransfer && (importMode === 'TRANSFER' || importMode === 'TRANSFER_WITH_CONVERSION' || importMode === 'SINGLE_TRANSFER_WITH_CONVERSION')">
 
 </ng-template>
 
@@ -67,6 +67,10 @@
     </div>
     <div *ngIf="transactionMayBeTransferWithConversion(transactionToImport)"
          (click)="importMode = 'TRANSFER_WITH_CONVERSION'">
+      Przekaz wewnętrzny z wymianą walut
+    </div>
+    <div *ngIf="transactionMayBeSingleTransferWithConversion(transactionToImport)"
+         (click)="importMode = 'SINGLE_TRANSFER_WITH_CONVERSION'">
       Przekaz wewnętrzny z wymianą walut
     </div>
     <div *ngIf="transactionMayBeMutuallyCancellation(transactionToImport)"
