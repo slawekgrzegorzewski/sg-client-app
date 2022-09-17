@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="Warstwa_1"
+   data-name="Warstwa 1"
+   viewBox="0 0 77.900001 82.089259"
+   version="1.1"
+   sodipodi:docname="logo-home.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   width="77.900002"
+   height="82.089256">
+  <metadata
+     id="metadata51">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>LOGO</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     id="namedview49"
+     showgrid="false"
+     inkscape:zoom="4"
+     inkscape:cx="-18.733089"
+     inkscape:cy="56.688185"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Warstwa_1" />
+  <defs
+     id="defs4">
+    <style
+       id="style2">.cls-1{fill:#4e6cb2;}.cls-2{fill:#1d1d1b;}</style>
+  </defs>
+  <title
+     id="title6">LOGO</title>
+  <path
+     style="fill:#4e6cb2;fill-opacity:1;stroke:#4e6cb2;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="M 0.5,30.009258 V 81.589257 H 77.399998 V 30.009258 L 38.950003,0.62925808 Z"
+     id="path837"
+     inkscape:connector-curvature="0" />
+</svg>

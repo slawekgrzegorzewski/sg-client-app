@@ -1,0 +1,413 @@
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        background-color: #b9c6eb;
+        font-family: Arial, serif;
+    }
+
+    .page-size {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #header {
+        width: 100%;
+        max-width: 612px;
+    }
+
+    .first-page {
+        width: 612px;
+        display: flex;
+        flex-flow: wrap;
+        background-color: #4970b6;
+    }
+
+    .first-page-part {
+        padding: 0;
+        float: left;
+        width: 306px;
+        height: 324px;
+        position: relative;
+    }
+
+    #first-page-part-middle-container {
+        height: 164px;
+        position: relative;
+    }
+
+    #first-page-part-middle-text {
+        text-align: right;
+        height: 60px;
+        width: 100%;
+        float: right;
+        color: white;
+        font-weight: bold;
+        margin: 0 12px 0 0
+    }
+
+    #white-logo-container {
+        width: 100%;
+        height: 105px;
+    }
+
+    #white-logo-image {
+        width: 110px;
+        height: 66px;
+        margin-left: 24px;
+        margin-top: 18px;
+        margin-bottom: 20px;
+        float: left;
+    }
+
+    #first-paw {
+        right: 006px;
+        top: 117px;
+    }
+
+    #second-paw {
+        right: 080px;
+        top: 132px;
+    }
+
+    #third-paw {
+        right: 124px;
+        top: 088px;
+    }
+
+    #fourth-paw {
+        right: 192px;
+        top: 090px;
+    }
+
+    #fifth-paw {
+        right: 233px;
+        top: 038px;
+    }
+
+    #sixth-paw {
+        right: 279px;
+        top: 019px;
+    }
+
+    .paw {
+        height: 15px;
+        position: absolute;
+    }
+
+    .first-step {
+        transform: rotate(300deg);
+    }
+
+    .second-step {
+        transform: rotate(305deg);
+    }
+
+    .third-step {
+        transform: rotate(335deg);
+    }
+
+    #first-page-part-footer-text {
+        text-align: center;
+        width: 100%;
+        font-size: 12px;
+        color: white;
+        font-weight: normal;
+        right: 0;
+    }
+
+    #dog-image {
+        height: 306px;
+        width: auto;
+        left: 13px;
+        top: 18px;
+        position: absolute;
+    }
+
+    #bone-image {
+        height: auto;
+        width: 237px;
+        left: 35px;
+        bottom: 36px;
+        position: absolute;
+    }
+
+    .bone-div {
+        bottom: 62px;
+        width: 100%;
+        position: absolute;
+    }
+
+    .bone-text {
+        font-size: 11px;
+        text-align: center;
+        margin: 0;
+        color: #4970b6;
+        font-weight: bold;
+    }
+
+    .second-page {
+        width: 612px;
+        display: flex;
+        flex-flow: wrap;
+    }
+
+    .second-page-part {
+        background-color: white;
+        padding: 0;
+        float: left;
+        width: 306px;
+        height: 324px;
+        position: relative;
+    }
+
+    .second-page-content {
+        margin-top: 39px
+    }
+
+    #logo-round {
+        height: 96px;
+        right: 27px;
+        top: 15px;
+        position: absolute;
+    }
+
+    ul.dashed-list {
+        list-style: none;
+        margin-left: 0;
+        padding-left: 1em;
+    }
+
+    ul.dashed-list > li:before {
+        display: inline-block;
+        content: "-";
+        width: 1em;
+    }
+
+    #cat-image {
+        height: 140px;
+        left: 0px;
+        top: 180px;
+        position: absolute;
+        transform: scaleX(-1);
+    }
+
+    .small-bone {
+        height: 10px;
+        position: absolute;
+    }
+
+    #first-bone {
+        right: 10px;
+        top: 210px;
+        transform: rotate(315deg)
+    }
+
+    #second-bone {
+        right: 55px;
+        top: 210px;
+        transform: rotate(255deg)
+    }
+
+    #third-bone {
+        right: 100px;
+        top: 210px
+    }
+
+    #fourth-bone {
+        right: 145px;
+        top: 210px;
+        transform: rotate(200deg)
+    }
+
+    #fifth-bone {
+        right: 190px;
+        top: 210px;
+        transform: rotate(315deg)
+    }
+
+    #sixth-bone {
+        right: 235px;
+        top: 210px
+    }
+
+    #seventh-bone {
+        right: 280px;
+        top: 210px;
+        transform: rotate(315deg)
+    }
+
+    #logo-house {
+        left: 30px;
+        bottom: 18px;
+        height: 48px;
+        position: absolute;
+    }
+
+    #contact-info {
+        left: 75px;
+        bottom: 18px;
+        height: 48px;
+        width: 215px;
+        position: absolute;
+        color: #4970b6;
+        font-weight: bold;
+        margin-left: 15px
+    }
+
+    @media screen and (max-width: 612px) {
+        .first-page {
+            width: 306px;
+            height: 648px;
+        }
+
+        .second-page {
+            width: 306px;
+            height: 648px;
+        }
+
+        .bone-text {
+            font-size: 10px;
+        }
+    }
+
+    a {
+        text-decoration:none;
+    }
+
+    .flex-container {
+        display: flex;
+        align-items: center;
+    }
+
+    .social-links {
+        display: flex;
+        flex-grow: 1;
+        justify-content: flex-end;
+    }
+	
+	.icons-advertisement {
+        display: flex;
+		flex-direction: column;
+		font-size: 10px;
+		width: 612px;
+	}
+</style>
+<!doctype html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobi Pet Care</title>
+    <meta name="description" content="Mobi Pet Care page">
+    <meta name="author" content="SG">
+    <link rel="icon" type="image/png" href="favicon.png">
+</head>
+
+<body>
+<div class="page-size">
+    <div id="header">
+        <h2 class="flex-container">
+            MOBI PET CARE
+            <div class="social-links">
+                <a href="https://www.facebook.com/Mobi-Pet-Care-1077315989123066/?modal=admin_todo_tour"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="margin-right: 5px">
+                    <img src="https://img.icons8.com/color/32/000000/facebook-circled.png">
+                </a>
+                <a href="https://www.instagram.com/mobi_pet_care/"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    <img src="https://img.icons8.com/color/32/000000/instagram-new.png">
+                </a>
+            </div>
+        </h2>
+        <p>Strona w budowie. Zapraszamy później. Tymczasem zapraszamy na nasze media społecznościowe oraz do zapoznania się z ulotką:</p>
+    </div>
+    <div class="first-page">
+        <div class="first-page-part">
+            <div id="white-logo-container">
+                <img src="logo-white.svg" id="white-logo-image" alt="logo">
+            </div>
+            <div id="first-page-part-middle-container">
+                <p id="first-page-part-middle-text">
+                    PROFESJONALNA<br/>I TROSKLIWA OPIEKA<br/>DLA PSÓW I KOTÓW<br/>W KRAKOWIE
+                </p>
+                <img src="paw.svg" id="first-paw" alt="paw" class="paw first-step">
+                <img src="paw.svg" id="second-paw" alt="paw" class="paw first-step">
+                <img src="paw.svg" id="third-paw" alt="paw" class="paw second-step">
+                <img src="paw.svg" id="fourth-paw" alt="paw" class="paw second-step">
+                <img src="paw.svg" id="fifth-paw" alt="paw" class="paw third-step">
+                <img src="paw.svg" id="sixth-paw" alt="paw" class="paw third-step">
+            </div>
+            <p id="first-page-part-footer-text">
+                Wyjeżdżasz i nie masz z kim zostawić pupila?<br/>
+                Pracujesz, a Twój pies siedzi sam i się nudzi?<br/>
+                Zadzwoń lub napisz!
+            </p>
+        </div>
+        <div class="first-page-part">
+            <img id="dog-image" src="dog.png" alt="dog-wih-leash">
+            <img id="bone-image" src="bone.svg" alt="bone">
+            <div class="bone-div">
+                <p class="bone-text">
+                    Zapraszamy na<br/>
+                    bezpłatne spotkanie<br/>
+                    zapoznawcze!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="second-page">
+        <div class="second-page-part">
+            <img id="logo-round" src="logo-round.svg" alt="logo-round">
+            <div class="second-page-content">
+                <b>Oferujemy:</b>
+                <ul class="dashed-list">
+                    <li>spacery z psami</li>
+                    <li>wizyty u kotów</li>
+                    <li>nocowanie u psa/kota</li>
+                    <li>indywidualną opiekę nad psem<br/>u opiekuna (hotel)</li>
+                    <li>taxi dla zwierząt</li>
+                </ul>
+            </div>
+            <img id="cat-image" src="cat.png" alt="cat">
+        </div>
+        <div class="second-page-part">
+            <div class="second-page-content">
+                <b>Zapewniamy:</b>
+                <ul class="dashed-list">
+                    <li>troskliwą i odpowiedzialną opiekę</li>
+                    <li>profesjonalizm</li>
+                    <li>dojazd do klienta</li>
+                    <li>ciekawe zabawy z wykorzystaniem<br/>zabawek behawioralnych</li>
+                    <li>mizianko bez limitów</li>
+                </ul>
+            </div>
+            <img id="first-bone" src="bone-blue.svg" alt="small-bone" class="small-bone">
+            <img id="second-bone" src="bone-blue.svg" alt="small-bone" class="small-bone">
+            <img id="third-bone" src="bone-blue.svg" alt="small-bone" class="small-bone">
+            <img id="fourth-bone" src="bone-blue.svg" alt="small-bone" class="small-bone">
+            <img id="fifth-bone" src="bone-blue.svg" alt="small-bone" class="small-bone">
+            <img id="sixth-bone" src="bone-blue.svg" alt="small-bone" class="small-bone">
+            <img id="seventh-bone" src="bone-blue.svg" alt="small-bone" class="small-bone">
+            <img id="logo-house" src="logo-house.svg" alt="logo-house">
+            <div id="contact-info">
+                kontakt: 799-790-843
+                mobipetcare@gmail.com
+                www.mobipetcare.pl
+            </div>
+        </div>
+    </div>
+	<div class="icons-advertisement">
+		<a href="https://icons8.com/icon/114441/facebook-circled">Facebook Circled icon by Icons8</a>
+		<a href="https://icons8.com/icon/32323/instagram">Instagram icon by Icons8</a>
+	</div>
+</body>
+</html>
