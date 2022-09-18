@@ -8,7 +8,7 @@ jobs:
       - image: cimg/node:18.9.0
     steps:
       - checkout
-      - run: npm install -g @angular/cli
+      - run: npm install
       - run: npm run buildProd
       - setup_remote_docker
       - aws-ecr/build-and-push-image:
