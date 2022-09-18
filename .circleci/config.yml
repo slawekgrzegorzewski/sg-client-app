@@ -1,0 +1,34 @@
+version: 2.1
+orbs:
+  aws-ecr: circleci/aws-ecr@8.1.2
+
+jobs:
+  build:
+    docker:
+      - image: cimg/node:18.9.0
+    steps:
+      - checkout
+      - run: npm run buildProd
+      - setup_remote_docker
+      - aws-ecr/build-and-push-image:
+          repo: 'client'
+          tag: latest
+          assume-web-identity: false
+          attach-workspace: false
+          create-repo: false
+          docker-login: false
+          public-registry: false
+          push-image: true
+          remote-docker-layer-caching: false
+          repo-scan-on-push: true
+          setup-remote-docker: false
+          skip-when-tags-exist: false
+          dockerfile: docker/Dockerfile
+          platform: linux/amd64
+          region: eu-central-1
+      - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "cd /home/slawek/deploy && ./start.sh"
+
+workflows:
+  workflow:
+    jobs:
+      - build
