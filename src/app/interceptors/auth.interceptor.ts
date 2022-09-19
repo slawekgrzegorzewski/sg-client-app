@@ -18,7 +18,8 @@ export class AuthInterceptor implements HttpInterceptor {
       request = request.clone({
         setHeaders: {
           Authorization: `Bearer ${this.loginService.getToken()}`,
-          DomainId: domainId ? domainId.toString() : ''
+          DomainId: domainId ? domainId.toString() : '',
+          'X-Timezone-Id': Intl.DateTimeFormat().resolvedOptions().timeZone
         }
       });
     }
