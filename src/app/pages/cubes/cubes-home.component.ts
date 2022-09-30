@@ -328,7 +328,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private sizeLayout(appSize: AppSize): void {
-    if (window.innerWidth < 640) {
+    if (window.innerWidth < 821) {
       this.viewMode = 'mobile';
       this.resultsTableHeight = 250;
       this.mobileTimerPartHeight = appSize.height - 250 - 70;
