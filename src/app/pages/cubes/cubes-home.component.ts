@@ -342,7 +342,6 @@ export class CubesHomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   press($event: any) {
-    this.resetState();
     this.color = 'red';
   }
 
@@ -356,7 +355,12 @@ export class CubesHomeComponent implements OnInit, AfterViewInit, OnDestroy {
       this.color = 'green';
       this.stop();
     } else {
-      this.save();
+      if (this.currentState === 'CLEAR' || this.currentState === 'SCRAMBLED') {
+        this.scramble();
+      }
+      if (this.currentState === 'STOPPED') {
+        this.save();
+      }
     }
   }
 }
