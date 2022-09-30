@@ -99,6 +99,10 @@
   align-self: flex-end;
 }
 
+.sg-flex-align-self-center {
+  align-self: center;
+}
+
 app-general-typeahead, app-date-picker {
   padding: 0 !important;
   margin: 0 !important;

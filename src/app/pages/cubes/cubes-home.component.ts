@@ -81,10 +81,12 @@ export class CubesHomeComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('cubeContainer') rubiksCubeContainer: ElementRef | null = null;
   resultsSummaryHeight: number = 200;
   resultsTableHeight: number = 0;
+  mobileTimerPartHeight: number = 0;
   clockWidth: number = 130;
   cubeAvailableSpace: number = 130;
 
   domainSubscription: Subscription | null = null;
+  color: string = 'black';
 
   constructor(private cubeRecordsService: CubeRecordsService,
               private eventBus: NgEventBus,
@@ -308,6 +310,7 @@ export class CubesHomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   resetState(currentState: PageState = 'CLEAR') {
+    this.color = 'black';
     this.currentState = currentState;
     this.turns = '';
     this.timer!.stop();
@@ -327,12 +330,34 @@ export class CubesHomeComponent implements OnInit, AfterViewInit, OnDestroy {
   private sizeLayout(appSize: AppSize): void {
     if (window.innerWidth < 640) {
       this.viewMode = 'mobile';
+      this.resultsTableHeight = 250;
+      this.mobileTimerPartHeight = appSize.height - 250 - 70;
     } else {
       this.viewMode = 'desktop';
+      this.resultsTableHeight = appSize.height - this.resultsSummaryHeight - appSize.navigationHeight - 60;
+      this.mobileTimerPartHeight = appSize.height;
     }
-    this.resultsTableHeight = appSize.height - this.resultsSummaryHeight - appSize.navigationHeight - 60;
     this.clockWidth = appSize.width / 2;
     this.cubeAvailableSpace = this.rubiksCubeContainer?.nativeElement?.offsetWidth;
+  }
+
+  press($event: any) {
+    this.resetState();
+    this.color = 'red';
+  }
+
+  pressup($event: any) {
+    this.color = 'black';
+    this.start();
+  }
+
+  tap($event: any) {
+    if (this.timer?.isRunning()) {
+      this.color = 'green';
+      this.stop();
+    } else {
+      this.save();
+    }
   }
 }
 

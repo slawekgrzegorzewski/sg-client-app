@@ -20,6 +20,7 @@ export class TimerComponent {
   hours = 0;
 
   @Input() width: number = 0;
+  @Input() color: string = 'black';
 
   constructor() {
     this.clear();

@@ -32,12 +32,21 @@
 </div>
 
 <div *ngIf="viewMode==='mobile'" class="sg-flex-column" style="height: 100%;">
-  <ng-container *ngTemplateOutlet="timerContainer"></ng-container>
 
-  <div class="sg-flex-justify-self-flex-end sg-flex-column sg-flex-justify-flex-start">
-    <ng-container *ngTemplateOutlet="buttons"></ng-container>
+  <ng-container *ngTemplateOutlet="detailedResultsTable"></ng-container>
+
+  <div (press)="press($event)" (pressup)="pressup($event)" (tap)="tap($event)"
+       [style.height.px]="mobileTimerPartHeight"
+       class="sg-flex-column sg-flex-justify-space-between">
+    <div></div>
+    <div class="sg-flex-align-self-center sg-flex-justify-self-center">
+      <ng-container *ngTemplateOutlet="timerContainer"></ng-container>
+    </div>
+
+    <div class="sg-flex-justify-self-flex-end sg-flex-column">
+      <ng-container *ngTemplateOutlet="buttons"></ng-container>
+    </div>
   </div>
-
 </div>
 
 <ng-template #generalStats>
@@ -167,5 +176,5 @@
 </ng-template>
 
 <ng-template #timerContainer>
-  <sg-timer [width]="clockWidth" #timer class="sg-flex-justify-self-center"></sg-timer>
+  <sg-timer [width]="clockWidth" #timer [color]="color" class="sg-flex-justify-self-center"></sg-timer>
 </ng-template>
