@@ -16,6 +16,7 @@ export class NodrigenComponent implements OnInit {
 
   permissionsGranted: NodrigenPermission[] = [];
   permissionsToProcess: NodrigenPermission[] = [];
+  institutionsToRecreate: NodrigenInstitution[] = [];
   institutions: NodrigenInstitution[] = [];
 
   constructor(private banksService: BanksService,
@@ -42,10 +43,12 @@ export class NodrigenComponent implements OnInit {
   private getPermissions() {
     this.nodrigenService.getPermissionsGranted().subscribe(permissions => this.permissionsGranted = permissions);
     this.nodrigenService.getPermissionsToProcess().subscribe(permissions => this.permissionsToProcess = permissions);
+    this.nodrigenService.getInstitutionsToRecreate().subscribe(institutions => this.institutionsToRecreate = institutions);
   }
 
   createPermissions(institutionId: string, maxHistoricalDays: number) {
     this.institutions = [];
+    this.nodrigenService.getInstitutionsToRecreate().subscribe(institutions => this.institutionsToRecreate = institutions);
     this.nodrigenService.startPermissionRequest(institutionId, maxHistoricalDays, document.location.href, 'pl')
       .subscribe(permissions => this.permissionsToProcess = permissions);
   }

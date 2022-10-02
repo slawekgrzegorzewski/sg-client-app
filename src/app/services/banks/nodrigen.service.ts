@@ -26,6 +26,11 @@ export class NodrigenService {
       .pipe(map((data: NodrigenInstitution[]) => data.map(d => new NodrigenInstitution(d))));
   }
 
+  getInstitutionsToRecreate(): Observable<NodrigenInstitution[]> {
+    return this.http.get<NodrigenInstitution[]>(`${this.endpoint}/institutions_to_recreate`)
+      .pipe(map((data: NodrigenInstitution[]) => data.map(d => new NodrigenInstitution(d))));
+  }
+
   getPermissionsGranted(): Observable<NodrigenPermission[]> {
     return this.http.get<NodrigenPermission[]>(`${this.endpoint}/permissions/granted`)
       .pipe(map((data: NodrigenPermission[]) => data.map(d => new NodrigenPermission(d))));

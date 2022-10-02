@@ -40,6 +40,20 @@
   </div>
 </div>
 
+<div class="sg-flex-column">
+  <h5>Potrzebne odnowienie pozwolenia</h5>
+  <div class="sg-flex-wrap">
+    <div *ngFor="let institution of institutionsToRecreate"
+         (click)="createPermissions(institution.id, institution.transaction_total_days)" class="sg-flex-column"
+         style="padding: 10px;">
+      <div>{{institution.name}}</div>
+      <div>{{institution.bic}}</div>
+      <div>{{institution.transaction_total_days}}</div>
+      <img [src]="institution.logo" [alt]="institution.name" style="max-height: 200px;max-width: 200px"/>
+    </div>
+  </div>
+</div>
+
 
 <button *ngIf="institutions.length >0" (click)="institutions = []" class="btn btn-outline-primary">Anuluj</button>
 <div class="sg-flex-wrap">
