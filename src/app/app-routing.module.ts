@@ -1,25 +1,25 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {SETTINGS_ROUTER_URL, SettingsComponent} from './pages/settings/settings.component';
-import {LoginComponent} from './pages/login/login.component';
-import {RegisterComponent} from './pages/register/register.component';
-import {UserLoggedInGuard} from './guards/AuthGuard/user-logged-in-guard.service';
-import {UserNotLoggedInGuard} from './guards/Login/user-not-logged-in-guard.service';
-import {ACCOUNTANT_HOME_ROUTER_URL, AccountantHomeComponent} from './pages/accountant/accountant-home/accountant-home.component';
-import {ACCOUNTANT_HISTORY_ROUTER_URL, AccountsHistoryComponent} from './pages/accountant/accounts-history/accounts-history.component';
-import {BILLING_SMALL_ROUTER_URL, BillingSmallComponent} from './pages/accountant/billings/billing-small.component';
-import {PIGGY_BANKS_SMALL_ROUTER_URL, PiggyBanksSmallComponent} from './pages/accountant/piggy-banks/piggy-banks-small.component';
-import {CHARTS_ROUTER_URL, ChartsComponent} from './pages/accountant/charts/charts.component';
-import {CHECKER_HOME_ROUTER_URL, CheckerHomeComponent} from './pages/checker/checker-home/checker-home.component';
-import {SYR_HOME_ROUTER_URL, SyrHomeComponent} from './pages/syr/syr-home.component';
-import {SYR_ADMIN_ROUTER_URL, SyrAdminComponent} from './pages/syr/syr-admin.component';
-import {CUBES_HOME_ROUTER_URL, CubesHomeComponent} from './pages/cubes/cubes-home.component';
+import {SETTINGS_ROUTER_URL, SettingsComponent} from './accountant/pages/settings/settings.component';
+import {LoginComponent} from './general/model/login/login.component';
+import {RegisterComponent} from './general/model/register/register.component';
+import {UserLoggedInGuard} from './general/guards/user-logged-in-guard.service';
+import {UserNotLoggedInGuard} from './general/guards/user-not-logged-in-guard.service';
+import {ACCOUNTANT_HOME_ROUTER_URL, AccountantHomeComponent} from './accountant/pages/accountant-home/accountant-home.component';
+import {ACCOUNTANT_HISTORY_ROUTER_URL, AccountsHistoryComponent} from './accountant/pages/accounts-history/accounts-history.component';
+import {BILLING_SMALL_ROUTER_URL, BillingSmallComponent} from './accountant/pages/billings/billing-small.component';
+import {PIGGY_BANKS_SMALL_ROUTER_URL, PiggyBanksSmallComponent} from './accountant/pages/piggy-banks/piggy-banks-small.component';
+import {CHARTS_ROUTER_URL, ChartsComponent} from './accountant/pages/charts/charts.component';
+import {CHECKER_HOME_ROUTER_URL, CheckerHomeComponent} from './periodic-checker/pages/checker-home/checker-home.component';
+import {SYR_HOME_ROUTER_URL, SyrHomeComponent} from './service-year-report/pages/syr-home.component';
+import {SYR_ADMIN_ROUTER_URL, SyrAdminComponent} from './service-year-report/pages/syr-admin.component';
+import {CUBES_HOME_ROUTER_URL, CubesHomeComponent} from './speedcubing/pages/cubes-home.component';
 import {
   HOLIDAY_CURRENCIES_ROUTER_URL,
   HolidayCurrenciesComponent
-} from './components/accountant/holiday-currencies/holiday-currencies.component';
-import {DefaultApplicationComponent} from './components/general/applications/default-application.component';
-import {CUBES_STATISTICS_ROUTER_URL, CubeStatisticsComponent} from './pages/cubes/cube-statistics.component';
+} from './accountant/components/holiday-currencies/holiday-currencies.component';
+import {DefaultApplicationComponent} from './general/components/applications/default-application.component';
+import {CUBES_STATISTICS_ROUTER_URL, CubeStatisticsComponent} from './speedcubing/pages/cube-statistics.component';
 
 const routes: Routes = [
   {path: 'login', component: LoginComponent, canActivate: [UserNotLoggedInGuard]},
