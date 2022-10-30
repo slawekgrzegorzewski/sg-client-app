@@ -1,6 +1,7 @@
-<ng-template [ngTemplateOutlet]="list" *ngIf="!transactionToImport">
+<ng-template [ngTemplateOutlet]="list" *ngIf="!_transactionToImport">
 
 </ng-template>
+
 <ng-template [ngTemplateOutlet]="importPart" *ngIf="transactionToImport && !importMode">
 
 </ng-template>
@@ -18,10 +19,12 @@
              *ngIf="transactionToImport && (importMode === 'CASH_WITHDRAWAL')">
 
 </ng-template>
+
 <ng-template [ngTemplateOutlet]="mutuallyCancelTransactions"
              *ngIf="transactionToImport && otherTransactionForTransfer && (importMode === 'MUTUALLY_CANCELLING')">
 
 </ng-template>
+
 <ng-template [ngTemplateOutlet]="ignoreTransaction"
              *ngIf="transactionToImport && importMode === 'IGNORE'">
 
@@ -49,37 +52,60 @@
     </div>
 
     <h6>Powyższą transakcję można zaimportować jako:</h6>
-    <div *ngIf="transactionMayBeDebit(transactionToImport)"
-         (click)="importMode = 'DEBIT'">
-      Wydatek
-    </div>
+    <ng-container *ngIf="transactionMayBeDebit(transactionToImport)">
+      <div (click)="importMode = 'DEBIT'">
+        <b>Wydatek</b>
+      </div>
+      <ng-container *ngIf="isAlignmentPossible()">
+        <b>Wydatek wyrównany transakcją:</b>
+        <div style="padding-left: 20px">
+          op
+          <app-transactions-row *ngFor="let alignment of candidatesToAlignment"
+                                [transactionToImport]="alignment"
+                                (click)="alignmentTransaction = alignment; importMode ='DEBIT';">
+
+          </app-transactions-row>
+        </div>
+      </ng-container>
+    </ng-container>
     <div *ngIf="transactionMayBeDebit(transactionToImport)"
          (click)="importMode = 'CASH_WITHDRAWAL'">
-      Wypłata gotówkowa
+      <b>Wypłata gotówkowa</b>
     </div>
-    <div *ngIf="transactionMayBeCredit(transactionToImport)"
-         (click)="importMode = 'CREDIT'">
-      Dochód
-    </div>
+    <ng-container *ngIf="transactionMayBeCredit(transactionToImport)">
+      <div (click)="importMode = 'CREDIT'">
+        <b>Dochód</b>
+      </div>
+      <ng-container *ngIf="isAlignmentPossible()">
+        <b>Dochód wyrównany transakcją:</b>
+        <div style="padding-left: 20px">
+          <app-transactions-row *ngFor="let alignment of candidatesToAlignment"
+                                [transactionToImport]="alignment"
+                                (click)="alignmentTransaction = alignment; importMode ='CREDIT';">
+
+          </app-transactions-row>
+        </div>
+      </ng-container>
+    </ng-container>
     <div *ngIf="transactionMayBeTransfer(transactionToImport)"
          (click)="importMode = 'TRANSFER'">
-      Przekaz wewnętrzny
+      <b>Przekaz wewnętrzny</b>
     </div>
     <div *ngIf="transactionMayBeTransferWithConversion(transactionToImport)"
          (click)="importMode = 'TRANSFER_WITH_CONVERSION'">
-      Przekaz wewnętrzny z wymianą walut
+      <b>Przekaz wewnętrzny z wymianą walut</b>
     </div>
     <div *ngIf="transactionMayBeSingleTransferWithConversion(transactionToImport)"
          (click)="importMode = 'SINGLE_TRANSFER_WITH_CONVERSION'">
-      Przekaz wewnętrzny z wymianą walut
+      <b>Przekaz wewnętrzny z wymianą walut</b>
     </div>
     <div *ngIf="transactionMayBeMutuallyCancellation(transactionToImport)"
          (click)="importMode = 'MUTUALLY_CANCELLING'">
-      Transakcje znoszące się
+      <b>Transakcje znoszące się</b>
     </div>
     <div *ngIf="transactionMayBeIgnored(transactionToImport)"
          (click)="importMode = 'IGNORE'">
-      Ignoruj tą transakcję
+      <b>Ignoruj tą transakcję</b>
     </div>
 
   </div>

@@ -5,7 +5,6 @@ import {ComparatorBuilder} from '../../../general/utils/comparator-builder';
 import {Expense} from '../../model/billings/expense';
 import {PiggyBank} from '../../model/piggy-bank';
 import {Income} from '../../model/billings/income';
-import {forkJoin, Observable} from 'rxjs';
 import {BillingPeriodsService} from '../../services/billing-periods.service';
 import {PiggyBanksService} from '../../services/piggy-banks.service';
 import {Account} from '../../model/account';
@@ -13,7 +12,8 @@ import {TransactionType} from '../../model/transaction-type';
 import {NgEventBus} from 'ng-event-bus';
 import {TRANSACTIONS_TO_IMPORT_CHANGED} from '../../../general/utils/event-bus-events';
 import {AccountsService} from '../../services/accounts.service';
-import {Domain} from '../../../general/model/domain';
+import Decimal from 'decimal.js';
+import {DatesUtils} from '../../../general/utils/dates-utils';
 
 
 export type ImportMode =
@@ -34,7 +34,23 @@ export type ImportMode =
 export class TransactionsImportComponent implements OnInit {
 
   transactionsToImport: BankTransactionToImport[] = [];
-  transactionToImport: BankTransactionToImport | null = null;
+  _transactionToImport: BankTransactionToImport | null = null;
+  set transactionToImport(value: BankTransactionToImport | null) {
+    this._transactionToImport = value;
+    this.candidatesToAlignment = [];
+    if (this.transactionMayBeDebit(value)) {
+      this.prepareAlignmentCandidates('DEBIT');
+    } else if (this.transactionMayBeCredit(value)) {
+      this.prepareAlignmentCandidates('CREDIT');
+    }
+  }
+
+  get transactionToImport(): BankTransactionToImport | null {
+    return this._transactionToImport;
+  }
+
+  alignmentTransaction: BankTransactionToImport | null = null;
+  candidatesToAlignment: (BankTransactionToImport | null)[] = [];
   otherTransactionForTransfer: BankTransactionToImport | null = null;
   cashAccounts: Account[] = [];
   private _importMode: ImportMode | null = null;
@@ -47,15 +63,15 @@ export class TransactionsImportComponent implements OnInit {
     switch (this.importMode) {
       case 'DEBIT':
         this.elementToCreate = new Expense();
-        this.elementToCreate.amount = this.transactionToImport!.debit;
-        this.elementToCreate.expenseDate = this.transactionToImport!.timeOfTransaction;
-        this.elementToCreate.description = this.transactionToImport!.description;
+        this.elementToCreate.amount = new Decimal(this.transactionToImport!.debit).minus(new Decimal(this.alignmentTransaction?.credit || 0)).toNumber();
+        this.elementToCreate.expenseDate = DatesUtils.min(this.transactionToImport!.timeOfTransaction, this.alignmentTransaction?.timeOfTransaction || null);
+        this.elementToCreate.description = this.transactionToImport!.description + (this.alignmentTransaction ? this.alignmentTransaction.description + '\n' : '');
         break;
       case 'CREDIT':
         this.elementToCreate = new Income();
-        this.elementToCreate.amount = this.transactionToImport!.credit;
-        this.elementToCreate.incomeDate = this.transactionToImport!.timeOfTransaction;
-        this.elementToCreate.description = this.transactionToImport!.description;
+        this.elementToCreate.amount = new Decimal(this.transactionToImport!.credit).minus(new Decimal(this.alignmentTransaction?.debit || 0)).toNumber();
+        this.elementToCreate.incomeDate = DatesUtils.min(this.transactionToImport!.timeOfTransaction, this.alignmentTransaction?.timeOfTransaction || null);
+        this.elementToCreate.description = this.transactionToImport!.description + (this.alignmentTransaction ? this.alignmentTransaction.description + '\n' : '');
         break;
       case 'MUTUALLY_CANCELLING':
         this.otherTransactionForTransfer = this.getOtherTransactionForMutualCancellation(this.transactionToImport);
@@ -305,7 +321,7 @@ export class TransactionsImportComponent implements OnInit {
       return;
     }
 
-    this.billingsService.createBillingElementWithImportingBankTransaction(elementToCreate, accountIdForElement, this.transactionToImport!)
+    this.billingsService.createBillingElementWithImportingBankTransaction(elementToCreate, accountIdForElement, this.transactionToImport!, this.alignmentTransaction)
       .subscribe({
         next: (success) => {
           if (piggyBankToUpdate) {
@@ -339,5 +355,32 @@ export class TransactionsImportComponent implements OnInit {
     if (this.transactionToImport !== null) {
       this.nodrigenService.ignoreTransaction(this.transactionToImport).subscribe();
     }
+  }
+
+  prepareAlignmentCandidates(importMode: ImportMode): void {
+    switch (importMode) {
+      case 'CREDIT':
+        this.candidatesToAlignment = this.transactionsToImport.filter(t =>
+          t.isDebit() && t.debit < (this.transactionToImport?.credit || 0)
+        );
+        if (this.candidatesToAlignment.length === 0) {
+          this.importMode = 'CREDIT';
+        }
+        break;
+      case 'DEBIT':
+        this.candidatesToAlignment = this.transactionsToImport.filter(t =>
+          t.isCredit() && t.credit < (this.transactionToImport?.debit || 0)
+        );
+        if (this.candidatesToAlignment.length === 0) {
+          this.importMode = 'DEBIT';
+        }
+        break;
+      default:
+        throw new Error('Wrong mode');
+    }
+  }
+
+  isAlignmentPossible(): boolean {
+    return (this.candidatesToAlignment?.length || 0) > 0;
   }
 }

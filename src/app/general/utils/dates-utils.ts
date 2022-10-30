@@ -62,4 +62,16 @@ export class DatesUtils {
   public static compareDatesOnly(date: Date, other: Date): number {
     return ComparatorBuilder.comparingByDateDays<Date>(d => d).build()(date, other);
   }
+
+  public static min(first: Date | null, second: Date | null): Date {
+    return [first, second]
+      .filter(d => d !== null)
+      .sort((a, b) => this.compareDatesOnly(a!, b!))[0]!;
+  }
+
+  public static max(first: Date | null, second: Date | null): Date {
+    return [first, second]
+      .filter(d => d !== null)
+      .sort((a, b) => -this.compareDatesOnly(a!, b!))[0]!;
+  }
 }

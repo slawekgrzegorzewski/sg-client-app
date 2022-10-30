@@ -73,16 +73,16 @@ export class BillingPeriodsService {
     }
   }
 
-  createBillingElementWithImportingBankTransaction(element: Income | Expense, accountId: number, bankTransactionToImport: BankTransactionToImport): Observable<string> {
+  createBillingElementWithImportingBankTransaction(element: Income | Expense, accountId: number, bankTransactionToImport: BankTransactionToImport, alignmentTransaction: BankTransactionToImport | null): Observable<string> {
     let observable: Observable<string> | null = null;
     if (element instanceof Income) {
       observable = this.http.put(
-        `${this.billingEndpoint}/income/${accountId}/${bankTransactionToImport.creditNodrigenTransactionId}`,
+        `${this.billingEndpoint}/income/${accountId}/${bankTransactionToImport.creditNodrigenTransactionId}/${alignmentTransaction?.debitNodrigenTransactionId?.toString() || ''}`,
         element,
         {responseType: 'text'});
     } else {
       observable = this.http.put(
-        `${this.billingEndpoint}/expense/${accountId}/${bankTransactionToImport.debitNodrigenTransactionId}`,
+        `${this.billingEndpoint}/expense/${accountId}/${bankTransactionToImport.debitNodrigenTransactionId}/${alignmentTransaction?.creditNodrigenTransactionId?.toString() || ''}`,
         element,
         {responseType: 'text'});
     }
