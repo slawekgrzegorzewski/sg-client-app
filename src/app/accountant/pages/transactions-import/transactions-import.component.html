@@ -1,40 +1,23 @@
-<ng-template [ngTemplateOutlet]="list" *ngIf="!_transactionToImport">
-
+<ng-template [ngTemplateOutlet]="transactionsList" *ngIf="shouldShowListOfTransactions()">
 </ng-template>
 
-<ng-template [ngTemplateOutlet]="importPart" *ngIf="transactionToImport && !importMode">
-
-</ng-template>
-<ng-template [ngTemplateOutlet]="createCreditDebit"
-             *ngIf="transactionToImport && (importMode === 'DEBIT' || importMode === 'CREDIT')">
-
+<ng-template [ngTemplateOutlet]="transactionImportOptions"
+             *ngIf="shouldShowListOfImportOptions()">
 </ng-template>
 
-<ng-template [ngTemplateOutlet]="createTransfer"
-             *ngIf="transactionToImport && otherTransactionForTransfer && (importMode === 'TRANSFER' || importMode === 'TRANSFER_WITH_CONVERSION' || importMode === 'SINGLE_TRANSFER_WITH_CONVERSION')">
-
+<ng-template [ngTemplateOutlet]="billingElementCreation"
+             *ngIf="transactionToImport && billingElementToCreate && !transactionCreationData">
 </ng-template>
 
-<ng-template [ngTemplateOutlet]="createCashWithdrawal"
-             *ngIf="transactionToImport && (importMode === 'CASH_WITHDRAWAL')">
-
+<ng-template [ngTemplateOutlet]="transactionCreation"
+             *ngIf="transactionToImport && !billingElementToCreate && transactionCreationData">
 </ng-template>
 
-<ng-template [ngTemplateOutlet]="mutuallyCancelTransactions"
-             *ngIf="transactionToImport && otherTransactionForTransfer && (importMode === 'MUTUALLY_CANCELLING')">
-
-</ng-template>
-
-<ng-template [ngTemplateOutlet]="ignoreTransaction"
-             *ngIf="transactionToImport && importMode === 'IGNORE'">
-
-</ng-template>
-
-<ng-template #list>
-  <ng-container *ngIf="transactionsToImport.length > 0">
+<ng-template #transactionsList>
+  <ng-container *ngIf="transactions.length > 0">
     <h4>Nowe transakcje z banku do zaimportowania</h4>
 
-    <ng-container *ngFor="let transactionToImport of transactionsToImport">
+    <ng-container *ngFor="let transactionToImport of transactions">
       <app-transactions-row [transactionToImport]="transactionToImport" (click)="select(transactionToImport)"
                             class="sg-row-hoverable">
 
@@ -43,7 +26,8 @@
   </ng-container>
 </ng-template>
 
-<ng-template #importPart>
+<ng-template #transactionImportOptions>
+
   <div class="sg-flex-column">
     <h5 class="sg-flex-justify-self-center">Importujesz następującą transakcję</h5>
     <app-transactions-row [transactionToImport]="transactionToImport"></app-transactions-row>
@@ -52,110 +36,68 @@
     </div>
 
     <h6>Powyższą transakcję można zaimportować jako:</h6>
-    <ng-container *ngIf="transactionMayBeDebit(transactionToImport)">
-      <div (click)="importMode = 'DEBIT'">
-        <b>Wydatek</b>
-      </div>
-      <ng-container *ngIf="isAlignmentPossible()">
-        <b>Wydatek wyrównany transakcją:</b>
-        <div style="padding-left: 20px">
-          op
-          <app-transactions-row *ngFor="let alignment of candidatesToAlignment"
-                                [transactionToImport]="alignment"
-                                (click)="alignmentTransaction = alignment; importMode ='DEBIT';">
 
-          </app-transactions-row>
-        </div>
-      </ng-container>
-    </ng-container>
-    <div *ngIf="transactionMayBeDebit(transactionToImport)"
-         (click)="importMode = 'CASH_WITHDRAWAL'">
-      <b>Wypłata gotówkowa</b>
-    </div>
-    <ng-container *ngIf="transactionMayBeCredit(transactionToImport)">
-      <div (click)="importMode = 'CREDIT'">
-        <b>Dochód</b>
-      </div>
-      <ng-container *ngIf="isAlignmentPossible()">
-        <b>Dochód wyrównany transakcją:</b>
-        <div style="padding-left: 20px">
-          <app-transactions-row *ngFor="let alignment of candidatesToAlignment"
-                                [transactionToImport]="alignment"
-                                (click)="alignmentTransaction = alignment; importMode ='CREDIT';">
+    <app-debit-transaction-importer
+      [transaction]="transactionToImport"
+      [allTransactions]="transactions"
+      [allAccounts]="allAccounts"
+      (onExpenseCreation)="showBillingElementCreation($event[0],$event[1],$event[2])"
+      (onTransactionCreation)="showTransactionCreation($event)">
+    </app-debit-transaction-importer>
 
-          </app-transactions-row>
-        </div>
-      </ng-container>
-    </ng-container>
-    <div *ngIf="transactionMayBeTransfer(transactionToImport)"
-         (click)="importMode = 'TRANSFER'">
-      <b>Przekaz wewnętrzny</b>
-    </div>
-    <div *ngIf="transactionMayBeTransferWithConversion(transactionToImport)"
-         (click)="importMode = 'TRANSFER_WITH_CONVERSION'">
-      <b>Przekaz wewnętrzny z wymianą walut</b>
-    </div>
-    <div *ngIf="transactionMayBeSingleTransferWithConversion(transactionToImport)"
-         (click)="importMode = 'SINGLE_TRANSFER_WITH_CONVERSION'">
-      <b>Przekaz wewnętrzny z wymianą walut</b>
-    </div>
-    <div *ngIf="transactionMayBeMutuallyCancellation(transactionToImport)"
-         (click)="importMode = 'MUTUALLY_CANCELLING'">
-      <b>Transakcje znoszące się</b>
-    </div>
-    <div *ngIf="transactionMayBeIgnored(transactionToImport)"
-         (click)="importMode = 'IGNORE'">
-      <b>Ignoruj tą transakcję</b>
-    </div>
+    <app-credit-transaction-importer
+      [transaction]="transactionToImport"
+      [allTransactions]="transactions"
+      [allAccounts]="allAccounts"
+      (onIncomeCreation)="showBillingElementCreation($event[0],$event[1],$event[2])"
+      (onTransactionCreation)="showTransactionCreation($event)">
+    </app-credit-transaction-importer>
+
+    <app-transfer-importer
+      [transaction]="transactionToImport"
+      [allTransactions]="transactions"
+      [allAccounts]="allAccounts"
+      (onTransactionCreation)="showTransactionCreation($event)">
+    </app-transfer-importer>
+
+    <app-mutually-cancelling-importer
+      [transaction]="transactionToImport"
+      [allTransactions]="transactions"
+      (onMutuallyCancel)="mutuallyCancelBothTransactions($event[0], $event[1])"
+      (onCancel)="showListOfTransactions()">
+    </app-mutually-cancelling-importer>
+
+    <app-ignore-importer
+      [transaction]="transactionToImport"
+      (onIgnore)="ignore($event)"
+      (onCancel)="showListOfTransactions()">
+    </app-ignore-importer>
 
   </div>
 </ng-template>
 
-<ng-template #createCreditDebit>
+<ng-template #billingElementCreation>
   <div class="sg-flex-column">
     <app-create-billing-element class="sg-flex-column"
-                                [elementType]="importMode === 'DEBIT' ? 'expense' : 'income'"
-                                [billingElement]="elementToCreate"
-                                [account]="getAccountForBillingElement()"
+                                [billingElement]="billingElementToCreate!"
+                                [elementType]="billingElementToCreateType!"
+                                [account]="accountOfBillingElementToCreate!"
                                 (editEvent)="createElement($event[0], $event[1], $event[2])"
     ></app-create-billing-element>
 
   </div>
 </ng-template>
 
-<ng-template #createTransfer>
-  <app-create-transaction *ngIf="transactionToImport && otherTransactionForTransfer && transactionToCreateType"
-                          [sourceAccount]="transactionToImport.sourceAccount"
-                          [destinationAccount]="otherTransactionForTransfer.destinationAccount"
-                          [involvedBankTransactions]="[transactionToImport.debitNodrigenTransactionId, otherTransactionForTransfer.creditNodrigenTransactionId]"
-                          [transactionType]="transactionToCreateType"
-                          [amount]="transactionToImport.debit"
-                          [description]="transactionToImport.description"
-                          [conversionRate]="conversionRate">
-  </app-create-transaction>
-</ng-template>
-
-<ng-template #createCashWithdrawal>
-  <app-create-transaction *ngIf="transactionToImport && !otherTransactionForTransfer && transactionToCreateType"
-                          [sourceAccount]="transactionToImport.sourceAccount"
-                          [destinationAccounts]="cashAccounts"
-                          [involvedBankTransactions]="[transactionToImport.debitNodrigenTransactionId]"
-                          [transactionType]="transactionToCreateType"
-                          [amount]="transactionToImport.debit"
-                          [description]="transactionToImport.description">
-  </app-create-transaction>
-</ng-template>
-
-<ng-template #mutuallyCancelTransactions>
-  <app-transactions-row [transactionToImport]="transactionToImport"></app-transactions-row>
-  <app-transactions-row [transactionToImport]="otherTransactionForTransfer"></app-transactions-row>
-  <button class="btn btn-sm btn-link" (click)="clearImport()">Cofnij</button>
-  <button class="btn btn-sm btn-link" (click)="mutuallyCancelBothTransactions()">Anuluj wzajemnie</button>
-</ng-template>
-
-<ng-template #ignoreTransaction>
-  <div>Na pewno zignorwać tą transakcję</div>
-  <app-transactions-row [transactionToImport]="transactionToImport"></app-transactions-row>
-  <button class="btn btn-sm btn-link" (click)="clearImport()">Nie</button>
-  <button class="btn btn-sm btn-link" (click)="ignore()">Tak</button>
+<ng-template #transactionCreation>
+  <app-create-transaction
+    [sourceAccounts]="transactionCreationData!.sourceAccounts"
+    [sourceAccount]="transactionCreationData!.sourceAccount"
+    [destinationAccounts]="transactionCreationData!.destinationAccounts"
+    [destinationAccount]="transactionCreationData!.destinationAccount"
+    [involvedBankTransactions]="transactionCreationData!.involvedBankTransactions"
+    [transactionType]="transactionCreationData!.transactionType"
+    [amount]="transactionCreationData!.amount.toNumber()"
+    [description]="transactionCreationData!.description"
+    [conversionRate]="transactionCreationData!.conversionRate?.toNumber() || 0"
+  ></app-create-transaction>
 </ng-template>

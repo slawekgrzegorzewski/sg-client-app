@@ -9,9 +9,9 @@ import {PiggyBank} from '../model/piggy-bank';
 import {DatesUtils} from '../../general/utils/dates-utils';
 import {Observable, tap} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {BankTransactionToImport} from '../../openbanking/model/nodrigen/bank-transaction-to-import';
 import {ACCOUNTS_CHANGED, BILLING_PERIOD_CHANGED} from '../../general/utils/event-bus-events';
 import {NgEventBus} from 'ng-event-bus';
+import {AffectedBankTransactionsToImportInfo} from '../../openbanking/model/nodrigen/affected-bank-transactions-to-import-info';
 
 @Injectable({
   providedIn: 'root'
@@ -73,16 +73,18 @@ export class BillingPeriodsService {
     }
   }
 
-  createBillingElementWithImportingBankTransaction(element: Income | Expense, accountId: number, bankTransactionToImport: BankTransactionToImport, alignmentTransaction: BankTransactionToImport | null): Observable<string> {
-    let observable: Observable<string> | null = null;
+  createBillingElementWithImportingBankTransaction(element: Income | Expense, accountId: number, affectedBankTransactionsToImportInfo: AffectedBankTransactionsToImportInfo): Observable<string> {
+    let observable: Observable<string> | null;
+    const creditTransactionId = affectedBankTransactionsToImportInfo.creditTransactions.length > 0 ? affectedBankTransactionsToImportInfo.creditTransactions[0] : null;
+    const debitTransactionId = affectedBankTransactionsToImportInfo.debitTransactions.length > 0 ? affectedBankTransactionsToImportInfo.debitTransactions[0] : null;
     if (element instanceof Income) {
       observable = this.http.put(
-        `${this.billingEndpoint}/income/${accountId}/${bankTransactionToImport.creditNodrigenTransactionId}/${alignmentTransaction?.debitNodrigenTransactionId?.toString() || ''}`,
+        `${this.billingEndpoint}/income/${accountId}/${creditTransactionId}/${debitTransactionId?.toString() || ''}`,
         element,
         {responseType: 'text'});
     } else {
       observable = this.http.put(
-        `${this.billingEndpoint}/expense/${accountId}/${bankTransactionToImport.debitNodrigenTransactionId}/${alignmentTransaction?.creditNodrigenTransactionId?.toString() || ''}`,
+        `${this.billingEndpoint}/expense/${accountId}/${debitTransactionId}/${creditTransactionId?.toString() || ''}`,
         element,
         {responseType: 'text'});
     }

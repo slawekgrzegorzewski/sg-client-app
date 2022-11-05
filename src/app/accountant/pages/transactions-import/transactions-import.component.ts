@@ -8,12 +8,13 @@ import {Income} from '../../model/billings/income';
 import {BillingPeriodsService} from '../../services/billing-periods.service';
 import {PiggyBanksService} from '../../services/piggy-banks.service';
 import {Account} from '../../model/account';
-import {TransactionType} from '../../model/transaction-type';
 import {NgEventBus} from 'ng-event-bus';
 import {TRANSACTIONS_TO_IMPORT_CHANGED} from '../../../general/utils/event-bus-events';
 import {AccountsService} from '../../services/accounts.service';
-import Decimal from 'decimal.js';
-import {DatesUtils} from '../../../general/utils/dates-utils';
+import {forkJoin} from 'rxjs';
+import {AffectedBankTransactionsToImportInfo} from '../../../openbanking/model/nodrigen/affected-bank-transactions-to-import-info';
+import {BillingElementType} from '../../components/billing-periods/create-billing-element.component';
+import {TransactionCreationData} from './model/transaction-creation-data';
 
 
 export type ImportMode =
@@ -33,119 +34,22 @@ export type ImportMode =
 })
 export class TransactionsImportComponent implements OnInit {
 
-  transactionsToImport: BankTransactionToImport[] = [];
-  _transactionToImport: BankTransactionToImport | null = null;
-  set transactionToImport(value: BankTransactionToImport | null) {
-    this._transactionToImport = value;
-    this.candidatesToAlignment = [];
-    if (this.transactionMayBeDebit(value)) {
-      this.prepareAlignmentCandidates('DEBIT');
-    } else if (this.transactionMayBeCredit(value)) {
-      this.prepareAlignmentCandidates('CREDIT');
-    }
-  }
+  allAccounts: Account[] = [];
+  transactions: BankTransactionToImport[] = [];
+  transactionToImport: BankTransactionToImport | null = null;
 
-  get transactionToImport(): BankTransactionToImport | null {
-    return this._transactionToImport;
-  }
+  billingElementToCreate: Income | Expense | null = null;
+  accountOfBillingElementToCreate: Account | null = null;
+  billingElementToCreateType: BillingElementType | null = null;
+  private affectedBankTransactionsInfo: AffectedBankTransactionsToImportInfo | null = null;
 
-  alignmentTransaction: BankTransactionToImport | null = null;
-  candidatesToAlignment: (BankTransactionToImport | null)[] = [];
-  otherTransactionForTransfer: BankTransactionToImport | null = null;
-  cashAccounts: Account[] = [];
-  private _importMode: ImportMode | null = null;
-  get importMode(): ImportMode | null {
-    return this._importMode;
-  }
-
-  set importMode(value: ImportMode | null) {
-    this._importMode = value;
-    switch (this.importMode) {
-      case 'DEBIT':
-        this.elementToCreate = new Expense();
-        this.elementToCreate.amount = new Decimal(this.transactionToImport!.debit).minus(new Decimal(this.alignmentTransaction?.credit || 0)).toNumber();
-        this.elementToCreate.expenseDate = DatesUtils.min(this.transactionToImport!.timeOfTransaction, this.alignmentTransaction?.timeOfTransaction || null);
-        this.elementToCreate.description = this.transactionToImport!.description + (this.alignmentTransaction ? this.alignmentTransaction.description + '\n' : '');
-        break;
-      case 'CREDIT':
-        this.elementToCreate = new Income();
-        this.elementToCreate.amount = new Decimal(this.transactionToImport!.credit).minus(new Decimal(this.alignmentTransaction?.debit || 0)).toNumber();
-        this.elementToCreate.incomeDate = DatesUtils.min(this.transactionToImport!.timeOfTransaction, this.alignmentTransaction?.timeOfTransaction || null);
-        this.elementToCreate.description = this.transactionToImport!.description + (this.alignmentTransaction ? this.alignmentTransaction.description + '\n' : '');
-        break;
-      case 'MUTUALLY_CANCELLING':
-        this.otherTransactionForTransfer = this.getOtherTransactionForMutualCancellation(this.transactionToImport);
-        break;
-      case 'TRANSFER':
-        this.otherTransactionForTransfer = this.getOtherTransactionForTransfer(this.transactionToImport);
-        if (this.transactionToImport?.creditBankAccountId) {
-          const localCopyOfTransactionToImport = this.transactionToImport;
-          this.transactionToImport = this.otherTransactionForTransfer;
-          this.otherTransactionForTransfer = localCopyOfTransactionToImport;
-        }
-        this.transactionToCreateType = TransactionType.TRANSFER_FROM_BANK_TRANSACTIONS;
-        break;
-      case 'TRANSFER_WITH_CONVERSION':
-        this.transactionToCreateType = TransactionType.TRANSFER_FROM_BANK_TRANSACTIONS;
-        this.otherTransactionForTransfer = this.getOtherTransactionForTransferWithConversion(this.transactionToImport);
-        if (this.transactionToImport?.creditBankAccountId) {
-          const localCopyOfTransactionToImport = this.transactionToImport;
-          this.transactionToImport = this.otherTransactionForTransfer;
-          this.otherTransactionForTransfer = localCopyOfTransactionToImport;
-        }
-        this.conversionRate = (this.otherTransactionForTransfer?.credit || 0) / (this.transactionToImport?.debit || 1);
-        break;
-      case 'SINGLE_TRANSFER_WITH_CONVERSION':
-        this.transactionToCreateType = TransactionType.TRANSFER_FROM_BANK_TRANSACTIONS;
-        let t = this.transactionToImport;
-        this.transactionToImport = new BankTransactionToImport({
-          id: t?.id,
-          domain: t?.domain,
-          conversionRate: t?.conversionRate,
-          debit: t?.debit,
-          description: t?.description,
-          timeOfTransaction: t?.timeOfTransaction,
-          sourceAccount: t?.sourceAccount,
-          debitBankAccountId: t?.debitBankAccountId,
-          debitNodrigenTransactionId: t?.debitNodrigenTransactionId,
-          nodrigenTransactionId: t?.nodrigenTransactionId
-        });
-        this.otherTransactionForTransfer = new BankTransactionToImport({
-          id: t?.id,
-          domain: t?.domain,
-          conversionRate: t?.conversionRate,
-          credit: t?.credit,
-          description: t?.description,
-          timeOfTransaction: t?.timeOfTransaction,
-          destinationAccount: t?.destinationAccount,
-          creditBankAccountId: t?.creditBankAccountId,
-          creditNodrigenTransactionId: t?.creditNodrigenTransactionId,
-          nodrigenTransactionId: t?.nodrigenTransactionId
-        });
-        this.conversionRate = (this.otherTransactionForTransfer?.credit || 0) / (this.transactionToImport?.debit || 1);
-        break;
-      case 'CASH_WITHDRAWAL':
-        this.transactionToCreateType = TransactionType.TRANSFER_FROM_BANK_TRANSACTIONS;
-        this.accountsService.currentDomainAccounts().subscribe(
-          data => this.cashAccounts = data.filter(d => d.bankAccount === null)
-        );
-        break;
-      case 'IGNORE':
-        this.elementToCreate = null;
-        this.otherTransactionForTransfer = null;
-        break;
-    }
-  }
-
-  elementToCreate: Income | Expense | null = null;
-  transactionToCreateType: TransactionType | null = null;
-  conversionRate: number | null = null;
+  transactionCreationData: TransactionCreationData | null = null;
 
   constructor(private accountsService: AccountsService,
               private billingsService: BillingPeriodsService,
               private nodrigenService: NodrigenService,
-              private eventBus: NgEventBus,
-              private piggyBanksService: PiggyBanksService) {
+              private piggyBanksService: PiggyBanksService,
+              private eventBus: NgEventBus) {
     this.eventBus.on(TRANSACTIONS_TO_IMPORT_CHANGED).subscribe(md => this.refreshData());
   }
 
@@ -153,163 +57,64 @@ export class TransactionsImportComponent implements OnInit {
     this.refreshData();
   }
 
-
   private refreshData() {
-    this.clearImport();
-    this.nodrigenService.getNodrigenTransactionsToImport()
-      .subscribe(data => this.transactionsToImport =
-        data.sort(ComparatorBuilder.comparingByDateDays<BankTransactionToImport>(btti => btti.timeOfTransaction)
-          .thenComparing(btti => btti.debit).thenComparing(btti => btti.credit).build()));
-  }
-
-  clearImport() {
-    this.elementToCreate = null;
-    this.transactionToImport = null;
-    this.otherTransactionForTransfer = null;
-    this.importMode = null;
-    this.conversionRate = null;
+    this.showListOfTransactions();
+    forkJoin([this.accountsService.currentDomainAccounts(), this.nodrigenService.getNodrigenTransactionsToImport()])
+      .subscribe(([accounts, bankTransactionsToImport]: [Account[], BankTransactionToImport[]]) => {
+        this.allAccounts = accounts;
+        this.transactions = bankTransactionsToImport.sort(ComparatorBuilder.comparingByDateDays<BankTransactionToImport>(btti => btti.timeOfTransaction)
+          .thenComparing(btti => btti.debit).thenComparing(btti => btti.credit).build());
+      });
   }
 
   @HostListener('window:keyup', ['$event'])
   onKeyUp(event: KeyboardEvent): void {
     switch (event.code) {
       case 'Escape':
-        this.clearImport();
+        if (!this.shouldShowListOfTransactions() && !this.shouldShowListOfImportOptions()) {
+          this.showOptionsOfImporting();
+        } else if (this.shouldShowListOfImportOptions()) {
+          this.showListOfTransactions();
+        }
         break;
     }
+  }
+
+  shouldShowListOfTransactions() {
+    return !this.transactionToImport && !this.billingElementToCreate && !this.transactionCreationData;
+  }
+
+  shouldShowListOfImportOptions() {
+    return this.transactionToImport && !this.billingElementToCreate && !this.transactionCreationData;
+  }
+
+  showListOfTransactions() {
+    this.showOptionsOfImporting();
+    this.transactionToImport = null;
+  }
+
+  showOptionsOfImporting() {
+    this.billingElementToCreate = null;
+    this.accountOfBillingElementToCreate = null;
+    this.billingElementToCreateType = null;
+    this.affectedBankTransactionsInfo = null;
+
+    this.transactionCreationData = null;
   }
 
   select(transactionToImport: BankTransactionToImport): void {
     this.transactionToImport = transactionToImport;
   }
 
-  transactionMayBeDebit(transaction: BankTransactionToImport | null) {
-    return transaction && transaction.sourceAccount !== null && transaction.destinationAccount === null
-      && !this.transactionMayBeTransfer(transaction) && !this.transactionMayBeMutuallyCancellation(transaction);
+  showBillingElementCreation(billingElementToCreate: Expense | Income, account: Account, affectedBankTransactionsInfo: AffectedBankTransactionsToImportInfo) {
+    this.billingElementToCreate = billingElementToCreate;
+    this.accountOfBillingElementToCreate = account;
+    this.billingElementToCreateType = billingElementToCreate instanceof Expense ? 'expense' : 'income';
+    this.affectedBankTransactionsInfo = affectedBankTransactionsInfo;
   }
 
-  transactionMayBeCredit(transaction: BankTransactionToImport | null) {
-    return transaction && transaction.destinationAccount !== null && transaction.sourceAccount === null
-      && !this.transactionMayBeTransfer(transaction) && !this.transactionMayBeMutuallyCancellation(transaction);
-  }
-
-  transactionMayBeTransfer(transaction: BankTransactionToImport | null) {
-    return this.getOtherTransactionForTransfer(transaction) !== null;
-  }
-
-  transactionMayBeTransferWithConversion(transaction: BankTransactionToImport | null) {
-    return this.getOtherTransactionForTransferWithConversion(transaction) !== null;
-  }
-
-  transactionMayBeSingleTransferWithConversion(transaction: BankTransactionToImport | null) {
-    return transaction?.sourceAccount && transaction?.destinationAccount &&
-      transaction?.sourceAccount.currency !== transaction?.destinationAccount.currency;
-  }
-
-  transactionMayBeMutuallyCancellation(transaction: BankTransactionToImport | null) {
-    return this.getOtherTransactionForMutualCancellation(transaction) !== null;
-  }
-
-  transactionMayBeIgnored(transaction: BankTransactionToImport | null) {
-    return (transaction?.credit || 0) === 0 && (transaction?.debit || 0) === 0;
-  }
-
-  private getOtherTransactionForTransfer(transaction: BankTransactionToImport | null): BankTransactionToImport | null {
-    let otherTransactionForTransfer = this.findCorrespondingTransaction(transaction);
-    if (!transaction || !otherTransactionForTransfer) {
-      otherTransactionForTransfer = null;
-    } else {
-      const correspondingAccounts = this.getCorrespondingAccounts(transaction, otherTransactionForTransfer);
-      if (correspondingAccounts[0].id === correspondingAccounts[1].id) {
-        otherTransactionForTransfer = null;
-      }
-    }
-    return otherTransactionForTransfer;
-  }
-
-  private getOtherTransactionForTransferWithConversion(transaction: BankTransactionToImport | null): BankTransactionToImport | null {
-    let otherTransactionForTransfer = this.findCorrespondingTransactionWitConversion(transaction);
-    if (!transaction || !otherTransactionForTransfer) {
-      otherTransactionForTransfer = null;
-    } else {
-      const correspondingAccounts = this.getCorrespondingAccounts(transaction, otherTransactionForTransfer);
-      if (correspondingAccounts[0].id === correspondingAccounts[1]?.id) {
-        otherTransactionForTransfer = null;
-      }
-    }
-    return otherTransactionForTransfer;
-  }
-
-  private getOtherTransactionForMutualCancellation(transaction: BankTransactionToImport | null): BankTransactionToImport | null {
-    let otherTransactionForTransfer = this.findCorrespondingTransaction(transaction);
-    if (!transaction || !otherTransactionForTransfer) {
-      otherTransactionForTransfer = null;
-    } else {
-      const correspondingAccounts = this.getCorrespondingAccounts(transaction, otherTransactionForTransfer);
-      if (correspondingAccounts[0].id !== correspondingAccounts[1].id) {
-        otherTransactionForTransfer = null;
-      }
-    }
-    return otherTransactionForTransfer;
-  }
-
-  getCorrespondingAccounts(first: BankTransactionToImport, second: BankTransactionToImport): Account [] {
-    return first.sourceAccount ? [first.sourceAccount!, second.destinationAccount!] : [second.sourceAccount!, first.destinationAccount!];
-  }
-
-  private findCorrespondingTransaction(transaction: BankTransactionToImport | null): BankTransactionToImport | null {
-
-    function findTransactionCandidateForTransfer(bankTransactions: BankTransactionToImport[],
-                                                 originalTransaction: BankTransactionToImport,
-                                                 originalAmountExtractor: (btti: BankTransactionToImport) => number,
-                                                 correspondingAmountExtractor: (btti: BankTransactionToImport) => number,
-                                                 originalCurrencyExtractor: (btti: BankTransactionToImport) => string,
-                                                 correspondingCurrencyExtractor: (btti: BankTransactionToImport) => string): BankTransactionToImport | null {
-      const originalAmount = originalAmountExtractor(originalTransaction);
-      const originalCurrency = originalCurrencyExtractor(originalTransaction);
-      const correspondingTransaction = bankTransactions.find(tti => {
-        return tti.id !== originalTransaction.id && correspondingAmountExtractor(tti) === originalAmount && BankTransactionToImport.compareDates(tti, originalTransaction) === 0
-          && correspondingCurrencyExtractor(tti) === originalCurrency;
-      });
-      return correspondingTransaction || null;
-    }
-
-    if (transaction && transaction.sourceAccount !== null && transaction.destinationAccount === null) {
-      return findTransactionCandidateForTransfer(this.transactionsToImport, transaction,
-        btti => btti.debit, btti => btti.credit,
-        btti => btti.sourceAccount?.currency || '', btti => btti.destinationAccount?.currency || '');
-    }
-    if (transaction && transaction.destinationAccount !== null && transaction.sourceAccount === null) {
-      return findTransactionCandidateForTransfer(this.transactionsToImport, transaction,
-        btti => btti.credit, btti => btti.debit,
-        btti => btti.destinationAccount?.currency || '', btti => btti.sourceAccount?.currency || '');
-    }
-    return null;
-  }
-
-  private findCorrespondingTransactionWitConversion(transaction: BankTransactionToImport | null): BankTransactionToImport | null {
-
-    function findTransactionCandidateForTransfer(bankTransactions: BankTransactionToImport[],
-                                                 originalTransaction: BankTransactionToImport,
-                                                 originalCurrencyExtractor: (btti: BankTransactionToImport) => string,
-                                                 correspondingCurrencyExtractor: (btti: BankTransactionToImport) => string): BankTransactionToImport | null {
-      const originalCurrency = originalCurrencyExtractor(originalTransaction);
-      const correspondingTransaction = bankTransactions.find(tti => {
-        return tti.id !== originalTransaction.id && BankTransactionToImport.compareDates(tti, originalTransaction) === 0
-          && correspondingCurrencyExtractor(tti) !== originalCurrency;
-      });
-      return correspondingTransaction || null;
-    }
-
-    if (transaction && transaction.sourceAccount !== null && transaction.destinationAccount === null) {
-      return findTransactionCandidateForTransfer(this.transactionsToImport, transaction,
-        btti => btti.sourceAccount?.currency || '', btti => btti.destinationAccount?.currency || '');
-    }
-    if (transaction && transaction.destinationAccount !== null && transaction.sourceAccount === null) {
-      return findTransactionCandidateForTransfer(this.transactionsToImport, transaction,
-        btti => btti.destinationAccount?.currency || '', btti => btti.sourceAccount?.currency || '');
-    }
-    return null;
+  showTransactionCreation(transactionCreationData: TransactionCreationData) {
+    this.transactionCreationData = transactionCreationData;
   }
 
   createElement(
@@ -318,10 +123,11 @@ export class TransactionsImportComponent implements OnInit {
     piggyBankToUpdate: PiggyBank | null = null): void {
 
     if (!elementToCreate || !accountIdForElement) {
+      this.showOptionsOfImporting();
       return;
     }
 
-    this.billingsService.createBillingElementWithImportingBankTransaction(elementToCreate, accountIdForElement, this.transactionToImport!, this.alignmentTransaction)
+    this.billingsService.createBillingElementWithImportingBankTransaction(elementToCreate, accountIdForElement, this.affectedBankTransactionsInfo!)
       .subscribe({
         next: (success) => {
           if (piggyBankToUpdate) {
@@ -337,50 +143,11 @@ export class TransactionsImportComponent implements OnInit {
       });
   }
 
-  getAccountForBillingElement(): Account | null {
-    if (this.importMode === 'DEBIT') {
-      return this.transactionToImport!.sourceAccount || null;
-    }
-    return this.transactionToImport!.destinationAccount || null;
-
+  mutuallyCancelBothTransactions(first: BankTransactionToImport, second: BankTransactionToImport) {
+    this.nodrigenService.mutuallyCancelTransactions(first, second).subscribe();
   }
 
-  mutuallyCancelBothTransactions() {
-    if (this.transactionToImport !== null && this.otherTransactionForTransfer !== null) {
-      this.nodrigenService.mutuallyCancelTransactions(this.transactionToImport, this.otherTransactionForTransfer).subscribe();
-    }
-  }
-
-  ignore() {
-    if (this.transactionToImport !== null) {
-      this.nodrigenService.ignoreTransaction(this.transactionToImport).subscribe();
-    }
-  }
-
-  prepareAlignmentCandidates(importMode: ImportMode): void {
-    switch (importMode) {
-      case 'CREDIT':
-        this.candidatesToAlignment = this.transactionsToImport.filter(t =>
-          t.isDebit() && t.debit < (this.transactionToImport?.credit || 0)
-        );
-        if (this.candidatesToAlignment.length === 0) {
-          this.importMode = 'CREDIT';
-        }
-        break;
-      case 'DEBIT':
-        this.candidatesToAlignment = this.transactionsToImport.filter(t =>
-          t.isCredit() && t.credit < (this.transactionToImport?.debit || 0)
-        );
-        if (this.candidatesToAlignment.length === 0) {
-          this.importMode = 'DEBIT';
-        }
-        break;
-      default:
-        throw new Error('Wrong mode');
-    }
-  }
-
-  isAlignmentPossible(): boolean {
-    return (this.candidatesToAlignment?.length || 0) > 0;
+  ignore(transaction: BankTransactionToImport) {
+    this.nodrigenService.ignoreTransaction(transaction).subscribe();
   }
 }

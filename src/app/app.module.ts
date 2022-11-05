@@ -90,6 +90,11 @@ import {BanksService} from './openbanking/services/banks.service';
 import {TransactionsImportComponent} from './accountant/pages/transactions-import/transactions-import.component';
 import {TransactionRowComponent} from './accountant/pages/transactions-import/row/transaction-row.component';
 import {MyHammerConfig} from './general/services/my-hammer-config.service';
+import {DebitTransactionImporterComponent} from './accountant/pages/transactions-import/importers/debit-transaction-importer.component';
+import {CreditTransactionImporterComponent} from './accountant/pages/transactions-import/importers/credit-transaction-importer.component';
+import {TransferImporterComponent} from './accountant/pages/transactions-import/importers/transfer-importer.component';
+import {IgnoreImporterComponent} from './accountant/pages/transactions-import/importers/ignore-importer.component';
+import {MutuallyCancellingImporterComponent} from './accountant/pages/transactions-import/importers/mutually-cancelling-importer.component';
 
 @NgModule({
   declarations: [
@@ -148,7 +153,12 @@ import {MyHammerConfig} from './general/services/my-hammer-config.service';
     CubeStatisticsComponent,
     NodrigenComponent,
     TransactionsImportComponent,
-    TransactionRowComponent
+    TransactionRowComponent,
+    DebitTransactionImporterComponent,
+    CreditTransactionImporterComponent,
+    TransferImporterComponent,
+    IgnoreImporterComponent,
+    MutuallyCancellingImporterComponent
   ],
   imports: [
     BrowserModule,
