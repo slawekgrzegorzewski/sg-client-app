@@ -8,7 +8,7 @@ import {AccountantSettingsService} from '../../accountant/services/accountant-se
 import {DomainService} from './domain.service';
 import {NgEventBus} from 'ng-event-bus';
 import {APP_LOGIN_STATUS_EVENT, APP_LOGIN_STATUS_REQUEST_EVENT} from '../utils/event-bus-events';
-import {ACCOUNTANT_APP, CHECKER_APP, CUBES_APP, SYR_APP} from './applications.service';
+import {ACCOUNTANT_APP, CHECKER_APP, CUBES_APP, IPR_APP, SYR_APP} from './applications.service';
 import {AppLoginStatus} from '../utils/app-login-status';
 
 class TokenData {
@@ -95,7 +95,6 @@ export class LoginService {
     if (this.isLoggedIn()) {
       this.eventBus.cast(APP_LOGIN_STATUS_EVENT, new AppLoginStatus(true, this.getDefaultDomain()));
       setTimeout(() => this.router.navigate(['/']), 100);
-      ;
     }
   }
 
@@ -146,6 +145,9 @@ export class LoginService {
       }
       if (roles.includes('CUBES')) {
         apps.push(CUBES_APP);
+      }
+      if (roles.includes('IPR')) {
+        apps.push(IPR_APP);
       }
     }
     return apps;

@@ -14,11 +14,13 @@ import {SYR_ADMIN_ROUTER_URL} from '../../service-year-report/pages/syr-admin.co
 import {CUBES_HOME_ROUTER_URL} from '../../speedcubing/pages/cubes-home.component';
 import {CUBES_STATISTICS_ROUTER_URL} from '../../speedcubing/pages/cube-statistics.component';
 import {SETTINGS_ROUTER_URL} from '../../accountant/pages/settings/settings.component';
+import {IP_HOME_ROUTER_URL} from '../../ip/components/intellectual-property.component';
 
 export const ACCOUNTANT_APP = 'Accountant';
 export const CHECKER_APP = 'Checker';
 export const SYR_APP = 'SYR';
 export const CUBES_APP = 'Cubes';
+export const IPR_APP = 'Intellectual property report';
 
 export class ApplicationConfig {
   routerUrls: string[] = [];
@@ -34,6 +36,7 @@ export const APPLICATIONS_CONFIG = new Map<string, ApplicationConfig>([
   [CHECKER_APP, new ApplicationConfig([CHECKER_HOME_ROUTER_URL])],
   [SYR_APP, new ApplicationConfig([SYR_HOME_ROUTER_URL, SYR_ADMIN_ROUTER_URL])],
   [CUBES_APP, new ApplicationConfig([CUBES_HOME_ROUTER_URL, CUBES_STATISTICS_ROUTER_URL])],
+  [IPR_APP, new ApplicationConfig([IP_HOME_ROUTER_URL])],
 ]);
 
 @Injectable({

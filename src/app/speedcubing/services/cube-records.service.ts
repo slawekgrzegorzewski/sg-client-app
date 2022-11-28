@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
-import {CubeRecord, CubeRecordDTO} from '../../speedcubing/model/cube-record';
+import {CubeRecord, CubeRecordDTO} from '../model/cube-record';
 import {Observable} from 'rxjs';
 import {DatePipe} from '@angular/common';
 import {map} from 'rxjs/operators';

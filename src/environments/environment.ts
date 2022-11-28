@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  // serviceUrl: 'http://localhost:8080'
-  serviceUrl: 'http://192.168.52.76:8080'
+  serviceUrl: 'http://localhost:8080'
+  // serviceUrl: 'http://192.168.52.76:8080'
 };
 
 /*

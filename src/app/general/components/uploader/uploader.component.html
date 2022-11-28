@@ -1,0 +1,17 @@
+<input type="file" class="file-input" (change)="selected($event)" #fileUpload>
+
+<div *ngIf="!fileName">Wybierz plik</div>
+<div *ngIf="fileName">Wysyłam plik {{fileName}}</div>
+<div class="sg-flex-row">
+  <button class="btn btn-sm btn-link" (click)="uploadCancelled.emit('')">
+    anuluj
+  </button>
+  <button class="btn btn-sm btn-link" (click)="fileUpload.click()">
+    wybierz
+  </button>
+</div>
+
+<p>
+  <ngb-progressbar *ngIf="fileName" type="secondary" [value]="uploadProgress"></ngb-progressbar>
+</p>
+

@@ -70,7 +70,6 @@ import {PaymentSelectionComponent} from './accountant/components/company-log/pay
 import {CompanyLogComponent} from './accountant/components/company-log/company-log.component';
 import {TimerComponent} from './general/components/timer/timer.component';
 import {CubesHomeComponent} from './speedcubing/pages/cubes-home.component';
-import {CubeRecordsService} from './accountant/services/cube-records.service';
 import {HolidayCurrenciesService} from './accountant/services/holiday-currencies.service';
 import {HolidayCurrenciesComponent} from './accountant/components/holiday-currencies/holiday-currencies.component';
 import {SevenSegComponent} from './general/components/seven-seg/seven-seg.component';
@@ -95,6 +94,9 @@ import {CreditTransactionImporterComponent} from './accountant/pages/transaction
 import {TransferImporterComponent} from './accountant/pages/transactions-import/importers/transfer-importer.component';
 import {IgnoreImporterComponent} from './accountant/pages/transactions-import/importers/ignore-importer.component';
 import {MutuallyCancellingImporterComponent} from './accountant/pages/transactions-import/importers/mutually-cancelling-importer.component';
+import {UploaderComponent} from './general/components/uploader/uploader.component';
+import {IntellectualPropertyComponent} from './ip/components/intellectual-property.component';
+import {CubeRecordsService} from './speedcubing/services/cube-records.service';
 
 @NgModule({
   declarations: [
@@ -158,7 +160,9 @@ import {MutuallyCancellingImporterComponent} from './accountant/pages/transactio
     CreditTransactionImporterComponent,
     TransferImporterComponent,
     IgnoreImporterComponent,
-    MutuallyCancellingImporterComponent
+    MutuallyCancellingImporterComponent,
+    UploaderComponent,
+    IntellectualPropertyComponent
   ],
   imports: [
     BrowserModule,

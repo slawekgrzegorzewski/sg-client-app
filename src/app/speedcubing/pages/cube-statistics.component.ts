@@ -1,17 +1,22 @@
 import {AfterViewInit, Component, HostListener, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {CubeRecordsService} from '../../accountant/services/cube-records.service';
-import {CubeRecord, CubeStats, CubeType, CubeTypeSetting, cubeTypeSettings, orderOfCubeTypes} from '../model/cube-record';
+import {CubeRecord, CubeStats, CubeType, cubeTypeSettings, orderOfCubeTypes} from '../model/cube-record';
 import {ChartMode, CubeRecordsLineChart} from '../model/CubeRecordsLineChart';
 import {BaseChartDirective} from 'ng2-charts';
 import {NgEventBus} from 'ng-event-bus';
 import {ComparatorBuilder} from '../../general/utils/comparator-builder';
 import {KeyValue} from '@angular/common';
-import {APP_GET_SIZE_EVENT, APP_SIZE_EVENT, DATA_REFRESH_REQUEST_EVENT, SELECTED_DOMAIN_CHANGED} from '../../general/utils/event-bus-events';
+import {
+  APP_GET_SIZE_EVENT,
+  APP_SIZE_EVENT,
+  DATA_REFRESH_REQUEST_EVENT,
+  SELECTED_DOMAIN_CHANGED
+} from '../../general/utils/event-bus-events';
 import {Subscription} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
 import {DomainService} from '../../general/services/domain.service';
 import {DateStats, RubikCubeRecordStatistics} from '../utils/rubik-cube-record-statistics';
 import {AppSize} from '../../general/services/size.service';
+import {CubeRecordsService} from '../services/cube-records.service';
 
 export const CUBES_STATISTICS_ROUTER_URL = 'cubes-statistics';
 

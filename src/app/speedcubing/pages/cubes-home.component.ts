@@ -1,6 +1,5 @@
 import {AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {TimerComponent} from '../../general/components/timer/timer.component';
-import {CubeRecordsService} from '../../accountant/services/cube-records.service';
 import {CubeRecord, CubeStats, CubeType, cubeTypeSettings, orderOfCubeTypes} from '../model/cube-record';
 import scramble from '../model/cube-scrambler';
 import {NgEventBus} from 'ng-event-bus';
@@ -13,6 +12,7 @@ import {CubeComponent} from '../components/cube/cube.component';
 import {RubikCubeRecordStatistics} from '../utils/rubik-cube-record-statistics';
 import {ViewMode} from '../../general/utils/view-mode';
 import {AppSize} from '../../general/services/size.service';
+import {CubeRecordsService} from '../services/cube-records.service';
 
 type PageState = 'CLEAR' | 'SCRAMBLING' | 'SCRAMBLED' | 'ONGOING' | 'STOPPED';
 
