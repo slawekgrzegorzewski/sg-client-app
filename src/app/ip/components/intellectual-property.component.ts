@@ -35,8 +35,10 @@ export class IntellectualPropertyComponent implements OnInit {
 
   refreshData() {
     this.intellectualPropertyService.getIntellectualPropertiesForDomain().subscribe(data => {
-      data.flatMap(entry => entry.tasks).forEach(task => task.timeRecords = (task.timeRecords || []).sort(ComparatorBuilder.comparingByDate<TimeRecord>(timeRecord => timeRecord.date).build()));
-      this.intellectualProperties = data;
+      const byIdDesc = ComparatorBuilder.comparing<IntellectualProperty>(intellectualProperty => intellectualProperty.id).desc().build();
+      data.flatMap(entry => entry.tasks)
+        .forEach(task => task.timeRecords = (task.timeRecords || []).sort(ComparatorBuilder.comparingByDate<TimeRecord>(timeRecord => timeRecord.date).build()));
+      this.intellectualProperties = data.sort(byIdDesc);
     });
   }
 
