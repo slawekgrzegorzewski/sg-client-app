@@ -76,7 +76,7 @@ export class IntellectualPropertyService extends Refreshable {
     return observable;
   }
 
-  createTimeRecord(taskId: number, timeRecordData: { date: Date; description: string; numberOfHours: number }) {
+  createTimeRecord(taskId: number, timeRecordData: { date: Date; description: string; numberOfHours: string }) {
     const observable: Observable<string> = this.http.put<string>(`${this.TIME_RECORD_URL}`, {
       ...timeRecordData,
       assignmentAction: 'ASSIGN',
@@ -86,7 +86,7 @@ export class IntellectualPropertyService extends Refreshable {
     return observable;
   }
 
-  updateTimeRecord(timeRecordId: number, timeRecordData: { date: Date; description: string; numberOfHours: number }) {
+  updateTimeRecord(timeRecordId: number, timeRecordData: { date: Date; description: string; numberOfHours: string }) {
     const observable: Observable<string> = this.http.patch<string>(`${this.TIME_RECORD_URL}/${timeRecordId}`, {
       ...timeRecordData,
       assignmentAction: 'NOP',

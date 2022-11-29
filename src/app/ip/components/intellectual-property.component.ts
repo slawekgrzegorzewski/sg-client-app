@@ -7,6 +7,7 @@ import {ComparatorBuilder} from '../../general/utils/comparator-builder';
 import {Observable} from 'rxjs';
 import {HttpEvent} from '@angular/common/http';
 import 'rxjs-compat/add/observable/of';
+import Decimal from 'decimal.js';
 
 export const IP_HOME_ROUTER_URL = 'ip-home';
 
@@ -22,7 +23,7 @@ export class IntellectualPropertyComponent implements OnInit {
   intellectualPropertyDescriptionToCreate: string = '';
   intellectualPropertyToEdit: IntellectualProperty | null = null;
   taskData: { intellectualPropertyId: number, taskId: number | null, coAuthors: string, description: string } | null = null;
-  timeRecordData: { taskId: number, timeRecordId: number | null, date: Date, numberOfHours: number, description: string } | null = null;
+  timeRecordData: { taskId: number, timeRecordId: number | null, date: Date, numberOfHours: Decimal, description: string } | null = null;
   attachmentData: { taskId: number } | null = null;
 
   constructor(private intellectualPropertyService: IntellectualPropertyService) {
@@ -129,7 +130,7 @@ export class IntellectualPropertyComponent implements OnInit {
       taskId: task.id,
       timeRecordId: null,
       date: new Date(),
-      numberOfHours: 0,
+      numberOfHours: new Decimal(0),
       description: ''
     };
   }
@@ -149,7 +150,7 @@ export class IntellectualPropertyComponent implements OnInit {
       if (this.timeRecordData.timeRecordId) {
         this.intellectualPropertyService.updateTimeRecord(this.timeRecordData.timeRecordId, {
           date: this.timeRecordData.date,
-          numberOfHours: this.timeRecordData.numberOfHours,
+          numberOfHours: this.timeRecordData.numberOfHours.toString(),
           description: this.timeRecordData.description
         })
           .subscribe({
@@ -161,7 +162,7 @@ export class IntellectualPropertyComponent implements OnInit {
       } else {
         this.intellectualPropertyService.createTimeRecord(this.timeRecordData.taskId, {
           date: this.timeRecordData.date,
-          numberOfHours: this.timeRecordData.numberOfHours,
+          numberOfHours: this.timeRecordData.numberOfHours.toString(),
           description: this.timeRecordData.description
         })
           .subscribe({
