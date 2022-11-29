@@ -22,12 +22,7 @@ export class DataPickerComponent implements ControlValueAccessor {
 
   set data(value: NgbDateStruct | null) {
     function convertToDate(date: NgbDateStruct): Date {
-      const result = new Date();
-      result.setFullYear(date.year);
-      result.setMonth(date.month - 1);
-      result.setDate(date.day);
-      result.setHours(12, 0, 0, 0);
-      return result;
+      return new Date(`${date.year}-${date.month}-${date.day} 12:00:00`);
     }
 
     this.dataInternal = value;
