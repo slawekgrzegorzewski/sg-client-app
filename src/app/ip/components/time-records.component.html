@@ -1,9 +1,12 @@
 <select class="form-select" [(ngModel)]="date">
   <option *ngFor="let dateOption of dates" [value]="dateOption">{{dateOption}}</option>
 </select>
-<button class="btn btn-link btn-sm" (click)="showTimeRecordCreation()">dodaj</button>
+<div class="sg-flex-row">
+  <button class="btn btn-link btn-sm" (click)="showTimeRecordCreation()">dodaj</button>
+  {{totalHours()}} godzin w tym miesiącu
+</div>
 <div *ngFor="let timeRecordsForDate of timeRecordsForMonth | keyvalue">
-  <b>{{timeRecordsForDate.key}} - w sumie {{sumHours(timeRecordsForDate.value)}} godzim</b>
+  <b>{{timeRecordsForDate.key}} - w sumie {{sumHours(timeRecordsForDate.value)}} godzin</b>
   <div style="margin-left: 50px">
     <div *ngFor="let timeRecord of timeRecordsForDate.value">
       {{timeRecord.numberOfHours}} hours {{timeRecord.task?.description || ''}}

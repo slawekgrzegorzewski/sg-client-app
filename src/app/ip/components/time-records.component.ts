@@ -133,6 +133,13 @@ export class TimeRecordsComponent implements OnInit {
     } as TimeRecordData & { timeRecordId: number | null };
   }
 
+  totalHours() {
+    return Array.from(this.timeRecordsForMonth.values())
+      .flatMap(arr => arr)
+      .map(timeRecord => timeRecord.numberOfHours)
+      .reduce((previousValue, currentValue) => previousValue.plus(currentValue), new Decimal(0));
+  }
+
   sumHours(value: TimeRecordWithTask[]) {
     return value.map(t => t.numberOfHours).reduce((previousValue, currentValue) => previousValue.plus(currentValue), new Decimal(0));
   }
