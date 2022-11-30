@@ -3,7 +3,7 @@
 </select>
 <div class="sg-flex-row">
   <button class="btn btn-link btn-sm" (click)="showTimeRecordCreation()">dodaj</button>
-  {{totalHours()}} godzin w tym miesiącu
+  <b>{{totalHours()}} godzin w tym miesiącu</b>
 </div>
 <div *ngFor="let timeRecordsForDate of timeRecordsForMonth | keyvalue">
   <b>{{timeRecordsForDate.key}} - w sumie {{sumHours(timeRecordsForDate.value)}} godzin</b>
