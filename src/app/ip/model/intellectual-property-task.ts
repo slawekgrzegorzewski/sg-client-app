@@ -1,8 +1,9 @@
 import {TimeRecord} from './time-record';
+import {ForTypeahead} from '../../accountant/model/for-typeahead';
 
 export type IntellectualPropertyTaskDTO = Partial<IntellectualPropertyTask>;
 
-export class IntellectualPropertyTask {
+export class IntellectualPropertyTask implements ForTypeahead{
   public id: number;
   public description: string;
   public attachments: string[];
@@ -18,6 +19,14 @@ export class IntellectualPropertyTask {
     this.attachments = data.attachments || [];
     this.coAuthors = data.coAuthors || '';
     this.timeRecords = (data.timeRecords || []).map(task => new TimeRecord(task));
+  }
+
+  getTypeaheadId(): string {
+    return this.id.toString();
+  }
+
+  getTypeaheadDescription(): string {
+    return this.description;
   }
 }
 

@@ -78,7 +78,7 @@ export class TimeRecordsComponent implements OnInit {
         if (previousDate && this.dates.includes(previousDate)) {
           this.date = previousDate;
         }
-        this.tasks = [EMPTY_TASK, ...intellectualProperties.flatMap(intellectualProperty => intellectualProperty.tasks)];
+        this.tasks = intellectualProperties.flatMap(intellectualProperty => intellectualProperty.tasks);
       });
   }
 

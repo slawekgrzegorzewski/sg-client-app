@@ -19,16 +19,28 @@ export class TimeRecordEditorComponent {
     description: ''
   } as TimeRecordData;
 
-  get taskIdValue(): string {
-    return (this.timeRecordData.taskId || EMPTY_TASK.id).toString();
+  get taskValue(): IntellectualPropertyTask {
+    return this.tasks.find(t => this.timeRecordData.taskId && t.id === this.timeRecordData.taskId) || EMPTY_TASK;
   }
 
-  set taskIdValue(value: string) {
-    this.timeRecordData.taskId = value === EMPTY_TASK.id.toString() ? null : Number(value);
+  set taskValue(value: IntellectualPropertyTask) {
+    this.timeRecordData.taskId = value.id === EMPTY_TASK.id ? null : value.id;
   }
+
+  $tasks: IntellectualPropertyTask[] = [];
+
+  get tasks(): IntellectualPropertyTask[] {
+    return this.$tasks;
+  };
 
   @Input()
-  tasks: IntellectualPropertyTask[] = [];
+  set tasks(value: IntellectualPropertyTask[]) {
+    if (!value.find(t => t.id === EMPTY_TASK.id)) {
+      this.$tasks = [EMPTY_TASK, ...value];
+    } else {
+      this.$tasks = value;
+    }
+  }
 
   @Output()
   onAction: EventEmitter<TimeRecordData> = new EventEmitter<TimeRecordData>();
@@ -36,5 +48,10 @@ export class TimeRecordEditorComponent {
   onCancel: EventEmitter<string> = new EventEmitter<string>();
 
   constructor() {
+  }
+
+  tasksForTypeAhead(): () => IntellectualPropertyTask[] {
+    const that = this;
+    return () => that.tasks;
   }
 }

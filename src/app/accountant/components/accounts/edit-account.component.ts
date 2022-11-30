@@ -37,7 +37,6 @@ export class EditAccountComponent implements OnInit {
     }
   }
 
-
   @Output() saveSubject = new Subject<Account>();
   @Output() cancelSubject = new Subject<string>();
 

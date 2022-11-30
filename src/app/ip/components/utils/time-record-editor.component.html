@@ -1,11 +1,16 @@
 <ng-container *ngIf="timeRecordData">
 
   <div *ngIf="tasks.length > 0" class="form-group sg-flex-row">
-    <label for="task" class="col-2 col-form-label">Zadanie</label>
+    <label for="taskTA" class="col-2 col-form-label">Zadanie</label>
     <div class="col-10">
-      <select name="task" id="task" class="form-select" [(ngModel)]="taskIdValue">
-        <option *ngFor="let taskOption of tasks" [value]="taskOption.id">{{taskOption.description}}</option>
-      </select>
+      <app-general-typeahead
+        [id]="'taskTA'"
+        name="taskTA"
+        [inputClass]="'form-control'"
+        [(ngModel)]="taskValue"
+        [dataProvider]="tasksForTypeAhead()"
+        required>
+      </app-general-typeahead>
     </div>
   </div>
 
