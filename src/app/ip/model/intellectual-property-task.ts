@@ -3,7 +3,7 @@ import {ForTypeahead} from '../../accountant/model/for-typeahead';
 
 export type IntellectualPropertyTaskDTO = Partial<IntellectualPropertyTask>;
 
-export class IntellectualPropertyTask implements ForTypeahead{
+export class IntellectualPropertyTask implements ForTypeahead {
   public id: number;
   public description: string;
   public attachments: string[];
@@ -30,4 +30,4 @@ export class IntellectualPropertyTask implements ForTypeahead{
   }
 }
 
-export const EMPTY_TASK = new IntellectualPropertyTask();
+export const EMPTY_TASK = new IntellectualPropertyTask({description: '---'});
