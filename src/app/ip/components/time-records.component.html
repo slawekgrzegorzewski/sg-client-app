@@ -9,7 +9,7 @@
   <b>{{timeRecordsForDate.key}} - w sumie {{sumHours(timeRecordsForDate.value)}} godzin</b>
   <div style="margin-left: 50px">
     <div *ngFor="let timeRecord of timeRecordsForDate.value">
-      {{timeRecord.numberOfHours}} hours {{timeRecord.task?.description || ''}}
+      {{timeRecord.numberOfHours}} godzin {{timeRecord.task?.description || timeRecord.description}}
       <button class="btn btn-link btn-sm" (click)="showTimeRecordEdition(timeRecord)">edytuj</button>
     </div>
   </div>
