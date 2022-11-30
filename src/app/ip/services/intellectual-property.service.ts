@@ -87,6 +87,7 @@ export class IntellectualPropertyService extends Refreshable {
   createTimeRecord(taskId: number | null, timeRecordData: { date: Date; description: string; numberOfHours: Decimal }) {
     const observable: Observable<string> = this.http.put<string>(`${this.TIME_RECORD_URL}`, {
       date: timeRecordData.date,
+      description: timeRecordData.description,
       numberOfHours: timeRecordData.numberOfHours.toString(),
       assignmentAction: taskId ? 'ASSIGN' : 'NOP',
       taskId: taskId

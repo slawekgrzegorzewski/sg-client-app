@@ -73,8 +73,10 @@ export class TimeRecordsComponent implements OnInit {
         const byDate = ComparatorBuilder.comparingByDate<TimeRecordWithTask>(timeRecord => timeRecord.date).build();
         this.timeRecords = [...timeRecordsWithTask, ...timeRecordsWithoutTask].sort(byDate);
         this.dates = [...new Set(this.timeRecords.map(timeRecord => timeRecord.date).map(d => this.getMonthString(d)))].sort();
-        if (!this.date || (this.date && !this.dates.includes(this.date))) {
-          this.date = this.dates[this.dates.length - 1];
+        const previousDate = this.date;
+        this.date = this.dates[this.dates.length - 1];
+        if (previousDate && this.dates.includes(previousDate)) {
+          this.date = previousDate;
         }
         this.tasks = [EMPTY_TASK, ...intellectualProperties.flatMap(intellectualProperty => intellectualProperty.tasks)];
       });
