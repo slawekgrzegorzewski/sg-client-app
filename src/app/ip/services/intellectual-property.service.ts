@@ -8,6 +8,8 @@ import {Refreshable} from '../../general/services/refreshable';
 import {IntellectualProperty} from '../model/intellectual-property';
 import {LoginService} from '../../general/services/login.service';
 import {DomainService} from '../../general/services/domain.service';
+import {TimeRecord} from '../model/time-record';
+import Decimal from 'decimal.js';
 
 @Injectable({
   providedIn: 'root'
@@ -76,21 +78,42 @@ export class IntellectualPropertyService extends Refreshable {
     return observable;
   }
 
-  createTimeRecord(taskId: number, timeRecordData: { date: Date; description: string; numberOfHours: string }) {
+  getTimeRecordsNotAssignedToTask() {
+    return this.http.get<TimeRecord[]>(`${this.TIME_RECORD_URL}`).pipe(
+      map(timeRecords => timeRecords.map(timeRecord => new TimeRecord(timeRecord)))
+    );
+  }
+
+  createTimeRecord(taskId: number | null, timeRecordData: { date: Date; description: string; numberOfHours: Decimal }) {
     const observable: Observable<string> = this.http.put<string>(`${this.TIME_RECORD_URL}`, {
-      ...timeRecordData,
-      assignmentAction: 'ASSIGN',
+      date: timeRecordData.date,
+      numberOfHours: timeRecordData.numberOfHours.toString(),
+      assignmentAction: taskId ? 'ASSIGN' : 'NOP',
       taskId: taskId
     });
     this.domainIntellectualProperties = null;
     return observable;
   }
 
-  updateTimeRecord(timeRecordId: number, timeRecordData: { date: Date; description: string; numberOfHours: string }) {
+  updateTimeRecord(timeRecordId: number, timeRecordData: { date: Date; description: string; numberOfHours: Decimal }) {
     const observable: Observable<string> = this.http.patch<string>(`${this.TIME_RECORD_URL}/${timeRecordId}`, {
-      ...timeRecordData,
+      date: timeRecordData.date,
+      description: timeRecordData.description,
+      numberOfHours: timeRecordData.numberOfHours.toString(),
       assignmentAction: 'NOP',
       taskId: null
+    });
+    this.domainIntellectualProperties = null;
+    return observable;
+  }
+
+  updateTimeRecordWithTask(taskId: number | null, timeRecordId: number, timeRecordData: { date: Date; description: string; numberOfHours: Decimal }) {
+    const observable: Observable<string> = this.http.patch<string>(`${this.TIME_RECORD_URL}/${timeRecordId}`, {
+      date: timeRecordData.date,
+      description: timeRecordData.description,
+      numberOfHours: timeRecordData.numberOfHours.toString(),
+      assignmentAction: taskId ? 'ASSIGN' : 'UNASSIGN',
+      taskId: taskId
     });
     this.domainIntellectualProperties = null;
     return observable;

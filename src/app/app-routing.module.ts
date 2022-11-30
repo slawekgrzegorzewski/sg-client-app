@@ -21,6 +21,7 @@ import {
 import {DefaultApplicationComponent} from './general/components/applications/default-application.component';
 import {CUBES_STATISTICS_ROUTER_URL, CubeStatisticsComponent} from './speedcubing/pages/cube-statistics.component';
 import {IntellectualPropertyComponent, IP_HOME_ROUTER_URL} from './ip/components/intellectual-property.component';
+import {TIME_RECORDS_ROUTER_URL, TimeRecordsComponent} from './ip/components/time-records.component';
 
 const routes: Routes = [
   {path: 'login', component: LoginComponent, canActivate: [UserNotLoggedInGuard]},
@@ -68,6 +69,9 @@ const routes: Routes = [
 
   {path: IP_HOME_ROUTER_URL, redirectTo: `/${IP_HOME_ROUTER_URL}/`, pathMatch: 'full'},
   {path: `${IP_HOME_ROUTER_URL}/:domainId`, component: IntellectualPropertyComponent, canActivate: [UserLoggedInGuard]},
+
+  {path: TIME_RECORDS_ROUTER_URL, redirectTo: `/${TIME_RECORDS_ROUTER_URL}/`, pathMatch: 'full'},
+  {path: `${TIME_RECORDS_ROUTER_URL}/:domainId`, component: TimeRecordsComponent, canActivate: [UserLoggedInGuard]},
 
   {path: '**', component: DefaultApplicationComponent}
 ];

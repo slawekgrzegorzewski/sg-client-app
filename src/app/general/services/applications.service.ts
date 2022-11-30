@@ -15,6 +15,7 @@ import {CUBES_HOME_ROUTER_URL} from '../../speedcubing/pages/cubes-home.componen
 import {CUBES_STATISTICS_ROUTER_URL} from '../../speedcubing/pages/cube-statistics.component';
 import {SETTINGS_ROUTER_URL} from '../../accountant/pages/settings/settings.component';
 import {IP_HOME_ROUTER_URL} from '../../ip/components/intellectual-property.component';
+import {TIME_RECORDS_ROUTER_URL} from '../../ip/components/time-records.component';
 
 export const ACCOUNTANT_APP = 'Accountant';
 export const CHECKER_APP = 'Checker';
@@ -36,7 +37,7 @@ export const APPLICATIONS_CONFIG = new Map<string, ApplicationConfig>([
   [CHECKER_APP, new ApplicationConfig([CHECKER_HOME_ROUTER_URL])],
   [SYR_APP, new ApplicationConfig([SYR_HOME_ROUTER_URL, SYR_ADMIN_ROUTER_URL])],
   [CUBES_APP, new ApplicationConfig([CUBES_HOME_ROUTER_URL, CUBES_STATISTICS_ROUTER_URL])],
-  [IPR_APP, new ApplicationConfig([IP_HOME_ROUTER_URL])],
+  [IPR_APP, new ApplicationConfig([IP_HOME_ROUTER_URL, TIME_RECORDS_ROUTER_URL])],
 ]);
 
 @Injectable({
@@ -117,6 +118,10 @@ export class ApplicationsService {
 
   isCubesApp(): boolean {
     return this.selectedApp !== null && this.selectedApp === CUBES_APP;
+  }
+
+  isIntellectualProperty() {
+    return this.selectedApp !== null && this.selectedApp === IPR_APP;
   }
 
   selectFirstAvailableApp(): void {

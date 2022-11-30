@@ -97,6 +97,8 @@ import {MutuallyCancellingImporterComponent} from './accountant/pages/transactio
 import {UploaderComponent} from './general/components/uploader/uploader.component';
 import {IntellectualPropertyComponent} from './ip/components/intellectual-property.component';
 import {CubeRecordsService} from './speedcubing/services/cube-records.service';
+import {TimeRecordsComponent} from './ip/components/time-records.component';
+import {TimeRecordEditorComponent} from './ip/components/utils/time-record-editor.component';
 
 @NgModule({
   declarations: [
@@ -162,7 +164,9 @@ import {CubeRecordsService} from './speedcubing/services/cube-records.service';
     IgnoreImporterComponent,
     MutuallyCancellingImporterComponent,
     UploaderComponent,
-    IntellectualPropertyComponent
+    IntellectualPropertyComponent,
+    TimeRecordsComponent,
+    TimeRecordEditorComponent
   ],
   imports: [
     BrowserModule,

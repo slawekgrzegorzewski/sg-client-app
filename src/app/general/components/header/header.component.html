@@ -65,6 +65,12 @@
       <li class="nav-item" [routerLinkActive]="['cubes-statistics']" *ngIf="isLoggedIn && applicationsService.isCubesApp()">
         <a class="nav-link" [routerLink]="['/cubes-statistics']">Statystyki</a>
       </li>
+      <li class="nav-item" [routerLinkActive]="['ip-home']" *ngIf="isLoggedIn && applicationsService.isIntellectualProperty()">
+        <a class="nav-link" [routerLink]="['/ip-home']">Raporty własności intelektualnej</a>
+      </li>
+      <li class="nav-item" [routerLinkActive]="['time-records']" *ngIf="isLoggedIn && applicationsService.isIntellectualProperty()">
+        <a class="nav-link" [routerLink]="['/time-records']">Raporty czasu</a>
+      </li>
       <li class="nav-item" *ngIf="isLoggedIn">
         <a class="nav-link" (click)="castRefreshRequest()">Odśwież dane</a>
       </li>

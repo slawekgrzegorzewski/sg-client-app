@@ -8,6 +8,7 @@ import {Observable} from 'rxjs';
 import {HttpEvent} from '@angular/common/http';
 import 'rxjs-compat/add/observable/of';
 import Decimal from 'decimal.js';
+import {TimeRecordData} from './utils/time-record-editor.component';
 
 export const IP_HOME_ROUTER_URL = 'ip-home';
 
@@ -23,7 +24,7 @@ export class IntellectualPropertyComponent implements OnInit {
   intellectualPropertyDescriptionToCreate: string = '';
   intellectualPropertyToEdit: IntellectualProperty | null = null;
   taskData: { intellectualPropertyId: number, taskId: number | null, coAuthors: string, description: string } | null = null;
-  timeRecordData: { taskId: number, timeRecordId: number | null, date: Date, numberOfHours: Decimal, description: string } | null = null;
+  timeRecordData: TimeRecordData & { taskId: number, timeRecordId: number | null } | null = null;
   attachmentData: { taskId: number } | null = null;
 
   constructor(private intellectualPropertyService: IntellectualPropertyService) {
@@ -152,7 +153,7 @@ export class IntellectualPropertyComponent implements OnInit {
       if (this.timeRecordData.timeRecordId) {
         this.intellectualPropertyService.updateTimeRecord(this.timeRecordData.timeRecordId, {
           date: this.timeRecordData.date,
-          numberOfHours: this.timeRecordData.numberOfHours.toString(),
+          numberOfHours: this.timeRecordData.numberOfHours,
           description: this.timeRecordData.description
         })
           .subscribe({
@@ -164,7 +165,7 @@ export class IntellectualPropertyComponent implements OnInit {
       } else {
         this.intellectualPropertyService.createTimeRecord(this.timeRecordData.taskId, {
           date: this.timeRecordData.date,
-          numberOfHours: this.timeRecordData.numberOfHours.toString(),
+          numberOfHours: this.timeRecordData.numberOfHours,
           description: this.timeRecordData.description
         })
           .subscribe({

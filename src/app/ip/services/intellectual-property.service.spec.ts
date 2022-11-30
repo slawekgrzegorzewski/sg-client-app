@@ -5,6 +5,10 @@ import {HttpClient} from '@angular/common/http';
 import {of} from 'rxjs';
 import {DATA_REFRESH_REQUEST_EVENT} from '../../general/utils/event-bus-events';
 import {IntellectualProperty} from '../model/intellectual-property';
+import Decimal from 'decimal.js';
+import {LoginService} from '../../general/services/login.service';
+import {Router} from '@angular/router';
+import {DomainService} from '../../general/services/domain.service';
 
 function callGetNTimes(intellectualPropertyService: IntellectualPropertyService, ipr: IntellectualProperty, n: number) {
   for (let i = 0; i < n; i++) {
@@ -25,6 +29,9 @@ describe('IntellectualPropertyService', () => {
       {
         providers: [
           {provide: HttpClient, useValue: httpClientSpy},
+          {provide: DomainService, useValue: jasmine.createSpyObj<DomainService>(['registerToDomainChangesViaRouterUrl'])},
+          {provide: LoginService, useValue: jasmine.createSpyObj<LoginService>(['authenticate'])},
+          {provide: Router, useValue: jasmine.createSpyObj<Router>(['url'])},
           {provide: NgEventBus, useValue: new NgEventBus()},
           IntellectualPropertyService
         ]
@@ -42,7 +49,7 @@ describe('IntellectualPropertyService', () => {
         attachments: ['at', 'bt'],
         coAuthors: 'author1',
         description: 'b',
-        timeRecords: [{id: 3, date: new Date(), numberOfHours: 2, description: 'c', domain: {id: 1, name: 'a'}}]
+        timeRecords: [{id: 3, date: new Date(), numberOfHours: new Decimal(2), description: 'c', domain: {id: 1, name: 'a'}}]
       }],
       domain: {id: 1, name: 'a'}
     };
@@ -84,25 +91,33 @@ describe('IntellectualPropertyService', () => {
     callGetNTimes(intellectualPropertyService, ipr, 10);
     expect(httpClientSpy.get.calls.count()).toEqual(8);
 
-    intellectualPropertyService.createTimeRecord(1, {date: new Date(), numberOfHours: 1, description: 'a'}).subscribe();
+    intellectualPropertyService.createTimeRecord(1, {date: new Date(), numberOfHours: new Decimal(1), description: 'a'}).subscribe();
     callGetNTimes(intellectualPropertyService, ipr, 10);
     expect(httpClientSpy.get.calls.count()).toEqual(9);
 
-    intellectualPropertyService.updateTimeRecord(1, {date: new Date(), numberOfHours: 1, description: 'a'}).subscribe();
+    intellectualPropertyService.updateTimeRecord(1, {date: new Date(), numberOfHours: new Decimal(1), description: 'a'}).subscribe();
     callGetNTimes(intellectualPropertyService, ipr, 10);
     expect(httpClientSpy.get.calls.count()).toEqual(10);
 
-    intellectualPropertyService.deleteTimeRecord(1).subscribe();
+    intellectualPropertyService.updateTimeRecordWithTask(1, 1, {
+      date: new Date(),
+      numberOfHours: new Decimal(1),
+      description: 'a'
+    }).subscribe();
     callGetNTimes(intellectualPropertyService, ipr, 10);
     expect(httpClientSpy.get.calls.count()).toEqual(11);
 
-    intellectualPropertyService.uploadAttachment(1, jasmine.createSpyObj(File)).subscribe();
+    intellectualPropertyService.deleteTimeRecord(1).subscribe();
     callGetNTimes(intellectualPropertyService, ipr, 10);
     expect(httpClientSpy.get.calls.count()).toEqual(12);
 
-    intellectualPropertyService.deleteAttachment(1, 'a').subscribe();
+    intellectualPropertyService.uploadAttachment(1, jasmine.createSpyObj(File, ['creation'])).subscribe();
     callGetNTimes(intellectualPropertyService, ipr, 10);
     expect(httpClientSpy.get.calls.count()).toEqual(13);
+
+    intellectualPropertyService.deleteAttachment(1, 'a').subscribe();
+    callGetNTimes(intellectualPropertyService, ipr, 10);
+    expect(httpClientSpy.get.calls.count()).toEqual(14);
 
     done();
   });

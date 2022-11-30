@@ -20,3 +20,5 @@ export class IntellectualPropertyTask {
     this.timeRecords = (data.timeRecords || []).map(task => new TimeRecord(task));
   }
 }
+
+export const EMPTY_TASK = new IntellectualPropertyTask();

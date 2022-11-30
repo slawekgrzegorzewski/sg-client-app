@@ -1,5 +1,6 @@
 import {Domain} from '../../general/model/domain';
 import Decimal from 'decimal.js';
+import {IntellectualPropertyTask} from './intellectual-property-task';
 
 export type TimeRecordDTO = Partial<TimeRecord>;
 
@@ -21,4 +22,8 @@ export class TimeRecord {
     this.description = data.description || '';
     this.domain = new Domain(data.domain);
   }
+}
+
+export type TimeRecordWithTask = TimeRecord & {
+  task: IntellectualPropertyTask | null;
 }

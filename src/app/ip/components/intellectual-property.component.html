@@ -5,7 +5,7 @@
   <div class="form-group sg-flex-row">
     <label for="description" class="col-2 col-form-label">Opis</label>
     <div class="col-10">
-      <input id="description" name="description" type="name" class="form-control"
+      <input id="description" name="description" type="text" class="form-control"
              #description="ngModel"
              [(ngModel)]="intellectualPropertyDescriptionToCreate"
              required/>
@@ -31,7 +31,7 @@
       <div class="form-group sg-flex-row">
         <label for="description1" class="col-2 col-form-label">Opis</label>
         <div class="col-10">
-          <input id="description1" name="description1" type="name" class="form-control"
+          <input id="description1" name="description1" type="text" class="form-control"
                  #description="ngModel"
                  [(ngModel)]="intellectualProperty.description"
                  required/>
@@ -92,10 +92,11 @@
                       </div>
                     </div>
                   </div>
-                  <div
-                    *ngIf="timeRecordData && timeRecordData.taskId === task.id">
-                    <ng-container [ngTemplateOutlet]=" timeRecordDetails"></ng-container>
-                  </div>
+                  <app-time-record-editor *ngIf="timeRecordData && timeRecordData.taskId === task.id"
+                                          [timeRecordData]="timeRecordData"
+                                          (onAction)="timeRecordAction()"
+                                          (onCancel)="timeRecordData = null">
+                  </app-time-record-editor>
                 </div>
                 <div class="sg-flex-column" *ngIf="!attachmentData || attachmentData.taskId !== task.id">
                   <div class="sg-flex-row">
@@ -131,7 +132,7 @@
     <div class="form-group sg-flex-row">
       <label for="coAuthors" class="col-2 col-form-label">Współautorzy</label>
       <div class="col-10">
-        <input id="coAuthors" name="coAuthors" type="name" class="form-control"
+        <input id="coAuthors" name="coAuthors" type="text" class="form-control"
                [(ngModel)]="taskData.coAuthors"
                required/>
       </div>
@@ -139,7 +140,7 @@
     <div class="form-group sg-flex-row">
       <label for="description" class="col-2 col-form-label">Opis</label>
       <div class="col-10">
-        <input id="taskDescription" name="taskDescription" type="name" class="form-control"
+        <input id="taskDescription" name="taskDescription" type="text" class="form-control"
                [(ngModel)]="taskData.description"
                required/>
       </div>
@@ -147,36 +148,6 @@
     <ng-container>
       <button class="btn btn-sm btn-link" (click)="taskData = null">anuluj</button>
       <button class="btn btn-sm btn-link" (click)="taskAction()">zatwierdź</button>
-    </ng-container>
-  </ng-container>
-</ng-template>
-
-<ng-template #timeRecordDetails>
-  <ng-container *ngIf="timeRecordData">
-    <div class="form-group sg-flex-row">
-      <label for="dateOfTimeRecord" class="col-3 col-form-label">Data</label>
-      <app-date-picker class="col-9" id="dateOfTimeRecord" name="dateOfTimeRecord" [(ngModel)]="timeRecordData.date">
-      </app-date-picker>
-    </div>
-    <div class="form-group sg-flex-row">
-      <label for="numberOfHours" class="col-2 col-form-label">Liczba godzin</label>
-      <div class="col-10">
-        <input id="numberOfHours" name="numberOfHours" type="number" class="form-control"
-               [(ngModel)]="timeRecordData.numberOfHours"
-               required/>
-      </div>
-    </div>
-    <div class="form-group sg-flex-row">
-      <label for="timeRecordDescription" class="col-2 col-form-label">Opis</label>
-      <div class="col-10">
-        <input id="timeRecordDescription" name="timeRecordDescription" type="name" class="form-control"
-               [(ngModel)]="timeRecordData.description"
-               required/>
-      </div>
-    </div>
-    <ng-container>
-      <button class="btn btn-sm btn-link" (click)="timeRecordData = null">anuluj</button>
-      <button class="btn btn-sm btn-link" (click)="timeRecordAction()">zatwierdź</button>
     </ng-container>
   </ng-container>
 </ng-template>
