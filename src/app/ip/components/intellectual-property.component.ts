@@ -10,8 +10,10 @@ import 'rxjs-compat/add/observable/of';
 import Decimal from 'decimal.js';
 import {TimeRecordData} from './utils/time-record-editor.component';
 import {IntellectualPropertyTaskData} from './utils/intellectual-property-task-editor.component';
+import {DatePipe} from '@angular/common';
 
 export const IP_HOME_ROUTER_URL = 'ip-home';
+export const ALL = 'wszystkie';
 
 @Component({
   selector: 'app-cube',
@@ -20,13 +22,28 @@ export const IP_HOME_ROUTER_URL = 'ip-home';
 })
 export class IntellectualPropertyComponent implements OnInit {
 
-  intellectualProperties: IntellectualProperty[] = [];
+  allIntellectualProperties: IntellectualProperty[] = [];
+  intellectualPropertiesFiltered: IntellectualProperty[] = [];
+  intellectualPropertiesDates: string[] = [];
+  $intellectualPropertiesFilter: string = '';
+
+  get intellectualPropertiesFilter(): string {
+    return this.$intellectualPropertiesFilter;
+  }
+
+  set intellectualPropertiesFilter(value: string) {
+    this.$intellectualPropertiesFilter = value;
+    this.intellectualPropertiesFiltered = value === ALL
+      ? this.allIntellectualProperties
+      : this.allIntellectualProperties.filter(ip => ip.tasks.find(t => t.timeRecords.find(tr => this.getMonthString(tr.date) === this.intellectualPropertiesFilter)));
+  }
+
   intellectualPropertyToEdit: IntellectualProperty | null = null;
   taskData: IntellectualPropertyTaskData | null = null;
   timeRecordData: TimeRecordData | null = null;
   attachmentData: { taskId: number } | null = null;
 
-  constructor(private intellectualPropertyService: IntellectualPropertyService) {
+  constructor(private intellectualPropertyService: IntellectualPropertyService, private datePipe: DatePipe) {
   }
 
   ngOnInit(): void {
@@ -38,17 +55,26 @@ export class IntellectualPropertyComponent implements OnInit {
       const byIdDesc = ComparatorBuilder.comparing<IntellectualProperty>(intellectualProperty => intellectualProperty.id).desc().build();
       data.flatMap(entry => entry.tasks)
         .forEach(task => task.timeRecords = (task.timeRecords || []).sort(ComparatorBuilder.comparingByDate<TimeRecord>(timeRecord => timeRecord.date).build()));
-      this.intellectualProperties = data.sort(byIdDesc);
+      this.allIntellectualProperties = data.sort(byIdDesc);
+      this.intellectualPropertiesDates = [...new Set(this.allIntellectualProperties
+        .flatMap(ip => ip.tasks)
+        .flatMap(t => t.timeRecords)
+        .map(tr => tr.date)
+        .map(d => this.getMonthString(d)))].sort();
+      this.intellectualPropertiesDates.unshift(ALL);
+      if (!this.intellectualPropertiesDates.includes(this.intellectualPropertiesFilter)) {
+        this.intellectualPropertiesFilter = ALL;
+      }
     });
   }
 
   startIntellectualPropertyCreation() {
     this.intellectualPropertyToEdit = new IntellectualProperty();
-    this.intellectualProperties = [this.intellectualPropertyToEdit, ...this.intellectualProperties];
+    this.allIntellectualProperties = [this.intellectualPropertyToEdit, ...this.allIntellectualProperties];
   }
 
   removeCreatingIPFromList() {
-    this.intellectualProperties = this.intellectualProperties.filter(ip => ip.id !== NO_ID);
+    this.allIntellectualProperties = this.allIntellectualProperties.filter(ip => ip.id !== NO_ID);
   }
 
   startIntellectualPropertyEdit(intellectualProperty: IntellectualProperty) {
@@ -215,5 +241,9 @@ export class IntellectualPropertyComponent implements OnInit {
     return (file: File) => {
       return that.intellectualPropertyService.uploadAttachment(that.attachmentData!.taskId, file);
     };
+  }
+
+  private getMonthString(d: Date) {
+    return this.datePipe.transform(d, 'yyyy-MM')!;
   }
 }

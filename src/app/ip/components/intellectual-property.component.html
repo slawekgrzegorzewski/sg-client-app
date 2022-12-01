@@ -1,7 +1,12 @@
-<button class="btn btn-sm btn-link" (click)="startIntellectualPropertyCreation()">Stwórz intellectual
-  property
-</button>
-<div *ngFor="let intellectualProperty of intellectualProperties">
+<div class="sg-flex-row">
+  <button class="btn btn-sm btn-link" (click)="startIntellectualPropertyCreation()">Stwórz intellectual
+    property
+  </button>
+  <select class="form-select" [(ngModel)]="intellectualPropertiesFilter" style="width: 150px;">
+    <option *ngFor="let filter of intellectualPropertiesDates" [value]="filter">{{filter}}</option>
+  </select>
+</div>
+<div *ngFor="let intellectualProperty of intellectualPropertiesFiltered">
   <div *ngIf="!intellectualPropertyToEdit || intellectualPropertyToEdit.id !== intellectualProperty.id"
        class="sg-flex-row">
     <span>{{intellectualProperty.description}}</span>
