@@ -1,46 +1,30 @@
-<button class="btn btn-sm btn-link" (click)="showIntellectualPropertyCreation = true">Stwórz intellectual
+<button class="btn btn-sm btn-link" (click)="startIntellectualPropertyCreation()">Stwórz intellectual
   property
 </button>
-<div *ngIf="showIntellectualPropertyCreation">
-  <div class="form-group sg-flex-row">
-    <label for="description" class="col-2 col-form-label">Opis</label>
-    <div class="col-10">
-      <input id="description" name="description" type="text" class="form-control"
-             #description="ngModel"
-             [(ngModel)]="intellectualPropertyDescriptionToCreate"
-             required/>
-    </div>
-  </div>
-  <ng-container>
-    <button class="btn btn-sm btn-link"
-            (click)="showIntellectualPropertyCreation = false; intellectualPropertyDescriptionToCreate = ''">anuluj
-    </button>
-    <button class="btn btn-sm btn-link" (click)="createIntellectualProperty()">stwórz</button>
-  </ng-container>
-</div>
+<app-intellectual-property-editor
+  *ngIf="intellectualPropertyToEdit && !intellectualPropertyToEdit.id"
+  [intellectualPropertyData]="intellectualPropertyToEdit"
+  (onAction)="intellectualPropertyAction($event)"
+  (onCancel)="intellectualPropertyToEdit = null"
+>
+</app-intellectual-property-editor>
 <div *ngFor="let intellectualProperty of intellectualProperties">
   <div class="sg-flex-row">
     <span>{{intellectualProperty.description}}</span>
-    <div *ngIf="intellectualProperty.tasks.length === 0">
-      <button class="btn btn-sm btn-link" (click)="intellectualPropertyToEdit = intellectualProperty">edytuj</button>
-      <button class="btn btn-sm btn-link" (click)="deleteIntellectualProperty(intellectualProperty.id)">usuń</button>
-    </div>
+    <button class="btn btn-sm btn-link" (click)="startIntellectualPropertyEdit(intellectualProperty)">edytuj</button>
+    <button *ngIf="intellectualProperty.tasks.length === 0"
+            class="btn btn-sm btn-link"
+            (click)="deleteIntellectualProperty(intellectualProperty.id)">usuń
+    </button>
   </div>
   <div style="margin-left: 50px; background-color: #c5ecb8">
     <div *ngIf="intellectualPropertyToEdit && intellectualPropertyToEdit.id === intellectualProperty.id">
-      <div class="form-group sg-flex-row">
-        <label for="description1" class="col-2 col-form-label">Opis</label>
-        <div class="col-10">
-          <input id="description1" name="description1" type="text" class="form-control"
-                 #description="ngModel"
-                 [(ngModel)]="intellectualProperty.description"
-                 required/>
-        </div>
-      </div>
-      <ng-container>
-        <button class="btn btn-sm btn-link" (click)="intellectualPropertyToEdit = null">anuluj</button>
-        <button class="btn btn-sm btn-link" (click)="updateIntellectualProperty()">stwórz</button>
-      </ng-container>
+      <app-intellectual-property-editor
+        [intellectualPropertyData]="intellectualPropertyToEdit"
+        (onAction)="intellectualPropertyAction($event)"
+        (onCancel)="intellectualPropertyToEdit = null"
+      >
+      </app-intellectual-property-editor>
     </div>
     <div>
       <div class="sg-flex-row">
@@ -48,10 +32,14 @@
         <span *ngIf="intellectualProperty.tasks.length === 0">Brak wykonanych zadań w ramach IP</span>
         <button class="btn btn-sm btn-link" (click)="showTaskCreator(intellectualProperty)">stwórz</button>
       </div>
-      <div *ngIf="taskData && taskData.intellectualPropertyId === intellectualProperty.id && !taskData.taskId"
-           style="margin-left: 50px; background-color: #acb2ec">
-        <ng-container [ngTemplateOutlet]="taskDetails"></ng-container>
-      </div>
+      <app-intellectual-property-task-editor
+        *ngIf="taskData && taskData.intellectualPropertyId === intellectualProperty.id && !taskData.taskId"
+        [style]="{'margin-left': '50px', 'background-color': '#acb2ec'}"
+        [taskData]="taskData"
+        (onAction)="taskAction($event)"
+        (onCancel)="taskData = null">
+
+      </app-intellectual-property-task-editor>
       <div *ngIf="intellectualProperty.tasks.length !== 0"
            style="margin-left: 50px; background-color: #acb2ec">
         <div *ngFor="let task of intellectualProperty.tasks">
@@ -67,10 +55,14 @@
               </div>
               <div>Współautorzy: {{ task.coAuthors }}</div>
             </div>
-            <div *ngIf="taskData && taskData.taskId && taskData.taskId === task.id"
-                 style="margin-left: 50px; background-color: #acb2ec">
-              <ng-container [ngTemplateOutlet]="taskDetails"></ng-container>
-            </div>
+            <app-intellectual-property-task-editor
+              *ngIf="taskData && taskData.taskId && taskData.taskId === task.id"
+              [style]="{'margin-left': '50px', 'background-color': '#acb2ec'}"
+              [taskData]="taskData"
+              (onAction)="taskAction($event)"
+              (onCancel)="taskData = null">
+
+            </app-intellectual-property-task-editor>
             <div *ngIf="!taskData || !taskData.taskId || taskData.taskId !== task.id"
                  style="margin-left: 50px; background-color: #acb2ec">
               <div class="sg-flex-row">
@@ -94,7 +86,7 @@
                   </div>
                   <app-time-record-editor *ngIf="timeRecordData && timeRecordData.taskId === task.id"
                                           [timeRecordData]="timeRecordData"
-                                          (onAction)="timeRecordAction()"
+                                          (onAction)="timeRecordAction($event)"
                                           (onCancel)="timeRecordData = null">
                   </app-time-record-editor>
                 </div>
@@ -126,28 +118,3 @@
     </div>
   </div>
 </div>
-
-<ng-template #taskDetails>
-  <ng-container *ngIf="taskData">
-    <div class="form-group sg-flex-row">
-      <label for="coAuthors" class="col-2 col-form-label">Współautorzy</label>
-      <div class="col-10">
-        <input id="coAuthors" name="coAuthors" type="text" class="form-control"
-               [(ngModel)]="taskData.coAuthors"
-               required/>
-      </div>
-    </div>
-    <div class="form-group sg-flex-row">
-      <label for="description" class="col-2 col-form-label">Opis</label>
-      <div class="col-10">
-        <input id="taskDescription" name="taskDescription" type="text" class="form-control"
-               [(ngModel)]="taskData.description"
-               required/>
-      </div>
-    </div>
-    <ng-container>
-      <button class="btn btn-sm btn-link" (click)="taskData = null">anuluj</button>
-      <button class="btn btn-sm btn-link" (click)="taskAction()">zatwierdź</button>
-    </ng-container>
-  </ng-container>
-</ng-template>

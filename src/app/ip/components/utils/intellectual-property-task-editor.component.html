@@ -1,0 +1,22 @@
+<div *ngIf="taskData" [ngStyle]="style">
+  <div class="form-group sg-flex-row">
+    <label for="coAuthors" class="col-2 col-form-label">Współautorzy</label>
+    <div class="col-10">
+      <input id="coAuthors" name="coAuthors" type="text" class="form-control"
+             [(ngModel)]="taskData.coAuthors"
+             required/>
+    </div>
+  </div>
+  <div class="form-group sg-flex-row">
+    <label for="taskDescription" class="col-2 col-form-label">Opis</label>
+    <div class="col-10">
+      <input id="taskDescription" name="taskDescription" type="text" class="form-control"
+             [(ngModel)]="taskData.description"
+             required/>
+    </div>
+  </div>
+  <ng-container>
+    <button class="btn btn-sm btn-link" (click)="onCancel.emit(); taskData = null;">anuluj</button>
+    <button class="btn btn-sm btn-link" (click)="onAction.emit(taskData); taskData = null;">zatwierdź</button>
+  </ng-container>
+</div>

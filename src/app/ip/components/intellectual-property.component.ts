@@ -9,6 +9,8 @@ import {HttpEvent} from '@angular/common/http';
 import 'rxjs-compat/add/observable/of';
 import Decimal from 'decimal.js';
 import {TimeRecordData} from './utils/time-record-editor.component';
+import {IntellectualPropertyTaskData} from './utils/intellectual-property-task-editor.component';
+import {IntellectualPropertyData} from './utils/intellectual-property-editor.component';
 
 export const IP_HOME_ROUTER_URL = 'ip-home';
 
@@ -20,11 +22,9 @@ export const IP_HOME_ROUTER_URL = 'ip-home';
 export class IntellectualPropertyComponent implements OnInit {
 
   intellectualProperties: IntellectualProperty[] = [];
-  showIntellectualPropertyCreation: boolean = false;
-  intellectualPropertyDescriptionToCreate: string = '';
-  intellectualPropertyToEdit: IntellectualProperty | null = null;
-  taskData: { intellectualPropertyId: number, taskId: number | null, coAuthors: string, description: string } | null = null;
-  timeRecordData: TimeRecordData & { taskId: number, timeRecordId: number | null } | null = null;
+  intellectualPropertyToEdit: IntellectualPropertyData | null = null;
+  taskData: IntellectualPropertyTaskData | null = null;
+  timeRecordData: TimeRecordData | null = null;
   attachmentData: { taskId: number } | null = null;
 
   constructor(private intellectualPropertyService: IntellectualPropertyService) {
@@ -43,15 +43,31 @@ export class IntellectualPropertyComponent implements OnInit {
     });
   }
 
-  createIntellectualProperty() {
-    if (this.intellectualPropertyDescriptionToCreate) {
-      this.intellectualPropertyService.createIntellectualProperty(this.intellectualPropertyDescriptionToCreate).subscribe({
-        complete: () => {
-          this.refreshData();
-          this.showIntellectualPropertyCreation = false;
-          this.intellectualPropertyDescriptionToCreate = '';
-        }
-      });
+  startIntellectualPropertyCreation() {
+    this.intellectualPropertyToEdit = {} as IntellectualPropertyData;
+  }
+
+  startIntellectualPropertyEdit(intellectualProperty: IntellectualProperty) {
+    this.intellectualPropertyToEdit = {
+      id: intellectualProperty.id,
+      description: intellectualProperty.description
+    } as IntellectualPropertyData;
+  }
+
+  intellectualPropertyAction(intellectualPropertyData: IntellectualPropertyData) {
+    this.mapIPToRequest(intellectualPropertyData).subscribe({
+      complete: () => {
+        this.refreshData();
+        this.intellectualPropertyToEdit = null;
+      }
+    });
+  }
+
+  mapIPToRequest(intellectualPropertyData: IntellectualPropertyData): Observable<IntellectualProperty | string> {
+    if (intellectualPropertyData.id) {
+      return this.intellectualPropertyService.updateIntellectualProperty(intellectualPropertyData.id, intellectualPropertyData.description);
+    } else {
+      return this.intellectualPropertyService.createIntellectualProperty(intellectualPropertyData.description);
     }
   }
 
@@ -59,17 +75,6 @@ export class IntellectualPropertyComponent implements OnInit {
     this.intellectualPropertyService.deleteIntellectualProperty(id).subscribe({
       complete: () => this.refreshData()
     });
-  }
-
-  updateIntellectualProperty() {
-    if (this.intellectualPropertyToEdit) {
-      this.intellectualPropertyService.updateIntellectualProperty(this.intellectualPropertyToEdit.id, this.intellectualPropertyToEdit.description).subscribe({
-        complete: () => {
-          this.refreshData();
-          this.intellectualPropertyToEdit = null;
-        }
-      });
-    }
   }
 
   showTaskCreator(intellectualProperty: IntellectualProperty) {
@@ -90,32 +95,31 @@ export class IntellectualPropertyComponent implements OnInit {
     };
   }
 
-  taskAction() {
-    if (this.taskData) {
-      if (this.taskData.taskId) {
-        this.intellectualPropertyService.updateTask(this.taskData.taskId, {
-          coAuthors: this.taskData.coAuthors,
-          description: this.taskData.description
-        })
-          .subscribe({
-            complete: () => {
-              this.refreshData();
-              this.taskData = null;
-            }
-          });
+  taskAction(taskData: IntellectualPropertyTaskData) {
+    this.mapToRequest(taskData)?.subscribe({
+      complete: () => {
+        this.refreshData();
+        this.taskData = null;
+      }
+    });
+  }
+
+  private mapToRequest(taskData: IntellectualPropertyTaskData | null): Observable<string> | null {
+    if (taskData) {
+      if (taskData.taskId) {
+        return this.intellectualPropertyService.updateTask(taskData.taskId, this.mapToRequestObject(taskData));
       } else {
-        this.intellectualPropertyService.createTask(this.taskData.intellectualPropertyId, {
-          coAuthors: this.taskData.coAuthors,
-          description: this.taskData.description
-        })
-          .subscribe({
-            complete: () => {
-              this.refreshData();
-              this.taskData = null;
-            }
-          });
+        return this.intellectualPropertyService.createTask(taskData.intellectualPropertyId, this.mapToRequestObject(taskData));
       }
     }
+    return null;
+  }
+
+  private mapToRequestObject(taskData: IntellectualPropertyTaskData) {
+    return {
+      coAuthors: taskData.coAuthors,
+      description: taskData.description
+    };
   }
 
   deleteTask(taskId: number) {
@@ -148,34 +152,32 @@ export class IntellectualPropertyComponent implements OnInit {
     };
   }
 
-  timeRecordAction() {
-    if (this.timeRecordData) {
-      if (this.timeRecordData.timeRecordId) {
-        this.intellectualPropertyService.updateTimeRecord(this.timeRecordData.timeRecordId, {
-          date: this.timeRecordData.date,
-          numberOfHours: this.timeRecordData.numberOfHours,
-          description: this.timeRecordData.description
-        })
-          .subscribe({
-            complete: () => {
-              this.refreshData();
-              this.timeRecordData = null;
-            }
-          });
+  timeRecordAction(timeRecordData: TimeRecordData) {
+    this.mapActionToRequest(timeRecordData)?.subscribe({
+      complete: () => {
+        this.refreshData();
+        this.timeRecordData = null;
+      }
+    });
+  }
+
+  private mapActionToRequest(timeRecordData: TimeRecordData): Observable<string> | null {
+    if (timeRecordData) {
+      if (timeRecordData.timeRecordId) {
+        return this.intellectualPropertyService.updateTimeRecord(timeRecordData.timeRecordId, this.mapToTimeRecordData(timeRecordData));
       } else {
-        this.intellectualPropertyService.createTimeRecord(this.timeRecordData.taskId, {
-          date: this.timeRecordData.date,
-          numberOfHours: this.timeRecordData.numberOfHours,
-          description: this.timeRecordData.description
-        })
-          .subscribe({
-            complete: () => {
-              this.refreshData();
-              this.timeRecordData = null;
-            }
-          });
+        return this.intellectualPropertyService.createTimeRecord(timeRecordData.taskId, this.mapToTimeRecordData(timeRecordData));
       }
     }
+    return null;
+  }
+
+  private mapToTimeRecordData(timeRecordData: TimeRecordData) {
+    return {
+      date: timeRecordData.date,
+      numberOfHours: timeRecordData.numberOfHours,
+      description: timeRecordData.description
+    };
   }
 
   deleteTimeRecord(timeRecordId: number) {

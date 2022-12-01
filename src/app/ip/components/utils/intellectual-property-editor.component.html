@@ -1,0 +1,17 @@
+<div *ngIf="intellectualPropertyData" [ngStyle]="style">
+  <div class="form-group sg-flex-row">
+    <label for="description1" class="col-2 col-form-label">Opis</label>
+    <div class="col-10">
+      <input id="description1" name="description1" type="text" class="form-control"
+             #description="ngModel"
+             [(ngModel)]="intellectualPropertyData.description"
+             required/>
+    </div>
+  </div>
+  <ng-container>
+    <button class="btn btn-sm btn-link" (click)="onCancel.emit();intellectualPropertyData = null;">anuluj</button>
+    <button class="btn btn-sm btn-link"
+            (click)="onAction.emit(intellectualPropertyData); intellectualPropertyData = null;">zatwierdź
+    </button>
+  </ng-container>
+</div>
