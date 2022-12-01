@@ -52,7 +52,7 @@
   justify-content: space-between;
 }
 
-.sg-flex-align-flex-end {
+.sg-flex-align-flex-start {
   display: flex;
   align-items: flex-start;
 }

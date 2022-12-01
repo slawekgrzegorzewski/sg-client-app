@@ -1,6 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-
-export type IntellectualPropertyData = { id: number | null, description: string };
+import {IntellectualProperty} from '../../model/intellectual-property';
 
 @Component({
   selector: 'app-intellectual-property-editor',
@@ -9,13 +8,13 @@ export type IntellectualPropertyData = { id: number | null, description: string 
 })
 export class IntellectualPropertyEditorComponent {
   @Input()
-  intellectualPropertyData: IntellectualPropertyData | null = null;
+  intellectualPropertyData: IntellectualProperty | null = null;
 
   @Input()
   style: any;
 
   @Output()
-  onAction: EventEmitter<IntellectualPropertyData> = new EventEmitter<IntellectualPropertyData>();
+  onAction: EventEmitter<IntellectualProperty> = new EventEmitter<IntellectualProperty>();
 
   @Output()
   onCancel: EventEmitter<string> = new EventEmitter<string>();

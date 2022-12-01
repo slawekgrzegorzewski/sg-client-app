@@ -1,15 +1,9 @@
 <button class="btn btn-sm btn-link" (click)="startIntellectualPropertyCreation()">Stwórz intellectual
   property
 </button>
-<app-intellectual-property-editor
-  *ngIf="intellectualPropertyToEdit && !intellectualPropertyToEdit.id"
-  [intellectualPropertyData]="intellectualPropertyToEdit"
-  (onAction)="intellectualPropertyAction($event)"
-  (onCancel)="intellectualPropertyToEdit = null"
->
-</app-intellectual-property-editor>
 <div *ngFor="let intellectualProperty of intellectualProperties">
-  <div class="sg-flex-row">
+  <div *ngIf="!intellectualPropertyToEdit || intellectualPropertyToEdit.id !== intellectualProperty.id"
+       class="sg-flex-row">
     <span>{{intellectualProperty.description}}</span>
     <button class="btn btn-sm btn-link" (click)="startIntellectualPropertyEdit(intellectualProperty)">edytuj</button>
     <button *ngIf="intellectualProperty.tasks.length === 0"
@@ -17,15 +11,14 @@
             (click)="deleteIntellectualProperty(intellectualProperty.id)">usuń
     </button>
   </div>
+  <app-intellectual-property-editor
+    *ngIf="intellectualPropertyToEdit && intellectualPropertyToEdit.id === intellectualProperty.id"
+    [intellectualPropertyData]="intellectualPropertyToEdit"
+    (onAction)="intellectualPropertyAction($event)"
+    (onCancel)="intellectualPropertyToEdit = null; removeCreatingIPFromList()"
+  >
+  </app-intellectual-property-editor>
   <div style="margin-left: 50px; background-color: #c5ecb8">
-    <div *ngIf="intellectualPropertyToEdit && intellectualPropertyToEdit.id === intellectualProperty.id">
-      <app-intellectual-property-editor
-        [intellectualPropertyData]="intellectualPropertyToEdit"
-        (onAction)="intellectualPropertyAction($event)"
-        (onCancel)="intellectualPropertyToEdit = null"
-      >
-      </app-intellectual-property-editor>
-    </div>
     <div>
       <div class="sg-flex-row">
         <span *ngIf="intellectualProperty.tasks.length !== 0">Zadania w ramach IP</span>

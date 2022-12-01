@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {IntellectualPropertyService} from '../services/intellectual-property.service';
-import {IntellectualProperty} from '../model/intellectual-property';
+import {IntellectualProperty, NO_ID} from '../model/intellectual-property';
 import {IntellectualPropertyTask} from '../model/intellectual-property-task';
 import {TimeRecord} from '../model/time-record';
 import {ComparatorBuilder} from '../../general/utils/comparator-builder';
@@ -10,7 +10,6 @@ import 'rxjs-compat/add/observable/of';
 import Decimal from 'decimal.js';
 import {TimeRecordData} from './utils/time-record-editor.component';
 import {IntellectualPropertyTaskData} from './utils/intellectual-property-task-editor.component';
-import {IntellectualPropertyData} from './utils/intellectual-property-editor.component';
 
 export const IP_HOME_ROUTER_URL = 'ip-home';
 
@@ -22,7 +21,7 @@ export const IP_HOME_ROUTER_URL = 'ip-home';
 export class IntellectualPropertyComponent implements OnInit {
 
   intellectualProperties: IntellectualProperty[] = [];
-  intellectualPropertyToEdit: IntellectualPropertyData | null = null;
+  intellectualPropertyToEdit: IntellectualProperty | null = null;
   taskData: IntellectualPropertyTaskData | null = null;
   timeRecordData: TimeRecordData | null = null;
   attachmentData: { taskId: number } | null = null;
@@ -44,17 +43,23 @@ export class IntellectualPropertyComponent implements OnInit {
   }
 
   startIntellectualPropertyCreation() {
-    this.intellectualPropertyToEdit = {} as IntellectualPropertyData;
+    this.intellectualPropertyToEdit = new IntellectualProperty();
+    this.intellectualProperties = [this.intellectualPropertyToEdit, ...this.intellectualProperties];
+  }
+
+  removeCreatingIPFromList() {
+    this.intellectualProperties = this.intellectualProperties.filter(ip => ip.id !== NO_ID);
   }
 
   startIntellectualPropertyEdit(intellectualProperty: IntellectualProperty) {
-    this.intellectualPropertyToEdit = {
+    this.removeCreatingIPFromList();
+    this.intellectualPropertyToEdit = new IntellectualProperty({
       id: intellectualProperty.id,
       description: intellectualProperty.description
-    } as IntellectualPropertyData;
+    });
   }
 
-  intellectualPropertyAction(intellectualPropertyData: IntellectualPropertyData) {
+  intellectualPropertyAction(intellectualPropertyData: IntellectualProperty) {
     this.mapIPToRequest(intellectualPropertyData).subscribe({
       complete: () => {
         this.refreshData();
@@ -63,7 +68,7 @@ export class IntellectualPropertyComponent implements OnInit {
     });
   }
 
-  mapIPToRequest(intellectualPropertyData: IntellectualPropertyData): Observable<IntellectualProperty | string> {
+  mapIPToRequest(intellectualPropertyData: IntellectualProperty): Observable<IntellectualProperty | string> {
     if (intellectualPropertyData.id) {
       return this.intellectualPropertyService.updateIntellectualProperty(intellectualPropertyData.id, intellectualPropertyData.description);
     } else {
