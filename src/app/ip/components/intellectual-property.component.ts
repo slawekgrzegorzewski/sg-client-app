@@ -22,7 +22,17 @@ export const ALL = 'wszystkie';
 })
 export class IntellectualPropertyComponent implements OnInit {
 
-  allIntellectualProperties: IntellectualProperty[] = [];
+  $allIntellectualProperties: IntellectualProperty[] = [];
+
+  get allIntellectualProperties(): IntellectualProperty[] {
+    return this.$allIntellectualProperties;
+  }
+
+  set allIntellectualProperties(value: IntellectualProperty[]) {
+    this.$allIntellectualProperties = value;
+    this.filterDataByMonth(this.intellectualPropertiesFilter);
+  }
+
   intellectualPropertiesFiltered: IntellectualProperty[] = [];
   intellectualPropertiesDates: string[] = [];
   $intellectualPropertiesFilter: string = '';
@@ -33,9 +43,7 @@ export class IntellectualPropertyComponent implements OnInit {
 
   set intellectualPropertiesFilter(value: string) {
     this.$intellectualPropertiesFilter = value;
-    this.intellectualPropertiesFiltered = value === ALL
-      ? this.allIntellectualProperties
-      : this.allIntellectualProperties.filter(ip => ip.tasks.find(t => t.timeRecords.find(tr => this.getMonthString(tr.date) === this.intellectualPropertiesFilter)));
+    this.filterDataByMonth(value);
   }
 
   intellectualPropertyToEdit: IntellectualProperty | null = null;
@@ -66,6 +74,12 @@ export class IntellectualPropertyComponent implements OnInit {
         this.intellectualPropertiesFilter = ALL;
       }
     });
+  }
+
+  private filterDataByMonth(monthFilter: string) {
+    this.intellectualPropertiesFiltered = monthFilter === ALL
+      ? this.allIntellectualProperties
+      : this.allIntellectualProperties.filter(ip => ip.tasks.find(t => t.timeRecords.find(tr => this.getMonthString(tr.date) === this.intellectualPropertiesFilter)));
   }
 
   startIntellectualPropertyCreation() {
