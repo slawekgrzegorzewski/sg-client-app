@@ -1,17 +1,17 @@
 <div style="width: 100%" class="container">
-  <div *ngIf="intellectualPropertyData" [ngStyle]="style" class="row">
+  <div *ngIf="intellectualProperty" [ngStyle]="style" class="row">
     <div class="col-3">Opis</div>
     <div class="col-6">
     <textarea class="form-control"
               #description="ngModel"
-              [(ngModel)]="intellectualPropertyData.description"
+              [(ngModel)]="intellectualProperty.description"
               required>
       </textarea>
     </div>
     <div class="sg-flex-column col-3">
-      <button class="btn btn-sm btn-link" (click)="onCancel.emit();intellectualPropertyData = null;">anuluj</button>
+      <button class="btn btn-sm btn-link" (click)="onCancel.emit();intellectualProperty = null;">anuluj</button>
       <button class="btn btn-sm btn-link"
-              (click)="onAction.emit(intellectualPropertyData); intellectualPropertyData = null;">zatwierdź
+              (click)="onAction.emit(intellectualProperty); intellectualProperty = null;">zatwierdź
       </button>
     </div>
   </div>

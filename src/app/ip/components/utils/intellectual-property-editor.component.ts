@@ -7,8 +7,9 @@ import {IntellectualProperty} from '../../model/intellectual-property';
   styleUrls: ['./intellectual-property-editor.component.css']
 })
 export class IntellectualPropertyEditorComponent {
+
   @Input()
-  intellectualPropertyData: IntellectualProperty | null = null;
+  intellectualProperty: IntellectualProperty | null = null;
 
   @Input()
   style: any;

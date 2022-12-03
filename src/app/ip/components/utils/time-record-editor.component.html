@@ -1,4 +1,4 @@
-<ng-container *ngIf="timeRecordData">
+<ng-container *ngIf="timeRecord">
 
   <div *ngIf="tasks.length > 0" class="form-group sg-flex-row">
     <label for="taskTA" class="col-2 col-form-label">Zadanie</label>
@@ -7,7 +7,7 @@
         [id]="'taskTA'"
         name="taskTA"
         [inputClass]="'form-control'"
-        [(ngModel)]="taskValue"
+        [(ngModel)]="task"
         [dataProvider]="tasksForTypeAhead()"
         required>
       </app-general-typeahead>
@@ -16,14 +16,14 @@
 
   <div class="form-group sg-flex-row">
     <label for="dateOfTimeRecord" class="col-3 col-form-label">Data</label>
-    <app-date-picker class="col-9" id="dateOfTimeRecord" name="dateOfTimeRecord" [(ngModel)]="timeRecordData.date">
+    <app-date-picker class="col-9" id="dateOfTimeRecord" name="dateOfTimeRecord" [(ngModel)]="timeRecord.date">
     </app-date-picker>
   </div>
   <div class="form-group sg-flex-row">
     <label for="numberOfHours" class="col-2 col-form-label">Liczba godzin</label>
     <div class="col-10">
       <input id="numberOfHours" name="numberOfHours" type="number" class="form-control"
-             [(ngModel)]="timeRecordData.numberOfHours"
+             [(ngModel)]="timeRecord.numberOfHours"
              required/>
     </div>
   </div>
@@ -31,12 +31,12 @@
     <label for="timeRecordDescription" class="col-2 col-form-label">Opis</label>
     <div class="col-10">
       <input id="timeRecordDescription" name="timeRecordDescription" type="text" class="form-control"
-             [(ngModel)]="timeRecordData.description"
+             [(ngModel)]="timeRecord.description"
              required/>
     </div>
   </div>
   <ng-container>
     <button class="btn btn-sm btn-link" (click)="onCancel.emit()">anuluj</button>
-    <button class="btn btn-sm btn-link" (click)="onAction.emit(timeRecordData)">zatwierdź</button>
+    <button class="btn btn-sm btn-link" (click)="emitAction()">zatwierdź</button>
   </ng-container>
 </ng-container>

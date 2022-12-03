@@ -2,6 +2,8 @@ import {Domain} from '../../general/model/domain';
 import Decimal from 'decimal.js';
 import {IntellectualPropertyTask} from './intellectual-property-task';
 
+export const EMPTY_TIME_RECORD_ID = 0;
+
 export type TimeRecordDTO = Partial<TimeRecord>;
 
 export class TimeRecord {
@@ -15,7 +17,7 @@ export class TimeRecord {
     if (!data) {
       data = {};
     }
-    this.id = data.id || 0;
+    this.id = data.id || EMPTY_TIME_RECORD_ID;
     this.date = data.date && new Date(data.date) || new Date();
     this.description = data.description || '';
     this.numberOfHours = new Decimal(data.numberOfHours || '0.0');
@@ -27,3 +29,4 @@ export class TimeRecord {
 export type TimeRecordWithTask = TimeRecord & {
   task: IntellectualPropertyTask | null;
 }
+export const EMPTY_TIME_RECORD = new TimeRecord();

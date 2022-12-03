@@ -2,6 +2,7 @@ import {TimeRecord} from './time-record';
 import {ForTypeahead} from '../../accountant/model/for-typeahead';
 
 export type IntellectualPropertyTaskDTO = Partial<IntellectualPropertyTask>;
+export const EMPTY_TASK_ID = 0;
 
 export class IntellectualPropertyTask implements ForTypeahead {
   public id: number;
@@ -14,7 +15,7 @@ export class IntellectualPropertyTask implements ForTypeahead {
     if (!data) {
       data = {};
     }
-    this.id = data.id || 0;
+    this.id = data.id || EMPTY_TASK_ID;
     this.description = data.description || '';
     this.attachments = data.attachments || [];
     this.coAuthors = data.coAuthors || '';

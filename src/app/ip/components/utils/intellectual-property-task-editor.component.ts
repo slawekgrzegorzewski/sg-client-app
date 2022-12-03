@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-
-export type IntellectualPropertyTaskData = { intellectualPropertyId: number, taskId: number | null, coAuthors: string, description: string };
+import {IntellectualProperty} from '../../model/intellectual-property';
+import {IntellectualPropertyTask} from '../../model/intellectual-property-task';
 
 @Component({
   selector: 'app-intellectual-property-task-editor',
@@ -9,14 +9,18 @@ export type IntellectualPropertyTaskData = { intellectualPropertyId: number, tas
 })
 export class IntellectualPropertyTaskEditorComponent {
   @Input()
-  taskData: IntellectualPropertyTaskData | null = null;
+  intellectualProperty: IntellectualProperty | null = null;
+
+  @Input()
+  taskData: IntellectualPropertyTask | null = null;
 
   @Input()
   style: any;
 
   @Output()
-  onAction: EventEmitter<IntellectualPropertyTaskData> = new EventEmitter<IntellectualPropertyTaskData>();
+  onAction: EventEmitter<{ intellectualProperty: IntellectualProperty, task: IntellectualPropertyTask }> = new EventEmitter<{ intellectualProperty: IntellectualProperty, task: IntellectualPropertyTask }>();
 
   @Output()
   onCancel: EventEmitter<string> = new EventEmitter<string>();
+
 }

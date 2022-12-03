@@ -1,4 +1,4 @@
-<div *ngIf="taskData" [ngStyle]="style">
+<div *ngIf="intellectualProperty && taskData" [ngStyle]="style">
   <div class="form-group sg-flex-row">
     <label for="coAuthors" class="col-2 col-form-label">Współautorzy</label>
     <div class="col-10">
@@ -17,6 +17,9 @@
   </div>
   <ng-container>
     <button class="btn btn-sm btn-link" (click)="onCancel.emit(); taskData = null;">anuluj</button>
-    <button class="btn btn-sm btn-link" (click)="onAction.emit(taskData); taskData = null;">zatwierdź</button>
+    <button class="btn btn-sm btn-link"
+            (click)="onAction.emit({intellectualProperty: intellectualProperty, task: taskData}); taskData = null;">
+      zatwierdź
+    </button>
   </ng-container>
 </div>

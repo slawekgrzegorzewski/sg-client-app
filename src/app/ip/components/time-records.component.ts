@@ -1,13 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 import {IntellectualPropertyService} from '../services/intellectual-property.service';
-import {EMPTY_TASK, IntellectualPropertyTask} from '../model/intellectual-property-task';
-import {TimeRecordWithTask} from '../model/time-record';
+import {EMPTY_TASK_ID, IntellectualPropertyTask} from '../model/intellectual-property-task';
+import {EMPTY_TIME_RECORD, TimeRecord, TimeRecordWithTask} from '../model/time-record';
 import {ComparatorBuilder} from '../../general/utils/comparator-builder';
 import {forkJoin} from 'rxjs';
 import 'rxjs-compat/add/observable/of';
 import Decimal from 'decimal.js';
 import {DatePipe} from '@angular/common';
-import {TimeRecordData} from './utils/time-record-editor.component';
 
 export const TIME_RECORDS_ROUTER_URL = 'time-records';
 
@@ -42,8 +41,9 @@ export class TimeRecordsComponent implements OnInit {
     }, new Map<string, TimeRecordWithTask[]>());
   }
 
+  task: IntellectualPropertyTask | null = null;
   tasks: IntellectualPropertyTask[] = [];
-  timeRecordData: TimeRecordData & { timeRecordId: number | null } | null = null;
+  timeRecordData: TimeRecord | null = null;
   private previousTaskId: number | null = null;
 
   constructor(private intellectualPropertyService: IntellectualPropertyService, private datePipe: DatePipe) {
@@ -90,49 +90,41 @@ export class TimeRecordsComponent implements OnInit {
     return this.datePipe.transform(d, 'yyyy-MM-dd')!;
   }
 
-  timeRecordAction() {
+  timeRecordAction(actionData: { timeRecord: TimeRecord, task: IntellectualPropertyTask }) {
+    const {timeRecord, task} = actionData;
     let responseObservable;
-    if (this.timeRecordData) {
-      const taskId = this.timeRecordData.taskId
-        ? (this.timeRecordData.taskId === EMPTY_TASK.id ? null : this.timeRecordData.taskId)
+    if (timeRecord) {
+      const taskId = task && task.id
+        ? (task.id === EMPTY_TASK_ID ? null : task.id)
         : null;
-      if (this.timeRecordData.timeRecordId) {
+      if (timeRecord.id) {
         if ((taskId === null && this.previousTaskId === null) || (taskId === this.previousTaskId)) {
-          responseObservable = this.intellectualPropertyService.updateTimeRecord(this.timeRecordData.timeRecordId, this.timeRecordData);
+          responseObservable = this.intellectualPropertyService.updateTimeRecord(timeRecord.id, timeRecord);
         } else {
-          responseObservable = this.intellectualPropertyService.updateTimeRecordWithTask(taskId, this.timeRecordData.timeRecordId, this.timeRecordData);
+          responseObservable = this.intellectualPropertyService.updateTimeRecordWithTask(taskId, timeRecord.id, timeRecord);
+          responseObservable = this.intellectualPropertyService.updateTimeRecordWithTask(taskId, timeRecord.id, timeRecord);
         }
       } else {
-        responseObservable = this.intellectualPropertyService.createTimeRecord(taskId, this.timeRecordData);
+        responseObservable = this.intellectualPropertyService.createTimeRecord(taskId, timeRecord);
       }
     }
     responseObservable?.subscribe({
       complete: () => {
         this.refreshData();
         this.timeRecordData = null;
+        this.task = null;
       }
     });
   }
 
   showTimeRecordEdition(timeRecord: TimeRecordWithTask) {
     this.previousTaskId = timeRecord.task?.id || null;
-    this.timeRecordData = {
-      taskId: timeRecord.task?.id || null,
-      timeRecordId: timeRecord.id,
-      date: timeRecord.date,
-      description: timeRecord.description,
-      numberOfHours: timeRecord.numberOfHours
-    } as TimeRecordData & { timeRecordId: number | null };
+    this.task = timeRecord.task;
+    this.timeRecordData = timeRecord;
   }
 
   showTimeRecordCreation() {
-    this.timeRecordData = {
-      taskId: null,
-      timeRecordId: null,
-      date: new Date(this.date + '-01'),
-      description: '',
-      numberOfHours: new Decimal(0)
-    } as TimeRecordData & { timeRecordId: number | null };
+    this.timeRecordData = new TimeRecord(EMPTY_TIME_RECORD);
   }
 
   totalHours() {

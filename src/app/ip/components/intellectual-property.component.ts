@@ -1,15 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 import {IntellectualPropertyService} from '../services/intellectual-property.service';
 import {IntellectualProperty, NO_ID} from '../model/intellectual-property';
-import {IntellectualPropertyTask} from '../model/intellectual-property-task';
-import {TimeRecord} from '../model/time-record';
+import {EMPTY_TASK, EMPTY_TASK_ID, IntellectualPropertyTask} from '../model/intellectual-property-task';
+import {EMPTY_TIME_RECORD, EMPTY_TIME_RECORD_ID, TimeRecord} from '../model/time-record';
 import {ComparatorBuilder} from '../../general/utils/comparator-builder';
 import {Observable} from 'rxjs';
 import {HttpEvent} from '@angular/common/http';
 import 'rxjs-compat/add/observable/of';
-import Decimal from 'decimal.js';
-import {TimeRecordData} from './utils/time-record-editor.component';
-import {IntellectualPropertyTaskData} from './utils/intellectual-property-task-editor.component';
 import {DatePipe} from '@angular/common';
 
 export const IP_HOME_ROUTER_URL = 'ip-home';
@@ -47,8 +44,8 @@ export class IntellectualPropertyComponent implements OnInit {
   }
 
   intellectualPropertyToEdit: IntellectualProperty | null = null;
-  taskData: IntellectualPropertyTaskData | null = null;
-  timeRecordData: TimeRecordData | null = null;
+  taskToEdit: IntellectualPropertyTask | null = null;
+  timeRecordToEdit: TimeRecord | null = null;
   attachmentData: { taskId: number } | null = null;
 
   constructor(private intellectualPropertyService: IntellectualPropertyService, private datePipe: DatePipe) {
@@ -123,48 +120,46 @@ export class IntellectualPropertyComponent implements OnInit {
   }
 
   showTaskCreator(intellectualProperty: IntellectualProperty) {
-    this.taskData = {
-      intellectualPropertyId: intellectualProperty.id,
-      taskId: null,
-      coAuthors: '',
-      description: ''
-    };
+    this.taskToEdit = new IntellectualPropertyTask(EMPTY_TASK);
+    intellectualProperty.tasks.unshift(this.taskToEdit);
   }
 
-  showTaskEditor(intellectualProperty: IntellectualProperty, task: IntellectualPropertyTask) {
-    this.taskData = {
-      intellectualPropertyId: intellectualProperty.id,
-      taskId: task.id,
-      coAuthors: task.coAuthors,
-      description: task.description
-    };
+  showTaskEditor(task: IntellectualPropertyTask) {
+    this.taskToEdit = task;
   }
 
-  taskAction(taskData: IntellectualPropertyTaskData) {
-    this.mapToRequest(taskData)?.subscribe({
+  cancelTaskEdition(intellectualProperty: IntellectualProperty) {
+    this.taskToEdit = null;
+    intellectualProperty.tasks = intellectualProperty.tasks.filter(t => t.id !== EMPTY_TASK_ID);
+  }
+
+  displayTaskEditor(task: IntellectualPropertyTask) {
+    return this.taskToEdit && this.taskToEdit.id === task.id;
+  }
+
+  taskAction(actionData: { intellectualProperty: IntellectualProperty, task: IntellectualPropertyTask }) {
+    const {intellectualProperty, task} = actionData;
+    this.mapToRequest(task, intellectualProperty).subscribe({
       complete: () => {
         this.refreshData();
-        this.taskData = null;
+        this.taskToEdit = null;
       }
     });
   }
 
-  private mapToRequest(taskData: IntellectualPropertyTaskData | null): Observable<string> | null {
-    if (taskData) {
-      if (taskData.taskId) {
-        return this.intellectualPropertyService.updateTask(taskData.taskId, this.mapToRequestObject(taskData));
-      } else {
-        return this.intellectualPropertyService.createTask(taskData.intellectualPropertyId, this.mapToRequestObject(taskData));
-      }
+  private mapToRequest(task: IntellectualPropertyTask, intellectualProperty: IntellectualProperty): Observable<string> {
+    function mapToRequestObject(task: IntellectualPropertyTask) {
+      return {
+        coAuthors: task.coAuthors,
+        description: task.description
+      };
     }
-    return null;
-  }
 
-  private mapToRequestObject(taskData: IntellectualPropertyTaskData) {
-    return {
-      coAuthors: taskData.coAuthors,
-      description: taskData.description
-    };
+    if (EMPTY_TASK_ID === task.id) {
+      return this.intellectualPropertyService.createTask(intellectualProperty.id, mapToRequestObject(task));
+    } else {
+      return this.intellectualPropertyService.updateTask(task.id, mapToRequestObject(task));
+    }
   }
 
   deleteTask(taskId: number) {
@@ -172,58 +167,51 @@ export class IntellectualPropertyComponent implements OnInit {
       .subscribe({
         complete: () => {
           this.refreshData();
-          this.taskData = null;
+          this.taskToEdit = null;
         }
       });
   }
 
   showTimeRecordCreator(task: IntellectualPropertyTask) {
-    this.timeRecordData = {
-      taskId: task.id,
-      timeRecordId: null,
-      date: new Date(),
-      numberOfHours: new Decimal(0),
-      description: ''
-    };
+    this.timeRecordToEdit = new TimeRecord(EMPTY_TIME_RECORD);
+    task.timeRecords.unshift(this.timeRecordToEdit);
   }
 
   showTimeRecordEditor(task: IntellectualPropertyTask, timeRecord: TimeRecord) {
-    this.timeRecordData = {
-      taskId: task.id,
-      timeRecordId: timeRecord.id,
-      date: timeRecord.date,
-      numberOfHours: timeRecord.numberOfHours,
-      description: timeRecord.description
-    };
+    this.timeRecordToEdit = timeRecord;
   }
 
-  timeRecordAction(timeRecordData: TimeRecordData) {
-    this.mapActionToRequest(timeRecordData)?.subscribe({
+  cancelTimeRecordEdition(task: IntellectualPropertyTask) {
+    this.timeRecordToEdit = null;
+    task.timeRecords = task.timeRecords.filter(tr => tr.id !== EMPTY_TIME_RECORD_ID);
+  }
+
+  timeRecordAction(dataAction: { timeRecord: TimeRecord, task: IntellectualPropertyTask }) {
+    const {timeRecord, task} = dataAction;
+    this.mapActionToRequest(timeRecord, task).subscribe({
       complete: () => {
         this.refreshData();
-        this.timeRecordData = null;
+        this.timeRecordToEdit = null;
       }
     });
   }
 
-  private mapActionToRequest(timeRecordData: TimeRecordData): Observable<string> | null {
-    if (timeRecordData) {
-      if (timeRecordData.timeRecordId) {
-        return this.intellectualPropertyService.updateTimeRecord(timeRecordData.timeRecordId, this.mapToTimeRecordData(timeRecordData));
-      } else {
-        return this.intellectualPropertyService.createTimeRecord(timeRecordData.taskId, this.mapToTimeRecordData(timeRecordData));
-      }
+  private mapActionToRequest(timeRecord: TimeRecord, task: IntellectualPropertyTask): Observable<string> {
+    function mapToRequestObject(timeRecord: TimeRecord) {
+      return {
+        date: timeRecord.date,
+        numberOfHours: timeRecord.numberOfHours,
+        description: timeRecord.description
+      };
     }
-    return null;
+
+    if (EMPTY_TIME_RECORD_ID === timeRecord.id) {
+      return this.intellectualPropertyService.createTimeRecord(task.id, mapToRequestObject(timeRecord));
+    } else {
+      return this.intellectualPropertyService.updateTimeRecord(timeRecord.id, mapToRequestObject(timeRecord));
+    }
   }
 
-  private mapToTimeRecordData(timeRecordData: TimeRecordData) {
-    return {
-      date: timeRecordData.date,
-      numberOfHours: timeRecordData.numberOfHours,
-      description: timeRecordData.description
-    };
-  }
 
   deleteTimeRecord(timeRecordId: number) {
     this.intellectualPropertyService.deleteTimeRecord(timeRecordId)

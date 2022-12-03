@@ -15,9 +15,16 @@
   </div>
 </div>
 
-<app-time-record-editor *ngIf="timeRecordData"
+<app-time-record-editor *ngIf="task && timeRecordData"
                         [tasks]="tasks"
-                        [timeRecordData]="timeRecordData"
-                        (onAction)="timeRecordAction()"
-                        (onCancel)="timeRecordData = null">
+                        [task]="task"
+                        [timeRecord]="timeRecordData"
+                        (onAction)="timeRecordAction($event)"
+                        (onCancel)="timeRecordData = null; task = null;">
+</app-time-record-editor>
+<app-time-record-editor *ngIf="!task && timeRecordData"
+                        [tasks]="tasks"
+                        [timeRecord]="timeRecordData"
+                        (onAction)="timeRecordAction($event)"
+                        (onCancel)="timeRecordData = null; task = null;">
 </app-time-record-editor>

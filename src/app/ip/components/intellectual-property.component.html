@@ -18,7 +18,7 @@
   </div>
   <app-intellectual-property-editor
     *ngIf="intellectualPropertyToEdit && intellectualPropertyToEdit.id === intellectualProperty.id"
-    [intellectualPropertyData]="intellectualPropertyToEdit"
+    [intellectualProperty]="intellectualPropertyToEdit"
     (onAction)="intellectualPropertyAction($event)"
     (onCancel)="intellectualPropertyToEdit = null; removeCreatingIPFromList()"
   >
@@ -28,51 +28,48 @@
       <div class="sg-flex-row">
         <span *ngIf="intellectualProperty.tasks.length !== 0">Zadania w ramach IP</span>
         <span *ngIf="intellectualProperty.tasks.length === 0">Brak wykonanych zadań w ramach IP</span>
-        <button class="btn btn-sm btn-link" (click)="showTaskCreator(intellectualProperty)">stwórz</button>
+        <button *ngIf="!taskToEdit" (click)="showTaskCreator(intellectualProperty)" class="btn btn-sm btn-link">stwórz
+        </button>
       </div>
-      <app-intellectual-property-task-editor
-        *ngIf="taskData && taskData.intellectualPropertyId === intellectualProperty.id && !taskData.taskId"
-        [style]="{'margin-left': '50px', 'background-color': '#acb2ec'}"
-        [taskData]="taskData"
-        (onAction)="taskAction($event)"
-        (onCancel)="taskData = null">
-
-      </app-intellectual-property-task-editor>
-      <div *ngIf="intellectualProperty.tasks.length !== 0"
-           style="margin-left: 50px; background-color: #acb2ec">
+      <div *ngIf="intellectualProperty.tasks.length !== 0" style="margin-left: 50px; background-color: #acb2ec">
         <div *ngFor="let task of intellectualProperty.tasks">
           <div class="sg-flex-row">
-            <div class="sg-flex-column">
+            <app-intellectual-property-task-editor
+              *ngIf="displayTaskEditor(task)"
+              [style]="{'margin-left': '50px', 'background-color': '#acb2ec'}"
+              [intellectualProperty]="intellectualProperty"
+              [taskData]="taskToEdit"
+              (onAction)="taskAction($event)"
+              (onCancel)="cancelTaskEdition(intellectualProperty)">
+            </app-intellectual-property-task-editor>
+
+            <div *ngIf="!taskToEdit || taskToEdit.id !== task.id" class="sg-flex-column">
               <div class="sg-flex-row">
                 {{ task.description }}
-                <button class="btn btn-sm btn-link" (click)="showTaskEditor(intellectualProperty, task)">edytuj
+                <button class="btn btn-sm btn-link" (click)="showTaskEditor(task)">edytuj
                 </button>
                 <button class="btn btn-sm btn-link" *ngIf="task.timeRecords.length === 0"
                         (click)="deleteTask(task.id)">usuń
                 </button>
               </div>
               <div>Współautorzy: {{ task.coAuthors }}</div>
-            </div>
-            <app-intellectual-property-task-editor
-              *ngIf="taskData && taskData.taskId && taskData.taskId === task.id"
-              [style]="{'margin-left': '50px', 'background-color': '#acb2ec'}"
-              [taskData]="taskData"
-              (onAction)="taskAction($event)"
-              (onCancel)="taskData = null">
-
-            </app-intellectual-property-task-editor>
-            <div *ngIf="!taskData || !taskData.taskId || taskData.taskId !== task.id"
-                 style="margin-left: 50px; background-color: #acb2ec">
-              <div class="sg-flex-row">
-                <div class="sg-flex-column">
-                  <div class="sg-flex-row">
-                    <div *ngIf="task.timeRecords.length === 0">Brak zarejestrowanego czasu</div>
-                    <div *ngIf="task.timeRecords.length > 0">Zarejestrowany czas</div>
-                    <button class="btn btn-sm btn-link" (click)="showTimeRecordCreator(task)">stwórz</button>
-                  </div>
-                  <div *ngIf="!timeRecordData">
-                    <div *ngFor="let timeRecord of task.timeRecords">
-                      <div class="sg-flex-row">
+              <div *ngIf="!taskToEdit || taskToEdit.id !== task.id"
+                   style="margin-left: 50px; background-color: #acb2ec">
+                <div class="sg-flex-row">
+                  <div class="sg-flex-column">
+                    <div class="sg-flex-row">
+                      <div *ngIf="task.timeRecords.length === 0">Brak zarejestrowanego czasu</div>
+                      <div *ngIf="task.timeRecords.length > 0">Zarejestrowany czas</div>
+                      <button class="btn btn-sm btn-link" (click)="showTimeRecordCreator(task)">stwórz</button>
+                    </div>
+                    <div *ngFor="let timeRecord of task.timeRecords" class="sg-flex-row">
+                      <app-time-record-editor *ngIf="timeRecordToEdit && timeRecordToEdit.id === timeRecord.id"
+                                              [task]="task"
+                                              [timeRecord]="timeRecordToEdit"
+                                              (onAction)="timeRecordAction($event)"
+                                              (onCancel)="cancelTimeRecordEdition(task)">
+                      </app-time-record-editor>
+                      <div *ngIf="!timeRecordToEdit">
                         <div>{{timeRecord.date | localizedDate}}: {{timeRecord.numberOfHours}} godzin
                           - {{timeRecord.description}}</div>
                         <button class="btn btn-sm btn-link" (click)="showTimeRecordEditor(task, timeRecord)">edytuj
@@ -82,31 +79,26 @@
                       </div>
                     </div>
                   </div>
-                  <app-time-record-editor *ngIf="timeRecordData && timeRecordData.taskId === task.id"
-                                          [timeRecordData]="timeRecordData"
-                                          (onAction)="timeRecordAction($event)"
-                                          (onCancel)="timeRecordData = null">
-                  </app-time-record-editor>
-                </div>
-                <div class="sg-flex-column" *ngIf="!attachmentData || attachmentData.taskId !== task.id">
-                  <div class="sg-flex-row">
-                    <div *ngIf="task.attachments.length === 0">Brak załączników</div>
-                    <div *ngIf="task.attachments.length > 0">Załączniki</div>
-                    <button class="btn btn-sm btn-link" (click)="showAttachmentUpload(task.id)">dodaj</button>
-                  </div>
-                  <div *ngFor="let attachment of task.attachments">
+                  <div class="sg-flex-column" *ngIf="!attachmentData || attachmentData.taskId !== task.id">
                     <div class="sg-flex-row">
-                      <div>{{attachment}}</div>
-                      <button class="btn btn-sm btn-link" (click)="downloadAttachment(task, attachment)">pobierz
-                      </button>
-                      <button class="btn btn-sm btn-link" (click)="deleteAttachment(task, attachment)">usuń
-                      </button>
+                      <div *ngIf="task.attachments.length === 0">Brak załączników</div>
+                      <div *ngIf="task.attachments.length > 0">Załączniki</div>
+                      <button class="btn btn-sm btn-link" (click)="showAttachmentUpload(task.id)">dodaj</button>
+                    </div>
+                    <div *ngFor="let attachment of task.attachments">
+                      <div class="sg-flex-row">
+                        <div>{{attachment}}</div>
+                        <button class="btn btn-sm btn-link" (click)="downloadAttachment(task, attachment)">pobierz
+                        </button>
+                        <button class="btn btn-sm btn-link" (click)="deleteAttachment(task, attachment)">usuń
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div *ngIf="attachmentData && attachmentData.taskId === task.id">
-                  <sg-uploader [uploadFunction]="upload()" (uploadFinished)="attachmentData = null;refreshData()"
-                               (uploadCancelled)="attachmentData = null;refreshData();"></sg-uploader>
+                  <div *ngIf="attachmentData && attachmentData.taskId === task.id">
+                    <sg-uploader [uploadFunction]="upload()" (uploadFinished)="attachmentData = null;refreshData()"
+                                 (uploadCancelled)="attachmentData = null;refreshData();"></sg-uploader>
+                  </div>
                 </div>
               </div>
             </div>

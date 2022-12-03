@@ -1,14 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import Decimal from 'decimal.js';
 import {EMPTY_TASK, IntellectualPropertyTask} from '../../model/intellectual-property-task';
-
-export type TimeRecordData = {
-  taskId: number | null,
-  timeRecordId: number | null,
-  date: Date,
-  numberOfHours: Decimal,
-  description: string
-};
+import {TimeRecord} from '../../model/time-record';
 
 @Component({
   selector: 'app-time-record-editor',
@@ -18,20 +10,10 @@ export type TimeRecordData = {
 export class TimeRecordEditorComponent {
 
   @Input()
-  timeRecordData: TimeRecordData = {
-    taskId: null,
-    date: new Date(),
-    numberOfHours: new Decimal(0),
-    description: ''
-  } as TimeRecordData;
+  task: IntellectualPropertyTask = EMPTY_TASK;
 
-  get taskValue(): IntellectualPropertyTask {
-    return this.tasks.find(t => this.timeRecordData.taskId && t.id === this.timeRecordData.taskId) || EMPTY_TASK;
-  }
-
-  set taskValue(value: IntellectualPropertyTask) {
-    this.timeRecordData.taskId = value.id === EMPTY_TASK.id ? null : value.id;
-  }
+  @Input()
+  timeRecord: TimeRecord = new TimeRecord();
 
   $tasks: IntellectualPropertyTask[] = [];
 
@@ -49,7 +31,7 @@ export class TimeRecordEditorComponent {
   }
 
   @Output()
-  onAction: EventEmitter<TimeRecordData> = new EventEmitter<TimeRecordData>();
+  onAction: EventEmitter<{ timeRecord: TimeRecord, task: IntellectualPropertyTask }> = new EventEmitter<{ timeRecord: TimeRecord, task: IntellectualPropertyTask }>();
 
   @Output()
   onCancel: EventEmitter<string> = new EventEmitter<string>();
@@ -60,5 +42,9 @@ export class TimeRecordEditorComponent {
   tasksForTypeAhead(): () => IntellectualPropertyTask[] {
     const that = this;
     return () => that.tasks;
+  }
+
+  emitAction() {
+    this.onAction.emit({timeRecord: this.timeRecord, task: this.task.id === EMPTY_TASK.id ? EMPTY_TASK : this.task});
   }
 }
