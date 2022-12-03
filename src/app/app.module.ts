@@ -13,7 +13,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
 import {httpInterceptorProviders} from './general/interceptors';
 import {AccountantHomeComponent} from './accountant/pages/accountant-home/accountant-home.component';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbAccordionModule, NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {EditAccountComponent} from './accountant/components/accounts/edit-account.component';
 import {ToastService} from './general/services/toast.service';
 import {ToastsContainer} from './general/components/toast/toast-container.component';
@@ -179,6 +179,7 @@ import {IntellectualPropertyEditorComponent} from './ip/components/utils/intelle
     HttpClientModule,
     ReactiveFormsModule,
     NgbModule,
+    NgbAccordionModule,
     HammerModule,
     NgChartsModule
   ],

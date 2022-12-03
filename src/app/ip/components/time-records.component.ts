@@ -11,7 +11,7 @@ import {DatePipe} from '@angular/common';
 export const TIME_RECORDS_ROUTER_URL = 'time-records';
 
 @Component({
-  selector: 'app-cube',
+  selector: 'app-time-records',
   templateUrl: './time-records.component.html',
   styleUrls: ['./time-records.component.css']
 })

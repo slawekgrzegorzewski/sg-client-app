@@ -1,0 +1,3 @@
+.task-row:nth-of-type(even){
+  background-color: #dddddd;
+}

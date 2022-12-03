@@ -47,9 +47,19 @@
   justify-content: left;
 }
 
+.sg-flex-justify-stretch {
+  display: flex;
+  justify-content: stretch;
+}
+
 .sg-flex-justify-space-between {
   display: flex;
   justify-content: space-between;
+}
+
+.sg-flex-justify-space-evenly {
+  display: flex;
+  justify-content: space-evenly;
 }
 
 .sg-flex-align-flex-start {
@@ -95,12 +105,16 @@
   flex: auto;
 }
 
-.sg-flex-align-self-end {
-  align-self: flex-end;
+.sg-flex-align-self-flex-start {
+  align-self: flex-start;
 }
 
 .sg-flex-align-self-center {
   align-self: center;
+}
+
+.sg-flex-align-self-flex-end {
+  align-self: flex-end;
 }
 
 app-general-typeahead, app-date-picker {

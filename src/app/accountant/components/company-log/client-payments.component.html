@@ -30,7 +30,7 @@
       </div>
       <h5 *ngIf="title" style="text-align: center; width: 60%">{{title}}</h5>
       <button *ngIf="isNonEditMode() && clientPaymentsDisplayType === 'desktop'" (click)="prepareToCreate()"
-              style="width: 20%;" class="btn btn-outline-primary sg-flex-align-self-end">
+              style="width: 20%;" class="btn btn-outline-primary sg-flex-align-self-flex-end">
         Stwórz
       </button>
     </div>
@@ -164,7 +164,7 @@
   <button *ngIf="isNonEditMode() && clientPaymentsDisplayType === 'mobile'" (click)="prepareToCreate()"
           #addCPButton
           style="width: 100%; margin-top: auto"
-          class="btn btn-outline-primary sg-flex-align-self-end">
+          class="btn btn-outline-primary sg-flex-align-self-flex-end">
     Dodaj
   </button>
 
