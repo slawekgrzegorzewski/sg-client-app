@@ -21,4 +21,9 @@ export class IntellectualPropertyEditorModalComponent {
 
   constructor(public activeModal: NgbActiveModal) {
   }
+
+  acceptModal() {
+    this.activeModal.close(this.intellectualProperty);
+    this.intellectualProperty = null;
+  }
 }
