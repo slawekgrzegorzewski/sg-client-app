@@ -63,53 +63,39 @@
                   <div class="sg-flex-column col-6"
                        style="border-right: #8e8e8e dotted; padding-right: 5px; margin-right: 5px">
                     <div class="sg-flex-row">
-                      <div *ngIf="task.timeRecords.length === 0">Brak zarejestrowanego czasu</div>
-                      <div *ngIf="task.timeRecords.length > 0">Zarejestrowany czas</div>
-                      <button class="btn btn-sm btn-link" (click)="showTimeRecordCreator(task)">stwórz raport
-                        czasu
-                      </button>
-                    </div>
-                    <div *ngFor="let timeRecord of task.timeRecords" class="sg-flex-row">
-                      <app-time-record-editor *ngIf="timeRecordToEdit && timeRecordToEdit.id === timeRecord.id"
-                                              [task]="task"
-                                              [timeRecord]="timeRecordToEdit"
-                                              (onAction)="timeRecordAction($event)"
-                                              (onCancel)="cancelTimeRecordEdition()">
-                      </app-time-record-editor>
-                      <div *ngIf="!timeRecordToEdit">
-                        <div>{{timeRecord.date | localizedDate}}: {{timeRecord.numberOfHours}} godzin
-                          - {{timeRecord.description}}</div>
-                        <button class="btn btn-sm btn-link" (click)="showTimeRecordEditor(task, timeRecord)">
-                          edytuj wpis
-                        </button>
-                        <button class="btn btn-sm btn-link" (click)="deleteTimeRecord(timeRecord.id)">usuń
-                        </button>
+                      <div class="sg-flex-row col-4">
+                        <div *ngIf="task.timeRecords.length === 0">Brak zarejestrowanego czasu</div>
+                        <div *ngIf="task.timeRecords.length > 0">Zarejestrowany czas</div>
                       </div>
+                      <div class="sg-flex-column col-7">
+                        {{getTimeRecordsSummary(task)}}
+                      </div>
+                      <button class="btn btn-sm btn-link col-1" (click)="showTasksDetails(task)">
+                        <i class="bi bi-search"></i>
+                      </button>
                     </div>
                   </div>
                   <div class="sg-flex-column col-6" *ngIf="!attachmentData || attachmentData.taskId !== task.id">
-                    <div class="sg-flex-row">
+                    <div class="sg-flex-row sg-flex-justify-space-between">
                       <div *ngIf="task.attachments.length === 0">Brak załączników</div>
                       <div *ngIf="task.attachments.length > 0">Załączniki</div>
-                      <button class="btn btn-sm btn-link" (click)="showAttachmentUpload(task.id)">dodaj załązcznik
+                      <button (click)="showAttachmentUpload(task.id)" class="btn btn-sm btn-link">
+                        <i class="bi bi-cloud-plus" style="font-size: 20px"></i>
                       </button>
                     </div>
                     <div *ngFor="let attachment of task.attachments">
-                      <div class="sg-flex-row">
+                      <div class="sg-flex-row sg-flex-justify-space-between">
                         <div>{{attachment}}</div>
-                        <button class="btn btn-sm btn-link" (click)="downloadAttachment(task, attachment)">
-                          pobierz załącznik
-                        </button>
-                        <button class="btn btn-sm btn-link" (click)="deleteAttachment(task, attachment)">usuń
-                          załącznik
-                        </button>
+                        <div class="sg-flex-row">
+                          <button (click)="downloadAttachment(task, attachment)" class="btn btn-sm btn-link">
+                            <i class="bi bi-cloud-arrow-down" style="font-size: 20px"></i>
+                          </button>
+                          <button (click)="deleteAttachment(task, attachment)" class="btn btn-sm btn-link">
+                            <i class="bi bi-x" style="font-size: 20px"></i>
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div *ngIf="attachmentData && attachmentData.taskId === task.id">
-                    <sg-uploader [uploadFunction]="upload()"
-                                 (uploadFinished)="attachmentData = null;refreshData()"
-                                 (uploadCancelled)="attachmentData = null;refreshData();"></sg-uploader>
                   </div>
                 </div>
               </div>

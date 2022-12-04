@@ -1,4 +1,5 @@
 import {ComparatorBuilder, TBasicComparable} from './comparator-builder';
+import {DatePipe} from '@angular/common';
 
 type SortOrder = 'ASC' | 'DESC';
 
@@ -74,4 +75,13 @@ export class DatesUtils {
       .filter(d => d !== null)
       .sort((a, b) => -this.compareDatesOnly(a!, b!))[0]!;
   }
+
+  public static getMonthString(d: Date, datePipe: DatePipe) {
+    return datePipe.transform(d, 'yyyy-MM')!;
+  }
+
+  public static getDateString(d: Date, datePipe: DatePipe) {
+    return datePipe.transform(d, 'yyyy-MM-dd')!;
+  }
+
 }

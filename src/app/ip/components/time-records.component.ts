@@ -7,6 +7,7 @@ import {forkJoin} from 'rxjs';
 import 'rxjs-compat/add/observable/of';
 import Decimal from 'decimal.js';
 import {DatePipe} from '@angular/common';
+import {DatesUtils} from '../../general/utils/dates-utils';
 
 export const TIME_RECORDS_ROUTER_URL = 'time-records';
 
@@ -28,9 +29,9 @@ export class TimeRecordsComponent implements OnInit {
 
   set date(value: string) {
     this.$date = value;
-    const filteredTimeRecords = this.timeRecords.filter(timeRecord => this.getMonthString(timeRecord.date) === this.date);
+    const filteredTimeRecords = this.timeRecords.filter(timeRecord => DatesUtils.getMonthString(timeRecord.date, this.datePipe) === this.date);
     this.timeRecordsForMonth = filteredTimeRecords.reduce((groups, item) => {
-      const dateKey = this.getDateString(item.date);
+      const dateKey = DatesUtils.getDateString(item.date, this.datePipe);
       let items = groups.get(dateKey);
       if (!items) {
         items = [];
@@ -72,7 +73,7 @@ export class TimeRecordsComponent implements OnInit {
 
         const byDate = ComparatorBuilder.comparingByDate<TimeRecordWithTask>(timeRecord => timeRecord.date).build();
         this.timeRecords = [...timeRecordsWithTask, ...timeRecordsWithoutTask].sort(byDate);
-        this.dates = [...new Set(this.timeRecords.map(timeRecord => timeRecord.date).map(d => this.getMonthString(d)))].sort();
+        this.dates = [...new Set(this.timeRecords.map(timeRecord => timeRecord.date).map(d => DatesUtils.getMonthString(d, this.datePipe)))].sort();
         const previousDate = this.date;
         this.date = this.dates[this.dates.length - 1];
         if (previousDate && this.dates.includes(previousDate)) {
@@ -80,14 +81,6 @@ export class TimeRecordsComponent implements OnInit {
         }
         this.tasks = intellectualProperties.flatMap(intellectualProperty => intellectualProperty.tasks);
       });
-  }
-
-  private getMonthString(d: Date) {
-    return this.datePipe.transform(d, 'yyyy-MM')!;
-  }
-
-  private getDateString(d: Date) {
-    return this.datePipe.transform(d, 'yyyy-MM-dd')!;
   }
 
   timeRecordAction(actionData: { timeRecord: TimeRecord, task: IntellectualPropertyTask }) {

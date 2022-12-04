@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {IntellectualPropertyService} from '../services/intellectual-property.service';
 import {IntellectualProperty} from '../model/intellectual-property';
 import {EMPTY_TASK, EMPTY_TASK_ID, IntellectualPropertyTask} from '../model/intellectual-property-task';
-import {EMPTY_TIME_RECORD, EMPTY_TIME_RECORD_ID, TimeRecord} from '../model/time-record';
+import {TimeRecord} from '../model/time-record';
 import {ComparatorBuilder} from '../../general/utils/comparator-builder';
 import {Observable} from 'rxjs';
 import {HttpEvent} from '@angular/common/http';
@@ -11,6 +11,11 @@ import {DatePipe} from '@angular/common';
 import {NgbModal, NgbModalConfig} from '@ng-bootstrap/ng-bootstrap';
 import {IntellectualPropertyEditorModalComponent} from './utils/intellectual-property-editor-modal.component';
 import {IntellectualPropertyTaskEditorModalComponent} from './utils/intellectual-property-task-editor-modal.component';
+import {DatesUtils} from '../../general/utils/dates-utils';
+import {IntellectualPropertyTaskDetailsModalComponent} from './utils/intellectual-property-task-details-modal.component';
+import Decimal from 'decimal.js';
+import {UploaderComponent} from '../../general/components/uploader/uploader.component';
+import {UploaderModalComponent} from '../../general/components/uploader/uploader-modal.component';
 
 export const IP_HOME_ROUTER_URL = 'ip-home';
 export const ALL = 'wszystkie';
@@ -49,10 +54,10 @@ export class IntellectualPropertyComponent implements OnInit {
   timeRecordToEdit: TimeRecord | null = null;
   attachmentData: { taskId: number } | null = null;
 
-  activeIds: string = '0';
+  activeIds: string = '';
 
   get activeIdsArray(): string[] {
-    return this.activeIds.split(',');
+    return this.activeIds.split(',').filter(s => s !== '');
   };
 
   set activeIdsArray(value: string[]) {
@@ -65,6 +70,7 @@ export class IntellectualPropertyComponent implements OnInit {
               private modalService: NgbModal) {
     this.modalConfig.backdrop = 'static';
     this.modalConfig.keyboard = false;
+    this.modalConfig.centered = true;
   }
 
   ngOnInit(): void {
@@ -81,7 +87,7 @@ export class IntellectualPropertyComponent implements OnInit {
         .flatMap(ip => ip.tasks)
         .flatMap(t => t.timeRecords)
         .map(tr => tr.date)
-        .map(d => this.getMonthString(d)))].sort();
+        .map(d => DatesUtils.getMonthString(d, this.datePipe)))].sort();
       this.intellectualPropertiesDates.unshift(ALL);
       if (!this.intellectualPropertiesDates.includes(this.intellectualPropertiesFilter)) {
         this.intellectualPropertiesFilter = ALL;
@@ -94,7 +100,7 @@ export class IntellectualPropertyComponent implements OnInit {
       this.intellectualPropertiesFilter === ALL
         ? this.allIntellectualProperties
         : this.allIntellectualProperties
-          .filter(ip => ip.tasks.find(t => t.timeRecords.find(tr => this.getMonthString(tr.date) === this.intellectualPropertiesFilter))))
+          .filter(ip => ip.tasks.find(t => t.timeRecords.find(tr => DatesUtils.getMonthString(tr.date, this.datePipe) === this.intellectualPropertiesFilter))))
       .map(ip => new IntellectualProperty(ip));
   }
 
@@ -110,7 +116,7 @@ export class IntellectualPropertyComponent implements OnInit {
   }
 
   openIntellectualPropertyModal(intellectualProperty: IntellectualProperty) {
-    const ngbModalRef = this.modalService.open(IntellectualPropertyEditorModalComponent, {centered: true});
+    const ngbModalRef = this.modalService.open(IntellectualPropertyEditorModalComponent);
     const componentInstance = ngbModalRef.componentInstance as IntellectualPropertyEditorModalComponent;
     componentInstance.intellectualProperty = intellectualProperty;
     ngbModalRef.result.then(
@@ -142,7 +148,7 @@ export class IntellectualPropertyComponent implements OnInit {
   }
 
   openIntellectualPropertyTaskModal(intellectualProperty: IntellectualProperty, task: IntellectualPropertyTask) {
-    const ngbModalRef = this.modalService.open(IntellectualPropertyTaskEditorModalComponent, {centered: true});
+    const ngbModalRef = this.modalService.open(IntellectualPropertyTaskEditorModalComponent);
     const componentInstance = ngbModalRef.componentInstance as IntellectualPropertyTaskEditorModalComponent;
     componentInstance.intellectualProperty = intellectualProperty;
     componentInstance.taskData = task;
@@ -177,60 +183,31 @@ export class IntellectualPropertyComponent implements OnInit {
       });
   }
 
-  showTimeRecordCreator(task: IntellectualPropertyTask) {
-    this.timeRecordToEdit = new TimeRecord(EMPTY_TIME_RECORD);
-    task.timeRecords.unshift(this.timeRecordToEdit);
-  }
-
-  showTimeRecordEditor(task: IntellectualPropertyTask, timeRecord: TimeRecord) {
-    this.timeRecordToEdit = timeRecord;
-  }
-
-  cancelTimeRecordEdition() {
-    this.timeRecordToEdit = null;
-    this.filterData();
-  }
-
-  timeRecordAction(dataAction: { timeRecord: TimeRecord, task: IntellectualPropertyTask }) {
-    const {timeRecord, task} = dataAction;
-    this.mapActionToRequest(timeRecord, task).subscribe({
-      complete: () => {
-        this.refreshData();
-        this.timeRecordToEdit = null;
-      }
-    });
-  }
-
-  private mapActionToRequest(timeRecord: TimeRecord, task: IntellectualPropertyTask): Observable<string> {
-    function mapToRequestObject(timeRecord: TimeRecord) {
-      return {
-        date: timeRecord.date,
-        numberOfHours: timeRecord.numberOfHours,
-        description: timeRecord.description
-      };
-    }
-
-    if (EMPTY_TIME_RECORD_ID === timeRecord.id) {
-      return this.intellectualPropertyService.createTimeRecord(task.id, mapToRequestObject(timeRecord));
-    } else {
-      return this.intellectualPropertyService.updateTimeRecord(timeRecord.id, mapToRequestObject(timeRecord));
-    }
-  }
-
-
-  deleteTimeRecord(timeRecordId: number) {
-    this.intellectualPropertyService.deleteTimeRecord(timeRecordId)
-      .subscribe({
-        complete: () => {
-          this.refreshData();
-        }
-      });
-  }
-
   showAttachmentUpload(taskId: number) {
     this.attachmentData = {
       taskId: taskId
     };
+    const ngbModalRef = this.modalService.open(UploaderModalComponent, {
+      backdrop: true,
+      keyboard: true
+    });
+    const componentInstance = ngbModalRef.componentInstance as UploaderComponent;
+    componentInstance.uploadFunction = this.upload();
+    const a = componentInstance.uploadFinished.subscribe(
+      () => {
+        this.attachmentData = null;
+        this.refreshData();
+        a.unsubscribe();
+      }
+    );
+    const b = componentInstance.uploadCancelled.subscribe(
+      () => {
+        this.attachmentData = null;
+        this.refreshData();
+        b.unsubscribe();
+      }
+    );
+
   }
 
   deleteAttachment(task: IntellectualPropertyTask, fileName: string) {
@@ -250,10 +227,6 @@ export class IntellectualPropertyComponent implements OnInit {
     };
   }
 
-  private getMonthString(d: Date) {
-    return this.datePipe.transform(d, 'yyyy-MM')!;
-  }
-
   tabShown(id: string) {
     const activeIdsArray1 = this.activeIdsArray;
     if (!activeIdsArray1.includes(id)) {
@@ -264,8 +237,35 @@ export class IntellectualPropertyComponent implements OnInit {
 
   tabHidden(id: string) {
     const activeIdsArray1 = this.activeIdsArray;
-    if (!activeIdsArray1.includes(id)) {
+    if (activeIdsArray1.includes(id)) {
       this.activeIdsArray = activeIdsArray1.filter(t => t !== id);
     }
+  }
+
+  getTimeRecordsSummary(task: IntellectualPropertyTask) {
+    let minDate: Date | null = null;
+    let maxDate: Date | null = null;
+    let numberOfHours = new Decimal('0');
+    task.timeRecords.forEach(tr => {
+      minDate = DatesUtils.min(minDate, tr.date);
+      maxDate = DatesUtils.max(maxDate, tr.date);
+      numberOfHours = numberOfHours.plus(tr.numberOfHours);
+    });
+    if (!minDate || !maxDate) {
+      return 'Brak zarejstrowanego czasu.';
+    } else if (DatesUtils.compareDatesOnly(minDate, maxDate) == 0) {
+      return DatesUtils.getDateString(minDate, this.datePipe) + ': ' + numberOfHours + ' godzin';
+    }
+    return DatesUtils.getDateString(minDate, this.datePipe) + ' - ' + DatesUtils.getDateString(maxDate, this.datePipe) + ': ' + numberOfHours + ' godzin';
+  }
+
+  showTasksDetails(task: IntellectualPropertyTask) {
+    const ngbModalRef = this.modalService.open(IntellectualPropertyTaskDetailsModalComponent, {
+      size: 'xl',
+      backdrop: true,
+      keyboard: true
+    });
+    const componentInstance = ngbModalRef.componentInstance as IntellectualPropertyTaskDetailsModalComponent;
+    componentInstance.task = task;
   }
 }

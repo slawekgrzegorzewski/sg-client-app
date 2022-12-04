@@ -101,6 +101,8 @@ import {TimeRecordsComponent} from './ip/components/time-records.component';
 import {TimeRecordEditorComponent} from './ip/components/utils/time-record-editor.component';
 import {IntellectualPropertyTaskEditorModalComponent} from './ip/components/utils/intellectual-property-task-editor-modal.component';
 import {IntellectualPropertyEditorModalComponent} from './ip/components/utils/intellectual-property-editor-modal.component';
+import {IntellectualPropertyTaskDetailsModalComponent} from './ip/components/utils/intellectual-property-task-details-modal.component';
+import {UploaderModalComponent} from './general/components/uploader/uploader-modal.component';
 
 @NgModule({
   declarations: [
@@ -170,7 +172,9 @@ import {IntellectualPropertyEditorModalComponent} from './ip/components/utils/in
     TimeRecordsComponent,
     TimeRecordEditorComponent,
     IntellectualPropertyTaskEditorModalComponent,
-    IntellectualPropertyEditorModalComponent
+    IntellectualPropertyEditorModalComponent,
+    IntellectualPropertyTaskDetailsModalComponent,
+    UploaderModalComponent
   ],
   imports: [
     BrowserModule,
