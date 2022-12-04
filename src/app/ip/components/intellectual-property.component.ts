@@ -8,6 +8,8 @@ import {Observable} from 'rxjs';
 import {HttpEvent} from '@angular/common/http';
 import 'rxjs-compat/add/observable/of';
 import {DatePipe} from '@angular/common';
+import {NgbModal, NgbModalConfig} from '@ng-bootstrap/ng-bootstrap';
+import {IntellectualPropertyEditorModalComponent} from './utils/intellectual-property-editor-modal.component';
 
 export const IP_HOME_ROUTER_URL = 'ip-home';
 export const ALL = 'wszystkie';
@@ -58,8 +60,12 @@ export class IntellectualPropertyComponent implements OnInit {
     this.activeIds = value.join(',');
   };
 
-
-  constructor(private intellectualPropertyService: IntellectualPropertyService, private datePipe: DatePipe) {
+  constructor(private intellectualPropertyService: IntellectualPropertyService,
+              private datePipe: DatePipe,
+              private modalConfig: NgbModalConfig,
+              private modalService: NgbModal) {
+    this.modalConfig.backdrop = 'static';
+    this.modalConfig.keyboard = false;
   }
 
   ngOnInit(): void {
@@ -93,27 +99,34 @@ export class IntellectualPropertyComponent implements OnInit {
       .map(ip => new IntellectualProperty(ip));
   }
 
-  startIntellectualPropertyCreation() {
-    if (!this.intellectualPropertyToEdit || this.intellectualPropertyToEdit.id !== EMPTY_TASK_ID) {
-      this.intellectualPropertyToEdit = new IntellectualProperty({});
-      this.intellectualPropertiesFiltered = [new IntellectualProperty({}), ...this.intellectualPropertiesFiltered];
-    }
+  openIntellectualPropertyCreationModal() {
+    this.openIntellectualPropertyModal(new IntellectualProperty({}));
   }
 
-  startIntellectualPropertyEdit(intellectualProperty: IntellectualProperty) {
-    this.filterData();
-    this.intellectualPropertyToEdit = new IntellectualProperty({
+  openIntellectualPropertyEditModal(intellectualProperty: IntellectualProperty) {
+    this.openIntellectualPropertyModal(new IntellectualProperty({
       id: intellectualProperty.id,
       description: intellectualProperty.description
-    });
+    }));
+  }
+
+  openIntellectualPropertyModal(intellectualProperty: IntellectualProperty) {
+    var ngbModalRef = this.modalService.open(IntellectualPropertyEditorModalComponent, {centered: true});
+    ngbModalRef.componentInstance.intellectualProperty = intellectualProperty;
+      ngbModalRef.result.then(
+        (intellectualProperty) => {
+          this.intellectualPropertyAction(intellectualProperty);
+          this.intellectualPropertyToEdit = null;
+        },
+        (reason) => {
+          this.intellectualPropertyToEdit = null;
+        },
+      );
   }
 
   intellectualPropertyAction(intellectualPropertyData: IntellectualProperty) {
     this.mapIPToRequest(intellectualPropertyData).subscribe({
-      complete: () => {
-        this.refreshData();
-        this.intellectualPropertyToEdit = null;
-      }
+      complete: () => this.refreshData()
     });
   }
 

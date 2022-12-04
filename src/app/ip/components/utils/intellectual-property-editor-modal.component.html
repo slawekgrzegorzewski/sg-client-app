@@ -1,0 +1,26 @@
+<ng-container *ngIf="intellectualProperty">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Edycja właśności intelektualnej</h4>
+    <button type="button" class="btn-close" aria-label="Close"
+            (click)="intellectualProperty=null;activeModal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <div [ngStyle]="style" class="sg-flex-row sg-flex-justify-space-evenly"
+         style="width: 100%">
+      <label for="description" class="col-form-label" style="max-width: 150px;margin-right: 10px;">Opis</label>
+      <textarea class="form-control"
+                rows="5"
+                style="resize: vertical"
+                id="description"
+                #description="ngModel"
+                [(ngModel)]="intellectualProperty.description"
+                required>
+      </textarea>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark"
+            (click)="activeModal.close(intellectualProperty); intellectualProperty = null;">zapisz
+    </button>
+  </div>
+</ng-container>

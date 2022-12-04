@@ -1,8 +1,8 @@
 <div class="sg-flex-justify-center">
   <div style="width: 1200px">
     <div class="sg-flex-row sg-flex-justify-space-between">
-      <button class="btn btn-sm btn-link" (click)="startIntellectualPropertyCreation()">
-        stwórz własność intelectualną
+      <button class="btn btn-sm btn-link" (click)="openIntellectualPropertyCreationModal();">
+        stwórz własność intelektualną
       </button>
       <div class="form-group row">
         <label for="filter" class="col-form-label" style="margin-right: 10px;width: 75px;">pokaż</label>
@@ -23,28 +23,21 @@
         <ng-template ngbPanelTitle>
           <div class="sg-flex-row sg-flex-justify-space-between" style="width: 100%">
             <div>{{intellectualProperty.description}}</div>
-            <div *ngIf="!intellectualPropertyToEdit || intellectualPropertyToEdit.id !== intellectualProperty.id"
-                 class="sg-flex-row">
+            <div class="sg-flex-row">
               <button class="btn btn-sm btn-link"
-                      (click)="startIntellectualPropertyEdit(intellectualProperty); accordion.expand(intellectualProperty.id.toString());">
+                      (click)="$event.cancelBubble = true;openIntellectualPropertyEditModal(intellectualProperty);">
                 edytuj IP
               </button>
               <button *ngIf="intellectualProperty.tasks.length === 0"
                       class="btn btn-sm btn-link"
-                      (click)="deleteIntellectualProperty(intellectualProperty.id); accordion.collapse(intellectualProperty.id.toString());">
+                      (click)="$event.cancelBubble = true;deleteIntellectualProperty(intellectualProperty.id); accordion.collapse(intellectualProperty.id.toString());">
                 usuń IP
               </button>
             </div>
           </div>
         </ng-template>
         <ng-template ngbPanelContent>
-          <app-intellectual-property-editor
-            *ngIf="intellectualPropertyToEdit && intellectualPropertyToEdit.id === intellectualProperty.id"
-            [intellectualProperty]="intellectualPropertyToEdit"
-            (onAction)="intellectualPropertyAction($event)"
-            (onCancel)="intellectualPropertyToEdit = null; filterData();">
-          </app-intellectual-property-editor>
-          <div *ngIf="!intellectualPropertyToEdit || intellectualPropertyToEdit.id !== intellectualProperty.id">
+          <div>
             <div class="sg-flex-row sg-flex-justify-space-between">
               <span *ngIf="intellectualProperty.tasks.length !== 0">Zadania w ramach IP</span>
               <span *ngIf="intellectualProperty.tasks.length === 0">Brak wykonanych zadań w ramach IP</span>
@@ -76,7 +69,8 @@
                 <div>Współautorzy: {{ task.coAuthors }}</div>
                 <div *ngIf="!taskToEdit || taskToEdit.id !== task.id">
                   <div class="sg-flex-row">
-                    <div class="sg-flex-column col-6" style="border-right: #8e8e8e dotted; padding-right: 5px; margin-right: 5px">
+                    <div class="sg-flex-column col-6"
+                         style="border-right: #8e8e8e dotted; padding-right: 5px; margin-right: 5px">
                       <div class="sg-flex-row">
                         <div *ngIf="task.timeRecords.length === 0">Brak zarejestrowanego czasu</div>
                         <div *ngIf="task.timeRecords.length > 0">Zarejestrowany czas</div>

@@ -100,7 +100,7 @@ import {CubeRecordsService} from './speedcubing/services/cube-records.service';
 import {TimeRecordsComponent} from './ip/components/time-records.component';
 import {TimeRecordEditorComponent} from './ip/components/utils/time-record-editor.component';
 import {IntellectualPropertyTaskEditorComponent} from './ip/components/utils/intellectual-property-task-editor.component';
-import {IntellectualPropertyEditorComponent} from './ip/components/utils/intellectual-property-editor.component';
+import {IntellectualPropertyEditorModalComponent} from './ip/components/utils/intellectual-property-editor-modal.component';
 
 @NgModule({
   declarations: [
@@ -170,7 +170,7 @@ import {IntellectualPropertyEditorComponent} from './ip/components/utils/intelle
     TimeRecordsComponent,
     TimeRecordEditorComponent,
     IntellectualPropertyTaskEditorComponent,
-    IntellectualPropertyEditorComponent
+    IntellectualPropertyEditorModalComponent
   ],
   imports: [
     BrowserModule,
