@@ -99,7 +99,7 @@ import {IntellectualPropertyComponent} from './ip/components/intellectual-proper
 import {CubeRecordsService} from './speedcubing/services/cube-records.service';
 import {TimeRecordsComponent} from './ip/components/time-records.component';
 import {TimeRecordEditorComponent} from './ip/components/utils/time-record-editor.component';
-import {IntellectualPropertyTaskEditorComponent} from './ip/components/utils/intellectual-property-task-editor.component';
+import {IntellectualPropertyTaskEditorModalComponent} from './ip/components/utils/intellectual-property-task-editor-modal.component';
 import {IntellectualPropertyEditorModalComponent} from './ip/components/utils/intellectual-property-editor-modal.component';
 
 @NgModule({
@@ -169,7 +169,7 @@ import {IntellectualPropertyEditorModalComponent} from './ip/components/utils/in
     IntellectualPropertyComponent,
     TimeRecordsComponent,
     TimeRecordEditorComponent,
-    IntellectualPropertyTaskEditorComponent,
+    IntellectualPropertyTaskEditorModalComponent,
     IntellectualPropertyEditorModalComponent
   ],
   imports: [

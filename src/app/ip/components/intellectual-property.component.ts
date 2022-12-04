@@ -10,6 +10,7 @@ import 'rxjs-compat/add/observable/of';
 import {DatePipe} from '@angular/common';
 import {NgbModal, NgbModalConfig} from '@ng-bootstrap/ng-bootstrap';
 import {IntellectualPropertyEditorModalComponent} from './utils/intellectual-property-editor-modal.component';
+import {IntellectualPropertyTaskEditorModalComponent} from './utils/intellectual-property-task-editor-modal.component';
 
 export const IP_HOME_ROUTER_URL = 'ip-home';
 export const ALL = 'wszystkie';
@@ -45,8 +46,6 @@ export class IntellectualPropertyComponent implements OnInit {
     this.filterData();
   }
 
-  intellectualPropertyToEdit: IntellectualProperty | null = null;
-  taskToEdit: IntellectualPropertyTask | null = null;
   timeRecordToEdit: TimeRecord | null = null;
   attachmentData: { taskId: number } | null = null;
 
@@ -111,31 +110,21 @@ export class IntellectualPropertyComponent implements OnInit {
   }
 
   openIntellectualPropertyModal(intellectualProperty: IntellectualProperty) {
-    var ngbModalRef = this.modalService.open(IntellectualPropertyEditorModalComponent, {centered: true});
-    ngbModalRef.componentInstance.intellectualProperty = intellectualProperty;
-      ngbModalRef.result.then(
-        (intellectualProperty) => {
-          this.intellectualPropertyAction(intellectualProperty);
-          this.intellectualPropertyToEdit = null;
-        },
-        (reason) => {
-          this.intellectualPropertyToEdit = null;
-        },
-      );
-  }
-
-  intellectualPropertyAction(intellectualPropertyData: IntellectualProperty) {
-    this.mapIPToRequest(intellectualPropertyData).subscribe({
-      complete: () => this.refreshData()
-    });
-  }
-
-  mapIPToRequest(intellectualPropertyData: IntellectualProperty): Observable<IntellectualProperty | string> {
-    if (intellectualPropertyData.id) {
-      return this.intellectualPropertyService.updateIntellectualProperty(intellectualPropertyData.id, intellectualPropertyData.description);
-    } else {
-      return this.intellectualPropertyService.createIntellectualProperty(intellectualPropertyData.description);
-    }
+    const ngbModalRef = this.modalService.open(IntellectualPropertyEditorModalComponent, {centered: true});
+    const componentInstance = ngbModalRef.componentInstance.intellectualProperty as IntellectualPropertyEditorModalComponent;
+    componentInstance.intellectualProperty = intellectualProperty;
+    ngbModalRef.result.then(
+      (intellectualProperty) => {
+        const request: Observable<IntellectualProperty | string> = intellectualProperty.id
+          ? this.intellectualPropertyService.updateIntellectualProperty(intellectualProperty.id, intellectualProperty.description)
+          : this.intellectualPropertyService.createIntellectualProperty(intellectualProperty.description);
+        request.subscribe({
+          complete: () => this.refreshData()
+        });
+      },
+      () => {
+      },
+    );
   }
 
   deleteIntellectualProperty(id: number) {
@@ -145,46 +134,38 @@ export class IntellectualPropertyComponent implements OnInit {
   }
 
   showTaskCreator(intellectualProperty: IntellectualProperty) {
-    this.taskToEdit = new IntellectualPropertyTask(EMPTY_TASK);
-    intellectualProperty.tasks.unshift(this.taskToEdit);
+    this.openIntellectualPropertyTaskModal(intellectualProperty, new IntellectualPropertyTask(EMPTY_TASK));
   }
 
-  showTaskEditor(task: IntellectualPropertyTask) {
-    this.taskToEdit = task;
+  showTaskEditor(intellectualProperty: IntellectualProperty, task: IntellectualPropertyTask) {
+    this.openIntellectualPropertyTaskModal(intellectualProperty, new IntellectualPropertyTask(task));
   }
 
-  cancelTaskEdition() {
-    this.taskToEdit = null;
-    this.filterData();
-  }
+  openIntellectualPropertyTaskModal(intellectualProperty: IntellectualProperty, task: IntellectualPropertyTask) {
+    const ngbModalRef = this.modalService.open(IntellectualPropertyTaskEditorModalComponent, {centered: true});
+    const componentInstance = ngbModalRef.componentInstance as IntellectualPropertyTaskEditorModalComponent;
+    componentInstance.intellectualProperty = intellectualProperty;
+    componentInstance.taskData = task;
+    ngbModalRef.result.then(
+      (actionData: { intellectualProperty: IntellectualProperty, task: IntellectualPropertyTask }) => {
+        const {intellectualProperty, task} = actionData;
 
-  displayTaskEditor(task: IntellectualPropertyTask) {
-    return this.taskToEdit && this.taskToEdit.id === task.id;
-  }
+        const requestObject = {
+          coAuthors: task.coAuthors,
+          description: task.description
+        };
 
-  taskAction(actionData: { intellectualProperty: IntellectualProperty, task: IntellectualPropertyTask }) {
-    const {intellectualProperty, task} = actionData;
-    this.mapToRequest(task, intellectualProperty).subscribe({
-      complete: () => {
-        this.refreshData();
-        this.taskToEdit = null;
-      }
-    });
-  }
-
-  private mapToRequest(task: IntellectualPropertyTask, intellectualProperty: IntellectualProperty): Observable<string> {
-    function mapToRequestObject(task: IntellectualPropertyTask) {
-      return {
-        coAuthors: task.coAuthors,
-        description: task.description
-      };
-    }
-
-    if (EMPTY_TASK_ID === task.id) {
-      return this.intellectualPropertyService.createTask(intellectualProperty.id, mapToRequestObject(task));
-    } else {
-      return this.intellectualPropertyService.updateTask(task.id, mapToRequestObject(task));
-    }
+        (EMPTY_TASK_ID === task.id
+          ? this.intellectualPropertyService.createTask(intellectualProperty.id, requestObject)
+          : this.intellectualPropertyService.updateTask(task.id, requestObject))
+          .subscribe({
+            complete: () => {
+              this.refreshData();
+            }
+          });
+      },
+      () => this.filterData(),
+    );
   }
 
   deleteTask(taskId: number) {
@@ -192,7 +173,6 @@ export class IntellectualPropertyComponent implements OnInit {
       .subscribe({
         complete: () => {
           this.refreshData();
-          this.taskToEdit = null;
         }
       });
   }

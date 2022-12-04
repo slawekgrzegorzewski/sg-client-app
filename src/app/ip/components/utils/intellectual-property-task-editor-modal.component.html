@@ -1,0 +1,32 @@
+<ng-container *ngIf="intellectualProperty && taskData">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Edycja zadania</h4>
+    <button type="button" class="btn-close" aria-label="Close"
+            (click)="intellectualProperty=null;taskData=null;activeModal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group sg-flex-row">
+      <label for="coAuthors" class="col-2 col-form-label">Współautorzy</label>
+      <div class="col-10">
+        <input id="coAuthors" name="coAuthors" type="text" class="form-control"
+               [(ngModel)]="taskData.coAuthors"
+               required/>
+      </div>
+    </div>
+    <div class="form-group sg-flex-row">
+      <label for="taskDescription" class="col-2 col-form-label">Opis</label>
+      <div class="col-10">
+        <input id="taskDescription" name="taskDescription" type="text" class="form-control"
+               [(ngModel)]="taskData.description"
+               required/>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-sm btn-link"
+            (click)="acceptModal()">
+      <ng-container *ngIf="taskData.id !== 0">zapisz</ng-container>
+      <ng-container *ngIf="taskData.id === 0">stwórz</ng-container>
+    </button>
+  </div>
+</ng-container>

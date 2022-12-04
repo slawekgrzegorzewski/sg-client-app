@@ -20,7 +20,9 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-dark"
-            (click)="activeModal.close(intellectualProperty); intellectualProperty = null;">zapisz
+            (click)="acceptModal()">
+      <ng-container *ngIf="intellectualProperty.id !== 0">zapisz</ng-container>
+      <ng-container *ngIf="intellectualProperty.id === 0">stwórz</ng-container>
     </button>
   </div>
 </ng-container>
