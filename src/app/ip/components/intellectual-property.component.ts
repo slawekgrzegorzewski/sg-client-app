@@ -111,7 +111,7 @@ export class IntellectualPropertyComponent implements OnInit {
 
   openIntellectualPropertyModal(intellectualProperty: IntellectualProperty) {
     const ngbModalRef = this.modalService.open(IntellectualPropertyEditorModalComponent, {centered: true});
-    const componentInstance = ngbModalRef.componentInstance.intellectualProperty as IntellectualPropertyEditorModalComponent;
+    const componentInstance = ngbModalRef.componentInstance as IntellectualPropertyEditorModalComponent;
     componentInstance.intellectualProperty = intellectualProperty;
     ngbModalRef.result.then(
       (intellectualProperty) => {
