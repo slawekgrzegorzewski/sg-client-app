@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {IntellectualPropertyService} from '../services/intellectual-property.service';
-import {EMPTY_TASK_ID, IntellectualPropertyTask} from '../model/intellectual-property-task';
+import {EMPTY_TASK, EMPTY_TASK_ID, IntellectualPropertyTask} from '../model/intellectual-property-task';
 import {EMPTY_TIME_RECORD, TimeRecord, TimeRecordWithTask} from '../model/time-record';
 import {ComparatorBuilder} from '../../general/utils/comparator-builder';
 import {forkJoin} from 'rxjs';
@@ -8,6 +8,8 @@ import 'rxjs-compat/add/observable/of';
 import Decimal from 'decimal.js';
 import {DatePipe} from '@angular/common';
 import {DatesUtils} from '../../general/utils/dates-utils';
+import {NgbModal, NgbModalConfig} from '@ng-bootstrap/ng-bootstrap';
+import {TimeRecordEditorComponent} from './utils/time-record-editor.component';
 
 export const TIME_RECORDS_ROUTER_URL = 'time-records';
 
@@ -42,12 +44,15 @@ export class TimeRecordsComponent implements OnInit {
     }, new Map<string, TimeRecordWithTask[]>());
   }
 
-  task: IntellectualPropertyTask | null = null;
   tasks: IntellectualPropertyTask[] = [];
-  timeRecordData: TimeRecord | null = null;
   private previousTaskId: number | null = null;
 
-  constructor(private intellectualPropertyService: IntellectualPropertyService, private datePipe: DatePipe) {
+  constructor(
+    private intellectualPropertyService: IntellectualPropertyService,
+    private datePipe: DatePipe,
+    private modalConfig: NgbModalConfig,
+    private modalService: NgbModal) {
+    modalConfig.centered = true;
   }
 
   ngOnInit(): void {
@@ -104,20 +109,34 @@ export class TimeRecordsComponent implements OnInit {
     responseObservable?.subscribe({
       complete: () => {
         this.refreshData();
-        this.timeRecordData = null;
-        this.task = null;
       }
     });
   }
 
   showTimeRecordEdition(timeRecord: TimeRecordWithTask) {
     this.previousTaskId = timeRecord.task?.id || null;
-    this.task = timeRecord.task;
-    this.timeRecordData = timeRecord;
+    const ngbModalRef = this.modalService.open(TimeRecordEditorComponent);
+    const componentInstance = ngbModalRef.componentInstance as TimeRecordEditorComponent;
+    componentInstance.tasks = this.tasks;
+    componentInstance.task = timeRecord.task || EMPTY_TASK;
+    componentInstance.timeRecord = timeRecord;
+    ngbModalRef.result.then(
+      result => this.timeRecordAction(result),
+      () => {
+      }
+    );
   }
 
   showTimeRecordCreation() {
-    this.timeRecordData = new TimeRecord(EMPTY_TIME_RECORD);
+    const ngbModalRef = this.modalService.open(TimeRecordEditorComponent);
+    const componentInstance = ngbModalRef.componentInstance as TimeRecordEditorComponent;
+    componentInstance.tasks = this.tasks;
+    componentInstance.timeRecord = new TimeRecord(EMPTY_TIME_RECORD);
+    ngbModalRef.result.then(
+      result => this.timeRecordAction(result),
+      () => {
+      }
+    );
   }
 
   totalHours() {

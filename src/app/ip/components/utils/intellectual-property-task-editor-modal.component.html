@@ -23,8 +23,7 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-sm btn-link"
-            (click)="acceptModal()">
+    <button class="btn btn-sm btn-link" (click)="acceptModal()">
       <ng-container *ngIf="taskData.id !== 0">zapisz</ng-container>
       <ng-container *ngIf="taskData.id === 0">stwórz</ng-container>
     </button>

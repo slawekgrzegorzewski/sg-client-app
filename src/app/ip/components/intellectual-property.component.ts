@@ -68,8 +68,6 @@ export class IntellectualPropertyComponent implements OnInit {
               private datePipe: DatePipe,
               private modalConfig: NgbModalConfig,
               private modalService: NgbModal) {
-    this.modalConfig.backdrop = 'static';
-    this.modalConfig.keyboard = false;
     this.modalConfig.centered = true;
   }
 
@@ -191,20 +189,33 @@ export class IntellectualPropertyComponent implements OnInit {
       backdrop: true,
       keyboard: true
     });
+
+    ngbModalRef.result.then(
+      () => {
+        this.attachmentData = null;
+        this.refreshData();
+        uploadFinishedSubscription.unsubscribe();
+      },
+      () => {
+        this.attachmentData = null;
+        this.refreshData();
+        uploadFinishedSubscription.unsubscribe();
+      });
+
     const componentInstance = ngbModalRef.componentInstance as UploaderComponent;
     componentInstance.uploadFunction = this.upload();
-    const a = componentInstance.uploadFinished.subscribe(
+    const uploadFinishedSubscription = componentInstance.uploadFinished.subscribe(
       () => {
         this.attachmentData = null;
         this.refreshData();
-        a.unsubscribe();
+        uploadFinishedSubscription.unsubscribe();
       }
     );
-    const b = componentInstance.uploadCancelled.subscribe(
+    const uploadCancelledSubscription = componentInstance.uploadCancelled.subscribe(
       () => {
         this.attachmentData = null;
         this.refreshData();
-        b.unsubscribe();
+        uploadCancelledSubscription.unsubscribe();
       }
     );
 

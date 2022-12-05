@@ -26,7 +26,7 @@
             <div class="sg-flex-row">
               <button class="btn btn-sm btn-link"
                       (click)="$event.cancelBubble = true;openIntellectualPropertyEditModal(intellectualProperty);">
-                edytuj IP
+                <i class="bi bi-pencil"></i>
               </button>
               <button *ngIf="intellectualProperty.tasks.length === 0"
                       class="btn btn-sm btn-link"
@@ -50,8 +50,8 @@
                 <div class="sg-flex-row sg-flex-justify-space-between">
                   <div>{{ task.description }}</div>
                   <div>
-                    <button class="btn btn-sm btn-link" (click)="showTaskEditor(intellectualProperty, task)">edytuj
-                      zadanie
+                    <button class="btn btn-sm btn-link" (click)="showTaskEditor(intellectualProperty, task)">
+                      <i class="bi bi-pencil"></i>
                     </button>
                     <button class="btn btn-sm btn-link" *ngIf="task.timeRecords.length === 0"
                             (click)="deleteTask(task.id)">usuń zadanie
@@ -80,7 +80,7 @@
                       <div *ngIf="task.attachments.length === 0">Brak załączników</div>
                       <div *ngIf="task.attachments.length > 0">Załączniki</div>
                       <button (click)="showAttachmentUpload(task.id)" class="btn btn-sm btn-link">
-                        <i class="bi bi-cloud-plus" style="font-size: 20px"></i>
+                        <i class="bi bi-upload"></i>
                       </button>
                     </div>
                     <div *ngFor="let attachment of task.attachments">
@@ -88,10 +88,10 @@
                         <div>{{attachment}}</div>
                         <div class="sg-flex-row">
                           <button (click)="downloadAttachment(task, attachment)" class="btn btn-sm btn-link">
-                            <i class="bi bi-cloud-arrow-down" style="font-size: 20px"></i>
+                            <i class="bi bi-download"></i>
                           </button>
                           <button (click)="deleteAttachment(task, attachment)" class="btn btn-sm btn-link">
-                            <i class="bi bi-x" style="font-size: 20px"></i>
+                            <i class="bi bi-x"></i>
                           </button>
                         </div>
                       </div>

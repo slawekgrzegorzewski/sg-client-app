@@ -1,6 +1,7 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {EMPTY_TASK, IntellectualPropertyTask} from '../../model/intellectual-property-task';
 import {TimeRecord} from '../../model/time-record';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-time-record-editor',
@@ -30,13 +31,7 @@ export class TimeRecordEditorComponent {
     }
   }
 
-  @Output()
-  onAction: EventEmitter<{ timeRecord: TimeRecord, task: IntellectualPropertyTask }> = new EventEmitter<{ timeRecord: TimeRecord, task: IntellectualPropertyTask }>();
-
-  @Output()
-  onCancel: EventEmitter<string> = new EventEmitter<string>();
-
-  constructor() {
+  constructor(public activeModal: NgbActiveModal) {
   }
 
   tasksForTypeAhead(): () => IntellectualPropertyTask[] {
@@ -45,6 +40,6 @@ export class TimeRecordEditorComponent {
   }
 
   emitAction() {
-    this.onAction.emit({timeRecord: this.timeRecord, task: this.task.id === EMPTY_TASK.id ? EMPTY_TASK : this.task});
+    this.activeModal.close({timeRecord: this.timeRecord, task: this.task.id === EMPTY_TASK.id ? EMPTY_TASK : this.task});
   }
 }

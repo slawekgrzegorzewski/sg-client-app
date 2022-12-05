@@ -7,7 +7,8 @@ import {UploaderComponent} from './uploader.component';
   template: `
       <div class="modal-header">
           <h4 class="modal-title" id="modal-basic-title">Dodaj plik</h4>
-          <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.close('Cross click')"></button>
+          <button type="button" class="btn-close" aria-label="Close"
+                  (click)="uploadSub?.unsubscribe();activeModal.dismiss('Cross click')"></button>
       </div>
       <div class="modal-body">
           <div class="sg-flex-row sg-flex-justify-space-between">
@@ -22,7 +23,7 @@ import {UploaderComponent} from './uploader.component';
 
       </div>
       <div class="modal-footer">
-          <button class="btn btn-sm btn-link" (click)="uploadSub?.unsubscribe();activeModal.close()">
+          <button class="btn btn-sm btn-link" (click)="uploadSub?.unsubscribe();activeModal.dismiss()">
               anuluj
           </button>
       </div>`,
@@ -30,10 +31,12 @@ import {UploaderComponent} from './uploader.component';
 })
 export class UploaderModalComponent extends UploaderComponent {
 
-
   constructor(public activeModal: NgbActiveModal) {
     super();
     this.uploadFinished.subscribe(
+      () => this.activeModal.close()
+    );
+    this.uploadCancelled.subscribe(
       () => this.activeModal.close()
     );
   }
