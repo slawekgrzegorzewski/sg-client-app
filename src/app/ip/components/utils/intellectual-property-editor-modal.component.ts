@@ -13,9 +13,6 @@ export class IntellectualPropertyEditorModalComponent {
   intellectualProperty: IntellectualProperty | null = null;
 
   @Input()
-  style: any;
-
-  @Input()
   modal: any;
 
 

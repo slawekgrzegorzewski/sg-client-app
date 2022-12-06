@@ -30,8 +30,8 @@
               </button>
               <button *ngIf="intellectualProperty.tasks.length === 0"
                       class="btn btn-sm btn-link"
-                      (click)="$event.cancelBubble = true;deleteIntellectualProperty(intellectualProperty.id); accordion.collapse(intellectualProperty.id.toString());">
-                usuń IP
+                      (click)="$event.cancelBubble = true;openIPDeletionConfirmationModal(content, intellectualProperty.id, accordion)">
+                <i class="bi bi-trash"></i>
               </button>
             </div>
           </div>
@@ -42,7 +42,7 @@
               <span *ngIf="intellectualProperty.tasks.length !== 0">Zadania w ramach IP</span>
               <span *ngIf="intellectualProperty.tasks.length === 0">Brak wykonanych zadań w ramach IP</span>
               <button (click)="showTaskCreator(intellectualProperty)" class="btn btn-sm btn-link">
-                nowe zadanie
+                stwórz zadanie
               </button>
             </div>
             <div *ngFor="let task of intellectualProperty.tasks" class="task-row sg-flex-row">
@@ -54,7 +54,8 @@
                       <i class="bi bi-pencil"></i>
                     </button>
                     <button class="btn btn-sm btn-link" *ngIf="task.timeRecords.length === 0"
-                            (click)="deleteTask(task.id)">usuń zadanie
+                            (click)="openTaskDeletionConfirmationModel(content, task.id)">
+                      <i class="bi bi-trash"></i>
                     </button>
                   </div>
                 </div>
@@ -90,8 +91,8 @@
                           <button (click)="downloadAttachment(task, attachment)" class="btn btn-sm btn-link">
                             <i class="bi bi-download"></i>
                           </button>
-                          <button (click)="deleteAttachment(task, attachment)" class="btn btn-sm btn-link">
-                            <i class="bi bi-x"></i>
+                          <button (click)="openAttachmentDeleteConfirmation(content, task, attachment)" class="btn btn-sm btn-link">
+                            <i class="bi bi-trash"></i>
                           </button>
                         </div>
                       </div>
@@ -106,3 +107,19 @@
     </ngb-accordion>
   </div>
 </div>
+
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Potwierdzenia usunięcia</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+
+  <div class="modal-body">
+    Czy na pewno chcesz usunąć?
+  </div>
+
+  <div class="modal-footer sg-flex-row">
+    <button class="btn btn-sm btn-link" (click)="modal.dismiss()">anuluj</button>
+    <button class="btn btn-sm btn-link" (click)="modal.close()">usuń</button>
+  </div>
+</ng-template>

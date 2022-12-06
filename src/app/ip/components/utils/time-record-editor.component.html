@@ -5,40 +5,40 @@
   </div>
 
   <div class="modal-body">
-    <div *ngIf="tasks.length > 0" class="form-group sg-flex-row">
-      <label for="taskTA" class="col-2 col-form-label">Zadanie</label>
-      <div class="col-10">
-        <app-general-typeahead
-          [id]="'taskTA'"
-          name="taskTA"
-          [inputClass]="'form-control'"
-          [(ngModel)]="task"
-          [dataProvider]="tasksForTypeAhead()"
-          required>
-        </app-general-typeahead>
-      </div>
+    <div class="form-group">
+      <label for="taskTA">Zadanie</label>
+      <app-general-typeahead
+        id="taskTA"
+        [inputClass]="'form-control'"
+        [(ngModel)]="task"
+        [dataProvider]="tasksForTypeAhead()"
+        required>
+      </app-general-typeahead>
     </div>
 
-    <div class="form-group sg-flex-row">
-      <label for="dateOfTimeRecord" class="col-3 col-form-label">Data</label>
-      <app-date-picker class="col-9" id="dateOfTimeRecord" name="dateOfTimeRecord" [(ngModel)]="timeRecord.date">
-      </app-date-picker>
+    <div class="form-group">
+      <label for="dateOfTimeRecord">Data</label>
+      <input
+        id="dateOfTimeRecord"
+        [(ngModel)]="timeRecord.date"
+        #datepicker="ngbDatepicker"
+        (click)="datepicker.toggle()"
+        class="form-control"
+        ngbDatepicker>
     </div>
-    <div class="form-group sg-flex-row">
-      <label for="numberOfHours" class="col-2 col-form-label">Liczba godzin</label>
-      <div class="col-10">
-        <input id="numberOfHours" name="numberOfHours" type="number" class="form-control"
-               [(ngModel)]="timeRecord.numberOfHours"
-               required/>
-      </div>
+
+    <div class="form-group">
+      <label for="numberOfHours">Liczba godzin</label>
+      <input id="numberOfHours" type="number" class="form-control"
+             [(ngModel)]="timeRecord.numberOfHours"
+             required/>
     </div>
-    <div class="form-group sg-flex-row">
-      <label for="timeRecordDescription" class="col-2 col-form-label">Opis</label>
-      <div class="col-10">
-        <input id="timeRecordDescription" name="timeRecordDescription" type="text" class="form-control"
-               [(ngModel)]="timeRecord.description"
-               required/>
-      </div>
+
+    <div class="form-group">
+      <label for="timeRecordDescription">Opis</label>
+      <input id="timeRecordDescription" type="text" class="form-control"
+             [(ngModel)]="timeRecord.description"
+             required/>
     </div>
   </div>
 

@@ -1,6 +1,5 @@
 import {Component, Input, OnInit, Output} from '@angular/core';
-import {BillingPeriod} from '../../model/billings/billing-period';
-import {Observable, of, Subject} from 'rxjs';
+import {Subject} from 'rxjs';
 import {Income} from '../../model/billings/income';
 import {Expense} from '../../model/billings/expense';
 import {Account} from '../../model/account';
@@ -204,7 +203,7 @@ export class CreateBillingElementComponent implements OnInit {
       that.piggyBanks
         .filter(pb => that.selectedAccount && pb.currency === that.selectedAccount.currency)
         .sort((a, b) => a.name.localeCompare(b.name))
-    ;
+      ;
   }
 
   getCurrencySymbol(currency: string): string {

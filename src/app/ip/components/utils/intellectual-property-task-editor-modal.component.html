@@ -1,25 +1,28 @@
 <ng-container *ngIf="intellectualProperty && taskData">
   <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">Edycja zadania</h4>
+    <h4 class="modal-title" id="modal-basic-title">
+      <ng-container *ngIf="taskData.id !== 0">Edycja zadania</ng-container>
+      <ng-container *ngIf="taskData.id === 0">Tworzenie zadania</ng-container>
+    </h4>
     <button type="button" class="btn-close" aria-label="Close"
             (click)="intellectualProperty=null;taskData=null;activeModal.dismiss('Cross click')"></button>
   </div>
   <div class="modal-body">
-    <div class="form-group sg-flex-row">
-      <label for="coAuthors" class="col-2 col-form-label">Współautorzy</label>
-      <div class="col-10">
-        <input id="coAuthors" name="coAuthors" type="text" class="form-control"
-               [(ngModel)]="taskData.coAuthors"
-               required/>
-      </div>
+    <div class="form-group">
+      <label for="coAuthors">Współautorzy</label>
+      <input id="coAuthors" class="form-control"
+             [(ngModel)]="taskData.coAuthors"
+             required/>
     </div>
-    <div class="form-group sg-flex-row">
-      <label for="taskDescription" class="col-2 col-form-label">Opis</label>
-      <div class="col-10">
-        <input id="taskDescription" name="taskDescription" type="text" class="form-control"
-               [(ngModel)]="taskData.description"
-               required/>
-      </div>
+    <div class="form-group">
+      <label for="taskDescription">Opis</label>
+      <textarea [(ngModel)]="taskData.description"
+                id="taskDescription"
+                class="form-control"
+                rows="5"
+                required>
+
+      </textarea>
     </div>
   </div>
   <div class="modal-footer">

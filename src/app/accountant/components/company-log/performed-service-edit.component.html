@@ -35,7 +35,7 @@
   <div class="form-group sg-flex-row">
     <label for="currency" class="col-3 col-form-label">Waluta</label>
     <app-general-typeahead class="col-9"
-                           [id]="'currency'"
+                           id="currency"
                            name="currency"
                            [inputClass]="'form-control'"
                            [readonly]="editMode"
@@ -48,8 +48,15 @@
 
   <div class="form-group sg-flex-row">
     <label for="paymentDate" class="col-3 col-form-label">Data</label>
-    <app-date-picker class="col-9" [id]="'paymentDate'" name="paymentDate" [(ngModel)]="performedService.date">
-    </app-date-picker>
+    <div class="col-9">
+      <input
+        [(ngModel)]="performedService.date"
+        id="paymentDate"
+        #datepicker="ngbDatepicker"
+        (click)="datepicker.toggle()"
+        class="form-control"
+        ngbDatepicker>
+    </div>
   </div>
 </div>
 

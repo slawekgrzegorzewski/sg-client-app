@@ -4,8 +4,14 @@
 
     <div class="form-group sg-flex-row">
       <label for="paymentDate" class="col-3 col-form-label">Data</label>
-      <app-date-picker class="col-9" [id]="'paymentDate'" name="paymentDate" [(ngModel)]="clientPayment.date">
-      </app-date-picker>
+      <div class="col-9">
+        <input [(ngModel)]="clientPayment.date"
+               id="paymentDate"
+               #datepicker="ngbDatepicker"
+               (click)="datepicker.toggle()"
+               class="form-control"
+               ngbDatepicker>
+      </div>
     </div>
 
     <div class="form-group sg-flex-row">

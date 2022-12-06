@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, TemplateRef} from '@angular/core';
 import {IntellectualPropertyService} from '../services/intellectual-property.service';
 import {IntellectualProperty} from '../model/intellectual-property';
 import {EMPTY_TASK, EMPTY_TASK_ID, IntellectualPropertyTask} from '../model/intellectual-property-task';
@@ -8,7 +8,7 @@ import {Observable} from 'rxjs';
 import {HttpEvent} from '@angular/common/http';
 import 'rxjs-compat/add/observable/of';
 import {DatePipe} from '@angular/common';
-import {NgbModal, NgbModalConfig} from '@ng-bootstrap/ng-bootstrap';
+import {NgbAccordion, NgbModal, NgbModalConfig} from '@ng-bootstrap/ng-bootstrap';
 import {IntellectualPropertyEditorModalComponent} from './utils/intellectual-property-editor-modal.component';
 import {IntellectualPropertyTaskEditorModalComponent} from './utils/intellectual-property-task-editor-modal.component';
 import {DatesUtils} from '../../general/utils/dates-utils';
@@ -278,5 +278,30 @@ export class IntellectualPropertyComponent implements OnInit {
     });
     const componentInstance = ngbModalRef.componentInstance as IntellectualPropertyTaskDetailsModalComponent;
     componentInstance.task = task;
+  }
+
+  openConfirmationModal(content: TemplateRef<any>, callback: () => void) {
+    this.modalService.open(content).result.then(
+      () => callback(),
+      () => {
+      }
+    );
+  }
+
+  openAttachmentDeleteConfirmation(content: TemplateRef<any>, task: IntellectualPropertyTask, attachment: string) {
+    this.openConfirmationModal(content, () => this.deleteAttachment(task, attachment));
+  }
+
+  openTaskDeletionConfirmationModel(content: TemplateRef<any>, taskId: number) {
+    this.openConfirmationModal(content, () => this.deleteTask(taskId));
+  }
+
+  openIPDeletionConfirmationModal(content: TemplateRef<any>, intellectualPropertyId: number, accordion: NgbAccordion) {
+    this.openConfirmationModal(content,
+      () => {
+        this.deleteIntellectualProperty(intellectualPropertyId);
+        accordion.collapse(intellectualPropertyId.toString());
+      }
+    );
   }
 }

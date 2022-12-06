@@ -13,7 +13,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
 import {httpInterceptorProviders} from './general/interceptors';
 import {AccountantHomeComponent} from './accountant/pages/accountant-home/accountant-home.component';
-import {NgbAccordionModule, NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbAccordionModule, NgbDateAdapter, NgbDateNativeAdapter, NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {EditAccountComponent} from './accountant/components/accounts/edit-account.component';
 import {ToastService} from './general/services/toast.service';
 import {ToastsContainer} from './general/components/toast/toast-container.component';
@@ -34,8 +34,8 @@ import {PiggyBanksService} from './accountant/services/piggy-banks.service';
 import {PiggyBanksComponent} from './accountant/components/piggy-banks/piggy-banks.component';
 import {HtmlNewLinePipe} from './general/pipes/html-new-line-pipe';
 import {GeneralTypeaheadComponent} from './general/components/typeaheads/general-typeahead.component';
-import {CurrencyTotalsComponent} from './accountant/components/general/currency-totals.component';
-import {MultiCurrencyTotalComponent} from './accountant/components/general/multi-currency-total.component';
+import {CurrencyTotalsComponent} from './general/components/currencies/currency-totals.component';
+import {MultiCurrencyTotalComponent} from './general/components/currencies/multi-currency-total.component';
 import {AccountsHistoryComponent} from './accountant/pages/accounts-history/accounts-history.component';
 import {BillingSmallComponent} from './accountant/pages/billings/billing-small.component';
 import {BrowseBillingElementsComponent} from './accountant/components/billing-periods/browse-billing-elements.component';
@@ -60,7 +60,6 @@ import {ServicesService} from './accountant/services/services.service';
 import {ServicesComponent} from './accountant/components/services/services.component';
 import {PerformedServicesService} from './accountant/services/performed-services.service';
 import {PerformedServicesComponent} from './accountant/components/company-log/performed-services.component';
-import {DataPickerComponent} from './accountant/components/data-picker/data-picker.component';
 import {ClientPaymentComponent} from './accountant/components/company-log/client-payments.component';
 import {ClientPaymentsService} from './accountant/services/client-payments.service';
 import {PerformedServicePaymentsService} from './accountant/services/performed-service-payments.service';
@@ -142,7 +141,6 @@ import {UploaderModalComponent} from './general/components/uploader/uploader-mod
     AccountantSettingsComponent,
     ServicesComponent,
     PerformedServicesComponent,
-    DataPickerComponent,
     ClientPaymentComponent,
     PerformedServiceEditComponent,
     ClientPaymentEditComponent,
@@ -224,7 +222,8 @@ import {UploaderModalComponent} from './general/components/uploader/uploader-mod
     ApplicationsService,
     NodrigenService,
     BanksService,
-    AccountantSettingsService
+    AccountantSettingsService,
+    {provide: NgbDateAdapter, useClass: NgbDateNativeAdapter}
   ],
   bootstrap: [AppComponent]
 })

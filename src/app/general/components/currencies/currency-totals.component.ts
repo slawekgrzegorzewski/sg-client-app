@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {WithBalance} from '../../model/with-balance';
+import {WithBalance} from '../../../accountant/model/with-balance';
 
 @Component({
   selector: 'app-currency-totals',
