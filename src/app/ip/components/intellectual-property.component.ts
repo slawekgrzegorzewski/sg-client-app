@@ -16,6 +16,11 @@ import {IntellectualPropertyTaskDetailsModalComponent} from './utils/intellectua
 import Decimal from 'decimal.js';
 import {UploaderComponent} from '../../general/components/uploader/uploader.component';
 import {UploaderModalComponent} from '../../general/components/uploader/uploader-modal.component';
+import {DATA_REFRESH_REQUEST_EVENT} from '../../general/utils/event-bus-events';
+import {NgEventBus} from 'ng-event-bus';
+import {ActivatedRoute} from '@angular/router';
+import {DomainService} from '../../general/services/domain.service';
+import {DomainRegistrationHelper} from '../../general/components/domain/domain-registration-helper';
 
 export const IP_HOME_ROUTER_URL = 'ip-home';
 export const ALL = 'wszystkie';
@@ -64,15 +69,29 @@ export class IntellectualPropertyComponent implements OnInit {
     this.activeIds = value.join(',');
   };
 
+  private domainRegistrationHelper: DomainRegistrationHelper;
+
   constructor(private intellectualPropertyService: IntellectualPropertyService,
               private datePipe: DatePipe,
               private modalConfig: NgbModalConfig,
-              private modalService: NgbModal) {
+              private modalService: NgbModal,
+              private eventBus: NgEventBus,
+              private route: ActivatedRoute,
+              private domainService: DomainService) {
     this.modalConfig.centered = true;
+    this.domainRegistrationHelper = new DomainRegistrationHelper(domainService, eventBus, route, IP_HOME_ROUTER_URL);
+    this.domainRegistrationHelper.domainChangedEvent.subscribe(() => this.refreshData());
   }
 
   ngOnInit(): void {
     this.refreshData();
+    this.eventBus.on(DATA_REFRESH_REQUEST_EVENT).subscribe(() => {
+      this.refreshData();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.domainRegistrationHelper.onDestroy();
   }
 
   refreshData() {

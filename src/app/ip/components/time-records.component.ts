@@ -10,6 +10,11 @@ import {DatePipe} from '@angular/common';
 import {DatesUtils} from '../../general/utils/dates-utils';
 import {NgbModal, NgbModalConfig} from '@ng-bootstrap/ng-bootstrap';
 import {TimeRecordEditorComponent} from './utils/time-record-editor.component';
+import {DATA_REFRESH_REQUEST_EVENT} from '../../general/utils/event-bus-events';
+import {NgEventBus} from 'ng-event-bus';
+import {ActivatedRoute} from '@angular/router';
+import {DomainService} from '../../general/services/domain.service';
+import {DomainRegistrationHelper} from '../../general/components/domain/domain-registration-helper';
 
 export const TIME_RECORDS_ROUTER_URL = 'time-records';
 
@@ -46,17 +51,30 @@ export class TimeRecordsComponent implements OnInit {
 
   tasks: IntellectualPropertyTask[] = [];
   private previousTaskId: number | null = null;
+  private domainRegistrationHelper: DomainRegistrationHelper;
 
   constructor(
     private intellectualPropertyService: IntellectualPropertyService,
     private datePipe: DatePipe,
     private modalConfig: NgbModalConfig,
-    private modalService: NgbModal) {
+    private modalService: NgbModal,
+    private eventBus: NgEventBus,
+    private route: ActivatedRoute,
+    private domainService: DomainService) {
     modalConfig.centered = true;
+    this.domainRegistrationHelper = new DomainRegistrationHelper(domainService, eventBus, route, TIME_RECORDS_ROUTER_URL);
+    this.domainRegistrationHelper.domainChangedEvent.subscribe(() => this.refreshData());
   }
 
   ngOnInit(): void {
     this.refreshData();
+    this.eventBus.on(DATA_REFRESH_REQUEST_EVENT).subscribe(() => {
+      this.refreshData();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.domainRegistrationHelper.onDestroy();
   }
 
   refreshData() {
