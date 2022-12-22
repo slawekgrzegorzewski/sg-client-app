@@ -28,6 +28,6 @@ export class IgnoreImporterComponent {
   showConfirmation = false;
 
   transactionMayBeIgnored() {
-    return this.transaction?.isDebit() || this.transaction?.isCredit() || false;
+    return this.transaction?.isEmpty() || false;
   }
 }

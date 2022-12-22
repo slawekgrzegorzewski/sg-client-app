@@ -52,6 +52,10 @@ export class BankTransactionToImport {
     return this.credit == 0 && this.debit > 0;
   }
 
+  public isEmpty(): boolean {
+    return this.credit == 0 && this.debit == 0;
+  }
+
   public isCreditOrDebitTransaction() {
     return this.isDebit() !== this.isCredit();
   }
