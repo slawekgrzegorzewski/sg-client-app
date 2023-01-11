@@ -25,7 +25,7 @@
       <canvas baseChart #cubesRecordsChart='base-chart' style="position: relative"
               [data]="cubeRecordsLineChart.lineChartData"
               [options]="cubeRecordsLineChart.lineChartOptions"
-              [type]="cubeRecordsLineChart.lineChartType">
+              [type]="'line'">
       </canvas>
     </div>
 
@@ -79,7 +79,8 @@
           ({{ (record.value.sub30 * 100 / record.value.all) | number: '.0-2' }}%)
         </td>
         <td style="text-align: right">{{ record.value.all }} </td>
-        <td style="text-align: right">{{ (record.value.sumOfAllTimes / record.value.all) | cubeRecordAsDate| date: 'mm:ss.SS' }} </td>
+        <td
+          style="text-align: right">{{ (record.value.sumOfAllTimes / record.value.all) | cubeRecordAsDate| date: 'mm:ss.SS' }} </td>
       </tr>
       </tbody>
     </table>

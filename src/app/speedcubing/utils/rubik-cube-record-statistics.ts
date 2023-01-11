@@ -24,7 +24,7 @@ export class RubikCubeRecordStatistics {
   }
 
   getLastNCubeRecords(n: number | null = null) {
-    const cubeStats = this.statsForSelectedCube.sort(ComparatorBuilder.comparingByDate<CubeStats>(cs => cs.recordTime).desc().build());
+    const cubeStats = this.statsForSelectedCube.sort(ComparatorBuilder.comparingByDate<CubeStats>(cs => cs.recordTime).build());
     return n ? cubeStats.slice(0, n) : cubeStats;
   }
 

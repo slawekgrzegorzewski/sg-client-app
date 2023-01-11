@@ -1,12 +1,10 @@
-import {Chart, ChartConfiguration, ChartType} from 'chart.js';
-
-import {default as Annotation} from 'chartjs-plugin-annotation';
+import {ChartConfiguration, ChartOptions} from 'chart.js';
 
 export class SyrCell {
   private nameInternal: string;
-  private valueInternal: number;
+  private valueInternal: number | null;
 
-  constructor(name: string, value: number) {
+  constructor(name: string, value: number | null) {
     this.nameInternal = name;
     this.valueInternal = value;
   }
@@ -15,101 +13,67 @@ export class SyrCell {
     return this.nameInternal;
   }
 
-  get value(): number {
+  get value(): number | null {
     return this.valueInternal;
   }
 }
 
 export class CountrySyrLineChart {
 
-  public lineChartData: ChartConfiguration['data'] = {
+  public lineChartData: ChartConfiguration<'line'>['data'] = {
     datasets: [],
     labels: []
   };
 
-  public lineChartOptions: ChartConfiguration['options'] = {
-
+  public lineChartOptions: ChartOptions<'line'> = {
     responsive: true,
-    maintainAspectRatio: true,
-    elements: {
-      line: {
-        tension: 0.5
-      }
-    },
-    scales: {
-      // We use this empty structure as a placeholder for dynamic theming.
-      x: {},
-      'y-axis-0':
-        {
-          position: 'left',
-        },
-      'y-axis-1': {
-        position: 'right',
-        grid: {
-          color: 'rgba(255,0,0,0.3)',
-        },
-        ticks: {
-          color: 'red'
-        }
-      }
-    },
-
-    plugins: {
-      legend: {display: true},
-      annotation: {
-        annotations: [
-          {
-            type: 'line',
-            scaleID: 'x-axis-0',
-            value: 'March',
-            borderColor: 'orange',
-            borderWidth: 2,
-            label: {
-              position: 'center',
-              enabled: true,
-              color: 'orange',
-              content: 'LineAnno',
-              font: {
-                weight: 'bold'
-              }
-            }
-          }
-        ]
-      }
-    }
+    maintainAspectRatio: true
   };
 
-  public lineChartType: ChartType = 'line';
+  private years: number[] = [];
+  public chartsData = new Map<string, (number | null)[]>();
+  private _selectedChart: string = '';
+  get selectedChart(): string {
+    return this._selectedChart;
+  }
+
+  set selectedChart(value: string) {
+    this._selectedChart = value;
+    for (const line of this.chartsData.keys()) {
+      if (this.selectedChart === line) {
+        this.lineChartData = {
+          datasets: [{data: this.chartsData.get(line) || [], label: line}],
+          labels: this.years
+        };
+      }
+    }
+  }
 
   constructor(data: Map<string, Map<number, SyrCell[]>>) {
-    Chart.register(Annotation);
-
-    let years: number[] = [];
-    data.forEach(countryData => {
-      for (const key of countryData.keys()) {
-        if (!years.includes(key)) {
-          years.push(key);
+    this.years = [];
+    data.forEach(d => {
+      for (const key of d.keys()) {
+        if (!this.years.includes(key)) {
+          this.years.push(key);
         }
       }
     });
-    years = years.sort();
-
-    const lines = new Map<string, (number | null)[]>();
-    years.forEach(year => {
+    this.years = this.years.sort();
+    this.years.forEach(year => {
       data.forEach((countryData, countryName) => {
         const yearStats = countryData.get(year);
         if (yearStats) {
           yearStats.forEach(cell => {
-            const label = CountrySyrLineChart.getDataSetLabel(countryName, cell);
-            let values = lines.get(label);
+            const label = cell.name;
+            let values = this.chartsData.get(label);
             if (!values) {
               values = [];
             }
             values.push(cell.value);
-            lines.set(label, values);
+            this.chartsData.set(label, values);
           });
         } else {
-          lines.forEach((dataSet, label) => {
+          this.chartsData.forEach((dataSet, label) => {
             if (label.startsWith(countryName + ' - ')) {
               dataSet.push(null);
             }
@@ -117,12 +81,6 @@ export class CountrySyrLineChart {
         }
       });
     });
-    for (const line of lines.keys()) {
-      this.lineChartData.datasets.push({data: lines.get(line) || [], label: line});
-    }
-  }
-
-  private static getDataSetLabel(countryName: string, cell: SyrCell): string {
-    return countryName + ' - ' + cell.name;
+    this.selectedChart = this.chartsData.keys().next()?.value || '';
   }
 }

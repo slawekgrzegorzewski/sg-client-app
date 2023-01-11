@@ -1,5 +1,5 @@
 import {Component, EventEmitter, ViewChild} from '@angular/core';
-import {Chart, ChartConfiguration, ChartEvent, ChartType} from 'chart.js';
+import {Chart, ChartConfiguration, ChartEvent, ChartOptions, ChartType} from 'chart.js';
 import {BaseChartDirective} from 'ng2-charts';
 
 import {default as Annotation} from 'chartjs-plugin-annotation';
@@ -10,63 +10,26 @@ import {ComparatorBuilder} from '../../../general/utils/comparator-builder';
 export class PiggyBanksLineChart {
 
   public updateChart = new EventEmitter<any>();
-  public lineChartData: ChartConfiguration['data'] = {
+
+  public lineChartData: ChartConfiguration<'line'>['data'] = {
     datasets: [],
     labels: []
   };
-  public lineChartOptions: ChartConfiguration['options'] = {
-    elements: {
-      line: {
-        tension: 0.5
-      }
-    },
-    scales: {
-      // We use this empty structure as a placeholder for dynamic theming.
-      x: {},
-      'y-axis-0':
-        {
-          position: 'left',
-        },
-      'y-axis-1': {
-        position: 'right',
-        grid: {
-          color: 'rgba(255,0,0,0.3)',
-        },
-        ticks: {
-          color: 'red'
-        }
-      }
-    },
 
-    plugins: {
-      legend: {display: true},
-      annotation: {
-        annotations: [
-          {
-            type: 'line',
-            scaleID: 'x',
-            value: 'March',
-            borderColor: 'orange',
-            borderWidth: 2,
-            label: {
-              position: 'center',
-              enabled: true,
-              color: 'orange',
-              content: 'LineAnno',
-              font: {
-                weight: 'bold'
-              }
-            }
-          },
-        ],
+  public lineChartOptions: ChartOptions<'line'> = {
+    responsive: true,
+    maintainAspectRatio: true,
+    scales: {
+      x: {
+        ticks: {
+          display: true
+        }
       }
     }
   };
-  public lineChartType: ChartType = 'line';
+
 
   constructor(data: Map<Date, PiggyBank[]>, datePipe: DatePipe) {
-
-    Chart.register(Annotation);
 
     let dates: Date[] = [];
     const piggyBanksNames = new Set<string>();
@@ -79,6 +42,7 @@ export class PiggyBanksLineChart {
     const dataPerPiggyName = new Map<string, (number | null)[]>();
     dates.forEach(d => {
       let dateLabel = datePipe.transform(d, 'yyyy-MM') || '';
+      this.lineChartData.labels?.push(dateLabel);
       const dateData = data.get(d) || [];
       for (const piggyBank of dateData) {
         const key = this.descriptionOfPiggyBank(piggyBank);

@@ -3,74 +3,56 @@ import {Chart, ChartConfiguration, ChartEvent, ChartType} from 'chart.js';
 import {BaseChartDirective} from 'ng2-charts';
 
 import {default as Annotation} from 'chartjs-plugin-annotation';
+import {ChartOptions} from 'chart.js/dist/types';
 
 export type ChartMode = 'RAW' | 'MOVING_AVERAGE'
 
 export class CubeRecordsLineChart {
 
   public updateChart = new EventEmitter<any>();
-  public lineChartData: ChartConfiguration['data'] = {
+
+  public lineChartData: ChartConfiguration<'line'>['data'] = {
     datasets: [],
     labels: []
   };
-  public lineChartOptions: ChartConfiguration['options'] = {
-    elements: {
-      line: {
-        tension: 0.5
-      }
-    },
-    scales: {
-      // We use this empty structure as a placeholder for dynamic theming.
-      x: {},
-      'y-axis-0':
-        {
-          position: 'left',
-        },
-      'y-axis-1': {
-        position: 'right',
-        grid: {
-          color: 'rgba(255,0,0,0.3)',
-        },
-        ticks: {
-          color: 'red'
-        }
-      }
-    },
 
-    plugins: {
-      legend: { display: true },
-      annotation: {
-        annotations: [
-          {
-            type: 'line',
-            scaleID: 'x',
-            value: 'March',
-            borderColor: 'orange',
-            borderWidth: 2,
-            label: {
-              position: 'center',
-              enabled: true,
-              color: 'orange',
-              content: 'LineAnno',
-              font: {
-                weight: 'bold'
-              }
-            }
-          },
-        ],
+  public lineChartOptions: ChartOptions<'line'> = {
+    responsive: true,
+    maintainAspectRatio: true,
+    scales: {
+      x: {
+        ticks: {
+          display: true
+        }
       }
     }
   };
-  public lineChartType: ChartType = 'line';
 
   constructor(data: (number | null)[], mode: ChartMode) {
-    Chart.register(Annotation);
     switch (mode) {
       case 'RAW':
-        this.lineChartData = {datasets: [{data: data || [], label: 'Results'}]};
+        this.lineChartData = {
+          datasets: [
+            {
+              data: data || [],
+              label: 'Results',
+              cubicInterpolationMode: 'monotone'
+            }
+          ],
+          labels: data.map(d => ''),
+        };
         break;
       case 'MOVING_AVERAGE':
-        this.lineChartData = {datasets: [{data: data || [], label: 'Moving average'}]};
+        this.lineChartData = {
+          datasets: [
+            {
+              data: data || [],
+              label: 'Moving average',
+              cubicInterpolationMode: 'monotone'
+            }
+          ],
+          labels: data.map(d => ''),
+        };
         break;
     }
   }
