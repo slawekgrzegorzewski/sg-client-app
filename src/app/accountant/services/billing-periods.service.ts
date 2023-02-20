@@ -11,7 +11,9 @@ import {Observable, tap} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {ACCOUNTS_CHANGED, BILLING_PERIOD_CHANGED} from '../../general/utils/event-bus-events';
 import {NgEventBus} from 'ng-event-bus';
-import {AffectedBankTransactionsToImportInfo} from '../../openbanking/model/nodrigen/affected-bank-transactions-to-import-info';
+import {
+  AffectedBankTransactionsToImportInfo
+} from '../../openbanking/model/nodrigen/affected-bank-transactions-to-import-info';
 
 @Injectable({
   providedIn: 'root'
@@ -77,20 +79,24 @@ export class BillingPeriodsService {
     let observable: Observable<string> | null;
     const creditTransactionId = affectedBankTransactionsToImportInfo.creditTransactions.length > 0 ? affectedBankTransactionsToImportInfo.creditTransactions[0] : null;
     const debitTransactionId = affectedBankTransactionsToImportInfo.debitTransactions.length > 0 ? affectedBankTransactionsToImportInfo.debitTransactions[0] : null;
+
+    function alignmentTransactionIdPart(id: number | null) {
+      return id ? ('/' + id.toString()) : '';
+    }
+
     if (element instanceof Income) {
       observable = this.http.put(
-        `${this.billingEndpoint}/income/${accountId}/${creditTransactionId}/${debitTransactionId?.toString() || ''}`,
+        `${this.billingEndpoint}/income/${accountId}/${creditTransactionId}${alignmentTransactionIdPart(debitTransactionId)}`,
         element,
         {responseType: 'text'});
     } else {
       observable = this.http.put(
-        `${this.billingEndpoint}/expense/${accountId}/${debitTransactionId}/${creditTransactionId?.toString() || ''}`,
+        `${this.billingEndpoint}/expense/${accountId}/${debitTransactionId}${alignmentTransactionIdPart(creditTransactionId)}`,
         element,
         {responseType: 'text'});
     }
     return observable.pipe(tap(data => this.onUpdate()));
   }
-
 
   private onUpdate() {
     this.eventBus.cast(BILLING_PERIOD_CHANGED);
