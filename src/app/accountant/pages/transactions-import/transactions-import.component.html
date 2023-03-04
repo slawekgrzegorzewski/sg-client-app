@@ -18,10 +18,24 @@
     <h4>Nowe transakcje z banku do zaimportowania</h4>
 
     <ng-container *ngFor="let transactionToImport of transactions">
-      <app-transactions-row [transactionToImport]="transactionToImport" (click)="select(transactionToImport)"
-                            class="sg-row-hoverable">
+      <div class="sg-flex-column" [class.transaction-multi-selection]="isTransactionSelected(transactionToImport.id)">
+        <div class="sg-flex-row">
+          <div class="sg-flex-column sg-flex-justify-center">
+            <ng-container *ngIf="isTransactionSelected(transactionToImport.id)">
+              <input class="form-check-input" type="checkbox" (click)="unselectTransaction(transactionToImport.id)"
+                     checked>
+            </ng-container>
+            <ng-container *ngIf="!isTransactionSelected(transactionToImport.id)">
+              <input class="form-check-input" type="checkbox" (click)="selectTransaction(transactionToImport.id)">
+            </ng-container>
+          </div>
+          <app-transactions-row [transactionToImport]="transactionToImport"
+                                (click)="selectSingleTransactionToImport(transactionToImport)"
+                                class="sg-row-hoverable">
 
-      </app-transactions-row>
+          </app-transactions-row>
+        </div>
+      </div>
     </ng-container>
   </ng-container>
 </ng-template>

@@ -38,6 +38,8 @@ export class TransactionsImportComponent implements OnInit {
   transactions: BankTransactionToImport[] = [];
   transactionToImport: BankTransactionToImport | null = null;
 
+  selectedTransactions: number[] = [];
+
   billingElementToCreate: Income | Expense | null = null;
   accountOfBillingElementToCreate: Account | null = null;
   billingElementToCreateType: BillingElementType | null = null;
@@ -102,8 +104,16 @@ export class TransactionsImportComponent implements OnInit {
     this.transactionCreationData = null;
   }
 
-  select(transactionToImport: BankTransactionToImport): void {
-    this.transactionToImport = transactionToImport;
+  selectSingleTransactionToImport(transactionToImport: BankTransactionToImport): void {
+    if(this.selectedTransactions.length === 0) {
+      this.transactionToImport = transactionToImport;
+    } else {
+      if(this.selectedTransactions.includes(transactionToImport.id)){
+        this.unselectTransaction(transactionToImport.id);
+      } else {
+        this.selectTransaction(transactionToImport.id);
+      }
+    }
   }
 
   showBillingElementCreation(billingElementToCreate: Expense | Income, account: Account, affectedBankTransactionsInfo: AffectedBankTransactionsToImportInfo) {
@@ -149,5 +159,17 @@ export class TransactionsImportComponent implements OnInit {
 
   ignore(transaction: BankTransactionToImport) {
     this.nodrigenService.ignoreTransaction(transaction).subscribe();
+  }
+
+  isTransactionSelected(transactionId: number) {
+    return this.selectedTransactions.includes(transactionId);
+  }
+
+  selectTransaction(transactionId: number) {
+    this.selectedTransactions.push(transactionId);
+  }
+
+  unselectTransaction(transactionId: number) {
+    this.selectedTransactions = this.selectedTransactions.filter(tId => tId !== transactionId);
   }
 }

@@ -1,3 +1,7 @@
 tr:not(:first-child) {
   border-top: #343a40 dashed thin;
 }
+
+.transaction-multi-selection {
+  background-color: #a7d7ff;
+}
