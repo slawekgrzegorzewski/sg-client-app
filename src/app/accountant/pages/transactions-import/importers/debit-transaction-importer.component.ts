@@ -12,88 +12,118 @@ import {TransactionType} from '../../../model/transaction-type';
 @Component({
   selector: 'app-debit-transaction-importer',
   template: `
-    <ng-container *ngIf="canBeImported()">
-      <div (click)="createDebit()">
-        <b>Wydatek</b>
-      </div>
-      <div (click)="createCashWithdrawal()">
-        <b>Wypłata gotówkowa</b>
-      </div>
-      <ng-container *ngIf="isAlignmentPossible()">
-        <b>Wydatek wyrównany transakcją:</b>
-        <div style="padding-left: 20px">
-          <app-transactions-row *ngFor="let alignmentCandidate of candidatesToAlignment"
-                                [transactionToImport]="alignmentCandidate"
-                                (click)="aligningTransaction = alignmentCandidate; createDebit();">
-          </app-transactions-row>
-        </div>
-      </ng-container>
-    </ng-container>
+    <div *ngIf="canBeImported()" (click)="createDebit()">
+      <b>Wydatek</b>
+    </div>
+    <div *ngIf="transactions.length === 1 && transactions[0].isDebit()" (click)="createCashWithdrawal()">
+      <b>Wypłata gotówkowa</b>
+    </div>
   `
 })
-export class DebitTransactionImporterComponent implements OnInit {
+export class DebitTransactionImporterComponent {
 
+  get transactions(): BankTransactionToImport[] {
+    return this._transactions;
+  }
+  @Input() set transactions(value: BankTransactionToImport[]) {
+    this._transactions = value;
+    this.createExpense();
+  }
   @Input() allAccounts: Account[] = [];
-  @Input() allTransactions: BankTransactionToImport[] = [];
-  @Input() transaction: BankTransactionToImport | null = null;
 
   @Output() onExpenseCreation = new EventEmitter<[Expense, Account, AffectedBankTransactionsToImportInfo]>();
   @Output() onTransactionCreation = new EventEmitter<TransactionCreationData>();
 
-  candidatesToAlignment: (BankTransactionToImport | null)[] = [];
-  aligningTransaction: (BankTransactionToImport | null) = null;
-
-  ngOnInit(): void {
-    this.candidatesToAlignment = this.allTransactions.filter(t =>
-      t.isCredit()
-      && t.destinationAccount?.currency === this.transaction?.sourceAccount?.currency
-      && t.credit < (this.transaction?.debit || 0)
-    );
-  }
+  private _transactions: BankTransactionToImport[] = [];
+  private _expenseToCreate: Expense | null = null;
 
   canBeImported() {
-    return this.transaction?.isDebit() || false;
+    return this._expenseToCreate !== null;
   }
 
-  isAlignmentPossible(): boolean {
-    return (this.candidatesToAlignment?.length || 0) > 0;
+  private createExpense() {
+    this._expenseToCreate = null;
+
+    if (this.transactions.length === 0) {
+      return;
+    }
+    if (!this.transactions[0].isCreditOrDebitTransaction()) {
+      return;
+    }
+
+    const accountOfCreatingExpense = this.getAccountOfTransaction(this.transactions[0])!;
+
+    let amount: Decimal = new Decimal(0);
+    let expenseDate = new Date();
+    let description = '';
+
+    for (let transaction of this.transactions) {
+      if (!transaction.isCreditOrDebitTransaction()) {
+        return;
+      }
+      let account = this.getAccountOfTransaction(transaction)!;
+      let otherAccount = this.getOtherAccountOfTransaction(transaction)!;
+
+      if (account.id !== accountOfCreatingExpense.id
+        || accountOfCreatingExpense.currency != account.currency
+        || otherAccount !== null) {
+        return;
+      }
+      if (transaction.isDebit()) {
+        amount = amount.plus(new Decimal(transaction.debit));
+      } else {
+        amount = amount.minus(new Decimal(transaction.credit));
+      }
+      expenseDate = DatesUtils.min(expenseDate, transaction.timeOfTransaction);
+      description += (description === '' ? '' : '\n') + transaction.description;
+    }
+    if (amount.gt(new Decimal(0))) {
+      this._expenseToCreate = new Expense();
+      this._expenseToCreate.description = description;
+      this._expenseToCreate.amount = amount.toNumber();
+      this._expenseToCreate.currency = accountOfCreatingExpense.currency;
+      this._expenseToCreate.expenseDate = expenseDate;
+    }
   }
 
   createDebit() {
-    const transactionToImport = this.transaction!;
-
-    const expense = new Expense();
-    expense.amount = new Decimal(transactionToImport.debit).minus(new Decimal(this.aligningTransaction?.credit || 0)).toNumber();
-    expense.expenseDate = DatesUtils.min(transactionToImport.timeOfTransaction, this.aligningTransaction?.timeOfTransaction || null);
-    expense.description = transactionToImport.description + (this.aligningTransaction ? this.aligningTransaction.description + '\n' : '');
-
-    const affectedBankTransactionsToImportInfo = AffectedBankTransactionsToImportInfo.debit([transactionToImport.debitNodrigenTransactionId]);
-    if (this.aligningTransaction) {
-      affectedBankTransactionsToImportInfo.creditTransactions = [this.aligningTransaction.creditNodrigenTransactionId];
-    }
-
+    const accountOfCreatingExpense = this.getAccountOfTransaction(this.transactions[0])!;
+    const affectedBankTransactionsToImportInfo = AffectedBankTransactionsToImportInfo.debitCredit(
+      this.transactions.filter(t => t.isDebit()).map(t => t.debitNodrigenTransactionId),
+      this.transactions.filter(t => t.isCredit()).map(t => t.creditNodrigenTransactionId)
+    );
     this.onExpenseCreation.emit([
-      expense,
-      transactionToImport.sourceAccount!,
+      this._expenseToCreate!,
+      accountOfCreatingExpense,
       affectedBankTransactionsToImportInfo
     ]);
   }
 
   createCashWithdrawal() {
-    const sourceAccount = this.allAccounts.find(account => account.id === this.transaction!.sourceAccount!.id)!;
+    const bankTransactionToImport = this.transactions[0]!;
+    const sourceAccount = this.allAccounts.find(account => {
+      return account.id === bankTransactionToImport!.sourceAccount!.id;
+    })!;
     const cashAccounts = this.allAccounts.filter(t => t.bankAccount === null);
     const transactionCreationData = new TransactionCreationData(
       [sourceAccount],
       sourceAccount,
       cashAccounts,
       null,
-      [this.transaction!.debitNodrigenTransactionId],
+      [bankTransactionToImport.debitNodrigenTransactionId],
       TransactionType.TRANSFER_FROM_BANK_TRANSACTIONS,
-      new Decimal(this.transaction!.debit),
-      this.transaction!.description,
+      new Decimal(bankTransactionToImport.debit),
+      bankTransactionToImport.description,
       new Decimal(1)
     );
     this.onTransactionCreation.emit(transactionCreationData);
   }
 
+  getAccountOfTransaction(transaction: BankTransactionToImport) {
+    return transaction.isCredit() ? transaction.destinationAccount : transaction.sourceAccount;
+  }
+
+  getOtherAccountOfTransaction(transaction: BankTransactionToImport) {
+    return transaction.isCredit() ? transaction.sourceAccount : transaction.destinationAccount;
+  }
 }

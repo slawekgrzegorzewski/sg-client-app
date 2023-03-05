@@ -1,4 +1,4 @@
-<ng-template [ngTemplateOutlet]="transactionsList" *ngIf="shouldShowListOfTransactions()">
+<ng-template [ngTemplateOutlet]="transactionsList">
 </ng-template>
 
 <ng-template [ngTemplateOutlet]="transactionImportOptions"
@@ -6,11 +6,11 @@
 </ng-template>
 
 <ng-template [ngTemplateOutlet]="billingElementCreation"
-             *ngIf="transactionToImport && billingElementToCreate && !transactionCreationData">
+             *ngIf="selectedTransactions.length > 0 && billingElementToCreate && !transactionCreationData">
 </ng-template>
 
 <ng-template [ngTemplateOutlet]="transactionCreation"
-             *ngIf="transactionToImport && !billingElementToCreate && transactionCreationData">
+             *ngIf="selectedTransactions.length > 0 && !billingElementToCreate && transactionCreationData">
 </ng-template>
 
 <ng-template #transactionsList>
@@ -18,21 +18,20 @@
     <h4>Nowe transakcje z banku do zaimportowania</h4>
 
     <ng-container *ngFor="let transactionToImport of transactions">
-      <div class="sg-flex-column" [class.transaction-multi-selection]="isTransactionSelected(transactionToImport.id)">
+      <div class="sg-flex-column" [class.transaction-multi-selection]="isTransactionSelected(transactionToImport)">
         <div class="sg-flex-row">
           <div class="sg-flex-column sg-flex-justify-center">
-            <ng-container *ngIf="isTransactionSelected(transactionToImport.id)">
-              <input class="form-check-input" type="checkbox" (click)="unselectTransaction(transactionToImport.id)"
+            <ng-container *ngIf="isTransactionSelected(transactionToImport)">
+              <input class="form-check-input" type="checkbox" (click)="unselectTransaction(transactionToImport)"
                      checked>
             </ng-container>
-            <ng-container *ngIf="!isTransactionSelected(transactionToImport.id)">
-              <input class="form-check-input" type="checkbox" (click)="selectTransaction(transactionToImport.id)">
+            <ng-container *ngIf="!isTransactionSelected(transactionToImport)">
+              <input class="form-check-input" type="checkbox" (click)="selectTransaction(transactionToImport)">
             </ng-container>
           </div>
           <app-transactions-row [transactionToImport]="transactionToImport"
-                                (click)="selectSingleTransactionToImport(transactionToImport)"
+                                (click)="changeSelectionOfTransaction(transactionToImport)"
                                 class="sg-row-hoverable">
-
           </app-transactions-row>
         </div>
       </div>
@@ -43,46 +42,48 @@
 <ng-template #transactionImportOptions>
 
   <div class="sg-flex-column">
-    <h5 class="sg-flex-justify-self-center">Importujesz następującą transakcję</h5>
-    <app-transactions-row [transactionToImport]="transactionToImport"></app-transactions-row>
+    <h5 class="sg-flex-justify-self-center" *ngIf="selectedTransactions.length === 1">Importujesz następującą
+      transakcję</h5>
+    <h5 class="sg-flex-justify-self-center" *ngIf="selectedTransactions.length > 1">Importujesz następujące
+      transakcje</h5>
+    <app-transactions-row *ngFor="let transaction of selectedTransactions"
+                          [transactionToImport]="transaction"></app-transactions-row>
     <div class="sg-flex-justify-flex-end">
-      <button class="btn btn-link btn-small" (click)="transactionToImport = null">Anuluj</button>
+      <button class="btn btn-link btn-small" (click)="selectedTransactions = []">Anuluj</button>
     </div>
 
     <h6>Powyższą transakcję można zaimportować jako:</h6>
 
     <app-debit-transaction-importer
-      [transaction]="transactionToImport"
-      [allTransactions]="transactions"
       [allAccounts]="allAccounts"
+      [transactions]="selectedTransactions"
       (onExpenseCreation)="showBillingElementCreation($event[0],$event[1],$event[2])"
       (onTransactionCreation)="showTransactionCreation($event)">
     </app-debit-transaction-importer>
 
     <app-credit-transaction-importer
-      [transaction]="transactionToImport"
-      [allTransactions]="transactions"
+      [transactions]="selectedTransactions"
       [allAccounts]="allAccounts"
-      (onIncomeCreation)="showBillingElementCreation($event[0],$event[1],$event[2])"
-      (onTransactionCreation)="showTransactionCreation($event)">
+      (onIncomeCreation)="showBillingElementCreation($event[0],$event[1],$event[2])">
     </app-credit-transaction-importer>
 
     <app-transfer-importer
-      [transaction]="transactionToImport"
+      *ngIf="transactions.length === 2"
+      [transactions]="selectedTransactions"
       [allTransactions]="transactions"
       [allAccounts]="allAccounts"
       (onTransactionCreation)="showTransactionCreation($event)">
     </app-transfer-importer>
 
     <app-mutually-cancelling-importer
-      [transaction]="transactionToImport"
+      [transaction]="selectedTransactions[0]"
       [allTransactions]="transactions"
       (onMutuallyCancel)="mutuallyCancelBothTransactions($event[0], $event[1])"
       (onCancel)="showListOfTransactions()">
     </app-mutually-cancelling-importer>
 
     <app-ignore-importer
-      [transaction]="transactionToImport"
+      [transaction]="selectedTransactions[0]"
       (onIgnore)="ignore($event)"
       (onCancel)="showListOfTransactions()">
     </app-ignore-importer>
@@ -112,6 +113,6 @@
     [transactionType]="transactionCreationData!.transactionType"
     [amount]="transactionCreationData!.amount.toNumber()"
     [description]="transactionCreationData!.description"
-    [conversionRate]="transactionCreationData!.conversionRate?.toNumber() || 0"
+    [conversionRate]="transactionCreationData!.conversionRate.toNumber()"
   ></app-create-transaction>
 </ng-template>

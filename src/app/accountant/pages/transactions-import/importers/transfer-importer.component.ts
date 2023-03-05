@@ -27,6 +27,15 @@ import {TransactionUtils} from './transaction-utils';
 })
 export class TransferImporterComponent implements OnInit {
 
+  get transactions(): BankTransactionToImport[] {
+    return this._transactions;
+  }
+
+  @Input() set transactions(value: BankTransactionToImport[]) {
+    this._transactions = value;
+    this.createIncome();
+  }
+
   @Input() transaction: BankTransactionToImport | null = null;
   @Input() allTransactions: BankTransactionToImport[] = [];
   @Input() allAccounts: Account[] = [];
@@ -35,6 +44,7 @@ export class TransferImporterComponent implements OnInit {
 
   otherTransactionForTransfer: BankTransactionToImport | null = null;
   otherTransactionForTransferWitConversion: BankTransactionToImport | null = null;
+  private _transactions: BankTransactionToImport[] = [];
 
   ngOnInit(): void {
     const transactionToImport = this.transaction!;

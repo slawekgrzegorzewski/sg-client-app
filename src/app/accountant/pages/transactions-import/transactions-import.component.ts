@@ -36,9 +36,7 @@ export class TransactionsImportComponent implements OnInit {
 
   allAccounts: Account[] = [];
   transactions: BankTransactionToImport[] = [];
-  transactionToImport: BankTransactionToImport | null = null;
-
-  selectedTransactions: number[] = [];
+  selectedTransactions: BankTransactionToImport[] = [];
 
   billingElementToCreate: Income | Expense | null = null;
   accountOfBillingElementToCreate: Account | null = null;
@@ -73,7 +71,7 @@ export class TransactionsImportComponent implements OnInit {
   onKeyUp(event: KeyboardEvent): void {
     switch (event.code) {
       case 'Escape':
-        if (!this.shouldShowListOfTransactions() && !this.shouldShowListOfImportOptions()) {
+        if (!this.shouldShowListOfImportOptions()) {
           this.showOptionsOfImporting();
         } else if (this.shouldShowListOfImportOptions()) {
           this.showListOfTransactions();
@@ -82,17 +80,13 @@ export class TransactionsImportComponent implements OnInit {
     }
   }
 
-  shouldShowListOfTransactions() {
-    return !this.transactionToImport && !this.billingElementToCreate && !this.transactionCreationData;
-  }
-
   shouldShowListOfImportOptions() {
-    return this.transactionToImport && !this.billingElementToCreate && !this.transactionCreationData;
+    return this.selectedTransactions.length > 0 && !this.billingElementToCreate && !this.transactionCreationData;
   }
 
   showListOfTransactions() {
     this.showOptionsOfImporting();
-    this.transactionToImport = null;
+    this.selectedTransactions = [];
   }
 
   showOptionsOfImporting() {
@@ -100,20 +94,7 @@ export class TransactionsImportComponent implements OnInit {
     this.accountOfBillingElementToCreate = null;
     this.billingElementToCreateType = null;
     this.affectedBankTransactionsInfo = null;
-
     this.transactionCreationData = null;
-  }
-
-  selectSingleTransactionToImport(transactionToImport: BankTransactionToImport): void {
-    if(this.selectedTransactions.length === 0) {
-      this.transactionToImport = transactionToImport;
-    } else {
-      if(this.selectedTransactions.includes(transactionToImport.id)){
-        this.unselectTransaction(transactionToImport.id);
-      } else {
-        this.selectTransaction(transactionToImport.id);
-      }
-    }
   }
 
   showBillingElementCreation(billingElementToCreate: Expense | Income, account: Account, affectedBankTransactionsInfo: AffectedBankTransactionsToImportInfo) {
@@ -161,15 +142,24 @@ export class TransactionsImportComponent implements OnInit {
     this.nodrigenService.ignoreTransaction(transaction).subscribe();
   }
 
-  isTransactionSelected(transactionId: number) {
-    return this.selectedTransactions.includes(transactionId);
+  isTransactionSelected(transaction: BankTransactionToImport) {
+    return this.selectedTransactions.includes(transaction);
   }
 
-  selectTransaction(transactionId: number) {
-    this.selectedTransactions.push(transactionId);
+  selectTransaction(transaction: BankTransactionToImport) {
+    this.selectedTransactions = [...this.selectedTransactions, transaction];
   }
 
-  unselectTransaction(transactionId: number) {
-    this.selectedTransactions = this.selectedTransactions.filter(tId => tId !== transactionId);
+  unselectTransaction(transaction: BankTransactionToImport) {
+    this.selectedTransactions = this.selectedTransactions.filter(t => t.id !== transaction.id);
+  }
+
+  changeSelectionOfTransaction(transaction: BankTransactionToImport) {
+    if (this.isTransactionSelected(transaction)) {
+      this.unselectTransaction(transaction);
+    } else {
+      this.selectTransaction(transaction);
+    }
+
   }
 }
