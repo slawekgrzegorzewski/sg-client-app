@@ -84,6 +84,10 @@ export class BillingPeriodsService {
       return id ? ('/' + id.toString()) : '';
     }
 
+    function alignmentTransactionIdParts(ids: number[]) {
+      return ids.length > 0 ? ('/' + ids) : '';
+    }
+
     if (element instanceof Income) {
       observable = this.http.put(
         `${this.billingEndpoint}/income/${accountId}/${creditTransactionId}${alignmentTransactionIdPart(debitTransactionId)}`,
@@ -91,7 +95,7 @@ export class BillingPeriodsService {
         {responseType: 'text'});
     } else {
       observable = this.http.put(
-        `${this.billingEndpoint}/expense/${accountId}/${debitTransactionId}${alignmentTransactionIdPart(creditTransactionId)}`,
+        `${this.billingEndpoint}/expense/${accountId}/${affectedBankTransactionsToImportInfo.debitTransactions}${alignmentTransactionIdParts(affectedBankTransactionsToImportInfo.creditTransactions)}`,
         element,
         {responseType: 'text'});
     }
