@@ -138,8 +138,8 @@ export class TransactionsImportComponent implements OnInit {
     this.nodrigenService.mutuallyCancelTransactions(first, second).subscribe();
   }
 
-  ignore(transaction: BankTransactionToImport) {
-    this.nodrigenService.ignoreTransaction(transaction).subscribe();
+  ignore(transactions: BankTransactionToImport[]) {
+    this.nodrigenService.ignoreTransactions(transactions).subscribe();
   }
 
   isTransactionSelected(transaction: BankTransactionToImport) {

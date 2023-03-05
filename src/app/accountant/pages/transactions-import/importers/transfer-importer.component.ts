@@ -1,7 +1,6 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {BankTransactionToImport} from '../../../../openbanking/model/nodrigen/bank-transaction-to-import';
 import Decimal from 'decimal.js';
-import {Account} from '../../../model/account';
 import {TransactionCreationData} from '../model/transaction-creation-data';
 import {TransactionType} from '../../../model/transaction-type';
 import {TransactionUtils} from './transaction-utils';
@@ -12,20 +11,21 @@ import {TransactionUtils} from './transaction-utils';
   template: `
     <ng-container>
       <div *ngIf="transactionMayBeTransfer()"
-           (click)="createTransfer(this.otherTransactionForTransfer!)">
+           (click)="createTransfer(this._otherTransactionForTransfer!)">
         <b>Przekaz wewnętrzny</b>
       </div>
       <div *ngIf="transactionMayBeTransferWithConversion()"
-           (click)="createTransfer(this.otherTransactionForTransferWitConversion!, decimal(this.otherTransactionForTransferWitConversion!.credit).div(decimal(this.transaction!.debit)))">
+           (click)="createTransferWithConversion()">
         <b>Przekaz wewnętrzny z wymianą walut</b>
       </div>
-      <div *ngIf="transactionMayBeSingleTransferWithConversion()" (click)="createSingleTransfer()">
+      <div *ngIf="transactionMayBeSingleTransferWithConversion()"
+           (click)="createTransferFromSingleTransactionWithConversion()">
         <b>Przekaz wewnętrzny z wymianą walut</b>
       </div>
     </ng-container>
   `
 })
-export class TransferImporterComponent implements OnInit {
+export class TransferImporterComponent {
 
   get transactions(): BankTransactionToImport[] {
     return this._transactions;
@@ -33,80 +33,98 @@ export class TransferImporterComponent implements OnInit {
 
   @Input() set transactions(value: BankTransactionToImport[]) {
     this._transactions = value;
-    this.createIncome();
+    this.prepareTransferParties();
   }
-
-  @Input() transaction: BankTransactionToImport | null = null;
-  @Input() allTransactions: BankTransactionToImport[] = [];
-  @Input() allAccounts: Account[] = [];
 
   @Output() onTransactionCreation = new EventEmitter<TransactionCreationData>();
 
-  otherTransactionForTransfer: BankTransactionToImport | null = null;
-  otherTransactionForTransferWitConversion: BankTransactionToImport | null = null;
+  _transaction: BankTransactionToImport | null = null;
+  _otherTransactionForTransfer: BankTransactionToImport | null = null;
+  _otherTransactionForTransferWithConversion: BankTransactionToImport | null = null;
   private _transactions: BankTransactionToImport[] = [];
 
-  ngOnInit(): void {
-    const transactionToImport = this.transaction!;
-    this.otherTransactionForTransfer = TransactionUtils.findTransactionCandidateForTransfer(
-      this.allTransactions,
-      transactionToImport,
+  private prepareTransferParties() {
+    this._transaction = null;
+    this._otherTransactionForTransfer = null;
+    this._otherTransactionForTransferWithConversion = null;
+
+    if (this.transactions.length === 1
+      && this.transactions[0].sourceAccount
+      && this.transactions[0].destinationAccount
+      && this.transactions[0].sourceAccount.currency !== this.transactions[0].destinationAccount.currency) {
+      this._transaction = this.transactions[0];
+      return;
+    }
+
+    if (this.transactions.length !== 2) return;
+
+    this._transaction = this.transactions[0].isDebit() ? this.transactions[0] : this.transactions[1];
+    const otherTransaction = this.transactions[0].isDebit() ? this.transactions[1] : this.transactions[0];
+
+    this._otherTransactionForTransfer = TransactionUtils.findTransactionCandidateForTransfer(
+      [otherTransaction],
+      this._transaction!,
       tti => tti.isCredit()
-        && BankTransactionToImport.compareDates(tti, transactionToImport) === 0
-        && tti.credit === transactionToImport.debit
-        && (tti.destinationAccount?.currency || '') === (transactionToImport.sourceAccount?.currency || '')
+        && BankTransactionToImport.compareDates(tti, this._transaction!) === 0
+        && tti.credit === this._transaction!.debit
+        && (tti.destinationAccount?.currency || '') === (this._transaction!.sourceAccount?.currency || '')
     );
-    this.otherTransactionForTransferWitConversion = TransactionUtils.findTransactionCandidateForTransfer(
-      this.allTransactions,
-      transactionToImport,
+
+    this._otherTransactionForTransferWithConversion = TransactionUtils.findTransactionCandidateForTransfer(
+      [otherTransaction],
+      this._transaction!,
       tti => tti.isCredit()
-        && BankTransactionToImport.compareDates(tti, transactionToImport) === 0
-        && (tti.destinationAccount?.currency || '') !== (transactionToImport.sourceAccount?.currency || ''));
+        && BankTransactionToImport.compareDates(tti, this._transaction!) === 0
+        && (tti.destinationAccount?.currency || '') !== (this._transaction!.sourceAccount?.currency || ''));
   }
 
   transactionMayBeTransfer() {
-    return this.transaction?.isDebit() && this.otherTransactionForTransfer !== null;
+    return this._transaction !== null && this._otherTransactionForTransfer !== null;
   }
 
   transactionMayBeTransferWithConversion() {
-    return this.transaction?.isDebit() && this.otherTransactionForTransferWitConversion !== null;
+    return this._transaction !== null && this._otherTransactionForTransferWithConversion !== null;
   }
 
   transactionMayBeSingleTransferWithConversion() {
-    return this.transaction?.sourceAccount
-      && this.transaction?.destinationAccount
-      && this.transaction.sourceAccount.currency !== this.transaction.destinationAccount.currency;
+    return this._transaction !== null && this._otherTransactionForTransferWithConversion === null;
   }
 
-  decimal(value: number): Decimal {
-    return new Decimal(value);
+  createTransfer(destinationTransactionForTransfer: BankTransactionToImport) {
+    this.onTransactionCreation.emit(
+      this.prepareTransactionCreationData(
+        this._transaction!,
+        destinationTransactionForTransfer,
+        new Decimal(1)));
   }
 
-  createTransfer(otherTransactionForTransfer: BankTransactionToImport, conversionRate = new Decimal(1)) {
-    this.onTransactionCreation.emit(new TransactionCreationData(
-      [this.transaction!.sourceAccount!],
-      this.transaction!.sourceAccount!,
-      [otherTransactionForTransfer!.destinationAccount!],
-      otherTransactionForTransfer!.destinationAccount!,
-      [otherTransactionForTransfer!.creditNodrigenTransactionId, this.transaction!.debitNodrigenTransactionId],
+  createTransferWithConversion() {
+    this.onTransactionCreation.emit(
+      this.prepareTransactionCreationData(
+        this._transaction!,
+        this._otherTransactionForTransferWithConversion!,
+        new Decimal(this._otherTransactionForTransferWithConversion!.credit).dividedBy(new Decimal(this._transaction!.debit))));
+  }
+
+  createTransferFromSingleTransactionWithConversion() {
+    this.onTransactionCreation.emit(
+      this.prepareTransactionCreationData(
+        this._transaction!,
+        this._transaction!,
+        new Decimal((this._transaction!.credit || 0)).dividedBy(new Decimal(this._transaction!.debit || 1))));
+  }
+
+  private prepareTransactionCreationData(sourceBankTransactionForTransfer: BankTransactionToImport, destinationTransactionForTransfer: BankTransactionToImport, conversionRate: Decimal) {
+    return new TransactionCreationData(
+      [sourceBankTransactionForTransfer.sourceAccount!],
+      sourceBankTransactionForTransfer.sourceAccount!,
+      [destinationTransactionForTransfer.destinationAccount!],
+      destinationTransactionForTransfer.destinationAccount!,
+      [sourceBankTransactionForTransfer.debitNodrigenTransactionId, destinationTransactionForTransfer.creditNodrigenTransactionId],
       TransactionType.TRANSFER_FROM_BANK_TRANSACTIONS,
-      new Decimal(this.transaction!.debit),
-      this.transaction!.description,
+      new Decimal(sourceBankTransactionForTransfer.debit),
+      sourceBankTransactionForTransfer.description,
       conversionRate
-    ));
-  }
-
-  createSingleTransfer() {
-    this.onTransactionCreation.emit(new TransactionCreationData(
-      [this.transaction!.sourceAccount!],
-      this.transaction!.sourceAccount!,
-      [this.transaction!.destinationAccount!],
-      this.transaction!.destinationAccount!,
-      [this.transaction!.debitNodrigenTransactionId, this.transaction!.creditNodrigenTransactionId],
-      TransactionType.TRANSFER_FROM_BANK_TRANSACTIONS,
-      new Decimal(this.transaction!.debit),
-      this.transaction!.description,
-      new Decimal((this.transaction!.credit || 0) / (this.transaction!.debit || 1))
-    ));
+    );
   }
 }

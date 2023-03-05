@@ -75,8 +75,8 @@ export class NodrigenService {
       .pipe(tap(value => this.refreshTransactionsToImport()));
   }
 
-  ignoreTransaction(transactionToIgnore: BankTransactionToImport) {
-    return this.http.put<void>(`${this.endpoint}/nodrigen_ignore_transaction/${transactionToIgnore.nodrigenTransactionId}`, null)
+  ignoreTransactions(transactionsToIgnore: BankTransactionToImport[]) {
+    return this.http.put<void>(`${this.endpoint}/nodrigen_ignore_transaction/${transactionsToIgnore.map(t => t.nodrigenTransactionId)}`, null)
       .pipe(tap(value => this.refreshTransactionsToImport()));
   }
 

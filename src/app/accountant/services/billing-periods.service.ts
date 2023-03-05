@@ -77,12 +77,6 @@ export class BillingPeriodsService {
 
   createBillingElementWithImportingBankTransaction(element: Income | Expense, accountId: number, affectedBankTransactionsToImportInfo: AffectedBankTransactionsToImportInfo): Observable<string> {
     let observable: Observable<string> | null;
-    const creditTransactionId = affectedBankTransactionsToImportInfo.creditTransactions.length > 0 ? affectedBankTransactionsToImportInfo.creditTransactions[0] : null;
-    const debitTransactionId = affectedBankTransactionsToImportInfo.debitTransactions.length > 0 ? affectedBankTransactionsToImportInfo.debitTransactions[0] : null;
-
-    function alignmentTransactionIdPart(id: number | null) {
-      return id ? ('/' + id.toString()) : '';
-    }
 
     function alignmentTransactionIdParts(ids: number[]) {
       return ids.length > 0 ? ('/' + ids) : '';
@@ -90,12 +84,12 @@ export class BillingPeriodsService {
 
     if (element instanceof Income) {
       observable = this.http.put(
-        `${this.billingEndpoint}/income/${accountId}/${creditTransactionId}${alignmentTransactionIdPart(debitTransactionId)}`,
+        `${this.billingEndpoint}/income/${accountId}/${[...affectedBankTransactionsToImportInfo.creditTransactions, ...affectedBankTransactionsToImportInfo.debitTransactions]}`,
         element,
         {responseType: 'text'});
     } else {
       observable = this.http.put(
-        `${this.billingEndpoint}/expense/${accountId}/${affectedBankTransactionsToImportInfo.debitTransactions}${alignmentTransactionIdParts(affectedBankTransactionsToImportInfo.creditTransactions)}`,
+        `${this.billingEndpoint}/expense/${accountId}/${[...affectedBankTransactionsToImportInfo.creditTransactions, ...affectedBankTransactionsToImportInfo.debitTransactions]}`,
         element,
         {responseType: 'text'});
     }
