@@ -68,13 +68,13 @@
     </app-credit-transaction-importer>
 
     <app-transfer-importer
-      *ngIf="transactions.length === 1 || transactions.length === 2"
+      *ngIf="selectedTransactions.length === 1 || selectedTransactions.length === 2"
       [transactions]="selectedTransactions"
       (onTransactionCreation)="showTransactionCreation($event)">
     </app-transfer-importer>
 
     <app-mutually-cancelling-importer
-      *ngIf="transactions.length === 2"
+      *ngIf="selectedTransactions.length === 2"
       [transactions]="selectedTransactions"
       (onMutuallyCancel)="mutuallyCancelBothTransactions($event[0], $event[1])"
       (onCancel)="showListOfTransactions()">
