@@ -9,6 +9,10 @@
         <select id="filter" class="form-select" [(ngModel)]="intellectualPropertiesFilter" style="width: 150px;">
           <option *ngFor="let filter of intellectualPropertiesDates" [value]="filter">{{filter}}</option>
         </select>
+        <div class="form-check form-switch sg-flex-row sg-flex-align-center" style="width: 200px;margin-left: 10px;">
+          <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" [(ngModel)]="withoutAttachments">
+          <label class="form-check-label" for="flexSwitchCheckDefault" style="margin-left: 5px;">bez załączników</label>
+        </div>
         <button class="btn btn-sm btn-link" (click)="activeIdsArray = []" style="width: 150px;">
           zwiń wszystkie
         </button>
