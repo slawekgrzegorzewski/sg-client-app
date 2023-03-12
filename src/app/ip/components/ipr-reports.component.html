@@ -1,0 +1,45 @@
+<div class="sg-flex-justify-center">
+  <div style="width: 800px">
+    <div class="sg-flex-row sg-flex-justify-space-between">
+      <div class="form-group row">
+        <label for="date" class="col-form-label" style="width: 130px;font-weight: bold">
+          Raport za rok
+        </label>
+        <select id="date" class="form-select" style="width: 120px;" [(ngModel)]="year">
+          <option *ngFor="let dateOption of years" [value]="dateOption">{{dateOption}}</option>
+        </select>
+      </div>
+    </div>
+    <div *ngIf="iprReport">
+      Łączna ilość prac autorskich: {{iprReport.intellectualProperties.length}}
+    </div>
+    <table *ngIf="iprReport">
+      <thead>
+      <tr>
+        <td style="font-weight: bold">Opis zadania</td>
+        <td style="font-weight: bold">Ilość godzin IP</td>
+        <td style="font-weight: bold">Ilość godzin zwykłych</td>
+      </tr>
+      </thead>
+      <tbody>
+      <ng-container *ngFor="let monthReport of iprReport.months | keyvalue">
+        <tr>
+          <td style="font-weight: bold">Raport ze świadczenia usług programistycznych na podstawie umowy z dnia 20-07-2020 za {{monthReport.key}}</td>
+          <td>{{monthReport.value.ipHours}}</td>
+          <td>{{monthReport.value.nonIPHours}}</td>
+        </tr>
+        <tr *ngFor="let ips of monthReport.value.ipTasksWithHours | keyvalue">
+          <td>{{ips.key}}</td>
+          <td>{{ips.value}}</td>
+          <td></td>
+        </tr>
+        <tr *ngFor="let ips of monthReport.value.nonIPTasksWithHours | keyvalue">
+          <td>{{ips.key}}</td>
+          <td></td>
+          <td>{{ips.value}}</td>
+        </tr>
+      </ng-container>
+      </tbody>
+    </table>
+  </div>
+</div>

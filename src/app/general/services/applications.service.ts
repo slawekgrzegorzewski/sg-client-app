@@ -16,6 +16,7 @@ import {CUBES_STATISTICS_ROUTER_URL} from '../../speedcubing/pages/cube-statisti
 import {SETTINGS_ROUTER_URL} from '../../accountant/pages/settings/settings.component';
 import {IP_HOME_ROUTER_URL} from '../../ip/components/intellectual-property.component';
 import {TIME_RECORDS_ROUTER_URL} from '../../ip/components/time-records.component';
+import {IPR_REPORTS_ROUTER_URL} from '../../ip/components/ipr-reports.component';
 
 export const ACCOUNTANT_APP = 'Accountant';
 export const CHECKER_APP = 'Checker';
@@ -37,7 +38,7 @@ export const APPLICATIONS_CONFIG = new Map<string, ApplicationConfig>([
   [CHECKER_APP, new ApplicationConfig([CHECKER_HOME_ROUTER_URL])],
   [SYR_APP, new ApplicationConfig([SYR_HOME_ROUTER_URL, SYR_ADMIN_ROUTER_URL])],
   [CUBES_APP, new ApplicationConfig([CUBES_HOME_ROUTER_URL, CUBES_STATISTICS_ROUTER_URL])],
-  [IPR_APP, new ApplicationConfig([IP_HOME_ROUTER_URL, TIME_RECORDS_ROUTER_URL])],
+  [IPR_APP, new ApplicationConfig([IP_HOME_ROUTER_URL, TIME_RECORDS_ROUTER_URL, IPR_REPORTS_ROUTER_URL])],
 ]);
 
 @Injectable({

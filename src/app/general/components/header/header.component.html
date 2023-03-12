@@ -71,6 +71,9 @@
       <li class="nav-item" [routerLinkActive]="['time-records']" *ngIf="isLoggedIn && applicationsService.isIntellectualProperty()">
         <a class="nav-link" [routerLink]="['/time-records']">Raporty czasu</a>
       </li>
+      <li class="nav-item" [routerLinkActive]="['ipr-reports']" *ngIf="isLoggedIn && applicationsService.isIntellectualProperty()">
+        <a class="nav-link" [routerLink]="['/ipr-reports']">Raporty IP</a>
+      </li>
       <li class="nav-item" *ngIf="isLoggedIn">
         <a class="nav-link" (click)="castRefreshRequest()">Odśwież dane</a>
       </li>

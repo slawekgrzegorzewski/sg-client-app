@@ -80,7 +80,7 @@ export class DatesUtils {
     return datePipe.transform(d, 'yyyy')!;
   }
 
-  public static getMonthString(d: Date, datePipe: DatePipe) {
+  public static getYearMonthString(d: Date, datePipe: DatePipe) {
     return datePipe.transform(d, 'yyyy-MM')!;
   }
 

@@ -116,7 +116,7 @@ import {
   IntellectualPropertyTaskDetailsModalComponent
 } from './ip/components/utils/intellectual-property-task-details-modal.component';
 import {UploaderModalComponent} from './general/components/uploader/uploader-modal.component';
-import {IpRecordsComponent} from "./ip/components/ip-records.component";
+import {IPRReportsComponent} from "./ip/components/ipr-reports.component";
 
 @NgModule({
   declarations: [
@@ -188,7 +188,7 @@ import {IpRecordsComponent} from "./ip/components/ip-records.component";
     IntellectualPropertyEditorModalComponent,
     IntellectualPropertyTaskDetailsModalComponent,
     UploaderModalComponent,
-    IpRecordsComponent
+    IPRReportsComponent
   ],
   imports: [
     BrowserModule,

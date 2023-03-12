@@ -114,7 +114,7 @@ export class IntellectualPropertyComponent implements OnInit {
         .flatMap(ip => ip.tasks)
         .flatMap(t => t.timeRecords)
         .map(tr => tr.date)
-        .map(d => DatesUtils.getMonthString(d, this.datePipe)))].sort();
+        .map(d => DatesUtils.getYearMonthString(d, this.datePipe)))].sort();
       this.intellectualPropertiesDates.unshift(ALL);
       if (!this.intellectualPropertiesDates.includes(this.intellectualPropertiesFilter)) {
         this.intellectualPropertiesFilter = ALL;
@@ -126,7 +126,7 @@ export class IntellectualPropertyComponent implements OnInit {
     const dateFiltered = this.intellectualPropertiesFilter === ALL
       ? this.allIntellectualProperties
       : this.allIntellectualProperties
-        .filter(ip => ip.tasks.find(t => t.timeRecords.find(tr => DatesUtils.getMonthString(tr.date, this.datePipe) === this.intellectualPropertiesFilter)));
+        .filter(ip => ip.tasks.find(t => t.timeRecords.find(tr => DatesUtils.getYearMonthString(tr.date, this.datePipe) === this.intellectualPropertiesFilter)));
     this.intellectualPropertiesFiltered = this.withoutAttachments
       ? dateFiltered.map(ip => {
         const taskWithoutAttachments = ip.tasks.filter(t => t.attachments === null || t.attachments.length === 0);

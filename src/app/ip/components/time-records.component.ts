@@ -36,7 +36,7 @@ export class TimeRecordsComponent implements OnInit {
 
   set date(value: string) {
     this.$date = value;
-    const filteredTimeRecords = this.timeRecords.filter(timeRecord => DatesUtils.getMonthString(timeRecord.date, this.datePipe) === this.date);
+    const filteredTimeRecords = this.timeRecords.filter(timeRecord => DatesUtils.getYearMonthString(timeRecord.date, this.datePipe) === this.date);
     this.timeRecordsForMonth = filteredTimeRecords.reduce((groups, item) => {
       const dateKey = DatesUtils.getDateString(item.date, this.datePipe);
       let items = groups.get(dateKey);
@@ -96,7 +96,7 @@ export class TimeRecordsComponent implements OnInit {
 
         const byDate = ComparatorBuilder.comparingByDate<TimeRecordWithTask>(timeRecord => timeRecord.date).build();
         this.timeRecords = [...timeRecordsWithTask, ...timeRecordsWithoutTask].sort(byDate);
-        this.dates = [...new Set(this.timeRecords.map(timeRecord => timeRecord.date).map(d => DatesUtils.getMonthString(d, this.datePipe)))].sort();
+        this.dates = [...new Set(this.timeRecords.map(timeRecord => timeRecord.date).map(d => DatesUtils.getYearMonthString(d, this.datePipe)))].sort();
         const previousDate = this.date;
         this.date = this.dates[this.dates.length - 1];
         if (previousDate && this.dates.includes(previousDate)) {
