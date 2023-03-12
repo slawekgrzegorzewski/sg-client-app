@@ -76,6 +76,10 @@ export class DatesUtils {
       .sort((a, b) => -this.compareDatesOnly(a!, b!))[0]!;
   }
 
+  public static getYearString(d: Date, datePipe: DatePipe) {
+    return datePipe.transform(d, 'yyyy')!;
+  }
+
   public static getMonthString(d: Date, datePipe: DatePipe) {
     return datePipe.transform(d, 'yyyy-MM')!;
   }

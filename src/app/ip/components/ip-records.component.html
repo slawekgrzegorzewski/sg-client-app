@@ -1,0 +1,26 @@
+<div class="sg-flex-justify-center">
+  <div style="width: 800px">
+    <div class="sg-flex-row sg-flex-justify-space-between">
+      <button class="btn btn-link btn-sm" (click)="showTimeRecordCreation()">stwórz raport czasowy</button>
+      <div class="form-group row">
+        <label for="date" class="col-form-label" style="width: 130px;font-weight: bold">
+          {{totalHours()}} godzin w
+        </label>
+        <select id="date" class="form-select" style="width: 120px;" [(ngModel)]="date">
+          <option *ngFor="let dateOption of dates" [value]="dateOption">{{dateOption}}</option>
+        </select>
+      </div>
+    </div>
+    <div *ngFor="let timeRecordsForDate of timeRecordsForMonth | keyvalue">
+      <b>{{timeRecordsForDate.key}} - w sumie {{sumHours(timeRecordsForDate.value)}} godzin</b>
+      <div style="margin-left: 50px">
+        <div *ngFor="let timeRecord of timeRecordsForDate.value">
+          <button class="btn btn-link btn-sm" (click)="showTimeRecordEdition(timeRecord)">
+            <i class="bi bi-pencil"></i>
+          </button>
+          {{timeRecord.numberOfHours}} godzin {{timeRecord.task?.description || timeRecord.description}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
