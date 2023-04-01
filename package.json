@@ -42,7 +42,11 @@
     "speakeasy": "~2.0.0",
     "three": "~0.142.0",
     "tslib": "~2.3.0",
-    "zone.js": "~0.11.4"
+    "zone.js": "~0.11.4",
+    "apollo-angular": "^4.2.0",
+    "@apollo/client": "^3.0.0",
+    "graphql": "^16",
+    "ngx-loading": "^14.0.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^14.2.10",
