@@ -1,129 +1,234 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpEvent} from '@angular/common/http';
+import {HttpClient, HttpEvent, HttpResponse} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
 import {Observable} from 'rxjs';
 import {NgEventBus} from 'ng-event-bus';
-import {map, share} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
 import {Refreshable} from '../../general/services/refreshable';
 import {IntellectualProperty} from '../model/intellectual-property';
 import {LoginService} from '../../general/services/login.service';
 import {DomainService} from '../../general/services/domain.service';
 import {TimeRecord} from '../model/time-record';
 import Decimal from 'decimal.js';
+import {Apollo, QueryRef} from 'apollo-angular';
+import {
+  AddIpr,
+  AssignmentAction,
+  CreateTask,
+  CreateTimeRecord,
+  DeleteIpr,
+  DeleteTask, DeleteTimeRecord,
+  GetAllDomainIntellectualProperties,
+  GetAllDomainNonIpTimeRecords,
+  UpdateIpr,
+  UpdateTask,
+  UpdateTimeRecord
+} from "../../../../types";
+import {DatesUtils} from "../../general/utils/dates-utils";
+import {DatePipe} from "@angular/common";
 
 @Injectable({
   providedIn: 'root'
 })
 export class IntellectualPropertyService extends Refreshable {
 
-  readonly IPR_URL = `${environment.serviceUrl}/ipr`;
   readonly TASK_URL = `${environment.serviceUrl}/task`;
-  readonly TIME_RECORD_URL = `${environment.serviceUrl}/time-record`;
 
-  private domainIntellectualProperties: Observable<IntellectualProperty[]> | null = null;
+  private domainIntellectualPropertiesQueryRef: QueryRef<{ allIPRs: IntellectualProperty[] }> | null = null;
+  private nonIPTimeRecordsQueryRef: QueryRef<{ nonIPTimeRecords: TimeRecord[] }> | null = null;
 
   constructor(
+    private apollo: Apollo,
     private loginService: LoginService,
     private domainService: DomainService,
     private http: HttpClient,
+    private datePipe: DatePipe,
     eventBus: NgEventBus) {
     super(eventBus);
   }
 
   getIntellectualPropertiesForDomain(): Observable<IntellectualProperty[]> {
-    if (!this.domainIntellectualProperties) {
-      this.domainIntellectualProperties = this.http.get<IntellectualProperty[]>(this.IPR_URL).pipe(
-        share(),
-        map(data => data.map(ip => new IntellectualProperty(ip)))
+    this.domainIntellectualPropertiesQueryRef = this.apollo
+      .watchQuery<{ allIPRs: IntellectualProperty[] }>({
+        query: GetAllDomainIntellectualProperties
+      });
+    return this.domainIntellectualPropertiesQueryRef.valueChanges
+      .pipe(
+        map(result => result.data && result.data.allIPRs && result.data.allIPRs.map(ip => new IntellectualProperty(ip)))
       );
-    }
-    return this.domainIntellectualProperties;
   }
 
   createIntellectualProperty(description: string): Observable<IntellectualProperty> {
-    const intellectualPropertyObservable: Observable<IntellectualProperty> = this.http.put<IntellectualProperty>(this.IPR_URL, {description: description}).pipe(
-      map(data => new IntellectualProperty(data))
-    );
-    this.domainIntellectualProperties = null;
-    return intellectualPropertyObservable;
+    return this.apollo
+      .mutate<{ addIPR: IntellectualProperty }>({
+        mutation: AddIpr,
+        variables: {
+          description: description
+        },
+      }).pipe(
+        map(data => new IntellectualProperty(data!.data!.addIPR)),
+        tap(data => this.refreshIP())
+      );
   }
 
-  updateIntellectualProperty(id: number, description: string): Observable<string> {
-    const observable: Observable<string> = this.http.patch<string>(`${this.IPR_URL}/${id}`, {description: description});
-    this.domainIntellectualProperties = null;
-    return observable;
+  updateIntellectualProperty(id: number, description: string): Observable<IntellectualProperty> {
+    return this.apollo
+      .mutate<{ addIPR: IntellectualProperty }>({
+        mutation: UpdateIpr,
+        variables: {
+          intellectualPropertyId: id,
+          description: description
+        },
+      }).pipe(
+        map(data => new IntellectualProperty(data!.data!.addIPR)),
+        tap(data => this.refreshIP())
+      );
   }
 
   deleteIntellectualProperty(id: number): Observable<string> {
-    const observable: Observable<string> = this.http.delete<string>(`${this.IPR_URL}/${id}`);
-    this.domainIntellectualProperties = null;
-    return observable;
+    return this.apollo
+      .mutate<{ result: string }>({
+        mutation: DeleteIpr,
+        variables: {
+          intellectualPropertyId: id
+        },
+      }).pipe(
+        map(data => data!.data!.result),
+        tap(data => this.refreshIP())
+      );
   }
 
   createTask(intellectualPropertyId: number, createData: { coAuthors: string, description: string }): Observable<string> {
-    const observable: Observable<string> = this.http.post<string>(`${this.IPR_URL}/${intellectualPropertyId}`, createData);
-    this.domainIntellectualProperties = null;
-    return observable;
+    return this.apollo
+      .mutate<{ result: string }>({
+        mutation: CreateTask,
+        variables: {
+          intellectualPropertyId: intellectualPropertyId,
+          coAuthors: createData.coAuthors,
+          description: createData.description
+        },
+      }).pipe(
+        map(data => data!.data!.result),
+        tap(data => this.refreshIP())
+      );
   }
 
   updateTask(taskId: number, taskData: { coAuthors: string; description: string }) {
-    const observable: Observable<string> = this.http.patch<string>(`${this.TASK_URL}/${taskId}`, taskData);
-    this.domainIntellectualProperties = null;
-    return observable;
+    return this.apollo
+      .mutate<{ result: string }>({
+        mutation: UpdateTask,
+        variables: {
+          taskId: taskId,
+          coAuthors: taskData.coAuthors,
+          description: taskData.description
+        },
+      }).pipe(
+        map(data => data!.data!.result),
+        tap(data => this.refreshIP())
+      );
   }
 
   deleteTask(taskId: number) {
-    const observable: Observable<string> = this.http.delete<string>(`${this.TASK_URL}/${taskId}`);
-    this.domainIntellectualProperties = null;
-    return observable;
+    return this.apollo
+      .mutate<{ result: string }>({
+        mutation: DeleteTask,
+        variables: {
+          taskId: taskId
+        },
+      }).pipe(
+        map(data => data!.data!.result),
+        tap(data => this.refreshIP())
+      );
   }
 
   getTimeRecordsNotAssignedToTask() {
-    return this.http.get<TimeRecord[]>(`${this.TIME_RECORD_URL}`).pipe(
-      map(timeRecords => timeRecords.map(timeRecord => new TimeRecord(timeRecord)))
-    );
+    this.nonIPTimeRecordsQueryRef = this.apollo
+      .watchQuery<{ nonIPTimeRecords: TimeRecord[] }>({
+        query: GetAllDomainNonIpTimeRecords
+      });
+    return this.nonIPTimeRecordsQueryRef.valueChanges
+      .pipe(
+        map(result => result.data && result.data.nonIPTimeRecords && result.data.nonIPTimeRecords.map(tr => new TimeRecord(tr)))
+      );
   }
 
   createTimeRecord(taskId: number | null, timeRecordData: { date: Date; description: string; numberOfHours: Decimal }) {
-    const observable: Observable<string> = this.http.put<string>(`${this.TIME_RECORD_URL}`, {
-      date: timeRecordData.date,
-      description: timeRecordData.description,
-      numberOfHours: timeRecordData.numberOfHours.toString(),
-      assignmentAction: taskId ? 'ASSIGN' : 'NOP',
-      taskId: taskId
-    });
-    this.domainIntellectualProperties = null;
-    return observable;
+    return this.apollo
+      .mutate<{ result: string }>({
+        mutation: CreateTimeRecord,
+        variables: {
+          taskId: taskId,
+          date: DatesUtils.getDateString(timeRecordData.date, this.datePipe),
+          numberOfHours: timeRecordData.numberOfHours,
+          description: timeRecordData.description,
+          assignmentAction: taskId ? AssignmentAction.Assign : AssignmentAction.Nop
+        },
+      }).pipe(
+        map(data => data!.data!.result),
+        tap(data => taskId ? this.refreshIP() : this.refreshTimeRecords())
+      );
   }
 
   updateTimeRecord(timeRecordId: number, timeRecordData: { date: Date; description: string; numberOfHours: Decimal }) {
-    const observable: Observable<string> = this.http.patch<string>(`${this.TIME_RECORD_URL}/${timeRecordId}`, {
-      date: timeRecordData.date,
-      description: timeRecordData.description,
-      numberOfHours: timeRecordData.numberOfHours.toString(),
-      assignmentAction: 'NOP',
-      taskId: null
-    });
-    this.domainIntellectualProperties = null;
-    return observable;
+    return this.apollo
+      .mutate<{ result: string }>({
+        mutation: UpdateTimeRecord,
+        variables: {
+          timeRecordId: timeRecordId,
+          taskId: null,
+          date: DatesUtils.getDateString(timeRecordData.date, this.datePipe),
+          numberOfHours: timeRecordData.numberOfHours,
+          description: timeRecordData.description,
+          assignmentAction: AssignmentAction.Nop
+        },
+      }).pipe(
+        map(data => data!.data!.result),
+        tap(data => {
+          this.refreshIP();
+          this.refreshTimeRecords();
+        })
+      );
   }
 
-  updateTimeRecordWithTask(taskId: number | null, timeRecordId: number, timeRecordData: { date: Date; description: string; numberOfHours: Decimal }) {
-    const observable: Observable<string> = this.http.patch<string>(`${this.TIME_RECORD_URL}/${timeRecordId}`, {
-      date: timeRecordData.date,
-      description: timeRecordData.description,
-      numberOfHours: timeRecordData.numberOfHours.toString(),
-      assignmentAction: taskId ? 'ASSIGN' : 'UNASSIGN',
-      taskId: taskId
-    });
-    this.domainIntellectualProperties = null;
-    return observable;
+  updateTimeRecordWithTask(taskId: number | null, timeRecordId: number, timeRecordData: {
+    date: Date;
+    description: string;
+    numberOfHours: Decimal
+  }) {
+    return this.apollo
+      .mutate<{ result: string }>({
+        mutation: UpdateTimeRecord,
+        variables: {
+          timeRecordId: timeRecordId,
+          taskId: taskId,
+          date: DatesUtils.getDateString(timeRecordData.date, this.datePipe),
+          numberOfHours: timeRecordData.numberOfHours,
+          description: timeRecordData.description,
+          assignmentAction: taskId ? AssignmentAction.Assign : AssignmentAction.Unassign
+        },
+      }).pipe(
+        map(data => data!.data!.result),
+        tap(data => {
+          this.refreshIP();
+          this.refreshTimeRecords();
+        })
+      );
   }
 
   deleteTimeRecord(timeRecordId: number) {
-    const observable: Observable<string> = this.http.delete<string>(`${this.TIME_RECORD_URL}/${timeRecordId}`);
-    this.domainIntellectualProperties = null;
-    return observable;
+    return this.apollo
+      .mutate<{ result: string }>({
+        mutation: DeleteTimeRecord,
+        variables: {
+          timeRecordId: timeRecordId
+        },
+      }).pipe(
+        map(data => data!.data!.result),
+        tap(data => {
+          this.refreshIP();
+          this.refreshTimeRecords();
+        })
+      );
   }
 
   linkForAttachmentDownload(taskId: number, fileName: string): string {
@@ -134,21 +239,29 @@ export class IntellectualPropertyService extends Refreshable {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('fileName', file.name);
-    var observable = this.http.post(`${this.TASK_URL}/${taskId}/attachment`, formData, {
+    return this.http.post(`${this.TASK_URL}/${taskId}/attachment`, formData, {
       reportProgress: true,
       observe: 'events'
-    });
-    this.refreshData();
-    return observable;
+    }).pipe(
+      tap(event => {
+        if (event instanceof HttpResponse) {
+          this.refreshIP();
+        }
+      })
+    );
   }
 
   deleteAttachment(taskId: number, fileName: string): Observable<string> {
-    const observable = this.http.delete<string>(`${this.TASK_URL}/${taskId}/attachment/${encodeURIComponent(fileName)}`);
-    this.refreshData();
-    return observable;
+    return this.http.delete<string>(`${this.TASK_URL}/${taskId}/attachment/${encodeURIComponent(fileName)}`).pipe(
+      tap(response => this.refreshIP())
+    );
   }
 
-  protected refreshData(): void {
-    this.domainIntellectualProperties = null;
+  public refreshIP(): void {
+    this.domainIntellectualPropertiesQueryRef?.refetch();
+  }
+
+  public refreshTimeRecords() {
+    this.nonIPTimeRecordsQueryRef?.refetch();
   }
 }

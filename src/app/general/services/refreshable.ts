@@ -5,10 +5,10 @@ export abstract class Refreshable {
   constructor(protected eventBus: NgEventBus) {
 
     eventBus.on(DATA_REFRESH_REQUEST_EVENT).subscribe(() => {
-      this.refreshData();
+      this.refreshIP();
     });
 
   }
 
-  protected abstract refreshData(): void;
+  protected abstract refreshIP(): void;
 }

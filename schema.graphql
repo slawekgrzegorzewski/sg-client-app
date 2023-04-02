@@ -1,0 +1,117 @@
+scalar UUID
+scalar BigDecimal
+scalar LocalDate
+scalar Upload
+
+type Query {
+  allIPRs: [IntellectualProperty!]!
+  nonIPTimeRecords: [TimeRecord!]!
+  monthKPIR(year: Int!, month: Int!): [KPiREntry!]
+}
+
+type Mutation{
+  addKPiREntry(input: KPiREntryInput):KPiREntry
+  addIPR(input: IntellectualPropertyData): IntellectualProperty
+  updateIPR(intellectualPropertyId: Int!, input: IntellectualPropertyData): IntellectualProperty
+  deleteIPR(intellectualPropertyId: Int!): String!
+  createTask(intellectualPropertyId: Int!, taskData: TaskData!): String!
+  updateTask(taskId: Int!, taskData: TaskData!): String!
+  deleteTask(taskId: Int!): String!
+  createTimeRecord(timeRecordData: TimeRecordData!): String!
+  updateTimeRecord(timeRecordId: Int!, timeRecordData: TimeRecordData!): String!
+  deleteTimeRecord(timeRecordId: Int!): String!
+}
+
+input IntellectualPropertyData{
+  description: String!
+}
+
+input TaskData{
+  coAuthors: String!,
+  description: String!
+}
+
+enum AssignmentAction {
+  NOP, ASSIGN, UNASSIGN
+}
+
+input TimeRecordData{
+  taskId:Int,
+  date:LocalDate!,
+  numberOfHours:BigDecimal!,
+  description:String!,
+  assignmentAction:AssignmentAction!
+}
+
+type DomainSimple {
+  id: Int!,
+  name: String!
+}
+
+type IntellectualProperty {
+  id: Int!,
+  description: String!,
+  tasks: [Task!],
+  domain: DomainSimple!
+}
+
+type Task {
+  id: Int!,
+  attachments: [String!],
+  coAuthors: String!,
+  description: String!,
+  timeRecords: [TimeRecord!]
+}
+
+type TimeRecord {
+  id: Int!,
+  date: LocalDate!,
+  numberOfHours: BigDecimal!,
+  description: String,
+  timeRecordCategory: TimeRecordCategory,
+  domain: DomainSimple!
+}
+
+type TimeRecordCategory {
+  id: Int!,
+  name: String!
+}
+
+type KPiREntry {
+  publicId: UUID!,
+  domain: DomainSimple!,
+  entryDate: LocalDate!,
+  entryOrder: Int!,
+  bookingNumber: String!,
+  counterparty: String!,
+  counterpartyAddress: String!,
+  description: String!,
+  providedGoodsAndServicesValue: BigDecimal!,
+  otherIncomes: BigDecimal!,
+  totalIncomes: BigDecimal!,
+  purchasedGoodsAndMaterialsValue: BigDecimal!,
+  additionalCostOfPurchase: BigDecimal!,
+  remunerationInCashOrInKind: BigDecimal!,
+  otherExpenses: BigDecimal!,
+  totalExpenses: BigDecimal!,
+  comments: String!
+}
+
+input KPiREntryInput {
+  publicId: UUID,
+  entryDate: LocalDate!,
+  entryOrder: Int!,
+  bookingNumber: String!,
+  counterparty: String!,
+  counterpartyAddress: String!,
+  description: String!,
+  providedGoodsAndServicesValue: BigDecimal!,
+  otherIncomes: BigDecimal!,
+  totalIncomes: BigDecimal!,
+  purchasedGoodsAndMaterialsValue: BigDecimal!,
+  additionalCostOfPurchase: BigDecimal!,
+  remunerationInCashOrInKind: BigDecimal!,
+  otherExpenses: BigDecimal!,
+  totalExpenses: BigDecimal!,
+  comments: String!
+}

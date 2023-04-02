@@ -33,18 +33,18 @@ export class CategoriesService extends Refreshable {
   updateCategory(category: Category): Observable<Category> {
     return this.http.patch(this.endpoint, category).pipe(
       map(d => new Category(d)),
-      tap(d => this.refreshData())
+      tap(d => this.refreshIP())
     );
   }
 
   createCategory(category: Category): Observable<Category> {
     return this.http.put(this.endpoint, category).pipe(
-      tap(d => this.refreshData()),
+      tap(d => this.refreshIP()),
       map(d => new Category(d))
     );
   }
 
-  protected refreshData(): void {
+  protected refreshIP(): void {
     this.domainCategories = null;
   }
 }

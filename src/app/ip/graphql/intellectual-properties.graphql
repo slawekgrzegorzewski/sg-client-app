@@ -1,0 +1,137 @@
+query GetAllDomainIntellectualProperties {
+  allIPRs {
+    id
+    description
+    tasks {
+      id
+      attachments
+      coAuthors
+      description
+      timeRecords {
+        id
+        date
+        numberOfHours
+        description
+        timeRecordCategory {
+          id
+          name
+        }
+        domain {
+          id
+          name
+        }
+      }
+    }
+    domain {
+      id
+      name
+    }
+  }
+}
+
+mutation AddIPR($description: String!) {
+  addIPR(input: {description: $description}) {
+    id
+    description
+    tasks {
+      id
+      attachments
+      coAuthors
+      description
+      timeRecords {
+        id
+        date
+        numberOfHours
+        description
+        timeRecordCategory {
+          id
+          name
+        }
+        domain {
+          id
+          name
+        }
+      }
+    }
+    domain {
+      id
+      name
+    }
+  }
+}
+
+mutation UpdateIPR($intellectualPropertyId: Int!, $description: String!) {
+  updateIPR(intellectualPropertyId: $intellectualPropertyId, input: {description: $description}){
+    id
+    description
+    tasks {
+      id
+      attachments
+      coAuthors
+      description
+      timeRecords {
+        id
+        date
+        numberOfHours
+        description
+        timeRecordCategory {
+          id
+          name
+        }
+        domain {
+          id
+          name
+        }
+      }
+    }
+    domain {
+      id
+      name
+    }
+  }
+}
+
+mutation DeleteIPR($intellectualPropertyId: Int!) {
+  deleteIPR(intellectualPropertyId: $intellectualPropertyId)
+}
+
+mutation CreateTask($intellectualPropertyId: Int!, $coAuthors: String!, $description: String!) {
+  createTask(intellectualPropertyId: $intellectualPropertyId, taskData: { coAuthors: $coAuthors, description: $description } )
+}
+
+mutation UpdateTask($taskId: Int!, $coAuthors: String!, $description: String!) {
+  updateTask(taskId: $taskId, taskData: { coAuthors: $coAuthors, description: $description } )
+}
+
+mutation DeleteTask($taskId: Int!) {
+  deleteTask(taskId: $taskId)
+}
+
+query GetAllDomainNonIPTimeRecords {
+  nonIPTimeRecords {
+    id
+    date
+    numberOfHours
+    description
+    timeRecordCategory {
+      id
+      name
+    }
+    domain {
+      id
+      name
+    }
+  }
+}
+
+mutation CreateTimeRecord($taskId: Int, $date: LocalDate!, $numberOfHours: BigDecimal!, $description: String!, $assignmentAction: AssignmentAction!) {
+  createTimeRecord(timeRecordData: {taskId: $taskId, date: $date, numberOfHours: $numberOfHours, description: $description, assignmentAction: $assignmentAction})
+}
+
+mutation UpdateTimeRecord($timeRecordId: Int!, $taskId: Int, $date: LocalDate!, $numberOfHours: BigDecimal!, $description: String!, $assignmentAction: AssignmentAction!) {
+  updateTimeRecord(timeRecordId: $timeRecordId, timeRecordData: {taskId: $taskId, date: $date, numberOfHours: $numberOfHours, description: $description, assignmentAction: $assignmentAction})
+}
+
+mutation DeleteTimeRecord($timeRecordId: Int!) {
+  deleteTimeRecord(timeRecordId: $timeRecordId)
+}

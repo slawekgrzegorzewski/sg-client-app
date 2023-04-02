@@ -1,8 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {IntellectualPropertyService} from '../services/intellectual-property.service';
-import {TimeRecord, TimeRecordWithTask} from '../model/time-record';
-import {ComparatorBuilder} from '../../general/utils/comparator-builder';
-import {forkJoin} from 'rxjs';
+import {TimeRecord} from '../model/time-record';
 import 'rxjs-compat/add/observable/of';
 import {DatePipe} from '@angular/common';
 import {DatesUtils} from '../../general/utils/dates-utils';
@@ -22,7 +20,6 @@ export const IPR_REPORTS_ROUTER_URL = 'ipr-reports';
   styleUrls: ['./ipr-reports.component.css']
 })
 export class IPRReportsComponent implements OnInit {
-
   timeRecordsNotAssignedToTask: TimeRecord[] = [];
   intellectualProperties: IntellectualProperty[] = [];
   iprReport: IPRReport | null = null;
@@ -59,7 +56,7 @@ export class IPRReportsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.refreshData();
+    this.fetchData();
     this.eventBus.on(DATA_REFRESH_REQUEST_EVENT).subscribe(() => {
       this.refreshData();
     });
@@ -70,38 +67,34 @@ export class IPRReportsComponent implements OnInit {
   }
 
   refreshData() {
-    forkJoin([
-      this.intellectualPropertyService.getTimeRecordsNotAssignedToTask(),
-      this.intellectualPropertyService.getIntellectualPropertiesForDomain()
-    ])
-      .subscribe(([timeRecordsNotAssignedToTask, intellectualProperties]) => {
-        this.timeRecordsNotAssignedToTask = timeRecordsNotAssignedToTask;
-        this.intellectualProperties = intellectualProperties;
-        const timeRecordsWithTask = intellectualProperties
-          .flatMap(intellectualProperties => intellectualProperties.tasks)
-          .flatMap(task => task.timeRecords.map(timeRecord => ({
-            ...timeRecord,
-            task: task
-          } as TimeRecordWithTask)));
-        const timeRecordsWithoutTask = timeRecordsNotAssignedToTask.map(timeRecord => ({
-          ...timeRecord,
-          task: null
-        } as TimeRecordWithTask));
+    this.intellectualPropertyService.refreshIP();
+    this.intellectualPropertyService.refreshTimeRecords();
+  }
 
-        const byDate = ComparatorBuilder.comparingByDate<TimeRecordWithTask>(timeRecord => timeRecord.date).build();
-        const datesSet = new Set<string>();
-        for (let timeRecord of this.timeRecordsNotAssignedToTask) {
+  fetchData() {
+    this.intellectualPropertyService.getIntellectualPropertiesForDomain().subscribe(value => {
+      this.intellectualProperties = value;
+      this.recalculateData();
+    });
+    this.intellectualPropertyService.getTimeRecordsNotAssignedToTask().subscribe(value => {
+      this.timeRecordsNotAssignedToTask = value;
+      this.recalculateData();
+    });
+  }
+
+  private recalculateData() {
+    const datesSet = new Set<string>();
+    for (let timeRecord of this.timeRecordsNotAssignedToTask) {
+      datesSet.add(DatesUtils.getYearString(timeRecord.date, this.datePipe));
+    }
+    for (let intellectualProperty of this.intellectualProperties) {
+      for (let task of intellectualProperty.tasks) {
+        for (let timeRecord of task.timeRecords) {
           datesSet.add(DatesUtils.getYearString(timeRecord.date, this.datePipe));
         }
-        for (let intellectualProperty of this.intellectualProperties) {
-          for (let task of intellectualProperty.tasks) {
-            for (let timeRecord of task.timeRecords) {
-              datesSet.add(DatesUtils.getYearString(timeRecord.date, this.datePipe));
-            }
-          }
-        }
-        this.years = [...datesSet.values()];
-        this.years.sort();
-      });
+      }
+    }
+    this.years = [...datesSet.values()];
+    this.years.sort();
   }
 }

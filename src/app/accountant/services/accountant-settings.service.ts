@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
-import {flatMap, Observable} from 'rxjs';
+import {Observable} from 'rxjs';
 import {AccountantSettings} from '../model/accountant-settings';
 import {NgEventBus} from 'ng-event-bus';
 import {map, share, switchMap, tap} from 'rxjs/operators';
@@ -36,13 +36,13 @@ export class AccountantSettingsService extends Refreshable {
     return this.http.patch<AccountantSettings>(`${this.API_URL}/is-company/${operation}`, {})
       .pipe(
         map(data => new AccountantSettings(data)),
-        tap(data => this.refreshData()),
+        tap(data => this.refreshIP()),
         tap(data => this.eventBus.cast(ACCOUNTANT_SETTINGS_CHANGED)),
         switchMap(data => this.getForDomain())
       );
   }
 
-  protected refreshData(): void {
+  protected refreshIP(): void {
     this.domainAccountantSetting = null;
   }
 }

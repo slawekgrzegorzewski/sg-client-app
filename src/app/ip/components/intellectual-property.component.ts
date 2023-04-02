@@ -90,13 +90,13 @@ export class IntellectualPropertyComponent implements OnInit {
               private domainService: DomainService) {
     this.modalConfig.centered = true;
     this.domainRegistrationHelper = new DomainRegistrationHelper(domainService, eventBus, route, IP_HOME_ROUTER_URL);
-    this.domainRegistrationHelper.domainChangedEvent.subscribe(() => this.refreshData());
+    this.domainRegistrationHelper.domainChangedEvent.subscribe(() => this.intellectualPropertyService.refreshIP());
   }
 
   ngOnInit(): void {
-    this.refreshData();
+    this.fetchData();
     this.eventBus.on(DATA_REFRESH_REQUEST_EVENT).subscribe(() => {
-      this.refreshData();
+      this.intellectualPropertyService.refreshIP();
     });
   }
 
@@ -104,21 +104,25 @@ export class IntellectualPropertyComponent implements OnInit {
     this.domainRegistrationHelper.onDestroy();
   }
 
-  refreshData() {
-    this.intellectualPropertyService.getIntellectualPropertiesForDomain().subscribe(data => {
-      const byIdDesc = ComparatorBuilder.comparing<IntellectualProperty>(intellectualProperty => intellectualProperty.id).desc().build();
-      data.flatMap(entry => entry.tasks)
-        .forEach(task => task.timeRecords = (task.timeRecords || []).sort(ComparatorBuilder.comparingByDate<TimeRecord>(timeRecord => timeRecord.date).build()));
-      this.allIntellectualProperties = data.sort(byIdDesc);
-      this.intellectualPropertiesDates = [...new Set(this.allIntellectualProperties
-        .flatMap(ip => ip.tasks)
-        .flatMap(t => t.timeRecords)
-        .map(tr => tr.date)
-        .map(d => DatesUtils.getYearMonthString(d, this.datePipe)))].sort();
-      this.intellectualPropertiesDates.unshift(ALL);
-      if (!this.intellectualPropertiesDates.includes(this.intellectualPropertiesFilter)) {
-        this.intellectualPropertiesFilter = ALL;
-      }
+  fetchData() {
+    this.intellectualPropertyService.getIntellectualPropertiesForDomain().subscribe({
+      next: data => {
+        const byIdDesc = ComparatorBuilder.comparing<IntellectualProperty>(intellectualProperty => intellectualProperty.id).desc().build();
+        data.flatMap(entry => entry.tasks)
+          .forEach(task => task.timeRecords = (task.timeRecords || []).sort(ComparatorBuilder.comparingByDate<TimeRecord>(timeRecord => timeRecord.date).build()));
+        this.allIntellectualProperties = data.sort(byIdDesc);
+        this.intellectualPropertiesDates = [...new Set(this.allIntellectualProperties
+          .flatMap(ip => ip.tasks)
+          .flatMap(t => t.timeRecords)
+          .map(tr => tr.date)
+          .map(d => DatesUtils.getYearMonthString(d, this.datePipe)))].sort();
+        this.intellectualPropertiesDates.unshift(ALL);
+        if (!this.intellectualPropertiesDates.includes(this.intellectualPropertiesFilter)) {
+          this.intellectualPropertiesFilter = ALL;
+        }
+      },
+      error: err => {},
+      complete: () => {}
     });
   }
 
@@ -157,9 +161,7 @@ export class IntellectualPropertyComponent implements OnInit {
         const request: Observable<IntellectualProperty | string> = intellectualProperty.id
           ? this.intellectualPropertyService.updateIntellectualProperty(intellectualProperty.id, intellectualProperty.description)
           : this.intellectualPropertyService.createIntellectualProperty(intellectualProperty.description);
-        request.subscribe({
-          complete: () => this.refreshData()
-        });
+        request.subscribe({});
       },
       () => {
       },
@@ -167,9 +169,7 @@ export class IntellectualPropertyComponent implements OnInit {
   }
 
   deleteIntellectualProperty(id: number) {
-    this.intellectualPropertyService.deleteIntellectualProperty(id).subscribe({
-      complete: () => this.refreshData()
-    });
+    this.intellectualPropertyService.deleteIntellectualProperty(id).subscribe({});
   }
 
   showTaskCreator(intellectualProperty: IntellectualProperty) {
@@ -197,11 +197,7 @@ export class IntellectualPropertyComponent implements OnInit {
         (EMPTY_TASK_ID === task.id
           ? this.intellectualPropertyService.createTask(intellectualProperty.id, requestObject)
           : this.intellectualPropertyService.updateTask(task.id, requestObject))
-          .subscribe({
-            complete: () => {
-              this.refreshData();
-            }
-          });
+          .subscribe({});
       },
       () => this.filterData(),
     );
@@ -209,11 +205,7 @@ export class IntellectualPropertyComponent implements OnInit {
 
   deleteTask(taskId: number) {
     this.intellectualPropertyService.deleteTask(taskId)
-      .subscribe({
-        complete: () => {
-          this.refreshData();
-        }
-      });
+      .subscribe({});
   }
 
   showAttachmentUpload(taskId: number) {
@@ -228,12 +220,10 @@ export class IntellectualPropertyComponent implements OnInit {
     ngbModalRef.result.then(
       () => {
         this.attachmentData = null;
-        this.refreshData();
         uploadFinishedSubscription.unsubscribe();
       },
       () => {
         this.attachmentData = null;
-        this.refreshData();
         uploadFinishedSubscription.unsubscribe();
       });
 
@@ -242,14 +232,12 @@ export class IntellectualPropertyComponent implements OnInit {
     const uploadFinishedSubscription = componentInstance.uploadFinished.subscribe(
       () => {
         this.attachmentData = null;
-        this.refreshData();
         uploadFinishedSubscription.unsubscribe();
       }
     );
     const uploadCancelledSubscription = componentInstance.uploadCancelled.subscribe(
       () => {
         this.attachmentData = null;
-        this.refreshData();
         uploadCancelledSubscription.unsubscribe();
       }
     );
@@ -257,9 +245,7 @@ export class IntellectualPropertyComponent implements OnInit {
   }
 
   deleteAttachment(task: IntellectualPropertyTask, fileName: string) {
-    this.intellectualPropertyService.deleteAttachment(task.id, fileName).subscribe({
-      complete: () => this.refreshData()
-    });
+    this.intellectualPropertyService.deleteAttachment(task.id, fileName).subscribe({});
   }
 
   downloadAttachment(task: IntellectualPropertyTask, fileName: string) {

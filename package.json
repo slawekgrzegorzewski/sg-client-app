@@ -10,7 +10,8 @@
     "buildProd": "ng build --configuration=production",
     "buildDev": "ng build --configuration=development",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "codegen": "graphql-codegen"
   },
   "private": true,
   "dependencies": {
@@ -42,12 +43,22 @@
     "speakeasy": "~2.0.0",
     "three": "~0.142.0",
     "tslib": "~2.3.0",
-    "zone.js": "~0.11.4"
+    "zone.js": "~0.11.4",
+    "apollo-angular": "^4.2.0",
+    "@apollo/client": "^3.0.0",
+    "graphql": "^16",
+    "@urql/core": "^4.0.2",
+    "ngx-loading": "^14.0.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^14.2.10",
     "@angular/cli": "^14.2.10",
     "@angular/compiler-cli": "^14.2.12",
+    "@graphql-codegen/cli":"^3.2.2",
+    "@graphql-codegen/typescript":"^3.0.2",
+    "@graphql-codegen/typescript-operations":"^3.0.2",
+    "@graphql-codegen/typed-document-node":"^3.0.2",
+    "@graphql-codegen/typescript-document-nodes": "^3.0.2",
     "@types/chai": "~4.3.1",
     "@types/chartjs-plugin-annotation": "~0.5.2",
     "@types/hammerjs": "~2.0.41",

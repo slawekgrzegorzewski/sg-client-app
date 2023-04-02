@@ -3,7 +3,6 @@ import {IntellectualPropertyService} from '../services/intellectual-property.ser
 import {EMPTY_TASK, EMPTY_TASK_ID, IntellectualPropertyTask} from '../model/intellectual-property-task';
 import {EMPTY_TIME_RECORD, TimeRecord, TimeRecordWithTask} from '../model/time-record';
 import {ComparatorBuilder} from '../../general/utils/comparator-builder';
-import {forkJoin} from 'rxjs';
 import 'rxjs-compat/add/observable/of';
 import Decimal from 'decimal.js';
 import {DatePipe} from '@angular/common';
@@ -15,6 +14,7 @@ import {NgEventBus} from 'ng-event-bus';
 import {ActivatedRoute} from '@angular/router';
 import {DomainService} from '../../general/services/domain.service';
 import {DomainRegistrationHelper} from '../../general/components/domain/domain-registration-helper';
+import {IntellectualProperty} from "../model/intellectual-property";
 
 export const TIME_RECORDS_ROUTER_URL = 'time-records';
 
@@ -25,6 +25,8 @@ export const TIME_RECORDS_ROUTER_URL = 'time-records';
 })
 export class TimeRecordsComponent implements OnInit {
 
+  private intellectualProperties: IntellectualProperty[] = [];
+  private timeRecordsNotAssociatedToTask: TimeRecord[] = [];
   timeRecords: TimeRecordWithTask[] = [];
   timeRecordsForMonth: Map<string, TimeRecordWithTask[]> = new Map<string, TimeRecordWithTask[]>();
   dates: string[] = [];
@@ -67,7 +69,7 @@ export class TimeRecordsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.refreshData();
+    this.fetchData();
     this.eventBus.on(DATA_REFRESH_REQUEST_EVENT).subscribe(() => {
       this.refreshData();
     });
@@ -78,32 +80,42 @@ export class TimeRecordsComponent implements OnInit {
   }
 
   refreshData() {
-    forkJoin([
-      this.intellectualPropertyService.getTimeRecordsNotAssignedToTask(),
-      this.intellectualPropertyService.getIntellectualPropertiesForDomain()
-    ])
-      .subscribe(([timeRecordsNotAssociatedToTask, intellectualProperties]) => {
-        const timeRecordsWithTask = intellectualProperties
-          .flatMap(intellectualProperties => intellectualProperties.tasks)
-          .flatMap(task => task.timeRecords.map(timeRecord => ({
-            ...timeRecord,
-            task: task
-          } as TimeRecordWithTask)));
-        const timeRecordsWithoutTask = timeRecordsNotAssociatedToTask.map(timeRecord => ({
-          ...timeRecord,
-          task: null
-        } as TimeRecordWithTask));
+    this.intellectualPropertyService.refreshIP();
+    this.intellectualPropertyService.refreshTimeRecords();
+  }
 
-        const byDate = ComparatorBuilder.comparingByDate<TimeRecordWithTask>(timeRecord => timeRecord.date).build();
-        this.timeRecords = [...timeRecordsWithTask, ...timeRecordsWithoutTask].sort(byDate);
-        this.dates = [...new Set(this.timeRecords.map(timeRecord => timeRecord.date).map(d => DatesUtils.getYearMonthString(d, this.datePipe)))].sort();
-        const previousDate = this.date;
-        this.date = this.dates[this.dates.length - 1];
-        if (previousDate && this.dates.includes(previousDate)) {
-          this.date = previousDate;
-        }
-        this.tasks = intellectualProperties.flatMap(intellectualProperty => intellectualProperty.tasks);
-      });
+  fetchData() {
+    this.intellectualPropertyService.getIntellectualPropertiesForDomain().subscribe(value => {
+      this.intellectualProperties = value;
+      this.recalculateData();
+    });
+    this.intellectualPropertyService.getTimeRecordsNotAssignedToTask().subscribe(value => {
+      this.timeRecordsNotAssociatedToTask = value;
+      this.recalculateData();
+    });
+  }
+
+  private recalculateData() {
+    const timeRecordsWithTask = this.intellectualProperties
+      .flatMap(intellectualProperties => intellectualProperties.tasks)
+      .flatMap(task => task.timeRecords.map(timeRecord => ({
+        ...timeRecord,
+        task: task
+      } as TimeRecordWithTask)));
+    const timeRecordsWithoutTask = this.timeRecordsNotAssociatedToTask.map(timeRecord => ({
+      ...timeRecord,
+      task: null
+    } as TimeRecordWithTask));
+
+    const byDate = ComparatorBuilder.comparingByDate<TimeRecordWithTask>(timeRecord => timeRecord.date).build();
+    this.timeRecords = [...timeRecordsWithTask, ...timeRecordsWithoutTask].sort(byDate);
+    this.dates = [...new Set(this.timeRecords.map(timeRecord => timeRecord.date).map(d => DatesUtils.getYearMonthString(d, this.datePipe)))].sort();
+    const previousDate = this.date;
+    this.date = this.dates[this.dates.length - 1];
+    if (previousDate && this.dates.includes(previousDate)) {
+      this.date = previousDate;
+    }
+    this.tasks = this.intellectualProperties.flatMap(intellectualProperty => intellectualProperty.tasks);
   }
 
   timeRecordAction(actionData: { timeRecord: TimeRecord, task: IntellectualPropertyTask }) {
