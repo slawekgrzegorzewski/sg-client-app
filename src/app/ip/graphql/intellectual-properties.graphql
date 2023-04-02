@@ -135,3 +135,33 @@ mutation UpdateTimeRecord($timeRecordId: Int!, $taskId: Int, $date: LocalDate!, 
 mutation DeleteTimeRecord($timeRecordId: Int!) {
   deleteTimeRecord(timeRecordId: $timeRecordId)
 }
+
+query GetAllDomainTimeRecordCategories {
+  allTimeRecordCategories {
+    id
+    name
+    domain {
+      id
+      name
+    }
+  }
+}
+
+mutation CreateTimeRecordCategory($name: String!) {
+  createTimeRecordCategory(name: $name) {
+    id
+    name
+    domain {
+      id
+      name
+    }
+  }
+}
+
+mutation UpdateTimeRecordCategory($timeRecordId: Int!, $name: String!){
+  updateTimeRecordCategory(timeRecordId: $timeRecordId, name: $name)
+}
+
+mutation DeleteTimeRecordCategory($timeRecordId: Int!) {
+  deleteTimeRecordCategory(timeRecordId: $timeRecordId)
+}

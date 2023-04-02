@@ -1,6 +1,7 @@
 import {Domain} from '../../general/model/domain';
 import Decimal from 'decimal.js';
 import {IntellectualPropertyTask} from './intellectual-property-task';
+import {EMPTY_TIME_RECORD_CATEGORY, TimeRecordCategory} from "./time-record-category";
 
 export const EMPTY_TIME_RECORD_ID = 0;
 
@@ -11,6 +12,7 @@ export class TimeRecord {
   public date: Date;
   public numberOfHours: Decimal;
   public description: string;
+  public timeRecordCategory: TimeRecordCategory;
   public domain: Domain;
 
   constructor(data?: TimeRecordDTO) {
@@ -23,6 +25,9 @@ export class TimeRecord {
     this.numberOfHours = new Decimal(data.numberOfHours || '0.0');
     this.description = data.description || '';
     this.domain = new Domain(data.domain);
+    this.timeRecordCategory = data.timeRecordCategory
+      ? new TimeRecordCategory(data.timeRecordCategory)
+      : EMPTY_TIME_RECORD_CATEGORY;
   }
 }
 

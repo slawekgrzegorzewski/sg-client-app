@@ -4,7 +4,9 @@ import {ActivationEnd, Router} from '@angular/router';
 import {filter} from 'rxjs/operators';
 import {ACCOUNTANT_HOME_ROUTER_URL} from '../../accountant/pages/accountant-home/accountant-home.component';
 import {ACCOUNTANT_HISTORY_ROUTER_URL} from '../../accountant/pages/accounts-history/accounts-history.component';
-import {HOLIDAY_CURRENCIES_ROUTER_URL} from '../../accountant/components/holiday-currencies/holiday-currencies.component';
+import {
+  HOLIDAY_CURRENCIES_ROUTER_URL
+} from '../../accountant/components/holiday-currencies/holiday-currencies.component';
 import {BILLING_SMALL_ROUTER_URL} from '../../accountant/pages/billings/billing-small.component';
 import {PIGGY_BANKS_SMALL_ROUTER_URL} from '../../accountant/pages/piggy-banks/piggy-banks-small.component';
 import {CHARTS_ROUTER_URL} from '../../accountant/pages/charts/charts.component';
@@ -17,6 +19,7 @@ import {SETTINGS_ROUTER_URL} from '../../accountant/pages/settings/settings.comp
 import {IP_HOME_ROUTER_URL} from '../../ip/components/intellectual-property.component';
 import {TIME_RECORDS_ROUTER_URL} from '../../ip/components/time-records.component';
 import {IPR_REPORTS_ROUTER_URL} from '../../ip/components/ipr-reports.component';
+import {IP_SETTINGS_ROUTER_URL} from "../../ip/components/ip-settings.component";
 
 export const ACCOUNTANT_APP = 'Accountant';
 export const CHECKER_APP = 'Checker';
@@ -38,7 +41,7 @@ export const APPLICATIONS_CONFIG = new Map<string, ApplicationConfig>([
   [CHECKER_APP, new ApplicationConfig([CHECKER_HOME_ROUTER_URL])],
   [SYR_APP, new ApplicationConfig([SYR_HOME_ROUTER_URL, SYR_ADMIN_ROUTER_URL])],
   [CUBES_APP, new ApplicationConfig([CUBES_HOME_ROUTER_URL, CUBES_STATISTICS_ROUTER_URL])],
-  [IPR_APP, new ApplicationConfig([IP_HOME_ROUTER_URL, TIME_RECORDS_ROUTER_URL, IPR_REPORTS_ROUTER_URL])],
+  [IPR_APP, new ApplicationConfig([IP_HOME_ROUTER_URL, TIME_RECORDS_ROUTER_URL, IPR_REPORTS_ROUTER_URL, IP_SETTINGS_ROUTER_URL])],
 ]);
 
 @Injectable({

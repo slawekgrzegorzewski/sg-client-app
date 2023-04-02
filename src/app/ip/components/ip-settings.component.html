@@ -1,0 +1,45 @@
+<ngb-accordion>
+  <ngb-panel title="Kategorie raportów czasowych">
+    <ng-template ngbPanelContent>
+      <ng-container [ngTemplateOutlet]="taskRecordCategories"></ng-container>
+    </ng-template>
+  </ngb-panel>
+</ngb-accordion>
+
+<ng-template #taskRecordCategories ngbPanelContent>
+  <div class="sg-flex-justify-center">
+    <div style="width: 800px">
+      <div class="sg-flex-row sg-flex-justify-space-between">
+        <button class="btn btn-link btn-sm" (click)="showTimeRecordCategoryCreation()">stwórz kategorię</button>
+      </div>
+      <div *ngFor="let timeRecordCategory of timeRecordCategories">
+        <div>
+          {{timeRecordCategory.name}}
+          <button class="btn btn-link btn-sm" (click)="showTimeRecordCategoryEdition(timeRecordCategory)">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button class="btn btn-sm btn-link"
+                  (click)="showTimeRecordCategoryDeletionConfirmation(content, timeRecordCategory)">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Potwierdzenia usunięcia</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+
+  <div class="modal-body">
+    Czy na pewno chcesz usunąć?
+  </div>
+
+  <div class="modal-footer sg-flex-row">
+    <button class="btn btn-sm btn-link" (click)="modal.dismiss()">anuluj</button>
+    <button class="btn btn-sm btn-link" (click)="modal.close()">usuń</button>
+  </div>
+</ng-template>
+

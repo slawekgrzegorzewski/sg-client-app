@@ -6,6 +6,7 @@ scalar Upload
 type Query {
   allIPRs: [IntellectualProperty!]!
   nonIPTimeRecords: [TimeRecord!]!
+  allTimeRecordCategories: [TimeRecordCategory!]!
   monthKPIR(year: Int!, month: Int!): [KPiREntry!]
 }
 
@@ -20,6 +21,9 @@ type Mutation{
   createTimeRecord(timeRecordData: TimeRecordData!): String!
   updateTimeRecord(timeRecordId: Int!, timeRecordData: TimeRecordData!): String!
   deleteTimeRecord(timeRecordId: Int!): String!
+  createTimeRecordCategory(name: String!): TimeRecordCategory!
+  updateTimeRecordCategory(timeRecordId: Int!, name: String!): String!
+  deleteTimeRecordCategory(timeRecordId:Int!): String!
 }
 
 input IntellectualPropertyData{
@@ -35,7 +39,7 @@ enum AssignmentAction {
   NOP, ASSIGN, UNASSIGN
 }
 
-input TimeRecordData{
+input TimeRecordData {
   taskId:Int,
   date:LocalDate!,
   numberOfHours:BigDecimal!,
@@ -74,7 +78,8 @@ type TimeRecord {
 
 type TimeRecordCategory {
   id: Int!,
-  name: String!
+  name: String!,
+  domain: DomainSimple!
 }
 
 type KPiREntry {

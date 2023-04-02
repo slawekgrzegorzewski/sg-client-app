@@ -16,16 +16,22 @@ import {
   AssignmentAction,
   CreateTask,
   CreateTimeRecord,
+  CreateTimeRecordCategory,
   DeleteIpr,
-  DeleteTask, DeleteTimeRecord,
+  DeleteTask,
+  DeleteTimeRecord,
+  DeleteTimeRecordCategory,
   GetAllDomainIntellectualProperties,
   GetAllDomainNonIpTimeRecords,
+  GetAllDomainTimeRecordCategories,
   UpdateIpr,
   UpdateTask,
-  UpdateTimeRecord
+  UpdateTimeRecord,
+  UpdateTimeRecordCategory
 } from "../../../../types";
 import {DatesUtils} from "../../general/utils/dates-utils";
 import {DatePipe} from "@angular/common";
+import {TimeRecordCategory} from "../model/time-record-category";
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +42,7 @@ export class IntellectualPropertyService extends Refreshable {
 
   private domainIntellectualPropertiesQueryRef: QueryRef<{ allIPRs: IntellectualProperty[] }> | null = null;
   private nonIPTimeRecordsQueryRef: QueryRef<{ nonIPTimeRecords: TimeRecord[] }> | null = null;
+  private domainTimeRecordCategoriesQueryRef: QueryRef<{ allTimeRecordCategories: TimeRecordCategory[] }> | null = null;
 
   constructor(
     private apollo: Apollo,
@@ -98,7 +105,10 @@ export class IntellectualPropertyService extends Refreshable {
       );
   }
 
-  createTask(intellectualPropertyId: number, createData: { coAuthors: string, description: string }): Observable<string> {
+  createTask(intellectualPropertyId: number, createData: {
+    coAuthors: string,
+    description: string
+  }): Observable<string> {
     return this.apollo
       .mutate<{ result: string }>({
         mutation: CreateTask,
@@ -257,11 +267,74 @@ export class IntellectualPropertyService extends Refreshable {
     );
   }
 
+
+  getTimeRecordCategoryForDomain(): Observable<TimeRecordCategory[]> {
+    this.domainTimeRecordCategoriesQueryRef = this.apollo
+      .watchQuery<{ allTimeRecordCategories: TimeRecordCategory[] }>({
+        query: GetAllDomainTimeRecordCategories
+      });
+    return this.domainTimeRecordCategoriesQueryRef.valueChanges
+      .pipe(
+        map(result =>
+          result.data && result.data.allTimeRecordCategories
+          && result.data.allTimeRecordCategories.map(trc => new TimeRecordCategory(trc)))
+      );
+  }
+
+  createTimeRecordCategory(name: string) {
+    return this.apollo
+      .mutate<{ result: TimeRecordCategory }>({
+        mutation: CreateTimeRecordCategory,
+        variables: {
+          name: name
+        },
+      }).pipe(
+        map(data => data!.data!.result),
+        tap(data => this.refreshTimeRecordCategories())
+      );
+  }
+
+  updateTimeRecordCategory(timeRecordId: number, name: string) {
+    return this.apollo
+      .mutate<{ result: string }>({
+        mutation: UpdateTimeRecordCategory,
+        variables: {
+          timeRecordId: timeRecordId,
+          name: name
+        },
+      }).pipe(
+        map(data => data!.data!.result),
+        tap(data => {
+          this.refreshTimeRecords();
+          this.refreshTimeRecordCategories();
+        })
+      );
+  }
+
+  deleteTimeRecordCategory(timeRecordId: number) {
+    return this.apollo
+      .mutate<{ result: string }>({
+        mutation: DeleteTimeRecordCategory,
+        variables: {
+          timeRecordId: timeRecordId
+        },
+      }).pipe(
+        map(data => data!.data!.result),
+        tap(data => {
+          this.refreshTimeRecordCategories();
+        })
+      );
+  }
+
   public refreshIP(): void {
     this.domainIntellectualPropertiesQueryRef?.refetch();
   }
 
   public refreshTimeRecords() {
     this.nonIPTimeRecordsQueryRef?.refetch();
+  }
+
+  public refreshTimeRecordCategories() {
+    this.domainTimeRecordCategoriesQueryRef?.refetch();
   }
 }

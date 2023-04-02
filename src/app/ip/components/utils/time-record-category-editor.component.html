@@ -1,0 +1,21 @@
+<ng-container *ngIf="timeRecordCategory">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Edycja zadania</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+  </div>
+
+  <div class="modal-body">
+
+    <div class="form-group">
+      <label for="name">Nazwa</label>
+      <input id="name" type="text" class="form-control"
+             [(ngModel)]="timeRecordCategory.name"
+             required/>
+    </div>
+  </div>
+
+  <div class="modal-footer sg-flex-row">
+    <button class="btn btn-sm btn-link" (click)="activeModal.dismiss()">anuluj</button>
+    <button class="btn btn-sm btn-link" (click)="emitAction()">zatwierdź</button>
+  </div>
+</ng-container>
