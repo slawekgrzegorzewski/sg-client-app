@@ -10,8 +10,13 @@
         </select>
       </div>
     </div>
+    <div *ngIf="iprReport" class="sg-flex-row sg-flex-justify-space-between">
+      <div>Łączna ilość prac autorskich: {{iprReport.intellectualProperties.length}}</div>
+      <div>godziny: IP: {{iprReport.yearIPHours}}, nie IP: {{iprReport.yearNonIPHours}}</div>
+    </div>
     <div *ngIf="iprReport">
-      Łączna ilość prac autorskich: {{iprReport.intellectualProperties.length}}
+      Wynagrodzenie z tytułu przeniesienia praw autorskich
+      stanowi {{percentage(iprReport.yearIPHours, iprReport.yearNonIPHours) | percent:'2.2-2'}} wynagrodzenia
     </div>
     <table *ngIf="iprReport">
       <thead>
@@ -19,32 +24,37 @@
         <td style="font-weight: bold">Opis zadania</td>
         <td style="font-weight: bold">Ilość godzin IP</td>
         <td style="font-weight: bold">Ilość godzin zwykłych</td>
+        <td style="font-weight: bold">Procent IP</td>
       </tr>
       </thead>
       <tbody>
       <ng-container *ngFor="let monthReport of iprReport.months | keyvalue">
         <tr>
-          <td style="font-weight: bold">Raport ze świadczenia usług programistycznych na podstawie umowy z dnia 20-07-2020 za {{monthReport.key}}</td>
+          <td style="font-weight: bold">Raport ze świadczenia usług programistycznych na podstawie umowy z dnia
+            20-07-2020 za {{monthReport.key}}</td>
           <td>{{monthReport.value.ipHours}}</td>
           <td>{{monthReport.value.nonIPHours}}</td>
+          <td>{{percentage(monthReport.value.ipHours, monthReport.value.nonIPHours) | percent:'2.2-2'}}</td>
         </tr>
         <tr *ngFor="let ips of monthReport.value.ipTasksWithHours | keyvalue">
           <td>{{ips.key}}</td>
           <td>{{ips.value}}</td>
+          <td></td>
           <td></td>
         </tr>
         <tr *ngFor="let ips of monthReport.value.nonIPTasksWithHours | keyvalue">
           <td>{{ips.key}}</td>
           <td></td>
           <td>{{ips.value}}</td>
+          <td></td>
         </tr>
         <tr *ngFor="let ips of monthReport.value.nonIPTasksWithHoursNotCategorized | keyvalue">
           <td>{{ips.key}}</td>
-          <td colspan="2">
+          <td colspan="3">
             <select (change)="assignTimeRecordCategory(ips.value.id, $event.target)">
               <option></option>
               <option *ngFor="let category of timeRecordCategories" [value]="category.id">
-                 {{category.name}}
+                {{category.name}}
               </option>
             </select>
           </td>

@@ -12,6 +12,7 @@ import {DomainRegistrationHelper} from '../../general/components/domain/domain-r
 import {IntellectualProperty} from '../model/intellectual-property';
 import {IPRReport} from '../utils/ipr-report';
 import {TimeRecordCategory} from "../model/time-record-category";
+import Decimal from "decimal.js";
 
 export const IPR_REPORTS_ROUTER_URL = 'ipr-reports';
 
@@ -130,5 +131,12 @@ export class IPRReportsComponent implements OnInit {
           this.intellectualPropertyService.refreshNonIPTimeRecords();
         }
       })
+  }
+
+  percentage(ipHours: Decimal, nonIPHours: Decimal): number {
+    if (ipHours.plus(nonIPHours).isZero()) {
+      return 0;
+    }
+    return ipHours.div(ipHours.plus(nonIPHours)).toDecimalPlaces(4, Decimal.ROUND_DOWN).toNumber();
   }
 }

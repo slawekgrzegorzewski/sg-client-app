@@ -6,6 +6,7 @@ import {DatePipe} from '@angular/common';
 import {EMPTY_TIME_RECORD_CATEGORY_ID} from "../model/time-record-category";
 
 export class IPRMonthReport {
+
   ipHours: Decimal = new Decimal(0);
   nonIPHours: Decimal = new Decimal(0);
   totalHours: Decimal = new Decimal(0);
@@ -44,6 +45,8 @@ export class IPRMonthReport {
 export class IPRReport {
 
   months: Map<string, IPRMonthReport>;
+  yearIPHours: Decimal = new Decimal(0);
+  yearNonIPHours: Decimal = new Decimal(0);
 
   constructor(
     private datePipe: DatePipe,
@@ -83,6 +86,9 @@ export class IPRReport {
           ?.addNonIntellectualProperty(notAssignedTimeRecord);
       }
     }
-  }
+    for (let monthReport of this.months.values()) {
+      this.yearIPHours = this.yearIPHours.plus(monthReport.ipHours);
+      this.yearNonIPHours = this.yearNonIPHours.plus(monthReport.nonIPHours);
+    }}
 
 }
