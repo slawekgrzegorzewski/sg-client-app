@@ -165,3 +165,7 @@ mutation UpdateTimeRecordCategory($timeRecordId: Int!, $name: String!){
 mutation DeleteTimeRecordCategory($timeRecordId: Int!) {
   deleteTimeRecordCategory(timeRecordId: $timeRecordId)
 }
+
+mutation AssignCategoryToTimeRecord($timeRecordId: Int!, $timeRecordCategoryId: Int) {
+  assignCategoryToTimeRecord(timeRecordId: $timeRecordId, timeRecordCategoryId: $timeRecordCategoryId)
+}

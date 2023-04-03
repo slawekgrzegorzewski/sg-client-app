@@ -20,6 +20,7 @@ type Mutation{
   deleteTask(taskId: Int!): String!
   createTimeRecord(timeRecordData: TimeRecordData!): String!
   updateTimeRecord(timeRecordId: Int!, timeRecordData: TimeRecordData!): String!
+  assignCategoryToTimeRecord(timeRecordId: Int!, timeRecordCategoryId: Int): String!
   deleteTimeRecord(timeRecordId: Int!): String!
   createTimeRecordCategory(name: String!): TimeRecordCategory!
   updateTimeRecordCategory(timeRecordId: Int!, name: String!): String!

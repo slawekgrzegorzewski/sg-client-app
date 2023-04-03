@@ -12,7 +12,7 @@ import {TimeRecord} from '../model/time-record';
 import Decimal from 'decimal.js';
 import {Apollo, QueryRef} from 'apollo-angular';
 import {
-  AddIpr,
+  AddIpr, AssignCategoryToTimeRecord,
   AssignmentAction,
   CreateTask,
   CreateTimeRecord,
@@ -175,7 +175,7 @@ export class IntellectualPropertyService extends Refreshable {
         },
       }).pipe(
         map(data => data!.data!.result),
-        tap(data => taskId ? this.refreshIP() : this.refreshTimeRecords())
+        tap(data => taskId ? this.refreshIP() : this.refreshNonIPTimeRecords())
       );
   }
 
@@ -195,7 +195,7 @@ export class IntellectualPropertyService extends Refreshable {
         map(data => data!.data!.result),
         tap(data => {
           this.refreshIP();
-          this.refreshTimeRecords();
+          this.refreshNonIPTimeRecords();
         })
       );
   }
@@ -220,7 +220,23 @@ export class IntellectualPropertyService extends Refreshable {
         map(data => data!.data!.result),
         tap(data => {
           this.refreshIP();
-          this.refreshTimeRecords();
+          this.refreshNonIPTimeRecords();
+        })
+      );
+  }
+
+  assignTimeRecordToCategory(timeRecordId: number, timeRecordCategoryId: number | null) {
+    return this.apollo
+      .mutate<{ result: string }>({
+        mutation: AssignCategoryToTimeRecord,
+        variables: {
+          timeRecordId: timeRecordId,
+          timeRecordCategoryId: timeRecordCategoryId
+        },
+      }).pipe(
+        map(data => data!.data!.result),
+        tap(data => {
+          this.refreshNonIPTimeRecords();
         })
       );
   }
@@ -236,7 +252,7 @@ export class IntellectualPropertyService extends Refreshable {
         map(data => data!.data!.result),
         tap(data => {
           this.refreshIP();
-          this.refreshTimeRecords();
+          this.refreshNonIPTimeRecords();
         })
       );
   }
@@ -305,7 +321,7 @@ export class IntellectualPropertyService extends Refreshable {
       }).pipe(
         map(data => data!.data!.result),
         tap(data => {
-          this.refreshTimeRecords();
+          this.refreshNonIPTimeRecords();
           this.refreshTimeRecordCategories();
         })
       );
@@ -330,7 +346,7 @@ export class IntellectualPropertyService extends Refreshable {
     this.domainIntellectualPropertiesQueryRef?.refetch();
   }
 
-  public refreshTimeRecords() {
+  public refreshNonIPTimeRecords() {
     this.nonIPTimeRecordsQueryRef?.refetch();
   }
 

@@ -11,6 +11,7 @@ import {DomainService} from '../../general/services/domain.service';
 import {DomainRegistrationHelper} from '../../general/components/domain/domain-registration-helper';
 import {IntellectualProperty} from '../model/intellectual-property';
 import {IPRReport} from '../utils/ipr-report';
+import {TimeRecordCategory} from "../model/time-record-category";
 
 export const IPR_REPORTS_ROUTER_URL = 'ipr-reports';
 
@@ -22,6 +23,7 @@ export const IPR_REPORTS_ROUTER_URL = 'ipr-reports';
 export class IPRReportsComponent implements OnInit {
   timeRecordsNotAssignedToTask: TimeRecord[] = [];
   intellectualProperties: IntellectualProperty[] = [];
+  timeRecordCategories: TimeRecordCategory[] = [];
   iprReport: IPRReport | null = null;
 
   years: string[] = [];
@@ -33,14 +35,7 @@ export class IPRReportsComponent implements OnInit {
 
   set year(value: string) {
     this._year = value;
-    const intellectualProperties1 = this.intellectualProperties.filter(ip => ip.tasks.find(t => t.timeRecords.find(tr => DatesUtils.getYearString(tr.date, this.datePipe) === this.year) !== undefined));
-    const notAssignedTimeRecords = this.timeRecordsNotAssignedToTask.filter(tr => DatesUtils.getYearString(tr.date, this.datePipe) === this.year);
-    this.iprReport = new IPRReport(
-      this.datePipe,
-      this.year,
-      intellectualProperties1,
-      notAssignedTimeRecords
-    );
+    this.recalculateIPReport();
   }
 
   private domainRegistrationHelper: DomainRegistrationHelper;
@@ -68,7 +63,8 @@ export class IPRReportsComponent implements OnInit {
 
   refreshData() {
     this.intellectualPropertyService.refreshIP();
-    this.intellectualPropertyService.refreshTimeRecords();
+    this.intellectualPropertyService.refreshNonIPTimeRecords();
+    this.intellectualPropertyService.refreshTimeRecordCategories();
   }
 
   fetchData() {
@@ -79,6 +75,9 @@ export class IPRReportsComponent implements OnInit {
     this.intellectualPropertyService.getTimeRecordsNotAssignedToTask().subscribe(value => {
       this.timeRecordsNotAssignedToTask = value;
       this.recalculateData();
+    });
+    this.intellectualPropertyService.getTimeRecordCategoryForDomain().subscribe(value => {
+      this.timeRecordCategories = value;
     });
   }
 
@@ -96,5 +95,40 @@ export class IPRReportsComponent implements OnInit {
     }
     this.years = [...datesSet.values()];
     this.years.sort();
+    if (this.year) {
+      this.recalculateIPReport();
+    } else {
+      this.iprReport = null;
+    }
+  }
+
+  private recalculateIPReport() {
+    this.iprReport = new IPRReport(
+      this.datePipe,
+      this.year,
+      this.intellectualProperties
+        .filter(
+          ip => ip.tasks
+            .find(
+              t => t.timeRecords
+                .find(
+                  tr => DatesUtils.getYearString(tr.date, this.datePipe) === this.year
+                ) !== undefined
+            )
+        ),
+      this.timeRecordsNotAssignedToTask
+        .filter(
+          tr => DatesUtils.getYearString(tr.date, this.datePipe) === this.year
+        )
+    );
+  }
+
+  assignTimeRecordCategory(timeRecordId: number, timeRecordCategoryId: any) {
+    this.intellectualPropertyService.assignTimeRecordToCategory(timeRecordId, timeRecordCategoryId.value)
+      .subscribe({
+        complete: () => {
+          this.intellectualPropertyService.refreshNonIPTimeRecords();
+        }
+      })
   }
 }

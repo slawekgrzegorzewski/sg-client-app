@@ -1,5 +1,4 @@
 import gql from 'graphql-tag';
-
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -86,6 +85,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   addIPR?: Maybe<IntellectualProperty>;
   addKPiREntry?: Maybe<KPiREntry>;
+  assignCategoryToTimeRecord: Scalars['String'];
   createTask: Scalars['String'];
   createTimeRecord: Scalars['String'];
   createTimeRecordCategory: TimeRecordCategory;
@@ -107,6 +107,12 @@ export type MutationAddIprArgs = {
 
 export type MutationAddKPiREntryArgs = {
   input?: InputMaybe<KPiREntryInput>;
+};
+
+
+export type MutationAssignCategoryToTimeRecordArgs = {
+  timeRecordCategoryId?: InputMaybe<Scalars['Int']>;
+  timeRecordId: Scalars['Int'];
 };
 
 
@@ -312,30 +318,14 @@ export type DeleteTimeRecordMutation = { __typename?: 'Mutation', deleteTimeReco
 export type GetAllDomainTimeRecordCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllDomainTimeRecordCategoriesQuery = {
-  __typename?: 'Query',
-  allTimeRecordCategories: Array<{
-    __typename?: 'TimeRecordCategory',
-    id: number,
-    name: string,
-    domain: { __typename?: 'DomainSimple', id: number, name: string }
-  }>
-};
+export type GetAllDomainTimeRecordCategoriesQuery = { __typename?: 'Query', allTimeRecordCategories: Array<{ __typename?: 'TimeRecordCategory', id: number, name: string, domain: { __typename?: 'DomainSimple', id: number, name: string } }> };
 
 export type CreateTimeRecordCategoryMutationVariables = Exact<{
   name: Scalars['String'];
 }>;
 
 
-export type CreateTimeRecordCategoryMutation = {
-  __typename?: 'Mutation',
-  createTimeRecordCategory: {
-    __typename?: 'TimeRecordCategory',
-    id: number,
-    name: string,
-    domain: { __typename?: 'DomainSimple', id: number, name: string }
-  }
-};
+export type CreateTimeRecordCategoryMutation = { __typename?: 'Mutation', createTimeRecordCategory: { __typename?: 'TimeRecordCategory', id: number, name: string, domain: { __typename?: 'DomainSimple', id: number, name: string } } };
 
 export type UpdateTimeRecordCategoryMutationVariables = Exact<{
   timeRecordId: Scalars['Int'];
@@ -352,15 +342,23 @@ export type DeleteTimeRecordCategoryMutationVariables = Exact<{
 
 export type DeleteTimeRecordCategoryMutation = { __typename?: 'Mutation', deleteTimeRecordCategory: string };
 
+export type AssignCategoryToTimeRecordMutationVariables = Exact<{
+  timeRecordId: Scalars['Int'];
+  timeRecordCategoryId?: InputMaybe<Scalars['Int']>;
+}>;
+
+
+export type AssignCategoryToTimeRecordMutation = { __typename?: 'Mutation', assignCategoryToTimeRecord: string };
+
 
 export const GetAllDomainIntellectualProperties = gql`
-  query GetAllDomainIntellectualProperties {
-    allIPRs {
+    query GetAllDomainIntellectualProperties {
+  allIPRs {
+    id
+    description
+    tasks {
       id
-      description
-      tasks {
-        id
-        attachments
+      attachments
       coAuthors
       description
       timeRecords {
@@ -509,44 +507,52 @@ export const UpdateTimeRecord = gql`
     timeRecordId: $timeRecordId
     timeRecordData: {taskId: $taskId, date: $date, numberOfHours: $numberOfHours, description: $description, assignmentAction: $assignmentAction}
   )
-    }
-`;
+}
+    `;
 export const DeleteTimeRecord = gql`
-  mutation DeleteTimeRecord($timeRecordId: Int!) {
-    deleteTimeRecord(timeRecordId: $timeRecordId)
-  }
-`;
+    mutation DeleteTimeRecord($timeRecordId: Int!) {
+  deleteTimeRecord(timeRecordId: $timeRecordId)
+}
+    `;
 export const GetAllDomainTimeRecordCategories = gql`
-  query GetAllDomainTimeRecordCategories {
-    allTimeRecordCategories {
+    query GetAllDomainTimeRecordCategories {
+  allTimeRecordCategories {
+    id
+    name
+    domain {
       id
       name
-      domain {
-        id
-        name
-      }
     }
   }
-`;
+}
+    `;
 export const CreateTimeRecordCategory = gql`
-  mutation CreateTimeRecordCategory($name: String!) {
-    createTimeRecordCategory(name: $name) {
+    mutation CreateTimeRecordCategory($name: String!) {
+  createTimeRecordCategory(name: $name) {
+    id
+    name
+    domain {
       id
       name
-      domain {
-        id
-        name
-      }
     }
   }
-`;
+}
+    `;
 export const UpdateTimeRecordCategory = gql`
-  mutation UpdateTimeRecordCategory($timeRecordId: Int!, $name: String!) {
-    updateTimeRecordCategory(timeRecordId: $timeRecordId, name: $name)
-  }
-`;
+    mutation UpdateTimeRecordCategory($timeRecordId: Int!, $name: String!) {
+  updateTimeRecordCategory(timeRecordId: $timeRecordId, name: $name)
+}
+    `;
 export const DeleteTimeRecordCategory = gql`
-  mutation DeleteTimeRecordCategory($timeRecordId: Int!) {
-    deleteTimeRecordCategory(timeRecordId: $timeRecordId)
-  }
-`;
+    mutation DeleteTimeRecordCategory($timeRecordId: Int!) {
+  deleteTimeRecordCategory(timeRecordId: $timeRecordId)
+}
+    `;
+export const AssignCategoryToTimeRecord = gql`
+    mutation AssignCategoryToTimeRecord($timeRecordId: Int!, $timeRecordCategoryId: Int) {
+  assignCategoryToTimeRecord(
+    timeRecordId: $timeRecordId
+    timeRecordCategoryId: $timeRecordCategoryId
+  )
+}
+    `;

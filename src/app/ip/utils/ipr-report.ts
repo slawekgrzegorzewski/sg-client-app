@@ -3,6 +3,7 @@ import {IntellectualProperty} from '../model/intellectual-property';
 import Decimal from 'decimal.js';
 import {DatesUtils} from '../../general/utils/dates-utils';
 import {DatePipe} from '@angular/common';
+import {EMPTY_TIME_RECORD_CATEGORY_ID} from "../model/time-record-category";
 
 export class IPRMonthReport {
   ipHours: Decimal = new Decimal(0);
@@ -10,6 +11,7 @@ export class IPRMonthReport {
   totalHours: Decimal = new Decimal(0);
   ipTasksWithHours = new Map<string, Decimal>();
   nonIPTasksWithHours = new Map<string, Decimal>();
+  nonIPTasksWithHoursNotCategorized = new Map<string, TimeRecord>();
 
   public addIntellectualProperty(intellectualProperty: IntellectualProperty, timeRecord: TimeRecord) {
     this.putStats(this.ipTasksWithHours, intellectualProperty.description, timeRecord);
@@ -18,7 +20,13 @@ export class IPRMonthReport {
   }
 
   public addNonIntellectualProperty(timeRecord: TimeRecord) {
-    this.putStats(this.nonIPTasksWithHours, timeRecord.description, timeRecord);
+    this.putStats(this.nonIPTasksWithHours, timeRecord.timeRecordCategory.name, timeRecord);
+    this.nonIPHours = this.nonIPHours.plus(new Decimal(timeRecord.numberOfHours));
+    this.totalHours = this.totalHours.plus(new Decimal(timeRecord.numberOfHours));
+  }
+
+  public addNonIntellectualPropertyNotCategorized(timeRecord: TimeRecord) {
+    this.nonIPTasksWithHoursNotCategorized.set(timeRecord.id + ' - ' + timeRecord.description, timeRecord);
     this.nonIPHours = this.nonIPHours.plus(new Decimal(timeRecord.numberOfHours));
     this.totalHours = this.totalHours.plus(new Decimal(timeRecord.numberOfHours));
   }
@@ -65,7 +73,15 @@ export class IPRReport {
       }
     }
     for (let notAssignedTimeRecord of this.notAssignedTimeRecords) {
-      this.months.get(DatesUtils.getYearMonthString(notAssignedTimeRecord.date, this.datePipe))?.addNonIntellectualProperty(notAssignedTimeRecord);
+      if (notAssignedTimeRecord.timeRecordCategory.id === EMPTY_TIME_RECORD_CATEGORY_ID) {
+        this.months
+          .get(DatesUtils.getYearMonthString(notAssignedTimeRecord.date, this.datePipe))
+          ?.addNonIntellectualPropertyNotCategorized(notAssignedTimeRecord);
+      } else {
+        this.months
+          .get(DatesUtils.getYearMonthString(notAssignedTimeRecord.date, this.datePipe))
+          ?.addNonIntellectualProperty(notAssignedTimeRecord);
+      }
     }
   }
 

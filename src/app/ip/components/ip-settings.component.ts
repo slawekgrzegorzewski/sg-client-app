@@ -68,7 +68,7 @@ export class IPSettingsComponent implements OnInit {
           .subscribe({
             complete: () => {
               this.refreshData();
-              this.intellectualPropertyService.refreshTimeRecords();
+              this.intellectualPropertyService.refreshNonIPTimeRecords();
             }
           });
       } else {
@@ -76,7 +76,7 @@ export class IPSettingsComponent implements OnInit {
           .subscribe({
             complete: () => {
               this.refreshData();
-              this.intellectualPropertyService.refreshTimeRecords();
+              this.intellectualPropertyService.refreshNonIPTimeRecords();
             }
           });
       }

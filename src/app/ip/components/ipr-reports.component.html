@@ -38,6 +38,17 @@
           <td></td>
           <td>{{ips.value}}</td>
         </tr>
+        <tr *ngFor="let ips of monthReport.value.nonIPTasksWithHoursNotCategorized | keyvalue">
+          <td>{{ips.key}}</td>
+          <td colspan="2">
+            <select (change)="assignTimeRecordCategory(ips.value.id, $event.target)">
+              <option></option>
+              <option *ngFor="let category of timeRecordCategories" [value]="category.id">
+                 {{category.name}}
+              </option>
+            </select>
+          </td>
+        </tr>
       </ng-container>
       </tbody>
     </table>

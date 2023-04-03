@@ -81,7 +81,7 @@ export class TimeRecordsComponent implements OnInit {
 
   refreshData() {
     this.intellectualPropertyService.refreshIP();
-    this.intellectualPropertyService.refreshTimeRecords();
+    this.intellectualPropertyService.refreshNonIPTimeRecords();
   }
 
   fetchData() {
