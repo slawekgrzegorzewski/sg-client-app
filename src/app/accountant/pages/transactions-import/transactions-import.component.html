@@ -111,6 +111,6 @@
     [transactionType]="transactionCreationData!.transactionType"
     [amount]="transactionCreationData!.amount.toNumber()"
     [description]="transactionCreationData!.description"
-    [conversionRate]="transactionCreationData!.conversionRate.toNumber()"
+    [conversionRate]="transactionCreationData!.conversionRate?.toNumber() || null"
   ></app-create-transaction>
 </ng-template>

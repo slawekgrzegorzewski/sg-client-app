@@ -12,7 +12,7 @@ export class TransactionCreationData {
     public transactionType: TransactionType,
     public amount: Decimal,
     public description: string,
-    public conversionRate: Decimal
+    public conversionRate: Decimal | null
   ) {
   }
 
