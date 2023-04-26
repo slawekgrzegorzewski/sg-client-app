@@ -12,7 +12,9 @@ import {NgEventBus} from 'ng-event-bus';
 import {TRANSACTIONS_TO_IMPORT_CHANGED} from '../../../general/utils/event-bus-events';
 import {AccountsService} from '../../services/accounts.service';
 import {forkJoin} from 'rxjs';
-import {AffectedBankTransactionsToImportInfo} from '../../../openbanking/model/nodrigen/affected-bank-transactions-to-import-info';
+import {
+  AffectedBankTransactionsToImportInfo
+} from '../../../openbanking/model/nodrigen/affected-bank-transactions-to-import-info';
 import {BillingElementType} from '../../components/billing-periods/create-billing-element.component';
 import {TransactionCreationData} from './model/transaction-creation-data';
 
@@ -38,7 +40,7 @@ export class TransactionsImportComponent implements OnInit {
   transactions: BankTransactionToImport[] = [];
   selectedTransactions: BankTransactionToImport[] = [];
 
-  billingElementToCreate: Income | Expense | null = null;
+  billingElementsToCreate: (Income | Expense)[] = [];
   accountOfBillingElementToCreate: Account | null = null;
   billingElementToCreateType: BillingElementType | null = null;
   private affectedBankTransactionsInfo: AffectedBankTransactionsToImportInfo | null = null;
@@ -81,7 +83,7 @@ export class TransactionsImportComponent implements OnInit {
   }
 
   shouldShowListOfImportOptions() {
-    return this.selectedTransactions.length > 0 && !this.billingElementToCreate && !this.transactionCreationData;
+    return this.selectedTransactions.length > 0 && this.billingElementsToCreate.length === 0 && !this.transactionCreationData;
   }
 
   showListOfTransactions() {
@@ -90,17 +92,17 @@ export class TransactionsImportComponent implements OnInit {
   }
 
   showOptionsOfImporting() {
-    this.billingElementToCreate = null;
+    this.billingElementsToCreate = [];
     this.accountOfBillingElementToCreate = null;
     this.billingElementToCreateType = null;
     this.affectedBankTransactionsInfo = null;
     this.transactionCreationData = null;
   }
 
-  showBillingElementCreation(billingElementToCreate: Expense | Income, account: Account, affectedBankTransactionsInfo: AffectedBankTransactionsToImportInfo) {
-    this.billingElementToCreate = billingElementToCreate;
+  showBillingElementsCreation(billingElementToCreate: Expense[] | Income[], account: Account, affectedBankTransactionsInfo: AffectedBankTransactionsToImportInfo) {
+    this.billingElementsToCreate = billingElementToCreate;
     this.accountOfBillingElementToCreate = account;
-    this.billingElementToCreateType = billingElementToCreate instanceof Expense ? 'expense' : 'income';
+    this.billingElementToCreateType = billingElementToCreate[0] instanceof Expense ? 'expense' : 'income';
     this.affectedBankTransactionsInfo = affectedBankTransactionsInfo;
   }
 
@@ -123,15 +125,23 @@ export class TransactionsImportComponent implements OnInit {
         next: (success) => {
           if (piggyBankToUpdate) {
             this.piggyBanksService.update(piggyBankToUpdate).subscribe({
-              next: () => this.refreshData(),
-              error: () => this.refreshData()
+              next: () => this.afterBillingElementCreation(elementToCreate),
+              error: () => this.afterBillingElementCreation(elementToCreate)
             });
           } else {
-            this.refreshData();
+            this.afterBillingElementCreation(elementToCreate);
           }
         },
         error: (error) => this.refreshData()
       });
+  }
+
+  afterBillingElementCreation(elementToCreate: Income | Expense) {
+    const indexToRemove = this.billingElementsToCreate.indexOf(elementToCreate);
+    this.billingElementsToCreate.splice(indexToRemove, 1);
+    if(this.billingElementsToCreate.length === 0){
+      this.refreshData();
+    }
   }
 
   mutuallyCancelBothTransactions(first: BankTransactionToImport, second: BankTransactionToImport) {

@@ -14,13 +14,28 @@ import {TransactionType} from '../../../model/transaction-type';
 @Component({
   selector: 'app-debit-transaction-importer',
   template: `
-    <div *ngIf="canBeImported()" (click)="createDebit()">
+    <div *ngIf="canBeImported()">
       <b>Wydatek</b>
+      <ul>
+        <li *ngFor="let expense of expensesToCreate">
+          {{expense.amount | currency: expense.currency }} -
+          <input #toSplit type="number" [max]="expense.amount" step="0.01">
+          <button class="btn btn-sm btn-link" *ngIf="isSplitAmountCorrect(expense, toSplit.value)"
+                  (click)="split(expense, toSplit.value);toSplit.value='';">
+            podziel
+          </button>
+          <span *ngIf="!isSplitAmountCorrect(expense, toSplit.value)" style="color: #aaaaaa">podziel</span>
+        </li>
+      </ul>
+      <button class="btn btn-sm btn-link" (click)="createDebit()">
+        stwórz
+      </button>
     </div>
     <div *ngIf="transactions.length === 1 && transactions[0].isDebit()" (click)="createCashWithdrawal()">
       <b>Wypłata gotówkowa</b>
     </div>
-    <div *ngIf="transactions.length === 1 && transactions[0].isDebit()" (click)="createCashWithdrawalWithConversion()">
+    <div *ngIf="transactions.length === 1 && transactions[0].isDebit()"
+         (click)="createCashWithdrawalWithConversion()">
       <b>Wypłata gotówkowa z wymianą walut</b>
     </div>
   `
@@ -38,18 +53,18 @@ export class DebitTransactionImporterComponent {
 
   @Input() allAccounts: Account[] = [];
 
-  @Output() onExpenseCreation = new EventEmitter<[Expense, Account, AffectedBankTransactionsToImportInfo]>();
+  @Output() onExpensesCreation = new EventEmitter<[Expense[], Account, AffectedBankTransactionsToImportInfo]>();
   @Output() onTransactionCreation = new EventEmitter<TransactionCreationData>();
 
   private _transactions: BankTransactionToImport[] = [];
-  private _expenseToCreate: Expense | null = null;
+  expensesToCreate: Expense[] = [];
 
   canBeImported() {
-    return this._expenseToCreate !== null;
+    return this.expensesToCreate.length > 0;
   }
 
   private createExpense() {
-    this._expenseToCreate = null;
+    this.expensesToCreate = [];
 
     if (this.transactions.length === 0) {
       return;
@@ -85,11 +100,12 @@ export class DebitTransactionImporterComponent {
       description += (description === '' ? '' : '\n') + transaction.description;
     }
     if (amount.gt(new Decimal(0))) {
-      this._expenseToCreate = new Expense();
-      this._expenseToCreate.description = description;
-      this._expenseToCreate.amount = amount.toNumber();
-      this._expenseToCreate.currency = accountOfCreatingExpense.currency;
-      this._expenseToCreate.expenseDate = expenseDate;
+      const newExpense = new Expense();
+      newExpense.description = description;
+      newExpense.amount = amount.toNumber();
+      newExpense.currency = accountOfCreatingExpense.currency;
+      newExpense.expenseDate = expenseDate;
+      this.expensesToCreate.push(newExpense);
     }
   }
 
@@ -99,8 +115,8 @@ export class DebitTransactionImporterComponent {
       this.transactions.filter(t => t.isDebit()).map(t => t.debitNodrigenTransactionId),
       this.transactions.filter(t => t.isCredit()).map(t => t.creditNodrigenTransactionId)
     );
-    this.onExpenseCreation.emit([
-      this._expenseToCreate!,
+    this.onExpensesCreation.emit([
+      this.expensesToCreate!,
       accountOfCreatingExpense,
       affectedBankTransactionsToImportInfo
     ]);
@@ -139,5 +155,28 @@ export class DebitTransactionImporterComponent {
 
   getOtherAccountOfTransaction(transaction: BankTransactionToImport) {
     return transaction.isCredit() ? transaction.sourceAccount : transaction.destinationAccount;
+  }
+
+  split(expense: Expense, value: string) {
+    if (!this.isSplitAmountCorrect(expense, value)) {
+      return;
+    }
+
+    const currentExpenseAmount = new Decimal(expense.amount);
+    const newExpenseAmount = new Decimal(value);
+    expense.amount = currentExpenseAmount.minus(newExpenseAmount).toNumber();
+
+    const newExpense = new Expense();
+    newExpense.description = expense.description;
+    newExpense.amount = newExpenseAmount.toNumber();
+    newExpense.currency = expense.currency;
+    newExpense.expenseDate = expense.expenseDate;
+    this.expensesToCreate.push(newExpense);
+  }
+
+  isSplitAmountCorrect(expense: Expense, value: string) {
+    const newExpenseAmount = Number(value);
+    return newExpenseAmount > 0 && newExpenseAmount <= expense.amount;
+
   }
 }

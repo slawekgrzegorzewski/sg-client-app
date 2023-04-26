@@ -6,11 +6,11 @@
 </ng-template>
 
 <ng-template [ngTemplateOutlet]="billingElementCreation"
-             *ngIf="selectedTransactions.length > 0 && billingElementToCreate && !transactionCreationData">
+             *ngIf="selectedTransactions.length > 0 && billingElementsToCreate.length > 0 && !transactionCreationData">
 </ng-template>
 
 <ng-template [ngTemplateOutlet]="transactionCreation"
-             *ngIf="selectedTransactions.length > 0 && !billingElementToCreate && transactionCreationData">
+             *ngIf="selectedTransactions.length > 0 && billingElementsToCreate.length === 0 && transactionCreationData">
 </ng-template>
 
 <ng-template #transactionsList>
@@ -57,14 +57,14 @@
     <app-debit-transaction-importer
       [allAccounts]="allAccounts"
       [transactions]="selectedTransactions"
-      (onExpenseCreation)="showBillingElementCreation($event[0],$event[1],$event[2])"
+      (onExpensesCreation)="showBillingElementsCreation($event[0],$event[1],$event[2])"
       (onTransactionCreation)="showTransactionCreation($event)">
     </app-debit-transaction-importer>
 
     <app-credit-transaction-importer
       [transactions]="selectedTransactions"
       [allAccounts]="allAccounts"
-      (onIncomeCreation)="showBillingElementCreation($event[0],$event[1],$event[2])">
+      (onIncomeCreation)="showBillingElementsCreation([$event[0]],$event[1],$event[2])">
     </app-credit-transaction-importer>
 
     <app-transfer-importer
@@ -90,7 +90,7 @@
 </ng-template>
 
 <ng-template #billingElementCreation>
-  <div class="sg-flex-column">
+  <div class="sg-flex-column" *ngFor="let billingElementToCreate of billingElementsToCreate">
     <app-create-billing-element class="sg-flex-column"
                                 [billingElement]="billingElementToCreate!"
                                 [elementType]="billingElementToCreateType!"
