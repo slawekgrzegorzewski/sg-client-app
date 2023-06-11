@@ -51,14 +51,16 @@
   <div class="row g-2 align-items-center">
     <label for="overpaymentMonthlyBudget" class="col-sm-2 col-form-label">Comiesięczny budżet</label>
     <div class="col-auto">
-      <input [(ngModel)]="overpaymentMonthlyBudget" id="overpaymentMonthlyBudget" type="number" step="0.01" class="form-control"/>
+      <input [(ngModel)]="overpaymentMonthlyBudget" id="overpaymentMonthlyBudget" type="number" step="0.01"
+             class="form-control"/>
     </div>
   </div>
 
   <div class="row g-2 align-items-center">
     <label for="overpaymentYearlyBudget" class="col-sm-2 col-form-label">Coroczny budżet</label>
     <div class="col-auto">
-      <input [(ngModel)]="overpaymentYearlyBudget" id="overpaymentYearlyBudget" type="number" step="0.01" class="form-control"/>
+      <input [(ngModel)]="overpaymentYearlyBudget" id="overpaymentYearlyBudget" type="number" step="0.01"
+             class="form-control"/>
     </div>
   </div>
 
@@ -78,6 +80,7 @@
 <table>
   <thead>
   <tr>
+    <td style="width: 50px"></td>
     <td style="width: 200px">Okres płatności</td>
     <td style="width: 150px">Pozostało do spłaty</td>
     <td style="width: 150px">Rata</td>
@@ -90,12 +93,14 @@
   <tr style="font-weight: bold">
     <td></td>
     <td></td>
+    <td></td>
     <td>{{ installmentsSum.toString() | currency: currency}}</td>
     <td>{{ repaidCapitalSum.toString() | currency: currency}}</td>
     <td>{{ paidInterestSum.toString() | currency: currency}}</td>
     <td>{{ overpaymentSum.toString() | currency: currency}}</td>
   </tr>
-  <tr *ngFor="let installment of mortgageInstallments">
+  <tr *ngFor="let installment of mortgageInstallments; let i = index;">
+    <td> {{i + 1}}</td>
     <td>{{ installment.paymentFrom | date: 'yyyy-MM-dd'}} - {{ installment.paymentTo | date: 'yyyy-MM-dd'}}</td>
     <td>{{ installment.remainingCapitalAtTheBeginning.toString() | currency: currency}}</td>
     <td>{{ installment.installment.toString() | currency: currency}}</td>
