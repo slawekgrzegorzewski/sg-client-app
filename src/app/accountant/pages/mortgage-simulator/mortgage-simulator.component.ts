@@ -131,8 +131,7 @@ export class MortgageSimulatorComponent implements OnInit, OnDestroy {
     return paramsStorage;
   }
 
-  private readParams() {
-    const paramsStorage = this.getParamsStorage();
+  private readParams(paramsStorage: MortgageSimulationParamsStorage = this.getParamsStorage()) {
     const params = paramsStorage.configurations.get(paramsStorage.selectedConfiguration)!;
 
     this.paramsConfigs = Array.from(paramsStorage.configurations.keys());
@@ -170,6 +169,7 @@ export class MortgageSimulatorComponent implements OnInit, OnDestroy {
     this._selectedConfiguration = value;
     const paramsStorage = this.getParamsStorage();
     paramsStorage.selectedConfiguration = value;
+    this.readParams(paramsStorage);
     this.writeParams(paramsStorage);
     this.paramsChanged();
   }
