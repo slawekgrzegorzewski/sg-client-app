@@ -18,7 +18,7 @@ export class PiggyBanksService extends Refreshable {
 
   constructor(private http: HttpClient, private currencyPipe: CurrencyPipe, eventBus: NgEventBus) {
     super(eventBus);
-    this.eventBus.on(PIGGY_BANKS_CHANGED).subscribe(md => this.refreshIP());
+    this.eventBus.on(PIGGY_BANKS_CHANGED).subscribe(md => this.refreshData());
   }
 
   private currentDomainPiggyBanksObservable: Observable<PiggyBank[]> | null = null;
@@ -35,7 +35,7 @@ export class PiggyBanksService extends Refreshable {
 
   create(piggyBank: PiggyBank): Observable<number> {
     return this.http.put<number>(this.endpoint, piggyBank)
-      .pipe(tap(data => this.refreshIP()));
+      .pipe(tap(data => this.refreshData()));
   }
 
   update(piggyBank: PiggyBank): Observable<string> {
@@ -44,11 +44,11 @@ export class PiggyBanksService extends Refreshable {
   }
 
   private onUpdate() {
-    this.refreshIP();
+    this.refreshData();
     this.eventBus.cast(PIGGY_BANKS_CHANGED);
   }
 
-  protected refreshIP(): void {
+  protected refreshData(): void {
     this.currentDomainPiggyBanksObservable = null;
   }
 

@@ -7,11 +7,12 @@ type Query {
   allIPRs: [IntellectualProperty!]!
   nonIPTimeRecords: [TimeRecord!]!
   allTimeRecordCategories: [TimeRecordCategory!]!
-  monthKPIR(year: Int!, month: Int!): [KPiREntry!]
+  monthRevenueAndExpenseEntry(year: Int!, month: Int!): [RevenueAndExpenseEntry!]
+  simulateMortgage(mortgageCalculationParams: MortgageCalculationParams): [MortgageCalculationInstallment!]!
 }
 
 type Mutation{
-  addKPiREntry(input: KPiREntryInput):KPiREntry
+  addRevenueAndExpenseEntry(input: RevenueAndExpenseEntryInput):RevenueAndExpenseEntry
   addIPR(input: IntellectualPropertyData): IntellectualProperty
   updateIPR(intellectualPropertyId: Int!, input: IntellectualPropertyData): IntellectualProperty
   deleteIPR(intellectualPropertyId: Int!): String!
@@ -25,6 +26,26 @@ type Mutation{
   createTimeRecordCategory(name: String!): TimeRecordCategory!
   updateTimeRecordCategory(timeRecordId: Int!, name: String!): String!
   deleteTimeRecordCategory(timeRecordId:Int!): String!
+}
+
+input MortgageCalculationParams {
+  mortgageAmount: BigDecimal!,
+  numberOfInstallments: Int!,
+  overpaymentMonthlyBudget: BigDecimal!,
+  overpaymentYearlyBudget: BigDecimal!
+  rate: BigDecimal!,
+  repaymentStart: LocalDate!,
+  wibor: BigDecimal!,
+}
+
+type MortgageCalculationInstallment {
+  paymentFrom: LocalDate!,
+  paymentTo: LocalDate!,
+  remainingCapitalAtTheBeginning: BigDecimal!,
+  installment: BigDecimal!,
+  repaidCapital: BigDecimal!,
+  paidInterest: BigDecimal!,
+  overpayment: BigDecimal!
 }
 
 input IntellectualPropertyData{
@@ -83,41 +104,41 @@ type TimeRecordCategory {
   domain: DomainSimple!
 }
 
-type KPiREntry {
+type RevenueAndExpenseEntry {
   publicId: UUID!,
   domain: DomainSimple!,
-  entryDate: LocalDate!,
   entryOrder: Int!,
-  bookingNumber: String!,
+  entryDate: LocalDate!,
+  accountingDocumentNumber: String!,
   counterparty: String!,
   counterpartyAddress: String!,
   description: String!,
   providedGoodsAndServicesValue: BigDecimal!,
-  otherIncomes: BigDecimal!,
-  totalIncomes: BigDecimal!,
+  otherIncome: BigDecimal!,
+  totalIncome: BigDecimal!,
   purchasedGoodsAndMaterialsValue: BigDecimal!,
   additionalCostOfPurchase: BigDecimal!,
   remunerationInCashOrInKind: BigDecimal!,
-  otherExpenses: BigDecimal!,
-  totalExpenses: BigDecimal!,
+  otherExpense: BigDecimal!,
+  totalExpense: BigDecimal!,
   comments: String!
 }
 
-input KPiREntryInput {
+input RevenueAndExpenseEntryInput {
   publicId: UUID,
-  entryDate: LocalDate!,
   entryOrder: Int!,
-  bookingNumber: String!,
+  entryDate: LocalDate!,
+  accountingDocumentNumber: String!,
   counterparty: String!,
   counterpartyAddress: String!,
   description: String!,
   providedGoodsAndServicesValue: BigDecimal!,
-  otherIncomes: BigDecimal!,
-  totalIncomes: BigDecimal!,
+  otherIncome: BigDecimal!,
+  totalIncome: BigDecimal!,
   purchasedGoodsAndMaterialsValue: BigDecimal!,
   additionalCostOfPurchase: BigDecimal!,
   remunerationInCashOrInKind: BigDecimal!,
-  otherExpenses: BigDecimal!,
-  totalExpenses: BigDecimal!,
+  otherExpense: BigDecimal!,
+  totalExpense: BigDecimal!,
   comments: String!
 }

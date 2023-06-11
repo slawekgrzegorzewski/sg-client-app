@@ -53,6 +53,9 @@
       <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn && applicationsService.isAccountant()">
         <a class="nav-link" [routerLink]="['/settings']">Ustawienia</a>
       </li>
+      <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn && applicationsService.isAccountant()">
+        <a class="nav-link" [routerLink]="['/mortgage-simulator']">Symulator kredytu</a>
+      </li>
       <li class="nav-item" [routerLinkActive]="['active']" *ngIf="isLoggedIn && applicationsService.isSYR()">
         <a class="nav-link" [routerLink]="['/syr-home']">Raporty</a>
       </li>

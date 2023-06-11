@@ -1,0 +1,30 @@
+query SimulateMortgage(
+  $mortgageAmount: BigDecimal!
+  $numberOfInstallments: Int!
+  $overpaymentMonthlyBudget: BigDecimal!
+  $overpaymentYearlyBudget: BigDecimal!
+  $rate: BigDecimal!
+  $repaymentStart: LocalDate!
+  $wibor: BigDecimal!
+)
+{
+  simulateMortgage(
+    mortgageCalculationParams: {
+      mortgageAmount: $mortgageAmount,
+      numberOfInstallments: $numberOfInstallments,
+      overpaymentMonthlyBudget: $overpaymentMonthlyBudget,
+      overpaymentYearlyBudget: $overpaymentYearlyBudget,
+      rate: $rate,
+      repaymentStart: $repaymentStart,
+      wibor: $wibor
+    }
+  ) {
+    paymentFrom
+    paymentTo
+    remainingCapitalAtTheBeginning
+    installment
+    repaidCapital
+    paidInterest
+    overpayment
+  }
+}

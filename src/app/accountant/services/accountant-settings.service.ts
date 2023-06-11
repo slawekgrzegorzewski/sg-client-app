@@ -36,13 +36,13 @@ export class AccountantSettingsService extends Refreshable {
     return this.http.patch<AccountantSettings>(`${this.API_URL}/is-company/${operation}`, {})
       .pipe(
         map(data => new AccountantSettings(data)),
-        tap(data => this.refreshIP()),
+        tap(data => this.refreshData()),
         tap(data => this.eventBus.cast(ACCOUNTANT_SETTINGS_CHANGED)),
         switchMap(data => this.getForDomain())
       );
   }
 
-  protected refreshIP(): void {
+  protected refreshData(): void {
     this.domainAccountantSetting = null;
   }
 }

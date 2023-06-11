@@ -47,8 +47,8 @@
     "apollo-angular": "^4.2.0",
     "@apollo/client": "^3.0.0",
     "graphql": "^16",
-    "@urql/core": "^4.0.2",
-    "ngx-loading": "^14.0.0"
+    "ngx-loading": "^14.0.0",
+    "@urql/core": "^4.0.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^14.2.10",

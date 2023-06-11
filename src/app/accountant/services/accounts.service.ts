@@ -27,7 +27,7 @@ export class AccountsService extends Refreshable {
               eventBus: NgEventBus,
               @Inject(LOCALE_ID) private defaultLocale: string) {
     super(eventBus);
-    this.eventBus.on(ACCOUNTS_CHANGED).subscribe(md => this.refreshIP());
+    this.eventBus.on(ACCOUNTS_CHANGED).subscribe(md => this.refreshData());
   }
 
 
@@ -92,7 +92,7 @@ export class AccountsService extends Refreshable {
       );
   }
 
-  protected refreshIP(): void {
+  protected refreshData(): void {
     this.allAccountsObservable = null;
     this.currenciesObservable = null;
     this.usersAccounts = null;

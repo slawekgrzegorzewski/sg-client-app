@@ -90,13 +90,13 @@ export class IntellectualPropertyComponent implements OnInit {
               private domainService: DomainService) {
     this.modalConfig.centered = true;
     this.domainRegistrationHelper = new DomainRegistrationHelper(domainService, eventBus, route, IP_HOME_ROUTER_URL);
-    this.domainRegistrationHelper.domainChangedEvent.subscribe(() => this.intellectualPropertyService.refreshIP());
+    this.domainRegistrationHelper.domainChangedEvent.subscribe(() => this.intellectualPropertyService.refreshData());
   }
 
   ngOnInit(): void {
     this.fetchData();
     this.eventBus.on(DATA_REFRESH_REQUEST_EVENT).subscribe(() => {
-      this.intellectualPropertyService.refreshIP();
+      this.intellectualPropertyService.refreshData();
     });
   }
 

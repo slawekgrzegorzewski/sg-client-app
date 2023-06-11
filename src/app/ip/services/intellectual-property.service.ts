@@ -74,7 +74,7 @@ export class IntellectualPropertyService extends Refreshable {
         },
       }).pipe(
         map(data => new IntellectualProperty(data!.data!.addIPR)),
-        tap(data => this.refreshIP())
+        tap(data => this.refreshData())
       );
   }
 
@@ -88,7 +88,7 @@ export class IntellectualPropertyService extends Refreshable {
         },
       }).pipe(
         map(data => new IntellectualProperty(data!.data!.addIPR)),
-        tap(data => this.refreshIP())
+        tap(data => this.refreshData())
       );
   }
 
@@ -101,7 +101,7 @@ export class IntellectualPropertyService extends Refreshable {
         },
       }).pipe(
         map(data => data!.data!.result),
-        tap(data => this.refreshIP())
+        tap(data => this.refreshData())
       );
   }
 
@@ -119,7 +119,7 @@ export class IntellectualPropertyService extends Refreshable {
         },
       }).pipe(
         map(data => data!.data!.result),
-        tap(data => this.refreshIP())
+        tap(data => this.refreshData())
       );
   }
 
@@ -134,7 +134,7 @@ export class IntellectualPropertyService extends Refreshable {
         },
       }).pipe(
         map(data => data!.data!.result),
-        tap(data => this.refreshIP())
+        tap(data => this.refreshData())
       );
   }
 
@@ -147,7 +147,7 @@ export class IntellectualPropertyService extends Refreshable {
         },
       }).pipe(
         map(data => data!.data!.result),
-        tap(data => this.refreshIP())
+        tap(data => this.refreshData())
       );
   }
 
@@ -175,7 +175,7 @@ export class IntellectualPropertyService extends Refreshable {
         },
       }).pipe(
         map(data => data!.data!.result),
-        tap(data => taskId ? this.refreshIP() : this.refreshNonIPTimeRecords())
+        tap(data => taskId ? this.refreshData() : this.refreshNonIPTimeRecords())
       );
   }
 
@@ -194,7 +194,7 @@ export class IntellectualPropertyService extends Refreshable {
       }).pipe(
         map(data => data!.data!.result),
         tap(data => {
-          this.refreshIP();
+          this.refreshData();
           this.refreshNonIPTimeRecords();
         })
       );
@@ -219,7 +219,7 @@ export class IntellectualPropertyService extends Refreshable {
       }).pipe(
         map(data => data!.data!.result),
         tap(data => {
-          this.refreshIP();
+          this.refreshData();
           this.refreshNonIPTimeRecords();
         })
       );
@@ -251,7 +251,7 @@ export class IntellectualPropertyService extends Refreshable {
       }).pipe(
         map(data => data!.data!.result),
         tap(data => {
-          this.refreshIP();
+          this.refreshData();
           this.refreshNonIPTimeRecords();
         })
       );
@@ -271,7 +271,7 @@ export class IntellectualPropertyService extends Refreshable {
     }).pipe(
       tap(event => {
         if (event instanceof HttpResponse) {
-          this.refreshIP();
+          this.refreshData();
         }
       })
     );
@@ -279,7 +279,7 @@ export class IntellectualPropertyService extends Refreshable {
 
   deleteAttachment(taskId: number, fileName: string): Observable<string> {
     return this.http.delete<string>(`${this.TASK_URL}/${taskId}/attachment/${encodeURIComponent(fileName)}`).pipe(
-      tap(response => this.refreshIP())
+      tap(response => this.refreshData())
     );
   }
 
@@ -342,7 +342,7 @@ export class IntellectualPropertyService extends Refreshable {
       );
   }
 
-  public refreshIP(): void {
+  public refreshData(): void {
     this.domainIntellectualPropertiesQueryRef?.refetch();
   }
 

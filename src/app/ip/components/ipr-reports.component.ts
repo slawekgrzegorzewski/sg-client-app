@@ -63,7 +63,7 @@ export class IPRReportsComponent implements OnInit {
   }
 
   refreshData() {
-    this.intellectualPropertyService.refreshIP();
+    this.intellectualPropertyService.refreshData();
     this.intellectualPropertyService.refreshNonIPTimeRecords();
     this.intellectualPropertyService.refreshTimeRecordCategories();
   }

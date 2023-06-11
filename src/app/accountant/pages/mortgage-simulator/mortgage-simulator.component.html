@@ -1,0 +1,107 @@
+<div class="sg-flex-column">
+
+  <div class="row g-2 align-items-center">
+    <div class="col-auto">
+      <select [(ngModel)]="selectedParamsConfig" class="form-select">
+        <option *ngFor="let config of paramsConfigs" [selected]="selectedParamsConfig === config"
+                [value]="config">{{config}}</option>
+      </select>
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-link btn-sm" (click)="copyConfiguration()">kopiuj
+      </button>
+    </div>
+  </div>
+
+  <div class="row g-2 align-items-center">
+    <label for="name" class="col-sm-2 col-form-label">Nazwa</label>
+    <div class="col-auto">
+      <input [(ngModel)]="selectedParamsConfigName" id="name" class="form-control"/>
+    </div>
+  </div>
+
+  <div class="row g-2 align-items-center">
+    <label for="amount" class="col-sm-2 col-form-label">Kwota</label>
+    <div class="col-auto">
+      <input [(ngModel)]="mortgageAmount" id="amount" type="number" step="0.01" class="form-control"/>
+    </div>
+  </div>
+
+  <div class="row g-2 align-items-center">
+    <label for="installmentsNumber" class="col-sm-2 col-form-label">Liczba rat</label>
+    <div class="col-auto">
+      <input [(ngModel)]="numberOfInstallments" id="installmentsNumber" type="number" step="1" class="form-control"/>
+    </div>
+  </div>
+
+  <div class="row g-2 align-items-center">
+    <label for="wibor" class="col-sm-2 col-form-label">Wibor</label>
+    <div class="col-auto">
+      <input [(ngModel)]="wibor" id="wibor" type="number" step="0.01" class="form-control"/>
+    </div>
+  </div>
+
+  <div class="row g-2 align-items-center">
+    <label for="rate" class="col-sm-2 col-form-label">Marża</label>
+    <div class="col-auto">
+      <input [(ngModel)]="rate" id="rate" type="number" step="0.01" class="form-control"/>
+    </div>
+  </div>
+
+  <div class="row g-2 align-items-center">
+    <label for="overpaymentMonthlyBudget" class="col-sm-2 col-form-label">Comiesięczny budżet</label>
+    <div class="col-auto">
+      <input [(ngModel)]="overpaymentMonthlyBudget" id="overpaymentMonthlyBudget" type="number" step="0.01" class="form-control"/>
+    </div>
+  </div>
+
+  <div class="row g-2 align-items-center">
+    <label for="overpaymentYearlyBudget" class="col-sm-2 col-form-label">Coroczny budżet</label>
+    <div class="col-auto">
+      <input [(ngModel)]="overpaymentYearlyBudget" id="overpaymentYearlyBudget" type="number" step="0.01" class="form-control"/>
+    </div>
+  </div>
+
+  <div class="row g-2 align-items-center">
+    <label for="dateOfElement" class="col-sm-2 col-form-label">Początek spłaty</label>
+    <div class="col-sm-10">
+      <input [(ngModel)]="repaymentStart"
+             #datepicker="ngbDatepicker"
+             (click)="datepicker.toggle()"
+             id="dateOfElement"
+             class="form-control"
+             style="width: 150px"
+             ngbDatepicker>
+    </div>
+  </div>
+</div>
+<table>
+  <thead>
+  <tr>
+    <td style="width: 200px">Okres płatności</td>
+    <td style="width: 150px">Pozostało do spłaty</td>
+    <td style="width: 150px">Rata</td>
+    <td style="width: 150px">Spłacony kapitał</td>
+    <td style="width: 150px">Odsetki</td>
+    <td style="width: 150px">Nadpłata</td>
+  </tr>
+  </thead>
+  <tbody>
+  <tr style="font-weight: bold">
+    <td></td>
+    <td></td>
+    <td>{{ installmentsSum.toString() | currency: currency}}</td>
+    <td>{{ repaidCapitalSum.toString() | currency: currency}}</td>
+    <td>{{ paidInterestSum.toString() | currency: currency}}</td>
+    <td>{{ overpaymentSum.toString() | currency: currency}}</td>
+  </tr>
+  <tr *ngFor="let installment of mortgageInstallments">
+    <td>{{ installment.paymentFrom | date: 'yyyy-MM-dd'}} - {{ installment.paymentTo | date: 'yyyy-MM-dd'}}</td>
+    <td>{{ installment.remainingCapitalAtTheBeginning.toString() | currency: currency}}</td>
+    <td>{{ installment.installment.toString() | currency: currency}}</td>
+    <td>{{ installment.repaidCapital.toString() | currency: currency}}</td>
+    <td>{{ installment.paidInterest.toString() | currency: currency}}</td>
+    <td>{{ installment.overpayment.toString() | currency: currency}}</td>
+  </tr>
+  </tbody>
+</table>

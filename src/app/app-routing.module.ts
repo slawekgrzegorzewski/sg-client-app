@@ -36,6 +36,10 @@ import {IntellectualPropertyComponent, IP_HOME_ROUTER_URL} from './ip/components
 import {TIME_RECORDS_ROUTER_URL, TimeRecordsComponent} from './ip/components/time-records.component';
 import {IPR_REPORTS_ROUTER_URL, IPRReportsComponent} from './ip/components/ipr-reports.component';
 import {IP_SETTINGS_ROUTER_URL, IPSettingsComponent} from "./ip/components/ip-settings.component";
+import {
+  MORTGAGE_SIMULATOR_ROUTER_URL,
+  MortgageSimulatorComponent
+} from './accountant/pages/mortgage-simulator/mortgage-simulator.component';
 
 const routes: Routes = [
   {path: 'login', component: LoginComponent, canActivate: [UserNotLoggedInGuard]},
@@ -92,6 +96,9 @@ const routes: Routes = [
 
   {path: IP_SETTINGS_ROUTER_URL, redirectTo: `/${IP_SETTINGS_ROUTER_URL}/`, pathMatch: 'full'},
   {path: `${IP_SETTINGS_ROUTER_URL}/:domainId`, component: IPSettingsComponent, canActivate: [UserLoggedInGuard]},
+
+  {path: MORTGAGE_SIMULATOR_ROUTER_URL, redirectTo: `/${MORTGAGE_SIMULATOR_ROUTER_URL}/`, pathMatch: 'full'},
+  {path: `${MORTGAGE_SIMULATOR_ROUTER_URL}/:domainId`, component: MortgageSimulatorComponent, canActivate: [UserLoggedInGuard]},
 
   {path: '**', component: DefaultApplicationComponent}
 ];

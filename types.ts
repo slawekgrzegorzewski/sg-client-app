@@ -41,50 +41,31 @@ export type IntellectualPropertyData = {
   description: Scalars['String'];
 };
 
-export type KPiREntry = {
-  __typename?: 'KPiREntry';
-  additionalCostOfPurchase: Scalars['BigDecimal'];
-  bookingNumber: Scalars['String'];
-  comments: Scalars['String'];
-  counterparty: Scalars['String'];
-  counterpartyAddress: Scalars['String'];
-  description: Scalars['String'];
-  domain: DomainSimple;
-  entryDate: Scalars['LocalDate'];
-  entryOrder: Scalars['Int'];
-  otherExpenses: Scalars['BigDecimal'];
-  otherIncomes: Scalars['BigDecimal'];
-  providedGoodsAndServicesValue: Scalars['BigDecimal'];
-  publicId: Scalars['UUID'];
-  purchasedGoodsAndMaterialsValue: Scalars['BigDecimal'];
-  remunerationInCashOrInKind: Scalars['BigDecimal'];
-  totalExpenses: Scalars['BigDecimal'];
-  totalIncomes: Scalars['BigDecimal'];
+export type MortgageCalculationInstallment = {
+  __typename?: 'MortgageCalculationInstallment';
+  installment: Scalars['BigDecimal'];
+  overpayment: Scalars['BigDecimal'];
+  paidInterest: Scalars['BigDecimal'];
+  paymentFrom: Scalars['LocalDate'];
+  paymentTo: Scalars['LocalDate'];
+  remainingCapitalAtTheBeginning: Scalars['BigDecimal'];
+  repaidCapital: Scalars['BigDecimal'];
 };
 
-export type KPiREntryInput = {
-  additionalCostOfPurchase: Scalars['BigDecimal'];
-  bookingNumber: Scalars['String'];
-  comments: Scalars['String'];
-  counterparty: Scalars['String'];
-  counterpartyAddress: Scalars['String'];
-  description: Scalars['String'];
-  entryDate: Scalars['LocalDate'];
-  entryOrder: Scalars['Int'];
-  otherExpenses: Scalars['BigDecimal'];
-  otherIncomes: Scalars['BigDecimal'];
-  providedGoodsAndServicesValue: Scalars['BigDecimal'];
-  publicId?: InputMaybe<Scalars['UUID']>;
-  purchasedGoodsAndMaterialsValue: Scalars['BigDecimal'];
-  remunerationInCashOrInKind: Scalars['BigDecimal'];
-  totalExpenses: Scalars['BigDecimal'];
-  totalIncomes: Scalars['BigDecimal'];
+export type MortgageCalculationParams = {
+  mortgageAmount: Scalars['BigDecimal'];
+  numberOfInstallments: Scalars['Int'];
+  overpaymentMonthlyBudget: Scalars['BigDecimal'];
+  overpaymentYearlyBudget: Scalars['BigDecimal'];
+  rate: Scalars['BigDecimal'];
+  repaymentStart: Scalars['LocalDate'];
+  wibor: Scalars['BigDecimal'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
   addIPR?: Maybe<IntellectualProperty>;
-  addKPiREntry?: Maybe<KPiREntry>;
+  addRevenueAndExpenseEntry?: Maybe<RevenueAndExpenseEntry>;
   assignCategoryToTimeRecord: Scalars['String'];
   createTask: Scalars['String'];
   createTimeRecord: Scalars['String'];
@@ -105,8 +86,8 @@ export type MutationAddIprArgs = {
 };
 
 
-export type MutationAddKPiREntryArgs = {
-  input?: InputMaybe<KPiREntryInput>;
+export type MutationAddRevenueAndExpenseEntryArgs = {
+  input?: InputMaybe<RevenueAndExpenseEntryInput>;
 };
 
 
@@ -179,14 +160,60 @@ export type Query = {
   __typename?: 'Query';
   allIPRs: Array<IntellectualProperty>;
   allTimeRecordCategories: Array<TimeRecordCategory>;
-  monthKPIR?: Maybe<Array<KPiREntry>>;
+  monthRevenueAndExpenseEntry?: Maybe<Array<RevenueAndExpenseEntry>>;
   nonIPTimeRecords: Array<TimeRecord>;
+  simulateMortgage: Array<MortgageCalculationInstallment>;
 };
 
 
-export type QueryMonthKpirArgs = {
+export type QueryMonthRevenueAndExpenseEntryArgs = {
   month: Scalars['Int'];
   year: Scalars['Int'];
+};
+
+
+export type QuerySimulateMortgageArgs = {
+  mortgageCalculationParams?: InputMaybe<MortgageCalculationParams>;
+};
+
+export type RevenueAndExpenseEntry = {
+  __typename?: 'RevenueAndExpenseEntry';
+  accountingDocumentNumber: Scalars['String'];
+  additionalCostOfPurchase: Scalars['BigDecimal'];
+  comments: Scalars['String'];
+  counterparty: Scalars['String'];
+  counterpartyAddress: Scalars['String'];
+  description: Scalars['String'];
+  domain: DomainSimple;
+  entryDate: Scalars['LocalDate'];
+  entryOrder: Scalars['Int'];
+  otherExpense: Scalars['BigDecimal'];
+  otherIncome: Scalars['BigDecimal'];
+  providedGoodsAndServicesValue: Scalars['BigDecimal'];
+  publicId: Scalars['UUID'];
+  purchasedGoodsAndMaterialsValue: Scalars['BigDecimal'];
+  remunerationInCashOrInKind: Scalars['BigDecimal'];
+  totalExpense: Scalars['BigDecimal'];
+  totalIncome: Scalars['BigDecimal'];
+};
+
+export type RevenueAndExpenseEntryInput = {
+  accountingDocumentNumber: Scalars['String'];
+  additionalCostOfPurchase: Scalars['BigDecimal'];
+  comments: Scalars['String'];
+  counterparty: Scalars['String'];
+  counterpartyAddress: Scalars['String'];
+  description: Scalars['String'];
+  entryDate: Scalars['LocalDate'];
+  entryOrder: Scalars['Int'];
+  otherExpense: Scalars['BigDecimal'];
+  otherIncome: Scalars['BigDecimal'];
+  providedGoodsAndServicesValue: Scalars['BigDecimal'];
+  publicId?: InputMaybe<Scalars['UUID']>;
+  purchasedGoodsAndMaterialsValue: Scalars['BigDecimal'];
+  remunerationInCashOrInKind: Scalars['BigDecimal'];
+  totalExpense: Scalars['BigDecimal'];
+  totalIncome: Scalars['BigDecimal'];
 };
 
 export type Task = {
@@ -227,6 +254,19 @@ export type TimeRecordData = {
   numberOfHours: Scalars['BigDecimal'];
   taskId?: InputMaybe<Scalars['Int']>;
 };
+
+export type SimulateMortgageQueryVariables = Exact<{
+  mortgageAmount: Scalars['BigDecimal'];
+  numberOfInstallments: Scalars['Int'];
+  overpaymentMonthlyBudget: Scalars['BigDecimal'];
+  overpaymentYearlyBudget: Scalars['BigDecimal'];
+  rate: Scalars['BigDecimal'];
+  repaymentStart: Scalars['LocalDate'];
+  wibor: Scalars['BigDecimal'];
+}>;
+
+
+export type SimulateMortgageQuery = { __typename?: 'Query', simulateMortgage: Array<{ __typename?: 'MortgageCalculationInstallment', paymentFrom: any, paymentTo: any, remainingCapitalAtTheBeginning: any, installment: any, repaidCapital: any, paidInterest: any, overpayment: any }> };
 
 export type GetAllDomainIntellectualPropertiesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -351,6 +391,21 @@ export type AssignCategoryToTimeRecordMutationVariables = Exact<{
 export type AssignCategoryToTimeRecordMutation = { __typename?: 'Mutation', assignCategoryToTimeRecord: string };
 
 
+export const SimulateMortgage = gql`
+    query SimulateMortgage($mortgageAmount: BigDecimal!, $numberOfInstallments: Int!, $overpaymentMonthlyBudget: BigDecimal!, $overpaymentYearlyBudget: BigDecimal!, $rate: BigDecimal!, $repaymentStart: LocalDate!, $wibor: BigDecimal!) {
+  simulateMortgage(
+    mortgageCalculationParams: {mortgageAmount: $mortgageAmount, numberOfInstallments: $numberOfInstallments, overpaymentMonthlyBudget: $overpaymentMonthlyBudget, overpaymentYearlyBudget: $overpaymentYearlyBudget, rate: $rate, repaymentStart: $repaymentStart, wibor: $wibor}
+  ) {
+    paymentFrom
+    paymentTo
+    remainingCapitalAtTheBeginning
+    installment
+    repaidCapital
+    paidInterest
+    overpayment
+  }
+}
+    `;
 export const GetAllDomainIntellectualProperties = gql`
     query GetAllDomainIntellectualProperties {
   allIPRs {

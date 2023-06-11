@@ -38,9 +38,7 @@ import {CurrencyTotalsComponent} from './general/components/currencies/currency-
 import {MultiCurrencyTotalComponent} from './general/components/currencies/multi-currency-total.component';
 import {AccountsHistoryComponent} from './accountant/pages/accounts-history/accounts-history.component';
 import {BillingSmallComponent} from './accountant/pages/billings/billing-small.component';
-import {
-  BrowseBillingElementsComponent
-} from './accountant/components/billing-periods/browse-billing-elements.component';
+import {BrowseBillingElementsComponent} from './accountant/components/billing-periods/browse-billing-elements.component';
 import {PiggyBanksSmallComponent} from './accountant/pages/piggy-banks/piggy-banks-small.component';
 import {NgChartsModule} from 'ng2-charts';
 import {ChartsComponent} from './accountant/pages/charts/charts.component';
@@ -90,37 +88,27 @@ import {BanksService} from './openbanking/services/banks.service';
 import {TransactionsImportComponent} from './accountant/pages/transactions-import/transactions-import.component';
 import {TransactionRowComponent} from './accountant/pages/transactions-import/row/transaction-row.component';
 import {MyHammerConfig} from './general/services/my-hammer-config.service';
-import {
-  DebitTransactionImporterComponent
-} from './accountant/pages/transactions-import/importers/debit-transaction-importer.component';
-import {
-  CreditTransactionImporterComponent
-} from './accountant/pages/transactions-import/importers/credit-transaction-importer.component';
+import {DebitTransactionImporterComponent} from './accountant/pages/transactions-import/importers/debit-transaction-importer.component';
+import {CreditTransactionImporterComponent} from './accountant/pages/transactions-import/importers/credit-transaction-importer.component';
 import {TransferImporterComponent} from './accountant/pages/transactions-import/importers/transfer-importer.component';
 import {IgnoreImporterComponent} from './accountant/pages/transactions-import/importers/ignore-importer.component';
-import {
-  MutuallyCancellingImporterComponent
-} from './accountant/pages/transactions-import/importers/mutually-cancelling-importer.component';
+import {MutuallyCancellingImporterComponent} from './accountant/pages/transactions-import/importers/mutually-cancelling-importer.component';
 import {UploaderComponent} from './general/components/uploader/uploader.component';
 import {IntellectualPropertyComponent} from './ip/components/intellectual-property.component';
 import {CubeRecordsService} from './speedcubing/services/cube-records.service';
 import {TimeRecordsComponent} from './ip/components/time-records.component';
 import {TimeRecordEditorComponent} from './ip/components/utils/time-record-editor.component';
-import {
-  IntellectualPropertyTaskEditorModalComponent
-} from './ip/components/utils/intellectual-property-task-editor-modal.component';
-import {
-  IntellectualPropertyEditorModalComponent
-} from './ip/components/utils/intellectual-property-editor-modal.component';
-import {
-  IntellectualPropertyTaskDetailsModalComponent
-} from './ip/components/utils/intellectual-property-task-details-modal.component';
+import {IntellectualPropertyTaskEditorModalComponent} from './ip/components/utils/intellectual-property-task-editor-modal.component';
+import {IntellectualPropertyEditorModalComponent} from './ip/components/utils/intellectual-property-editor-modal.component';
+import {IntellectualPropertyTaskDetailsModalComponent} from './ip/components/utils/intellectual-property-task-details-modal.component';
 import {UploaderModalComponent} from './general/components/uploader/uploader-modal.component';
 import {IPRReportsComponent} from './ip/components/ipr-reports.component';
 import {GraphQLModule} from './graphql.module';
 import {NgxLoadingModule} from 'ngx-loading';
-import {IPSettingsComponent} from "./ip/components/ip-settings.component";
-import {TimeRecordCategoryEditorComponent} from "./ip/components/utils/time-record-category-editor.component";
+import {MortgageSimulatorComponent} from './accountant/pages/mortgage-simulator/mortgage-simulator.component';
+import {MortgageSimulatorService} from './accountant/services/mortgage-simulator.service';
+import {IPSettingsComponent} from './ip/components/ip-settings.component';
+import {TimeRecordCategoryEditorComponent} from './ip/components/utils/time-record-category-editor.component';
 
 @NgModule({
   declarations: [
@@ -194,7 +182,8 @@ import {TimeRecordCategoryEditorComponent} from "./ip/components/utils/time-reco
     UploaderModalComponent,
     IPRReportsComponent,
     IPSettingsComponent,
-    TimeRecordCategoryEditorComponent
+    TimeRecordCategoryEditorComponent,
+    MortgageSimulatorComponent
   ],
   imports: [
     BrowserModule,
@@ -247,6 +236,7 @@ import {TimeRecordCategoryEditorComponent} from "./ip/components/utils/time-reco
     NodrigenService,
     BanksService,
     AccountantSettingsService,
+    MortgageSimulatorService,
     {provide: NgbDateAdapter, useClass: NgbDateNativeAdapter}
   ],
   bootstrap: [AppComponent]
