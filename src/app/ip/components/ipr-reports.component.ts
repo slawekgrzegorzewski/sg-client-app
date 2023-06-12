@@ -125,7 +125,7 @@ export class IPRReportsComponent implements OnInit {
   }
 
   assignTimeRecordCategory(timeRecordId: number, timeRecordCategoryId: any) {
-    this.intellectualPropertyService.assignTimeRecordToCategory(timeRecordId, timeRecordCategoryId.value)
+    this.intellectualPropertyService.assignTimeRecordToCategory(timeRecordId, Number(timeRecordCategoryId.value))
       .subscribe({
         complete: () => {
           this.intellectualPropertyService.refreshNonIPTimeRecords();
