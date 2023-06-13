@@ -35,6 +35,8 @@ const EMPTY_MORTGAGE_SIMULATOR_PARAMS: MortgageSimulationParams = {
   wibor: new Decimal(0)
 };
 
+const mortgageSimulatorParamsLocalStorageKey = 'mortgage-simulator-params';
+
 @Component({
   selector: 'app-accounts-home',
   templateUrl: './mortgage-simulator.component.html',
@@ -42,6 +44,7 @@ const EMPTY_MORTGAGE_SIMULATOR_PARAMS: MortgageSimulationParams = {
 })
 export class MortgageSimulatorComponent implements OnInit, OnDestroy {
 
+  configurationSourceVisible = false;
   private _selectedConfiguration: string = 'default';
   public paramsConfigs: string[] = ['default'];
   private _mortgageAmount: Decimal = new Decimal(0);
@@ -123,9 +126,13 @@ export class MortgageSimulatorComponent implements OnInit, OnDestroy {
     this.selectedParamsConfig = newKey;
   }
 
+  showConfigurationSource() {
+    this.configurationSourceVisible = !this.configurationSourceVisible;
+  }
+
   private getParamsStorage() {
-    const paramsStorage: MortgageSimulationParamsStorage = localStorage.getItem('mortgage-simulator-params')
-      ? JSON.parse(localStorage.getItem('mortgage-simulator-params')!, this.reviver)
+    const paramsStorage: MortgageSimulationParamsStorage = localStorage.getItem(mortgageSimulatorParamsLocalStorageKey)
+      ? JSON.parse(localStorage.getItem(mortgageSimulatorParamsLocalStorageKey)!, this.reviver)
       : {selectedConfiguration: 'default', configurations: new Map([['default', EMPTY_MORTGAGE_SIMULATOR_PARAMS]])};
     this.paramsConfigs = Array.from(paramsStorage.configurations.keys());
     return paramsStorage;
@@ -156,7 +163,7 @@ export class MortgageSimulatorComponent implements OnInit, OnDestroy {
       wibor: this.wibor
     });
     localStorage.setItem(
-      'mortgage-simulator-params',
+      mortgageSimulatorParamsLocalStorageKey,
       JSON.stringify(paramsStorage, this.replacer)
     );
   }
@@ -189,6 +196,15 @@ export class MortgageSimulatorComponent implements OnInit, OnDestroy {
     this._selectedConfiguration = value;
   }
 
+  get configurationSource(): string {
+    return JSON.stringify(this.getParamsStorage(), this.replacer, 2);
+  }
+
+  set configurationSource(value: string) {
+    localStorage.setItem(mortgageSimulatorParamsLocalStorageKey, JSON.stringify(JSON.parse(value, this.reviver), this.replacer));
+    this.readParams();
+    this.fetchData();
+  }
   get mortgageAmount(): Decimal {
     return this._mortgageAmount;
   }
