@@ -1,13 +1,14 @@
 <div class="content">
 
   <div class="btn-group element">
-    <input type="radio" class="btn-check" name="config" id="config" autocomplete="off" (click)="viewMode = 'CONFIG'"
-           [checked]="viewMode === 'CONFIG'">
-    <label class="btn btn-outline-primary" for="config">Konfiguracja</label>
 
     <input type="radio" class="btn-check" name="info" id="info" autocomplete="off" (click)="viewMode = 'INFO'"
            [checked]="viewMode === 'INFO'">
     <label class="btn btn-outline-primary" for="info">Dane o kredycie</label>
+
+    <input type="radio" class="btn-check" name="config" id="config" autocomplete="off" (click)="viewMode = 'CONFIG'"
+           [checked]="viewMode === 'CONFIG'">
+    <label class="btn btn-outline-primary" for="config">Konfiguracja</label>
 
     <input type="radio" class="btn-check" name="source" id="source" autocomplete="off" (click)="viewMode = 'SOURCE'"
            [checked]="viewMode === 'SOURCE'">
@@ -39,14 +40,18 @@
     </div>
   </div>
 </div>
+
+<ng-template #configSelectInput>
+  <div class="col-auto">
+    <select [(ngModel)]="selectedParamsConfig" class="form-select">
+      <option *ngFor="let config of paramsConfigs" [selected]="selectedParamsConfig === config"
+              [value]="config">{{config}}</option>
+    </select>
+  </div>
+</ng-template>
 <ng-template #configSection>
   <div class="row g-2 align-items-center">
-    <div class="col-auto">
-      <select [(ngModel)]="selectedParamsConfig" class="form-select">
-        <option *ngFor="let config of paramsConfigs" [selected]="selectedParamsConfig === config"
-                [value]="config">{{config}}</option>
-      </select>
-    </div>
+    <ng-template [ngTemplateOutlet]="configSelectInput"></ng-template>
     <div class="col-auto">
       <button class="btn btn-link btn-sm" (click)="copyConfiguration()">kopiuj
       </button>
@@ -124,6 +129,7 @@
 </ng-template>
 
 <ng-template #infoSection>
+  <ng-template [ngTemplateOutlet]="configSelectInput"></ng-template>
   <div><b>Sumaryczne informacje o kredycie:</b></div>
   <div><b>Kwota kredytu: </b> {{mortgageAmount.toString() | currency: currency}}</div>
   <div><b>Spłacono łącznie: </b> {{installmentsSum.toString() | currency: currency}}</div>
