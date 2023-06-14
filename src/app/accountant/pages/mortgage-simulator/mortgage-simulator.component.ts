@@ -8,6 +8,7 @@ import {MortgageInstallment} from '../../model/mortgage-installment';
 import {MortgageSimulatorService} from '../../services/mortgage-simulator.service';
 import Decimal from 'decimal.js';
 
+type ViewMode = 'CONFIG' | 'INFO' | 'SOURCE';
 export const MORTGAGE_SIMULATOR_ROUTER_URL = 'mortgage-simulator';
 
 type MortgageSimulationParams = {
@@ -44,6 +45,7 @@ const mortgageSimulatorParamsLocalStorageKey = 'mortgage-simulator-params';
 })
 export class MortgageSimulatorComponent implements OnInit, OnDestroy {
 
+  viewMode: ViewMode = 'CONFIG';
   configurationSourceVisible = false;
   private _selectedConfiguration: string = 'default';
   public paramsConfigs: string[] = ['default'];

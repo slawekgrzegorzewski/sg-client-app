@@ -1,0 +1,12 @@
+.content {
+  width: 800px;
+  margin: auto;
+}
+
+.element {
+  width: 100%;
+}
+
+.installments:nth-child(odd) {
+  background: #d0d0d0;
+}
