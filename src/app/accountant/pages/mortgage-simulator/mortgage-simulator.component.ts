@@ -46,7 +46,6 @@ const mortgageSimulatorParamsLocalStorageKey = 'mortgage-simulator-params';
 export class MortgageSimulatorComponent implements OnInit, OnDestroy {
 
   viewMode: ViewMode = 'CONFIG';
-  configurationSourceVisible = false;
   private _selectedConfiguration: string = 'default';
   public paramsConfigs: string[] = ['default'];
   private _mortgageAmount: Decimal = new Decimal(0);
@@ -126,10 +125,6 @@ export class MortgageSimulatorComponent implements OnInit, OnDestroy {
     paramsStorage.configurations.set(newKey, paramsStorage.configurations.get(paramsStorage.selectedConfiguration)!);
     this.writeParams(paramsStorage);
     this.selectedParamsConfig = newKey;
-  }
-
-  showConfigurationSource() {
-    this.configurationSourceVisible = !this.configurationSourceVisible;
   }
 
   private getParamsStorage() {

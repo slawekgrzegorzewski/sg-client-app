@@ -56,10 +56,6 @@
       <button class="btn btn-link btn-sm" (click)="copyConfiguration()">kopiuj
       </button>
     </div>
-    <div class="col-auto">
-      <button class="btn btn-link btn-sm" (click)="showConfigurationSource()">źródło
-      </button>
-    </div>
   </div>
 
   <div class="row g-2 align-items-center">
@@ -138,6 +134,6 @@
 </ng-template>
 <ng-template #sourceSection>
   <div>
-    <textarea cols="75" rows="15" *ngIf="configurationSourceVisible" [(ngModel)]="configurationSource"></textarea>
+    <textarea cols="75" rows="15" [(ngModel)]="configurationSource"></textarea>
   </div>
 </ng-template>
