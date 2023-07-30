@@ -1,6 +1,6 @@
 <div class="creating-transaction-main">
   <h5>Enter transaction details</h5>
-  <form #createTransactionForm="ngForm" class="needs-validation" *ngIf="sourceAccount">
+  <form #createTransactionForm="ngForm" class="needs-validation" *ngIf="sourceAccount || sourceAccounts.length > 0">
 
     <div class="form-group row">
       <ng-template *ngIf="sourceAccounts.length === 0 && sourceAccount" [ngTemplateOutlet]="sourceAccountReadonly">

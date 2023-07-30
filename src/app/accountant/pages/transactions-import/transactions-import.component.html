@@ -62,9 +62,11 @@
     </app-debit-transaction-importer>
 
     <app-credit-transaction-importer
-      [transactions]="selectedTransactions"
       [allAccounts]="allAccounts"
-      (onIncomeCreation)="showBillingElementsCreation([$event[0]],$event[1],$event[2])">
+      [transactions]="selectedTransactions"
+      (onIncomeCreation)="showBillingElementsCreation([$event[0]],$event[1],$event[2])"
+      (onTransactionCreation)="showTransactionCreation($event)"
+    >
     </app-credit-transaction-importer>
 
     <app-transfer-importer

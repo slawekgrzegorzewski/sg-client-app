@@ -5,14 +5,21 @@ import {DatesUtils} from '../../../../general/utils/dates-utils';
 import {AffectedBankTransactionsToImportInfo} from '../../../../openbanking/model/nodrigen/affected-bank-transactions-to-import-info';
 import {Account} from '../../../model/account';
 import {Income} from '../../../model/billings/income';
+import {TransactionCreationData} from '../model/transaction-creation-data';
+import {TransactionType} from '../../../model/transaction-type';
 
 
 @Component({
   selector: 'app-credit-transaction-importer',
   template: `
     <ng-container *ngIf="canBeImported()">
-      <div (click)="emitCreateEvent()">
+      <div (click)="emitCreateIncomeEvent()">
         <b>Dochód</b>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="canBeCashCredit()">
+      <div (click)="emitCreateTransactionEvent()">
+        <b>Wpłata z konta gotówkowego</b>
       </div>
     </ng-container>
   `
@@ -25,21 +32,33 @@ export class CreditTransactionImporterComponent {
 
   @Input() set transactions(value: BankTransactionToImport[]) {
     this._transactions = value;
-    this.createIncome();
+    this.prepareCreationCandidates();
   }
 
-  @Input() allAccounts: Account[] = [];
+  _allAccounts: Account[] = [];
+  get allAccounts() {
+    return this._allAccounts;
+  }
+  @Input() set allAccounts(a: Account[]) {
+    this._allAccounts = a;
+  }
 
   @Output() onIncomeCreation = new EventEmitter<[Income, Account, AffectedBankTransactionsToImportInfo]>();
+  @Output() onTransactionCreation = new EventEmitter<TransactionCreationData>();
 
   private _transactions: BankTransactionToImport[] = [];
   private _incomeToCreate: Income | null = null;
+  private _transactionToCreate: TransactionCreationData | null = null;
 
   canBeImported() {
     return this._incomeToCreate !== null;
   }
 
-  private createIncome() {
+  canBeCashCredit() {
+    return this._transactionToCreate !== null;
+  }
+
+  private prepareCreationCandidates() {
     this._incomeToCreate = null;
 
     if (this.transactions.length === 0) {
@@ -49,7 +68,23 @@ export class CreditTransactionImporterComponent {
       return;
     }
 
-    const accountOfCreatingIncome = this.getAccountOfTransaction(this.transactions[0])!;
+    const firstTransaction = this.transactions[0];
+    const accountOfFirstTransaction = this.getAccountOfTransaction(firstTransaction)!;
+
+    this._transactionToCreate = null;
+    if (this.transactions.length === 1) {
+      this._transactionToCreate = new TransactionCreationData(
+        this.allAccounts.filter(t => t.bankAccount === null),
+        null,
+        [accountOfFirstTransaction],
+        accountOfFirstTransaction,
+        [firstTransaction.creditNodrigenTransactionId],
+        TransactionType.TRANSFER_FROM_BANK_TRANSACTIONS,
+        new Decimal(firstTransaction.credit),
+        firstTransaction.description,
+        null
+      );
+    }
 
     let amount: Decimal = new Decimal(0);
     let incomeDate = new Date();
@@ -62,8 +97,8 @@ export class CreditTransactionImporterComponent {
       let account = this.getAccountOfTransaction(transaction)!;
       let otherAccount = this.getOtherAccountOfTransaction(transaction)!;
 
-      if (account.id !== accountOfCreatingIncome.id
-        || accountOfCreatingIncome.currency != account.currency
+      if (account.id !== accountOfFirstTransaction.id
+        || accountOfFirstTransaction.currency != account.currency
         || otherAccount !== null) {
         return;
       }
@@ -79,7 +114,7 @@ export class CreditTransactionImporterComponent {
       this._incomeToCreate = new Income();
       this._incomeToCreate.description = description;
       this._incomeToCreate.amount = amount.toNumber();
-      this._incomeToCreate.currency = accountOfCreatingIncome.currency;
+      this._incomeToCreate.currency = accountOfFirstTransaction.currency;
       this._incomeToCreate.incomeDate = incomeDate;
     }
   }
@@ -92,7 +127,7 @@ export class CreditTransactionImporterComponent {
     return transaction.isCredit() ? transaction.sourceAccount : transaction.destinationAccount;
   }
 
-  emitCreateEvent() {
+  emitCreateIncomeEvent() {
     const accountOfCreatingIncome = this.getAccountOfTransaction(this.transactions[0])!;
     const affectedBankTransactionsToImportInfo = AffectedBankTransactionsToImportInfo.debitCredit(
       this.transactions.filter(t => t.isDebit()).map(t => t.debitNodrigenTransactionId),
@@ -104,5 +139,9 @@ export class CreditTransactionImporterComponent {
       accountOfCreatingIncome,
       affectedBankTransactionsToImportInfo
     ]);
+  }
+
+  emitCreateTransactionEvent() {
+    this.onTransactionCreation.emit(this._transactionToCreate!);
   }
 }
