@@ -10,3 +10,7 @@
 .installments:nth-child(odd) {
   background: #d0d0d0;
 }
+
+.installments-count {
+  padding-right: 5px;
+}

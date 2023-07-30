@@ -6,7 +6,7 @@ import {map} from 'rxjs/operators';
 import {Refreshable} from '../../general/services/refreshable';
 import {LoginService} from '../../general/services/login.service';
 import {DomainService} from '../../general/services/domain.service';
-import {Apollo, gql, QueryRef} from 'apollo-angular';
+import {Apollo, QueryRef} from 'apollo-angular';
 import {MortgageInstallment} from '../model/mortgage-installment';
 import Decimal from 'decimal.js';
 import {SimulateMortgage} from '../../../../types';
@@ -38,7 +38,8 @@ export class MortgageSimulatorService extends Refreshable {
     overpaymentYearlyBudget: Decimal,
     rate: Decimal,
     repaymentStart: Date,
-    wibor: Decimal
+    wibor: Decimal,
+    holidaysMonthAfterNumberOfInstallments: number | null
   ): Observable<MortgageInstallment[]> {
     this.simulateMortgageQueryRef = this.apollo
       .watchQuery<{ simulateMortgage: MortgageInstallment[] }>({
@@ -50,7 +51,8 @@ export class MortgageSimulatorService extends Refreshable {
           overpaymentYearlyBudget: overpaymentYearlyBudget,
           rate: rate,
           repaymentStart: DatesUtils.getDateString(repaymentStart, this.datePipe),
-          wibor: wibor
+          wibor: wibor,
+          holidaysMonthAfterNumberOfInstallments: holidaysMonthAfterNumberOfInstallments
         }
       });
     return this.simulateMortgageQueryRef.valueChanges

@@ -36,6 +36,7 @@ input MortgageCalculationParams {
   rate: BigDecimal!,
   repaymentStart: LocalDate!,
   wibor: BigDecimal!,
+  holidaysMonthAfterNumberOfInstallments: Int,
 }
 
 type MortgageCalculationInstallment {
