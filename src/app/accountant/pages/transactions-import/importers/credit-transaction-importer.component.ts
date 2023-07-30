@@ -22,10 +22,32 @@ import {TransactionType} from '../../../model/transaction-type';
         <b>Wpłata z konta gotówkowego</b>
       </div>
     </ng-container>
+    <ng-container *ngIf="canBeCashCredit() && canBeImported()">
+      <div>
+        <b>Wpłata z konta gotówkowego i dochód</b>
+        <div class="form-group row">
+          <label for="income" class="col-4 col-form-label">Dochód</label>
+          <div class="col-8">
+            <input id="income" name="income" type="number" min=0 class="form-control" #currencyRate="ngModel" [(ngModel)]="income"
+                   required/>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="deposit" class="col-4 col-form-label">Wpłata</label>
+          <div class="col-8">
+            <input id="deposit" name="deposit" type="number" min=0 class="form-control" #currencyRate="ngModel" [(ngModel)]="deposit"
+                   required/>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-sm btn-link" *ngIf="incomeAndTransactionCanBeCreated()" (click)="emitCreateIncomeAndTransactionEvent()">
+        stwórz
+      </button>
+    </ng-container>
   `
 })
 export class CreditTransactionImporterComponent {
-
   get transactions(): BankTransactionToImport[] {
     return this._transactions;
   }
@@ -39,16 +61,42 @@ export class CreditTransactionImporterComponent {
   get allAccounts() {
     return this._allAccounts;
   }
+
   @Input() set allAccounts(a: Account[]) {
     this._allAccounts = a;
   }
 
+  get deposit(): number {
+    return this._deposit;
+  }
+
+  set deposit(value: number) {
+    this._deposit = value;
+    this._income = this.transactions[0].credit - value;
+  }
+
+  get income(): number {
+    return this._income;
+  }
+
+  set income(value: number) {
+    this._income = value;
+    this._deposit = this.transactions[0].credit - value;
+  }
+
   @Output() onIncomeCreation = new EventEmitter<[Income, Account, AffectedBankTransactionsToImportInfo]>();
   @Output() onTransactionCreation = new EventEmitter<TransactionCreationData>();
+  @Output() onIncomeAndTransactionCreation = new EventEmitter<{
+    transaction: TransactionCreationData;
+    income: [Income, Account, AffectedBankTransactionsToImportInfo]
+  }>();
 
   private _transactions: BankTransactionToImport[] = [];
   private _incomeToCreate: Income | null = null;
   private _transactionToCreate: TransactionCreationData | null = null;
+  private _income: number = 0;
+  private _deposit: number = 0;
+
 
   canBeImported() {
     return this._incomeToCreate !== null;
@@ -56,6 +104,10 @@ export class CreditTransactionImporterComponent {
 
   canBeCashCredit() {
     return this._transactionToCreate !== null;
+  }
+
+  incomeAndTransactionCanBeCreated() {
+    return this.canBeImported() && this.canBeCashCredit() && this.income + this.deposit === this.transactions[0].credit;
   }
 
   private prepareCreationCandidates() {
@@ -128,20 +180,35 @@ export class CreditTransactionImporterComponent {
   }
 
   emitCreateIncomeEvent() {
+    this.onIncomeCreation.emit(this.prepareCreateIncomeEvent());
+  }
+
+  private prepareCreateIncomeEvent() {
     const accountOfCreatingIncome = this.getAccountOfTransaction(this.transactions[0])!;
     const affectedBankTransactionsToImportInfo = AffectedBankTransactionsToImportInfo.debitCredit(
       this.transactions.filter(t => t.isDebit()).map(t => t.debitNodrigenTransactionId),
       this.transactions.filter(t => t.isCredit()).map(t => t.creditNodrigenTransactionId)
     );
 
-    this.onIncomeCreation.emit([
+    const event: [Income, Account, AffectedBankTransactionsToImportInfo] = [
       this._incomeToCreate!,
       accountOfCreatingIncome,
       affectedBankTransactionsToImportInfo
-    ]);
+    ];
+    return event;
   }
 
   emitCreateTransactionEvent() {
     this.onTransactionCreation.emit(this._transactionToCreate!);
+  }
+
+  emitCreateIncomeAndTransactionEvent() {
+    const createIncomeEvent = this.prepareCreateIncomeEvent();
+    createIncomeEvent[0].amount = this.income;
+    this._transactionToCreate!.amount = new Decimal(this.deposit);
+    this.onIncomeAndTransactionCreation.emit({
+      transaction: this._transactionToCreate!,
+      income: createIncomeEvent
+    });
   }
 }

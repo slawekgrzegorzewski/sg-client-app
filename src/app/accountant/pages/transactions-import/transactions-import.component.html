@@ -6,11 +6,11 @@
 </ng-template>
 
 <ng-template [ngTemplateOutlet]="billingElementCreation"
-             *ngIf="selectedTransactions.length > 0 && billingElementsToCreate.length > 0 && !transactionCreationData">
+             *ngIf="selectedTransactions.length > 0 && billingElementsToCreate.length > 0">
 </ng-template>
 
 <ng-template [ngTemplateOutlet]="transactionCreation"
-             *ngIf="selectedTransactions.length > 0 && billingElementsToCreate.length === 0 && transactionCreationData">
+             *ngIf="selectedTransactions.length > 0 && transactionCreationData">
 </ng-template>
 
 <ng-template #transactionsList>
@@ -66,6 +66,7 @@
       [transactions]="selectedTransactions"
       (onIncomeCreation)="showBillingElementsCreation([$event[0]],$event[1],$event[2])"
       (onTransactionCreation)="showTransactionCreation($event)"
+      (onIncomeAndTransactionCreation)="showBillingElementAndTransactionCreation($event.transaction, $event.income)"
     >
     </app-credit-transaction-importer>
 
@@ -114,5 +115,6 @@
     [amount]="transactionCreationData!.amount.toNumber()"
     [description]="transactionCreationData!.description"
     [conversionRate]="transactionCreationData!.conversionRate?.toNumber() || null"
+    (finishSubject)="transactionCreationEvent($event)"
   ></app-create-transaction>
 </ng-template>

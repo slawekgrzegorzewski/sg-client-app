@@ -12,9 +12,7 @@ import {NgEventBus} from 'ng-event-bus';
 import {TRANSACTIONS_TO_IMPORT_CHANGED} from '../../../general/utils/event-bus-events';
 import {AccountsService} from '../../services/accounts.service';
 import {forkJoin} from 'rxjs';
-import {
-  AffectedBankTransactionsToImportInfo
-} from '../../../openbanking/model/nodrigen/affected-bank-transactions-to-import-info';
+import {AffectedBankTransactionsToImportInfo} from '../../../openbanking/model/nodrigen/affected-bank-transactions-to-import-info';
 import {BillingElementType} from '../../components/billing-periods/create-billing-element.component';
 import {TransactionCreationData} from './model/transaction-creation-data';
 
@@ -52,7 +50,12 @@ export class TransactionsImportComponent implements OnInit {
               private nodrigenService: NodrigenService,
               private piggyBanksService: PiggyBanksService,
               private eventBus: NgEventBus) {
-    this.eventBus.on(TRANSACTIONS_TO_IMPORT_CHANGED).subscribe(md => this.refreshData());
+    this.eventBus.on(TRANSACTIONS_TO_IMPORT_CHANGED).subscribe(md => {
+        if (!this.accountOfBillingElementToCreate) {
+          this.refreshData();
+        }
+      }
+    );
   }
 
   ngOnInit(): void {
@@ -110,6 +113,18 @@ export class TransactionsImportComponent implements OnInit {
     this.transactionCreationData = transactionCreationData;
   }
 
+  showBillingElementAndTransactionCreation(
+    transactionCreationData: TransactionCreationData,
+    incomeCreationData: [Income, Account, AffectedBankTransactionsToImportInfo]) {
+
+    this.billingElementsToCreate = [incomeCreationData[0]];
+    this.accountOfBillingElementToCreate = incomeCreationData[1];
+    this.billingElementToCreateType = incomeCreationData[0] instanceof Expense ? 'expense' : 'income';
+    this.affectedBankTransactionsInfo = incomeCreationData[2];
+
+    this.transactionCreationData = transactionCreationData;
+  }
+
   createElement(
     elementToCreate: Income | Expense | null,
     accountIdForElement: number | null,
@@ -139,7 +154,7 @@ export class TransactionsImportComponent implements OnInit {
   afterBillingElementCreation(elementToCreate: Income | Expense) {
     const indexToRemove = this.billingElementsToCreate.indexOf(elementToCreate);
     this.billingElementsToCreate.splice(indexToRemove, 1);
-    if(this.billingElementsToCreate.length === 0){
+    if (this.billingElementsToCreate.length === 0 && !this.transactionCreationData) {
       this.refreshData();
     }
   }
@@ -171,5 +186,11 @@ export class TransactionsImportComponent implements OnInit {
       this.selectTransaction(transaction);
     }
 
+  }
+
+  transactionCreationEvent(event: string) {
+    if (event === 'OK') {
+      this.transactionCreationData = null;
+    }
   }
 }
