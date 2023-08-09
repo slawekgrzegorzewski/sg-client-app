@@ -56,7 +56,9 @@ export class TransferImporterComponent {
       return;
     }
 
-    if (this.transactions.length !== 2) return;
+    if (this.transactions.length !== 2) {
+      return;
+    }
 
     this._transaction = this.transactions[0].isDebit() ? this.transactions[0] : this.transactions[1];
     const otherTransaction = this.transactions[0].isDebit() ? this.transactions[1] : this.transactions[0];
@@ -65,7 +67,6 @@ export class TransferImporterComponent {
       [otherTransaction],
       this._transaction!,
       tti => tti.isCredit()
-        && BankTransactionToImport.compareDates(tti, this._transaction!) === 0
         && tti.credit === this._transaction!.debit
         && (tti.destinationAccount?.currency || '') === (this._transaction!.sourceAccount?.currency || '')
     );
@@ -74,7 +75,6 @@ export class TransferImporterComponent {
       [otherTransaction],
       this._transaction!,
       tti => tti.isCredit()
-        && BankTransactionToImport.compareDates(tti, this._transaction!) === 0
         && (tti.destinationAccount?.currency || '') !== (this._transaction!.sourceAccount?.currency || ''));
   }
 
@@ -87,7 +87,10 @@ export class TransferImporterComponent {
   }
 
   transactionMayBeSingleTransferWithConversion() {
-    return this._transaction !== null && this._otherTransactionForTransferWithConversion === null;
+    return this._transaction !== null
+      && this._transaction.sourceAccount
+      && this._transaction.destinationAccount
+      && this._otherTransactionForTransferWithConversion === null;
   }
 
   createTransfer(destinationTransactionForTransfer: BankTransactionToImport) {
