@@ -33,7 +33,7 @@ export class DomainAccountsComponent implements OnInit {
   @Input() showTitle = true;
 
   @Output() deleteAccountEvent = new EventEmitter<Account>();
-  @Output() renameAccountEvent = new EventEmitter<Account>();
+  @Output() editAccountEvent = new EventEmitter<Account>();
   @Output() changeAccountVisibilityEvent = new EventEmitter<Account>();
   @Output() bankAccountAssignedEvent = new EventEmitter<[Account, BankAccount]>();
 

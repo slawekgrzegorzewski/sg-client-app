@@ -8,7 +8,7 @@
             <app-domain-accounts [bankAccountsAvailableToAssign]="bankAccountsAvailableToAssign"
                                  [adminMode]="true"
                                  (deleteAccountEvent)="deleteAccount($event)"
-                                 (renameAccountEvent)="rename($event)"
+                                 (editAccountEvent)="edit($event)"
                                  (changeAccountVisibilityEvent)="changeAccountVisibility($event)"
                                  (bankAccountAssignedEvent)="assignBankAccountToAnAccount($event)">
             </app-domain-accounts>

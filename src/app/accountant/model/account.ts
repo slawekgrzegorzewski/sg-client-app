@@ -8,6 +8,7 @@ export class Account implements WithBalance {
   public name: string;
   public currency: string;
   public currentBalance: number;
+  public creditLimit: number;
   public balanceIndex: number;
   public visible: boolean;
   bankAccount: BankAccount | null;
@@ -21,6 +22,7 @@ export class Account implements WithBalance {
     this.name = data.name || '';
     this.currency = data.currency || '';
     this.currentBalance = data.currentBalance || 0;
+    this.creditLimit = data.creditLimit || 0;
     this.balanceIndex = data.balanceIndex || 0;
     this.visible = data.visible || false;
     this.bankAccount = data.bankAccount ? new BankAccount(data.bankAccount) : null;

@@ -168,7 +168,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
     );
   }
 
-  rename(a: Account): void {
+  edit(a: Account): void {
     this.editAccount(a);
   }
 

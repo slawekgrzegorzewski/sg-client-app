@@ -40,7 +40,7 @@
                       (click)="deleteAccountEvent.emit(selectedAccount)">usuń
               </button>
               <button class="btn btn-link btn-sm"
-                      (click)="renameAccountEvent.emit(selectedAccount)">zmień nazwę
+                      (click)="editAccountEvent.emit(selectedAccount)">edytuj
               </button>
               <button class="btn btn-link btn-sm" *ngIf="selectedAccount && !selectedAccount.visible || false"
                       (click)="changeAccountVisibilityEvent.emit(selectedAccount)">pokaż

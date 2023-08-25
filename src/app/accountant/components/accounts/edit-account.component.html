@@ -8,6 +8,16 @@
                #accountName="ngModel" [(ngModel)]="entity.name" required autofocus>
       </div>
     </div>
+
+    <div class="form-group row">
+      <label for="creditLimit" class="col-3 col-form-label">Limit kredytowy</label>
+      <input id="creditLimit" name="creditLimit" type="number" class="form-control col-7"
+             #amount="ngModel"
+             [(ngModel)]="creditLimit"
+             min=0
+             required/>
+    </div>
+
     <div class="form-group row">
       <label for="accountCurrency" class="col-2 col-form-label">Waluta</label>
       <div class="col-10">
@@ -26,7 +36,7 @@
     <div class="form-group row">
       <div class="col-10">
         <button type="button" class="btn btn-outline-dark" (click)="saveAccount()"
-                [disabled]="accountName?.errors?.['required'] || accountCurrency?.errors?.['required']">
+                [disabled]="accountName?.errors?.['required'] || accountCurrency?.errors?.['required'] || creditLimitIncorrect">
           <span *ngIf="!isEditMode()">Stwórz</span>
           <span *ngIf="isEditMode()">Zapisz</span>
         </button>

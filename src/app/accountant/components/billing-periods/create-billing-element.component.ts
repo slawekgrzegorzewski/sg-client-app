@@ -189,7 +189,7 @@ export class CreateBillingElementComponent implements OnInit {
 
   isAllowed(): boolean {
     return this.selectedAccount !== null && this.billingElement !== null
-      && (this.isIncome() || this.billingElement.amount <= this.selectedAccount.currentBalance);
+      && (this.isIncome() || this.billingElement.amount <= (this.selectedAccount.currentBalance + this.selectedAccount.creditLimit));
   }
 
   categoriesForTypeAhead(): () => Category[] {

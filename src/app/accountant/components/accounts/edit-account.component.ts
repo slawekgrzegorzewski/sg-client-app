@@ -10,6 +10,8 @@ import {Account} from '../../model/account';
 })
 export class EditAccountComponent implements OnInit {
 
+  creditLimitIncorrect = false;
+
   @Input() currencies: Currency[] = [];
 
   private _entity: Account | null = null;
@@ -20,6 +22,21 @@ export class EditAccountComponent implements OnInit {
 
   get entity(): Account | null {
     return this._entity;
+  }
+
+  get creditLimit(): number {
+    if (this.entity) {
+      return this.entity.creditLimit;
+    } else {
+      return 0;
+    }
+  }
+
+  set creditLimit(value: number) {
+    if (this.entity) {
+      this.entity.creditLimit = value;
+        this.creditLimitIncorrect = this.creditLimit < 0 || (this.entity.currentBalance < 0 && this.entity.currentBalance + this.entity.creditLimit < 0);
+    }
   }
 
   get currency(): Currency | null {
