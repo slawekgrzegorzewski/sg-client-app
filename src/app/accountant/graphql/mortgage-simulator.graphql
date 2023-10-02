@@ -5,8 +5,7 @@ query SimulateMortgage(
   $overpaymentYearlyBudget: BigDecimal!
   $rate: BigDecimal!
   $repaymentStart: LocalDate!
-  $wibor: BigDecimal!,
-  $holidaysMonthAfterNumberOfInstallments: Int,
+  $wibor: BigDecimal!
 )
 {
   simulateMortgage(
@@ -17,8 +16,7 @@ query SimulateMortgage(
       overpaymentYearlyBudget: $overpaymentYearlyBudget,
       rate: $rate,
       repaymentStart: $repaymentStart,
-      wibor: $wibor,
-      holidaysMonthAfterNumberOfInstallments: $holidaysMonthAfterNumberOfInstallments
+      wibor: $wibor
     }
   ) {
     paymentFrom

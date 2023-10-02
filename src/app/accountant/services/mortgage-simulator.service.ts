@@ -38,8 +38,7 @@ export class MortgageSimulatorService extends Refreshable {
     overpaymentYearlyBudget: Decimal,
     rate: Decimal,
     repaymentStart: Date,
-    wibor: Decimal,
-    holidaysMonthAfterNumberOfInstallments: number | null
+    wibor: Decimal
   ): Observable<MortgageInstallment[]> {
     this.simulateMortgageQueryRef = this.apollo
       .watchQuery<{ simulateMortgage: MortgageInstallment[] }>({
@@ -51,8 +50,7 @@ export class MortgageSimulatorService extends Refreshable {
           overpaymentYearlyBudget: overpaymentYearlyBudget,
           rate: rate,
           repaymentStart: DatesUtils.getDateString(repaymentStart, this.datePipe),
-          wibor: wibor,
-          holidaysMonthAfterNumberOfInstallments: holidaysMonthAfterNumberOfInstallments
+          wibor: wibor
         }
       });
     return this.simulateMortgageQueryRef.valueChanges

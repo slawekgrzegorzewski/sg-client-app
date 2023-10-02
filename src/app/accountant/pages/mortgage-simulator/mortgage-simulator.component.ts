@@ -19,7 +19,6 @@ type MortgageSimulationParams = {
   rate: Decimal;
   repaymentStart: Date;
   wibor: Decimal;
-  holidaysMonthAfterNumberOfInstallments: number | null;
 }
 
 type MortgageSimulationParamsStorage = {
@@ -34,8 +33,7 @@ const EMPTY_MORTGAGE_SIMULATOR_PARAMS: MortgageSimulationParams = {
   overpaymentYearlyBudget: new Decimal(0),
   rate: new Decimal(0),
   repaymentStart: new Date(),
-  wibor: new Decimal(0),
-  holidaysMonthAfterNumberOfInstallments: null
+  wibor: new Decimal(0)
 };
 
 const mortgageSimulatorParamsLocalStorageKey = 'mortgage-simulator-params';
@@ -57,7 +55,6 @@ export class MortgageSimulatorComponent implements OnInit, OnDestroy {
   private _rate: Decimal = new Decimal(0);
   private _repaymentStart: Date = new Date();
   private _wibor: Decimal = new Decimal(0);
-  private _holidaysMonthAfterNumberOfInstallments: number | null = null;
 
   domainSubscription: Subscription | null = null;
   fetchSubscription: Subscription | null = null;
@@ -92,8 +89,7 @@ export class MortgageSimulatorComponent implements OnInit, OnDestroy {
       this.overpaymentYearlyBudget,
       this.rate,
       this.repaymentStart,
-      this.wibor,
-      this.holidaysMonthAfterNumberOfInstallments
+      this.wibor
     ).subscribe(data => {
       this.mortgageInstallments = data;
 
@@ -151,7 +147,6 @@ export class MortgageSimulatorComponent implements OnInit, OnDestroy {
     this._rate = params.rate;
     this._repaymentStart = new Date(params.repaymentStart);
     this._wibor = params.wibor;
-    this._holidaysMonthAfterNumberOfInstallments = params.holidaysMonthAfterNumberOfInstallments;
   }
 
   private writeParams(paramsStorage: MortgageSimulationParamsStorage = this.getParamsStorage()) {
@@ -163,7 +158,6 @@ export class MortgageSimulatorComponent implements OnInit, OnDestroy {
       rate: this.rate,
       repaymentStart: this.repaymentStart,
       wibor: this.wibor,
-      holidaysMonthAfterNumberOfInstallments: this.holidaysMonthAfterNumberOfInstallments,
     });
     localStorage.setItem(
       mortgageSimulatorParamsLocalStorageKey,
@@ -268,15 +262,6 @@ export class MortgageSimulatorComponent implements OnInit, OnDestroy {
 
   set wibor(value: Decimal) {
     this._wibor = value;
-    this.paramsChanged();
-  }
-
-  get holidaysMonthAfterNumberOfInstallments(): number | null {
-    return this._holidaysMonthAfterNumberOfInstallments;
-  }
-
-  set holidaysMonthAfterNumberOfInstallments(value: number | null) {
-    this._holidaysMonthAfterNumberOfInstallments = value;
     this.paramsChanged();
   }
 

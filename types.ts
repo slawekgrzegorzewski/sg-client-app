@@ -53,7 +53,6 @@ export type MortgageCalculationInstallment = {
 };
 
 export type MortgageCalculationParams = {
-  holidaysMonthAfterNumberOfInstallments?: InputMaybe<Scalars['Int']>;
   mortgageAmount: Scalars['BigDecimal'];
   numberOfInstallments: Scalars['Int'];
   overpaymentMonthlyBudget: Scalars['BigDecimal'];
@@ -264,7 +263,6 @@ export type SimulateMortgageQueryVariables = Exact<{
   rate: Scalars['BigDecimal'];
   repaymentStart: Scalars['LocalDate'];
   wibor: Scalars['BigDecimal'];
-  holidaysMonthAfterNumberOfInstallments?: InputMaybe<Scalars['Int']>;
 }>;
 
 
@@ -394,9 +392,9 @@ export type AssignCategoryToTimeRecordMutation = { __typename?: 'Mutation', assi
 
 
 export const SimulateMortgage = gql`
-    query SimulateMortgage($mortgageAmount: BigDecimal!, $numberOfInstallments: Int!, $overpaymentMonthlyBudget: BigDecimal!, $overpaymentYearlyBudget: BigDecimal!, $rate: BigDecimal!, $repaymentStart: LocalDate!, $wibor: BigDecimal!, $holidaysMonthAfterNumberOfInstallments: Int) {
+    query SimulateMortgage($mortgageAmount: BigDecimal!, $numberOfInstallments: Int!, $overpaymentMonthlyBudget: BigDecimal!, $overpaymentYearlyBudget: BigDecimal!, $rate: BigDecimal!, $repaymentStart: LocalDate!, $wibor: BigDecimal!) {
   simulateMortgage(
-    mortgageCalculationParams: {mortgageAmount: $mortgageAmount, numberOfInstallments: $numberOfInstallments, overpaymentMonthlyBudget: $overpaymentMonthlyBudget, overpaymentYearlyBudget: $overpaymentYearlyBudget, rate: $rate, repaymentStart: $repaymentStart, wibor: $wibor, holidaysMonthAfterNumberOfInstallments: $holidaysMonthAfterNumberOfInstallments}
+    mortgageCalculationParams: {mortgageAmount: $mortgageAmount, numberOfInstallments: $numberOfInstallments, overpaymentMonthlyBudget: $overpaymentMonthlyBudget, overpaymentYearlyBudget: $overpaymentYearlyBudget, rate: $rate, repaymentStart: $repaymentStart, wibor: $wibor}
   ) {
     paymentFrom
     paymentTo
