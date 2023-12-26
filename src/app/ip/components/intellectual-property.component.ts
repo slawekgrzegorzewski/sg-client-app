@@ -61,13 +61,29 @@ export class IntellectualPropertyComponent implements OnInit {
 
   activeIds: string = '';
 
-  private _withoutAttachments = false;
-  get withoutAttachments() {
-    return this._withoutAttachments;
+  private _tasksWithoutAttachments = false;
+  get tasksWithoutAttachments() {
+    return this._tasksWithoutAttachments;
   }
 
-  set withoutAttachments(value: boolean) {
-    this._withoutAttachments = value;
+  set tasksWithoutAttachments(value: boolean) {
+    this._tasksWithoutAttachments = value;
+    if (this._tasksWithoutAttachments) {
+      this._ipsWithoutAttachments = false;
+    }
+    this.filterData();
+  }
+
+  private _ipsWithoutAttachments = false;
+  get ipsWithoutAttachments() {
+    return this._ipsWithoutAttachments;
+  }
+
+  set ipsWithoutAttachments(value: boolean) {
+    this._ipsWithoutAttachments = value;
+    if (this._ipsWithoutAttachments) {
+      this._tasksWithoutAttachments = false;
+    }
     this.filterData();
   }
 
@@ -121,8 +137,10 @@ export class IntellectualPropertyComponent implements OnInit {
           this.intellectualPropertiesFilter = ALL;
         }
       },
-      error: err => {},
-      complete: () => {}
+      error: err => {
+      },
+      complete: () => {
+      }
     });
   }
 
@@ -131,14 +149,19 @@ export class IntellectualPropertyComponent implements OnInit {
       ? this.allIntellectualProperties
       : this.allIntellectualProperties
         .filter(ip => ip.tasks.find(t => t.timeRecords.find(tr => DatesUtils.getYearMonthString(tr.date, this.datePipe) === this.intellectualPropertiesFilter)));
-    this.intellectualPropertiesFiltered = this.withoutAttachments
-      ? dateFiltered.map(ip => {
+    if (this.ipsWithoutAttachments) {
+      this.intellectualPropertiesFiltered = dateFiltered
+        .filter(ip => ip.tasks.filter(t => t.attachments !== null && t.attachments.length > 0).length === 0);
+    } else if (this.tasksWithoutAttachments) {
+      this.intellectualPropertiesFiltered = dateFiltered.map(ip => {
         const taskWithoutAttachments = ip.tasks.filter(t => t.attachments === null || t.attachments.length === 0);
         const newIp = new IntellectualProperty(ip);
         newIp.tasks = taskWithoutAttachments;
         return newIp;
-      }).filter(ip => ip.tasks.length > 0)
-      : dateFiltered.map(ip => new IntellectualProperty(ip));
+      }).filter(ip => ip.tasks.length > 0);
+    } else {
+      this.intellectualPropertiesFiltered = dateFiltered.map(ip => new IntellectualProperty(ip));
+    }
   }
 
   openIntellectualPropertyCreationModal() {
