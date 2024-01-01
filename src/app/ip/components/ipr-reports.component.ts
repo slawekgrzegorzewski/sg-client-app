@@ -13,6 +13,7 @@ import {IntellectualProperty} from '../model/intellectual-property';
 import {IPRReport} from '../utils/ipr-report';
 import {TimeRecordCategory} from '../model/time-record-category';
 import Decimal from 'decimal.js';
+import * as XLSX from 'xlsx';
 
 export const IPR_REPORTS_ROUTER_URL = 'ipr-reports';
 
@@ -139,5 +140,17 @@ export class IPRReportsComponent implements OnInit {
       return 0;
     }
     return ipHours.div(ipHours.plus(nonIPHours)).toDecimalPlaces(4, Decimal.ROUND_DOWN).toNumber();
+  }
+
+  exportexcel() {
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      wb,
+      XLSX.utils.table_to_sheet(document.getElementById('report')),
+      this.year);
+
+    /* save to file */
+    XLSX.writeFile(wb, 'Raport IP - ' + this.year + '.xlsx');
   }
 }

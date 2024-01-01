@@ -9,8 +9,11 @@
           <option *ngFor="let dateOption of years" [value]="dateOption">{{dateOption}}</option>
         </select>
       </div>
+      <button *ngIf="iprReport" class="btn btn-sm btn-link" (click)="exportexcel()">
+        Pobierz jako excel
+      </button>
     </div>
-    <table *ngIf="iprReport">
+    <table *ngIf="iprReport" id="report">
       <thead>
       <tr class="report-header">
         <th [colSpan]="reportHeaderColSpan">

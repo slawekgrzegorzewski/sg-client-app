@@ -11,7 +11,7 @@ tr.report-header:last-child {
   border-bottom: 2px solid;
 }
 
-.report-columns-header th {
+.report-columns-header {
   border: 2px solid;
 }
 
