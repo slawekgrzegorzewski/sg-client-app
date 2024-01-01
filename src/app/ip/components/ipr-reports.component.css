@@ -1,0 +1,30 @@
+tr.report-header:first-child {
+  border-top: 2px solid;
+}
+
+tr.report-header {
+  border-right: 2px solid;
+  border-left: 2px solid;
+}
+
+tr.report-header:last-child {
+  border-bottom: 2px solid;
+}
+
+.report-columns-header th {
+  border: 2px solid;
+}
+
+.month-report-header {
+  border-top: 2px solid;
+}
+
+.month-report-row {
+  border-right: 2px solid;
+  border-left: 2px solid;
+}
+
+.month-report-footer {
+  border-bottom: 2px solid;
+}
+

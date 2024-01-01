@@ -10,45 +10,59 @@
         </select>
       </div>
     </div>
-    <div *ngIf="iprReport" class="sg-flex-row sg-flex-justify-space-between">
-      <div>Łączna ilość prac autorskich: {{iprReport.intellectualProperties.length}}</div>
-      <div>godziny: IP: {{iprReport.yearIPHours}}, nie IP: {{iprReport.yearNonIPHours}}</div>
-    </div>
-    <div *ngIf="iprReport">
-      Wynagrodzenie z tytułu przeniesienia praw autorskich
-      stanowi {{percentage(iprReport.yearIPHours, iprReport.yearNonIPHours) | percent:'2.2-2'}} wynagrodzenia
-    </div>
     <table *ngIf="iprReport">
       <thead>
-      <tr>
-        <td style="font-weight: bold">Opis zadania</td>
-        <td style="font-weight: bold">Ilość godzin IP</td>
-        <td style="font-weight: bold">Ilość godzin zwykłych</td>
-        <td style="font-weight: bold">Procent IP</td>
+      <tr class="report-header">
+        <th [colSpan]="reportHeaderColSpan">
+          Raporty ze świadczenia usług programistycznych na podstawie umowy z dnia 20-07-2020 z Satago Software
+          Solutions spółka z o.o. w roku {{year}}
+        </th>
+      </tr>
+      <tr class="report-header">
+        <th [colSpan]="reportHeaderColSpan">
+          Łączna ilość prac autorskich: {{iprReport.intellectualProperties.length}}
+        </th>
+      </tr>
+      <tr class="report-header">
+        <th [colSpan]="reportHeaderColSpan">
+          Liczba godzin: IP: {{iprReport.yearIPHours}}, nie IP: {{iprReport.yearNonIPHours}}
+        </th>
+      </tr>
+      <tr class="report-header">
+        <th [colSpan]="reportHeaderColSpan">
+          Wynagrodzenie z tytułu przeniesienia praw autorskich
+          stanowi {{percentage(iprReport.yearIPHours, iprReport.yearNonIPHours) | percent:'2.2-2'}} wynagrodzenia
+        </th>
+      </tr>
+      <tr class="report-columns-header">
+        <th style="font-weight: bold">Opis zadania</th>
+        <th style="font-weight: bold">Ilość godzin IP</th>
+        <th style="font-weight: bold">Ilość godzin zwykłych</th>
+        <th style="font-weight: bold">Procent IP</th>
       </tr>
       </thead>
       <tbody>
-      <ng-container *ngFor="let monthReport of iprReport.months | keyvalue">
-        <tr>
-          <td style="font-weight: bold">Raport ze świadczenia usług programistycznych na podstawie umowy z dnia
-            20-07-2020 za {{monthReport.key}}</td>
-          <td>{{monthReport.value.ipHours}}</td>
-          <td>{{monthReport.value.nonIPHours}}</td>
+      <ng-container *ngFor="let monthReport of iprReport.months | keyvalue; index as i">
+        <tr class="month-report-row month-report-header">
+          <td style="font-weight: bold">{{monthReport.key}}</td>
+          <td style="font-weight: bold">{{monthReport.value.ipHours}}</td>
+          <td style="font-weight: bold">{{monthReport.value.nonIPHours}}</td>
           <td>{{percentage(monthReport.value.ipHours, monthReport.value.nonIPHours) | percent:'2.2-2'}}</td>
         </tr>
-        <tr *ngFor="let ips of monthReport.value.ipTasksWithHours | keyvalue">
+        <tr class="month-report-row" *ngFor="let ips of monthReport.value.ipTasksWithHours | keyvalue">
           <td>{{ips.key}}</td>
           <td>{{ips.value}}</td>
           <td></td>
           <td></td>
         </tr>
-        <tr *ngFor="let ips of monthReport.value.nonIPTasksWithHours | keyvalue">
+        <tr class="month-report-row" *ngFor="let ips of monthReport.value.nonIPTasksWithHours | keyvalue">
           <td>{{ips.key}}</td>
           <td></td>
           <td>{{ips.value}}</td>
           <td></td>
         </tr>
-        <tr *ngFor="let ips of monthReport.value.nonIPTasksWithHoursNotCategorized | keyvalue">
+        <tr class="month-report-row month-report-footer"
+            *ngFor="let ips of monthReport.value.nonIPTasksWithHoursNotCategorized | keyvalue">
           <td>{{ips.key}}</td>
           <td colspan="3">
             <select (change)="assignTimeRecordCategory(ips.value.id, $event.target)">

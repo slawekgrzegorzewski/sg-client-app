@@ -11,8 +11,8 @@ import {DomainService} from '../../general/services/domain.service';
 import {DomainRegistrationHelper} from '../../general/components/domain/domain-registration-helper';
 import {IntellectualProperty} from '../model/intellectual-property';
 import {IPRReport} from '../utils/ipr-report';
-import {TimeRecordCategory} from "../model/time-record-category";
-import Decimal from "decimal.js";
+import {TimeRecordCategory} from '../model/time-record-category';
+import Decimal from 'decimal.js';
 
 export const IPR_REPORTS_ROUTER_URL = 'ipr-reports';
 
@@ -26,6 +26,7 @@ export class IPRReportsComponent implements OnInit {
   intellectualProperties: IntellectualProperty[] = [];
   timeRecordCategories: TimeRecordCategory[] = [];
   iprReport: IPRReport | null = null;
+  reportHeaderColSpan = 5;
 
   years: string[] = [];
   _year: string | null = null;
@@ -45,8 +46,8 @@ export class IPRReportsComponent implements OnInit {
     private intellectualPropertyService: IntellectualPropertyService,
     private datePipe: DatePipe,
     private eventBus: NgEventBus,
-    private route: ActivatedRoute,
-    private domainService: DomainService) {
+    route: ActivatedRoute,
+    domainService: DomainService) {
     this.domainRegistrationHelper = new DomainRegistrationHelper(domainService, eventBus, route, IPR_REPORTS_ROUTER_URL);
     this.domainRegistrationHelper.domainChangedEvent.subscribe(() => this.refreshData());
   }
@@ -130,7 +131,7 @@ export class IPRReportsComponent implements OnInit {
         complete: () => {
           this.intellectualPropertyService.refreshNonIPTimeRecords();
         }
-      })
+      });
   }
 
   percentage(ipHours: Decimal, nonIPHours: Decimal): number {
