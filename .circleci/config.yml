@@ -37,6 +37,9 @@ jobs:
                 dockerfile: docker/Dockerfile
                 platform: linux/amd64
                 region: eu-central-1
+            - run:
+                name: remove existing Docker context
+                command: docker context rm -f builder
             - run: npm run buildProdRpi
             - aws-ecr/build-and-push-image:
                 repo: 'client'
