@@ -19,8 +19,8 @@ jobs:
                 key: AngularCircleCI-{{ .Branch }}-{{ checksum "package.json" }}
                 paths:
                   - "node_modules"
-            - run: npm run buildProd
             - setup_remote_docker
+            - run: npm run buildProd
             - aws-ecr/build-and-push-image:
                 repo: 'client'
                 tag: latest
@@ -38,7 +38,6 @@ jobs:
                 platform: linux/amd64
                 region: eu-central-1
             - run: npm run buildProdRpi
-            - setup_remote_docker
             - aws-ecr/build-and-push-image:
                 repo: 'client'
                 tag: latest-rpi4
