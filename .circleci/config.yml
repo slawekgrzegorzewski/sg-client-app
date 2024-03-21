@@ -37,6 +37,24 @@ jobs:
                 dockerfile: docker/Dockerfile
                 platform: linux/amd64
                 region: eu-central-1
+            - run: npm run buildProdRpi
+            - setup_remote_docker
+            - aws-ecr/build-and-push-image:
+                repo: 'client'
+                tag: latest-rpi4
+                assume-web-identity: false
+                attach-workspace: false
+                create-repo: false
+                docker-login: false
+                public-registry: false
+                push-image: true
+                remote-docker-layer-caching: false
+                repo-scan-on-push: true
+                setup-remote-docker: false
+                skip-when-tags-exist: false
+                dockerfile: docker/Dockerfile
+                platform: linux/arm64
+                region: eu-central-1
             - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "cd /home/slawek/deploy && ./start.sh"
 
 workflows:

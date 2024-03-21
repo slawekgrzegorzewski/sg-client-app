@@ -8,6 +8,7 @@
     "startMac": "ng serve --configuration=mac",
     "build": "ng build",
     "buildProd": "ng build --configuration=production",
+    "buildProdRpi": "ng build --configuration=prod-rpi4",
     "buildDev": "ng build --configuration=development",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
