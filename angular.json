@@ -57,6 +57,20 @@
               "outputHashing": "all",
               "buildOptimizer": true
             },
+            "production-rpi4": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod-rpi4.ts"
+                }
+              ]
+            },
             "mac": {
               "buildOptimizer": false,
               "optimization": false,
