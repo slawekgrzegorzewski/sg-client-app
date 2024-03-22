@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  serviceUrl: 'http://sgrzegorzewski.pl:8080'
+  serviceUrl: 'https://grzegorzewski.org:1985'
 };
