@@ -6,4 +6,4 @@ COPY dist/accountant-client /usr/share/nginx/html
 EXPOSE 443
 EXPOSE 80
 
-CMD ["nginx-debug", "-g", "daemon off;"]
+CMD ["nginx-debug", "-g", "'daemon off';"]
