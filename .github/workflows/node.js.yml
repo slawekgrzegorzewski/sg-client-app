@@ -23,3 +23,17 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: npm run buildProdRpi
+    - name: Run a multi-line script
+      run: |
+        mkdir ../build
+        cp -TR ./dist/accountant-client ../build
+        tar -cvf deploy.tar ../build/    
+    - name: copy file via ssh password
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ env.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        password: ${{ secrets.SSH_PASSWORD }}
+        port: 22
+        source: "deploy.tar"
+        target: "/home/slawek/Application/destination/folder"
