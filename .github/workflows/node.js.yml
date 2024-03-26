@@ -25,9 +25,8 @@ jobs:
     - run: npm run buildProdRpi
     - name: Run a multi-line script
       run: |
-        mkdir ../build
-        cp -TR ./dist/accountant-client ../build
-        tar -cvf deploy.tar ../build/    
+        cd ./dist/accountant-client/
+        tar -cvf deploy.tar *    
     - name: copy file via ssh password
       uses: appleboy/scp-action@master
       with:
@@ -35,5 +34,5 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         password: ${{ secrets.SSH_PASSWORD }}
         port: 22
-        source: "deploy.tar"
+        source: "./dist/accountant-client/deploy.tar"
         target: "/home/slawek/Application/destination/folder"
