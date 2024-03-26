@@ -9,7 +9,6 @@
     "build": "ng build",
     "buildProd": "ng build --configuration=production",
     "buildProdRpi": "ng build --configuration=production-rpi4",
-    "applicationZipPackage": "gzipper compress ./dist/accountant-client/ ./a",
     "buildDev": "ng build --configuration=development",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
@@ -87,7 +86,6 @@
     "protractor": "~7.0.0",
     "ts-node": "~10.8.2",
     "tslint": "~6.1.3",
-    "typescript": "~4.6.2",
-    "gzip-directory-compressor": "^0.0.1"
+    "typescript": "~4.6.2"
   }
 }
