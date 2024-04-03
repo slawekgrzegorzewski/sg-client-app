@@ -33,4 +33,8 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: 22
-          script: rm -rf /home/slawek/Application/fe/mobipetcare/* && tar -xf /home/slawek/Application/mobipetcare.tar -C /home/slawek/Application/fe/mobipetcare/ && rm /home/slawek/Application/mobipetcare.tar
+          script: | 
+              mkdir -p /home/slawek/Application/fe/mobipetcare/ 
+              rm -rf /home/slawek/Application/fe/mobipetcare/* 
+              tar -xf /home/slawek/Application/mobipetcare.tar -C /home/slawek/Application/fe/mobipetcare/
+              rm /home/slawek/Application/mobipetcare.tar
