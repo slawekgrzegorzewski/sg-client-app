@@ -48,6 +48,7 @@ jobs:
         password: ${{ secrets.SSH_PASSWORD }}
         port: 22
         script: |
+          mkdir -p /home/slawek/Application/fe/angular-fe
           rm -rf /home/slawek/Application/fe/angular-fe/*
           tar -xf /home/slawek/Application/deploy.tar -C /home/slawek/Application/fe/angular-fe/
           rm /home/slawek/Application/deploy.tar
