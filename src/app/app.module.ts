@@ -105,8 +105,8 @@ import {UploaderModalComponent} from './general/components/uploader/uploader-mod
 import {IPRReportsComponent} from './ip/components/ipr-reports.component';
 import {GraphQLModule} from './graphql.module';
 import {NgxLoadingModule} from 'ngx-loading';
-import {MortgageSimulatorComponent} from './accountant/pages/mortgage-simulator/mortgage-simulator.component';
-import {MortgageSimulatorService} from './accountant/services/mortgage-simulator.service';
+import {LoanSimulatorComponent} from './accountant/pages/loan-simulator/loan-simulator.component';
+import {LoanSimulatorService} from './accountant/services/loan-simulator.service';
 import {IPSettingsComponent} from './ip/components/ip-settings.component';
 import {TimeRecordCategoryEditorComponent} from './ip/components/utils/time-record-category-editor.component';
 
@@ -183,7 +183,7 @@ import {TimeRecordCategoryEditorComponent} from './ip/components/utils/time-reco
     IPRReportsComponent,
     IPSettingsComponent,
     TimeRecordCategoryEditorComponent,
-    MortgageSimulatorComponent
+    LoanSimulatorComponent
   ],
   imports: [
     BrowserModule,
@@ -236,7 +236,7 @@ import {TimeRecordCategoryEditorComponent} from './ip/components/utils/time-reco
     NodrigenService,
     BanksService,
     AccountantSettingsService,
-    MortgageSimulatorService,
+    LoanSimulatorService,
     {provide: NgbDateAdapter, useClass: NgbDateNativeAdapter}
   ],
   bootstrap: [AppComponent]

@@ -7,9 +7,9 @@ import {Refreshable} from '../../general/services/refreshable';
 import {LoginService} from '../../general/services/login.service';
 import {DomainService} from '../../general/services/domain.service';
 import {Apollo, QueryRef} from 'apollo-angular';
-import {MortgageInstallment} from '../model/mortgage-installment';
+import {LoanInstallment} from '../model/loan-installment';
 import Decimal from 'decimal.js';
-import {SimulateMortgage} from '../../../../types';
+import {SimulateLoan} from '../../../../types';
 import {DatesUtils} from '../../general/utils/dates-utils';
 import {DatePipe} from '@angular/common';
 
@@ -17,7 +17,7 @@ import {DatePipe} from '@angular/common';
 @Injectable({
   providedIn: 'root'
 })
-export class MortgageSimulatorService extends Refreshable {
+export class LoanSimulatorService extends Refreshable {
 
   constructor(
     private apollo: Apollo,
@@ -29,22 +29,22 @@ export class MortgageSimulatorService extends Refreshable {
     super(eventBus);
   }
 
-  private simulateMortgageQueryRef: QueryRef<{ simulateMortgage: MortgageInstallment[] }> | null = null;
+  private simulateLoanQueryRef: QueryRef<{ simulateLoan: LoanInstallment[] }> | null = null;
 
-  simulateMortgage(
-    mortgageAmount: Decimal,
+  simulateLoan(
+    loanAmount: Decimal,
     numberOfInstallments: number,
     overpaymentMonthlyBudget: Decimal,
     overpaymentYearlyBudget: Decimal,
     rate: Decimal,
     repaymentStart: Date,
     wibor: Decimal
-  ): Observable<MortgageInstallment[]> {
-    this.simulateMortgageQueryRef = this.apollo
-      .watchQuery<{ simulateMortgage: MortgageInstallment[] }>({
-        query: SimulateMortgage,
+  ): Observable<LoanInstallment[]> {
+    this.simulateLoanQueryRef = this.apollo
+      .watchQuery<{ simulateLoan: LoanInstallment[] }>({
+        query: SimulateLoan,
         variables: {
-          mortgageAmount: mortgageAmount,
+          loanAmount: loanAmount,
           numberOfInstallments: numberOfInstallments,
           overpaymentMonthlyBudget: overpaymentMonthlyBudget,
           overpaymentYearlyBudget: overpaymentYearlyBudget,
@@ -53,13 +53,13 @@ export class MortgageSimulatorService extends Refreshable {
           wibor: wibor
         }
       });
-    return this.simulateMortgageQueryRef.valueChanges
+    return this.simulateLoanQueryRef.valueChanges
       .pipe(
-        map(result => result.data && result.data.simulateMortgage && result.data.simulateMortgage.map(installment => new MortgageInstallment(installment)))
+        map(result => result.data && result.data.simulateLoan && result.data.simulateLoan.map(installment => new LoanInstallment(installment)))
       );
   }
 
   public refreshData(): void {
-    this.simulateMortgageQueryRef?.refetch();
+    this.simulateLoanQueryRef?.refetch();
   }
 }

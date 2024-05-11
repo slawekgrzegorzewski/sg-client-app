@@ -8,7 +8,7 @@ type Query {
   nonIPTimeRecords: [TimeRecord!]!
   allTimeRecordCategories: [TimeRecordCategory!]!
   monthRevenueAndExpenseEntry(year: Int!, month: Int!): [RevenueAndExpenseEntry!]
-  simulateMortgage(mortgageCalculationParams: MortgageCalculationParams): [MortgageCalculationInstallment!]!
+  simulateLoan(loanCalculationParams: LoanCalculationParams): [LoanCalculationInstallment!]!
 }
 
 type Mutation{
@@ -28,8 +28,8 @@ type Mutation{
   deleteTimeRecordCategory(timeRecordId:Int!): String!
 }
 
-input MortgageCalculationParams {
-  mortgageAmount: BigDecimal!,
+input LoanCalculationParams {
+  loanAmount: BigDecimal!,
   numberOfInstallments: Int!,
   overpaymentMonthlyBudget: BigDecimal!,
   overpaymentYearlyBudget: BigDecimal!
@@ -38,7 +38,7 @@ input MortgageCalculationParams {
   wibor: BigDecimal!
 }
 
-type MortgageCalculationInstallment {
+type LoanCalculationInstallment {
   paymentFrom: LocalDate!,
   paymentTo: LocalDate!,
   remainingCapitalAtTheBeginning: BigDecimal!,

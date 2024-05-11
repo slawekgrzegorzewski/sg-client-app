@@ -1,5 +1,5 @@
-query SimulateMortgage(
-  $mortgageAmount: BigDecimal!
+query SimulateLoan(
+  $loanAmount: BigDecimal!
   $numberOfInstallments: Int!
   $overpaymentMonthlyBudget: BigDecimal!
   $overpaymentYearlyBudget: BigDecimal!
@@ -8,9 +8,9 @@ query SimulateMortgage(
   $wibor: BigDecimal!
 )
 {
-  simulateMortgage(
-    mortgageCalculationParams: {
-      mortgageAmount: $mortgageAmount,
+  simulateLoan(
+    loanCalculationParams: {
+      loanAmount: $loanAmount,
       numberOfInstallments: $numberOfInstallments,
       overpaymentMonthlyBudget: $overpaymentMonthlyBudget,
       overpaymentYearlyBudget: $overpaymentYearlyBudget,

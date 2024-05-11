@@ -4,15 +4,15 @@ import {NgEventBus} from 'ng-event-bus';
 import {ActivatedRoute} from '@angular/router';
 import {DomainService} from '../../../general/services/domain.service';
 import {SELECTED_DOMAIN_CHANGED} from '../../../general/utils/event-bus-events';
-import {MortgageInstallment} from '../../model/mortgage-installment';
-import {MortgageSimulatorService} from '../../services/mortgage-simulator.service';
+import {LoanInstallment} from '../../model/loan-installment';
+import {LoanSimulatorService} from '../../services/loan-simulator.service';
 import Decimal from 'decimal.js';
 
 type ViewMode = 'CONFIG' | 'INFO' | 'SOURCE';
-export const MORTGAGE_SIMULATOR_ROUTER_URL = 'mortgage-simulator';
+export const LOAN_SIMULATOR_ROUTER_URL = 'loan-simulator';
 
-type MortgageSimulationParams = {
-  mortgageAmount: Decimal;
+type LoanSimulationParams = {
+  loanAmount: Decimal;
   numberOfInstallments: number;
   overpaymentMonthlyBudget: Decimal;
   overpaymentYearlyBudget: Decimal;
@@ -21,13 +21,13 @@ type MortgageSimulationParams = {
   wibor: Decimal;
 }
 
-type MortgageSimulationParamsStorage = {
+type LoanSimulationParamsStorage = {
   selectedConfiguration: string;
-  configurations: Map<string, MortgageSimulationParams>;
+  configurations: Map<string, LoanSimulationParams>;
 };
 
-const EMPTY_MORTGAGE_SIMULATOR_PARAMS: MortgageSimulationParams = {
-  mortgageAmount: new Decimal(0),
+const EMPTY_LOAN_SIMULATOR_PARAMS: LoanSimulationParams = {
+  loanAmount: new Decimal(0),
   numberOfInstallments: 0,
   overpaymentMonthlyBudget: new Decimal(0),
   overpaymentYearlyBudget: new Decimal(0),
@@ -36,19 +36,19 @@ const EMPTY_MORTGAGE_SIMULATOR_PARAMS: MortgageSimulationParams = {
   wibor: new Decimal(0)
 };
 
-const mortgageSimulatorParamsLocalStorageKey = 'mortgage-simulator-params';
+const loanSimulatorParamsLocalStorageKey = 'loan-simulator-params';
 
 @Component({
   selector: 'app-accounts-home',
-  templateUrl: './mortgage-simulator.component.html',
-  styleUrls: ['./mortgage-simulator.component.css']
+  templateUrl: './loan-simulator.component.html',
+  styleUrls: ['./loan-simulator.component.css']
 })
-export class MortgageSimulatorComponent implements OnInit, OnDestroy {
+export class LoanSimulatorComponent implements OnInit, OnDestroy {
 
   viewMode: ViewMode = 'CONFIG';
   private _selectedConfiguration: string = 'default';
   public paramsConfigs: string[] = ['default'];
-  private _mortgageAmount: Decimal = new Decimal(0);
+  private _loanAmount: Decimal = new Decimal(0);
   private _numberOfInstallments: number = 0;
   private _overpaymentMonthlyBudget: Decimal = new Decimal(0);
   private _overpaymentYearlyBudget: Decimal = new Decimal(0);
@@ -58,7 +58,7 @@ export class MortgageSimulatorComponent implements OnInit, OnDestroy {
 
   domainSubscription: Subscription | null = null;
   fetchSubscription: Subscription | null = null;
-  mortgageInstallments: MortgageInstallment[] = [];
+  loanInstallments: LoanInstallment[] = [];
   currency = 'PLN';
   installmentsSum: Decimal = new Decimal(0);
   repaidCapitalSum: Decimal = new Decimal(0);
@@ -69,8 +69,8 @@ export class MortgageSimulatorComponent implements OnInit, OnDestroy {
     private eventBus: NgEventBus,
     private route: ActivatedRoute,
     private domainService: DomainService,
-    private mortgageSimulatorService: MortgageSimulatorService) {
-    this.domainService.registerToDomainChangesViaRouterUrl(MORTGAGE_SIMULATOR_ROUTER_URL, this.route);
+    private loanSimulatorService: LoanSimulatorService) {
+    this.domainService.registerToDomainChangesViaRouterUrl(LOAN_SIMULATOR_ROUTER_URL, this.route);
     this.domainSubscription = this.eventBus.on(SELECTED_DOMAIN_CHANGED).subscribe((domain) => {
     });
     this.readParams();
@@ -82,8 +82,8 @@ export class MortgageSimulatorComponent implements OnInit, OnDestroy {
 
   private fetchData() {
     this.fetchSubscription?.unsubscribe();
-    this.fetchSubscription = this.mortgageSimulatorService.simulateMortgage(
-      this.mortgageAmount,
+    this.fetchSubscription = this.loanSimulatorService.simulateLoan(
+      this.loanAmount,
       this.numberOfInstallments,
       this.overpaymentMonthlyBudget,
       this.overpaymentYearlyBudget,
@@ -91,7 +91,7 @@ export class MortgageSimulatorComponent implements OnInit, OnDestroy {
       this.repaymentStart,
       this.wibor
     ).subscribe(data => {
-      this.mortgageInstallments = data;
+      this.loanInstallments = data;
 
       this.installmentsSum = new Decimal(0);
       this.repaidCapitalSum = new Decimal(0);
@@ -111,7 +111,7 @@ export class MortgageSimulatorComponent implements OnInit, OnDestroy {
     if (this.domainSubscription) {
       this.domainSubscription.unsubscribe();
     }
-    this.domainService.deregisterFromDomainChangesViaRouterUrl(MORTGAGE_SIMULATOR_ROUTER_URL);
+    this.domainService.deregisterFromDomainChangesViaRouterUrl(LOAN_SIMULATOR_ROUTER_URL);
   }
 
   paramsChanged() {
@@ -128,19 +128,19 @@ export class MortgageSimulatorComponent implements OnInit, OnDestroy {
   }
 
   private getParamsStorage() {
-    const paramsStorage: MortgageSimulationParamsStorage = localStorage.getItem(mortgageSimulatorParamsLocalStorageKey)
-      ? JSON.parse(localStorage.getItem(mortgageSimulatorParamsLocalStorageKey)!, this.reviver)
-      : {selectedConfiguration: 'default', configurations: new Map([['default', EMPTY_MORTGAGE_SIMULATOR_PARAMS]])};
+    const paramsStorage: LoanSimulationParamsStorage = localStorage.getItem(loanSimulatorParamsLocalStorageKey)
+      ? JSON.parse(localStorage.getItem(loanSimulatorParamsLocalStorageKey)!, this.reviver)
+      : {selectedConfiguration: 'default', configurations: new Map([['default', EMPTY_LOAN_SIMULATOR_PARAMS]])};
     this.paramsConfigs = Array.from(paramsStorage.configurations.keys());
     return paramsStorage;
   }
 
-  private readParams(paramsStorage: MortgageSimulationParamsStorage = this.getParamsStorage()) {
+  private readParams(paramsStorage: LoanSimulationParamsStorage = this.getParamsStorage()) {
     const params = paramsStorage.configurations.get(paramsStorage.selectedConfiguration)!;
 
     this.paramsConfigs = Array.from(paramsStorage.configurations.keys());
     this._selectedConfiguration = paramsStorage.selectedConfiguration;
-    this._mortgageAmount = params.mortgageAmount;
+    this._loanAmount = params.loanAmount;
     this._numberOfInstallments = params.numberOfInstallments;
     this._overpaymentMonthlyBudget = params.overpaymentMonthlyBudget;
     this._overpaymentYearlyBudget = params.overpaymentYearlyBudget;
@@ -149,9 +149,9 @@ export class MortgageSimulatorComponent implements OnInit, OnDestroy {
     this._wibor = params.wibor;
   }
 
-  private writeParams(paramsStorage: MortgageSimulationParamsStorage = this.getParamsStorage()) {
+  private writeParams(paramsStorage: LoanSimulationParamsStorage = this.getParamsStorage()) {
     paramsStorage.configurations.set(paramsStorage.selectedConfiguration, {
-      mortgageAmount: this.mortgageAmount,
+      loanAmount: this.loanAmount,
       numberOfInstallments: this.numberOfInstallments,
       overpaymentMonthlyBudget: this.overpaymentMonthlyBudget,
       overpaymentYearlyBudget: this.overpaymentYearlyBudget,
@@ -160,7 +160,7 @@ export class MortgageSimulatorComponent implements OnInit, OnDestroy {
       wibor: this.wibor,
     });
     localStorage.setItem(
-      mortgageSimulatorParamsLocalStorageKey,
+      loanSimulatorParamsLocalStorageKey,
       JSON.stringify(paramsStorage, this.replacer)
     );
   }
@@ -198,16 +198,16 @@ export class MortgageSimulatorComponent implements OnInit, OnDestroy {
   }
 
   set configurationSource(value: string) {
-    localStorage.setItem(mortgageSimulatorParamsLocalStorageKey, JSON.stringify(JSON.parse(value, this.reviver), this.replacer));
+    localStorage.setItem(loanSimulatorParamsLocalStorageKey, JSON.stringify(JSON.parse(value, this.reviver), this.replacer));
     this.readParams();
     this.fetchData();
   }
-  get mortgageAmount(): Decimal {
-    return this._mortgageAmount;
+  get loanAmount(): Decimal {
+    return this._loanAmount;
   }
 
-  set mortgageAmount(value: Decimal) {
-    this._mortgageAmount = value;
+  set loanAmount(value: Decimal) {
+    this._loanAmount = value;
     this.paramsChanged();
   }
 

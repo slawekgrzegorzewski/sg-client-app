@@ -41,8 +41,8 @@ export type IntellectualPropertyData = {
   description: Scalars['String'];
 };
 
-export type MortgageCalculationInstallment = {
-  __typename?: 'MortgageCalculationInstallment';
+export type LoanCalculationInstallment = {
+  __typename?: 'LoanCalculationInstallment';
   installment: Scalars['BigDecimal'];
   overpayment: Scalars['BigDecimal'];
   paidInterest: Scalars['BigDecimal'];
@@ -52,8 +52,8 @@ export type MortgageCalculationInstallment = {
   repaidCapital: Scalars['BigDecimal'];
 };
 
-export type MortgageCalculationParams = {
-  mortgageAmount: Scalars['BigDecimal'];
+export type LoanCalculationParams = {
+  loanAmount: Scalars['BigDecimal'];
   numberOfInstallments: Scalars['Int'];
   overpaymentMonthlyBudget: Scalars['BigDecimal'];
   overpaymentYearlyBudget: Scalars['BigDecimal'];
@@ -162,7 +162,7 @@ export type Query = {
   allTimeRecordCategories: Array<TimeRecordCategory>;
   monthRevenueAndExpenseEntry?: Maybe<Array<RevenueAndExpenseEntry>>;
   nonIPTimeRecords: Array<TimeRecord>;
-  simulateMortgage: Array<MortgageCalculationInstallment>;
+  simulateLoan: Array<LoanCalculationInstallment>;
 };
 
 
@@ -172,8 +172,8 @@ export type QueryMonthRevenueAndExpenseEntryArgs = {
 };
 
 
-export type QuerySimulateMortgageArgs = {
-  mortgageCalculationParams?: InputMaybe<MortgageCalculationParams>;
+export type QuerySimulateLoanArgs = {
+  loanCalculationParams?: InputMaybe<LoanCalculationParams>;
 };
 
 export type RevenueAndExpenseEntry = {
@@ -255,8 +255,8 @@ export type TimeRecordData = {
   taskId?: InputMaybe<Scalars['Int']>;
 };
 
-export type SimulateMortgageQueryVariables = Exact<{
-  mortgageAmount: Scalars['BigDecimal'];
+export type SimulateLoanQueryVariables = Exact<{
+  loanAmount: Scalars['BigDecimal'];
   numberOfInstallments: Scalars['Int'];
   overpaymentMonthlyBudget: Scalars['BigDecimal'];
   overpaymentYearlyBudget: Scalars['BigDecimal'];
@@ -266,7 +266,7 @@ export type SimulateMortgageQueryVariables = Exact<{
 }>;
 
 
-export type SimulateMortgageQuery = { __typename?: 'Query', simulateMortgage: Array<{ __typename?: 'MortgageCalculationInstallment', paymentFrom: any, paymentTo: any, remainingCapitalAtTheBeginning: any, installment: any, repaidCapital: any, paidInterest: any, overpayment: any }> };
+export type SimulateLoanQuery = { __typename?: 'Query', simulateLoan: Array<{ __typename?: 'LoanCalculationInstallment', paymentFrom: any, paymentTo: any, remainingCapitalAtTheBeginning: any, installment: any, repaidCapital: any, paidInterest: any, overpayment: any }> };
 
 export type GetAllDomainIntellectualPropertiesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -391,10 +391,10 @@ export type AssignCategoryToTimeRecordMutationVariables = Exact<{
 export type AssignCategoryToTimeRecordMutation = { __typename?: 'Mutation', assignCategoryToTimeRecord: string };
 
 
-export const SimulateMortgage = gql`
-    query SimulateMortgage($mortgageAmount: BigDecimal!, $numberOfInstallments: Int!, $overpaymentMonthlyBudget: BigDecimal!, $overpaymentYearlyBudget: BigDecimal!, $rate: BigDecimal!, $repaymentStart: LocalDate!, $wibor: BigDecimal!) {
-  simulateMortgage(
-    mortgageCalculationParams: {mortgageAmount: $mortgageAmount, numberOfInstallments: $numberOfInstallments, overpaymentMonthlyBudget: $overpaymentMonthlyBudget, overpaymentYearlyBudget: $overpaymentYearlyBudget, rate: $rate, repaymentStart: $repaymentStart, wibor: $wibor}
+export const SimulateLoan = gql`
+    query SimulateLoan($loanAmount: BigDecimal!, $numberOfInstallments: Int!, $overpaymentMonthlyBudget: BigDecimal!, $overpaymentYearlyBudget: BigDecimal!, $rate: BigDecimal!, $repaymentStart: LocalDate!, $wibor: BigDecimal!) {
+  simulateLoan(
+    loanCalculationParams: {loanAmount: $loanAmount, numberOfInstallments: $numberOfInstallments, overpaymentMonthlyBudget: $overpaymentMonthlyBudget, overpaymentYearlyBudget: $overpaymentYearlyBudget, rate: $rate, repaymentStart: $repaymentStart, wibor: $wibor}
   ) {
     paymentFrom
     paymentTo

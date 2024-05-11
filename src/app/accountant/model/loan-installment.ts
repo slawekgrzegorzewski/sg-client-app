@@ -1,9 +1,9 @@
 import Decimal from 'decimal.js';
 
-export type MortgageInstallmentDTO = Partial<MortgageInstallment>;
+export type LoanInstallmentDTO = Partial<LoanInstallment>;
 
 
-export class MortgageInstallment {
+export class LoanInstallment {
   public paymentFrom: Date;
   public paymentTo: Date;
   public remainingCapitalAtTheBeginning: Decimal;
@@ -13,7 +13,7 @@ export class MortgageInstallment {
   public paidInterest: Decimal;
   public overpayment: Decimal;
 
-  constructor(data?: MortgageInstallmentDTO) {
+  constructor(data?: LoanInstallmentDTO) {
     if (!data) {
       data = {};
     }

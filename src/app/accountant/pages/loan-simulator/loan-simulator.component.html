@@ -20,7 +20,7 @@
     <div *ngSwitchCase="'SOURCE'" [ngTemplateOutlet]="sourceSection"></div>
   </div>
   <div class="element">
-    <div *ngFor="let installment of mortgageInstallments; let i = index" class="sg-flex-row installments">
+    <div *ngFor="let installment of loanInstallments; let i = index" class="sg-flex-row installments">
       <div class="installments-count">{{i + 1}}</div>
       <div class="sg-flex-column">
         <div class="sg-flex-align-self-flex-start">Rata za okres {{ installment.paymentFrom | date: 'yyyy-MM-dd'}}
@@ -68,7 +68,7 @@
   <div class="row g-2 align-items-center">
     <label for="amount" class="col-sm-2 col-form-label">Kwota</label>
     <div class="col-auto">
-      <input [(ngModel)]="mortgageAmount" id="amount" type="number" step="0.01" class="form-control"/>
+      <input [(ngModel)]="loanAmount" id="amount" type="number" step="0.01" class="form-control"/>
     </div>
   </div>
 
@@ -127,10 +127,10 @@
 <ng-template #infoSection>
   <ng-template [ngTemplateOutlet]="configSelectInput"></ng-template>
   <div><b>Sumaryczne informacje o kredycie:</b></div>
-  <div><b>Kwota kredytu: </b> {{mortgageAmount.toString() | currency: currency}}</div>
+  <div><b>Kwota kredytu: </b> {{loanAmount.toString() | currency: currency}}</div>
   <div><b>Spłacono łącznie: </b> {{(installmentsSum.plus(overpaymentSum)).toString() | currency: currency}}</div>
   <div><b>Spłacono odsetek: </b> {{paidInterestSum.toString() | currency: currency}}</div>
-  <div><b>Czas spłaty: </b> {{mortgageInstallments.length}} miesięcy</div>
+  <div><b>Czas spłaty: </b> {{loanInstallments.length}} miesięcy</div>
 </ng-template>
 <ng-template #sourceSection>
   <div>
