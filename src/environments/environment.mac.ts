@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  serviceUrl: 'http://localhost:8080'
+  serviceUrl: 'http://localhost:8080',
+  newAppLink: 'http://localhost:3000/ACCOUNTANT/1/'
 };
 
 /*

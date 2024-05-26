@@ -1,6 +1,10 @@
 <nav #navigation class="navbar navbar-expand-md navbar-dark bg-dark" style="z-index: 99998;" (resize)="onResize()">
 
   <div class="navbar-brand bg-dark">
+    <a class="nav-link" [href]="environment.newAppLink">Nowa aplikacja</a>
+  </div>
+
+  <div class="navbar-brand bg-dark">
     <select *ngIf="applicationsService.availableApps && applicationsService.availableApps.length > 0"
             [(ngModel)]="applicationsService.selectedApp" class="navbar-brand bg-dark"
             style="border-color: #343a40">

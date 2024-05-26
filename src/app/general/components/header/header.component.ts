@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {LoginService} from 'src/app/general/services/login.service';
 import {Router} from '@angular/router';
 import {DomainService} from '../../services/domain.service';
@@ -14,7 +14,7 @@ import {
 } from '../../utils/event-bus-events';
 import {AccountantSettingsService} from '../../../accountant/services/accountant-settings.service';
 import {AccountantSettings} from '../../../accountant/model/accountant-settings';
-import {Subscription} from 'rxjs';
+import {environment} from '../../../../environments/environment';
 
 @Component({
   selector: 'app-header',
@@ -64,7 +64,7 @@ export class HeaderComponent implements OnInit {
   private fetchData(): void {
     this.isLoggedIn = this.loginService.isLoggedIn();
     this.accountantSettingsService.getForDomain().subscribe(data => this.accountantSettings = data);
-    this.domainService.getAllDomains().subscribe(domains => this.availableDomains = domains)
+    this.domainService.getAllDomains().subscribe(domains => this.availableDomains = domains);
     this.domainService.getInvitations().subscribe(invitations => this.invitations = invitations);
   }
 
@@ -103,4 +103,6 @@ export class HeaderComponent implements OnInit {
     this.fetchData();
     this.eventBus.cast(DATA_REFRESH_REQUEST_EVENT);
   }
+
+  protected readonly environment = environment;
 }
