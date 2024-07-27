@@ -23,18 +23,18 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
-          port: 22
+          port: 25
           source: "mobipetcare.tar"
-          target: "/home/slawek/Application"
+          target: "/home/slawek"
       - name: unpack and deploy application files
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
-          port: 22
-          script: | 
-              mkdir -p /home/slawek/Application/fe/mobipetcare/ 
-              rm -rf /home/slawek/Application/fe/mobipetcare/* 
-              tar -xf /home/slawek/Application/mobipetcare.tar -C /home/slawek/Application/fe/mobipetcare/
-              rm /home/slawek/Application/mobipetcare.tar
+          port: 25
+          script: |
+              mkdir -p /home/slawek/Cluster/permanent_data/core_gateway/html/mobipetcare
+              rm -rf /home/slawek/Cluster/permanent_data/core_gateway/html/mobipetcare/*
+              tar -xf /home/slawek/mobipetcare.tar -C /home/slawek/Cluster/permanent_data/core_gateway/html/mobipetcare
+              rm /home/slawek/mobipetcare.tar

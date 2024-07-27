@@ -37,18 +37,18 @@ jobs:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USER }}
         password: ${{ secrets.SSH_PASSWORD }}
-        port: 22
+        port: 25
         source: "deploy.tar"
-        target: "/home/slawek/Application"
+        target: "/home/slawek"
     - name: unpack and deploy application files
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USER }}
         password: ${{ secrets.SSH_PASSWORD }}
-        port: 22
+        port: 25
         script: |
-          mkdir -p /home/slawek/Application/fe/angular-fe
-          rm -rf /home/slawek/Application/fe/angular-fe/*
-          tar -xf /home/slawek/Application/deploy.tar -C /home/slawek/Application/fe/angular-fe/
-          rm /home/slawek/Application/deploy.tar
+          mkdir -p  /home/slawek/Cluster/permanent_data/sg-application-gateway/angular-fe
+          rm -rf  /home/slawek/Cluster/permanent_data/sg-application-gateway/angular-fe/*
+          tar -xf /home/slawek/deploy.tar -C  /home/slawek/Cluster/permanent_data/sg-application-gateway/angular-fe/
+          rm /home/slawek/deploy.tar
