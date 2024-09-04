@@ -23,7 +23,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
-          port: 25
+          port: 101
           source: "mobipetcare.tar"
           target: "/home/slawek"
       - name: unpack and deploy application files
@@ -32,7 +32,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
-          port: 25
+          port: 101
           script: |
               mkdir -p /home/slawek/Cluster/permanent_data/core_gateway/html/mobipetcare
               rm -rf /home/slawek/Cluster/permanent_data/core_gateway/html/mobipetcare/*
