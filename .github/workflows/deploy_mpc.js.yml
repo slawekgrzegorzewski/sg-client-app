@@ -36,5 +36,5 @@ jobs:
           script: |
               mkdir -p /home/slawek/Cluster/permanent_data/core_gateway/html/mobipetcare
               rm -rf /home/slawek/Cluster/permanent_data/core_gateway/html/mobipetcare/*
-              tar -xf /home/slawek/mobipetcare.tar -C /home/slawek/Cluster/permanent_data/core_gateway/html/mobipetcare
+              tar -xf /home/slawek/mobipetcare.tar -C /home/slawek/Cluster/permanent_data/sg-application-gateway/mobipetcare
               rm /home/slawek/mobipetcare.tar
