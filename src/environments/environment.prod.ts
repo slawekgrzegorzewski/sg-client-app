@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  serviceUrl: 'https://grzegorzewski.org:8090',
+  serviceUrl: 'https://be.grzegorzewski.org',
   newAppLink: 'https://grzegorzewski.org/react/'
 };
