@@ -2,6 +2,9 @@ import {Domain} from '../../general/model/domain';
 import Decimal from 'decimal.js';
 import {IntellectualPropertyTask} from './intellectual-property-task';
 import {EMPTY_TIME_RECORD_CATEGORY, TimeRecordCategory} from "./time-record-category";
+import {
+  TimeRecord as GQTimeRecord
+} from '../../../../types';
 
 export const EMPTY_TIME_RECORD_ID = 0;
 
@@ -15,7 +18,7 @@ export class TimeRecord {
   public timeRecordCategory: TimeRecordCategory;
   public domain: Domain;
 
-  constructor(data?: TimeRecordDTO) {
+  constructor(data?: TimeRecordDTO | GQTimeRecord) {
     if (!data) {
       data = {};
     }

@@ -1,30 +1,32 @@
-query GetAllDomainIntellectualProperties {
-  allIPRs {
-    id
-    description
-    tasks {
+query GetAllDomainIntellectualProperties($yearMonthFilter: YearMonth) {
+  intellectualPropertiesRecords(input: {yearMonthFilter: $yearMonthFilter}) {
+    reports {
       id
-      attachments
-      coAuthors
       description
-      timeRecords {
+      tasks {
         id
-        date
-        numberOfHours
+        attachments
+        coAuthors
         description
-        timeRecordCategory {
+        timeRecords {
           id
-          name
-        }
-        domain {
-          id
-          name
+          date
+          numberOfHours
+          description
+          timeRecordCategory {
+            id
+            name
+          }
+          domain {
+            id
+            name
+          }
         }
       }
-    }
-    domain {
-      id
-      name
+      domain {
+        id
+        name
+      }
     }
   }
 }

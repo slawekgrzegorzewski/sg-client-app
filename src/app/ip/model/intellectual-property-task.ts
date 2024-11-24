@@ -1,5 +1,8 @@
 import {TimeRecord} from './time-record';
 import {ForTypeahead} from '../../accountant/model/for-typeahead';
+import {
+  Task as GQTask
+} from '../../../../types';
 
 export type IntellectualPropertyTaskDTO = Partial<IntellectualPropertyTask>;
 export const EMPTY_TASK_ID = 0;
@@ -11,7 +14,7 @@ export class IntellectualPropertyTask implements ForTypeahead {
   public coAuthors: string;
   public timeRecords: TimeRecord[];
 
-  constructor(data?: IntellectualPropertyTaskDTO) {
+  constructor(data?: IntellectualPropertyTaskDTO | GQTask) {
     if (!data) {
       data = {};
     }
@@ -19,7 +22,7 @@ export class IntellectualPropertyTask implements ForTypeahead {
     this.description = data.description || '';
     this.attachments = data.attachments || [];
     this.coAuthors = data.coAuthors || '';
-    this.timeRecords = (data.timeRecords || []).map(task => new TimeRecord(task));
+    this.timeRecords = (data.timeRecords || []).map(timeRecord => new TimeRecord(timeRecord));
   }
 
   getTypeaheadId(): string {

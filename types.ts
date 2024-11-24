@@ -15,6 +15,7 @@ export type Scalars = {
   LocalDate: any;
   UUID: any;
   Upload: any;
+  YearMonth: any;
 };
 
 export enum AssignmentAction {
@@ -27,6 +28,22 @@ export type DomainSimple = {
   __typename?: 'DomainSimple';
   id: Scalars['Int'];
   name: Scalars['String'];
+};
+
+export type IntellectualPropertiesRecordsQueryInput = {
+  yearMonthFilter?: InputMaybe<Scalars['YearMonth']>;
+};
+
+export type IntellectualPropertiesRecordsResponse = {
+  __typename?: 'IntellectualPropertiesRecordsResponse';
+  reports: Array<IntellectualProperty>;
+  stats: IntellectualPropertiesRecordsStats;
+};
+
+export type IntellectualPropertiesRecordsStats = {
+  __typename?: 'IntellectualPropertiesRecordsStats';
+  firstTimeRecord: Scalars['LocalDate'];
+  lastTimeRecord: Scalars['LocalDate'];
 };
 
 export type IntellectualProperty = {
@@ -158,11 +175,16 @@ export type MutationUpdateTimeRecordCategoryArgs = {
 
 export type Query = {
   __typename?: 'Query';
-  allIPRs: Array<IntellectualProperty>;
   allTimeRecordCategories: Array<TimeRecordCategory>;
+  intellectualPropertiesRecords?: Maybe<IntellectualPropertiesRecordsResponse>;
   monthRevenueAndExpenseEntry?: Maybe<Array<RevenueAndExpenseEntry>>;
   nonIPTimeRecords: Array<TimeRecord>;
   simulateLoan: Array<LoanCalculationInstallment>;
+};
+
+
+export type QueryIntellectualPropertiesRecordsArgs = {
+  input?: InputMaybe<IntellectualPropertiesRecordsQueryInput>;
 };
 
 
@@ -268,10 +290,12 @@ export type SimulateLoanQueryVariables = Exact<{
 
 export type SimulateLoanQuery = { __typename?: 'Query', simulateLoan: Array<{ __typename?: 'LoanCalculationInstallment', paymentFrom: any, paymentTo: any, remainingCapitalAtTheBeginning: any, installment: any, repaidCapital: any, paidInterest: any, overpayment: any }> };
 
-export type GetAllDomainIntellectualPropertiesQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetAllDomainIntellectualPropertiesQueryVariables = Exact<{
+  yearMonthFilter?: InputMaybe<Scalars['YearMonth']>;
+}>;
 
 
-export type GetAllDomainIntellectualPropertiesQuery = { __typename?: 'Query', allIPRs: Array<{ __typename?: 'IntellectualProperty', id: number, description: string, tasks?: Array<{ __typename?: 'Task', id: number, attachments?: Array<string> | null, coAuthors: string, description: string, timeRecords?: Array<{ __typename?: 'TimeRecord', id: number, date: any, numberOfHours: any, description?: string | null, timeRecordCategory?: { __typename?: 'TimeRecordCategory', id: number, name: string } | null, domain: { __typename?: 'DomainSimple', id: number, name: string } }> | null }> | null, domain: { __typename?: 'DomainSimple', id: number, name: string } }> };
+export type GetAllDomainIntellectualPropertiesQuery = { __typename?: 'Query', intellectualPropertiesRecords?: { __typename?: 'IntellectualPropertiesRecordsResponse', reports: Array<{ __typename?: 'IntellectualProperty', id: number, description: string, tasks?: Array<{ __typename?: 'Task', id: number, attachments?: Array<string> | null, coAuthors: string, description: string, timeRecords?: Array<{ __typename?: 'TimeRecord', id: number, date: any, numberOfHours: any, description?: string | null, timeRecordCategory?: { __typename?: 'TimeRecordCategory', id: number, name: string } | null, domain: { __typename?: 'DomainSimple', id: number, name: string } }> | null }> | null, domain: { __typename?: 'DomainSimple', id: number, name: string } }> } | null };
 
 export type AddIprMutationVariables = Exact<{
   description: Scalars['String'];
@@ -407,33 +431,35 @@ export const SimulateLoan = gql`
 }
     `;
 export const GetAllDomainIntellectualProperties = gql`
-    query GetAllDomainIntellectualProperties {
-  allIPRs {
-    id
-    description
-    tasks {
+    query GetAllDomainIntellectualProperties($yearMonthFilter: YearMonth) {
+  intellectualPropertiesRecords(input: {yearMonthFilter: $yearMonthFilter}) {
+    reports {
       id
-      attachments
-      coAuthors
       description
-      timeRecords {
+      tasks {
         id
-        date
-        numberOfHours
+        attachments
+        coAuthors
         description
-        timeRecordCategory {
+        timeRecords {
           id
-          name
-        }
-        domain {
-          id
-          name
+          date
+          numberOfHours
+          description
+          timeRecordCategory {
+            id
+            name
+          }
+          domain {
+            id
+            name
+          }
         }
       }
-    }
-    domain {
-      id
-      name
+      domain {
+        id
+        name
+      }
     }
   }
 }

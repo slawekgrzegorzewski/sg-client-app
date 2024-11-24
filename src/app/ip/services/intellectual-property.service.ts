@@ -23,15 +23,15 @@ import {
   DeleteTimeRecordCategory,
   GetAllDomainIntellectualProperties,
   GetAllDomainNonIpTimeRecords,
-  GetAllDomainTimeRecordCategories,
+  GetAllDomainTimeRecordCategories, IntellectualPropertiesRecordsResponse,
   UpdateIpr,
   UpdateTask,
   UpdateTimeRecord,
   UpdateTimeRecordCategory
-} from "../../../../types";
-import {DatesUtils} from "../../general/utils/dates-utils";
-import {DatePipe} from "@angular/common";
-import {TimeRecordCategory} from "../model/time-record-category";
+} from '../../../../types';
+import {DatesUtils} from '../../general/utils/dates-utils';
+import {DatePipe} from '@angular/common';
+import {TimeRecordCategory} from '../model/time-record-category';
 
 @Injectable({
   providedIn: 'root'
@@ -40,7 +40,9 @@ export class IntellectualPropertyService extends Refreshable {
 
   readonly TASK_URL = `${environment.serviceUrl}/task`;
 
-  private domainIntellectualPropertiesQueryRef: QueryRef<{ allIPRs: IntellectualProperty[] }> | null = null;
+  private domainIntellectualPropertiesQueryRef: QueryRef<{
+    intellectualPropertiesRecords: IntellectualPropertiesRecordsResponse
+  }> | null = null;
   private nonIPTimeRecordsQueryRef: QueryRef<{ nonIPTimeRecords: TimeRecord[] }> | null = null;
   private domainTimeRecordCategoriesQueryRef: QueryRef<{ allTimeRecordCategories: TimeRecordCategory[] }> | null = null;
 
@@ -56,12 +58,12 @@ export class IntellectualPropertyService extends Refreshable {
 
   getIntellectualPropertiesForDomain(): Observable<IntellectualProperty[]> {
     this.domainIntellectualPropertiesQueryRef = this.apollo
-      .watchQuery<{ allIPRs: IntellectualProperty[] }>({
+      .watchQuery<{ intellectualPropertiesRecords: IntellectualPropertiesRecordsResponse }>({
         query: GetAllDomainIntellectualProperties
       });
     return this.domainIntellectualPropertiesQueryRef.valueChanges
       .pipe(
-        map(result => result.data && result.data.allIPRs && result.data.allIPRs.map(ip => new IntellectualProperty(ip)))
+        map(result => result.data?.intellectualPropertiesRecords?.reports?.map(ip => new IntellectualProperty(ip)))
       );
   }
 

@@ -1,5 +1,8 @@
 import {Domain} from '../../general/model/domain';
 import {IntellectualPropertyTask} from './intellectual-property-task';
+import {
+  IntellectualProperty as GQIntellectualProperty
+} from '../../../../types';
 
 export type IntellectualPropertyDTO = Partial<IntellectualProperty>;
 
@@ -11,7 +14,7 @@ export class IntellectualProperty {
   public tasks: IntellectualPropertyTask[];
   public domain: Domain;
 
-  constructor(data?: IntellectualPropertyDTO) {
+  constructor(data?: IntellectualPropertyDTO | GQIntellectualProperty) {
     if (!data) {
       data = {};
     }
