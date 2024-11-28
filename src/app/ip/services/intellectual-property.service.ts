@@ -23,7 +23,7 @@ import {
   DeleteTimeRecordCategory,
   GetAllDomainIntellectualProperties,
   GetAllDomainNonIpTimeRecords,
-  GetAllDomainTimeRecordCategories, IntellectualPropertiesRecordsResponse,
+  GetAllDomainTimeRecordCategories, IntellectualPropertiesRecordsResponse, TimeRecordsResponse,
   UpdateIpr,
   UpdateTask,
   UpdateTimeRecord,
@@ -43,7 +43,7 @@ export class IntellectualPropertyService extends Refreshable {
   private domainIntellectualPropertiesQueryRef: QueryRef<{
     intellectualPropertiesRecords: IntellectualPropertiesRecordsResponse
   }> | null = null;
-  private nonIPTimeRecordsQueryRef: QueryRef<{ nonIPTimeRecords: TimeRecord[] }> | null = null;
+  private nonIPTimeRecordsQueryRef: QueryRef<{ timeRecords: TimeRecordsResponse }> | null = null;
   private domainTimeRecordCategoriesQueryRef: QueryRef<{ allTimeRecordCategories: TimeRecordCategory[] }> | null = null;
 
   constructor(
@@ -155,12 +155,12 @@ export class IntellectualPropertyService extends Refreshable {
 
   getTimeRecordsNotAssignedToTask() {
     this.nonIPTimeRecordsQueryRef = this.apollo
-      .watchQuery<{ nonIPTimeRecords: TimeRecord[] }>({
+      .watchQuery<{ timeRecords: TimeRecordsResponse }>({
         query: GetAllDomainNonIpTimeRecords
       });
     return this.nonIPTimeRecordsQueryRef.valueChanges
       .pipe(
-        map(result => result.data && result.data.nonIPTimeRecords && result.data.nonIPTimeRecords.map(tr => new TimeRecord(tr)))
+        map(result => result.data?.timeRecords?.nonIPTimeRecords?.map(tr => new TimeRecord(tr)))
       );
   }
 

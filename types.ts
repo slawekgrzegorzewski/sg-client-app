@@ -37,13 +37,7 @@ export type IntellectualPropertiesRecordsQueryInput = {
 export type IntellectualPropertiesRecordsResponse = {
   __typename?: 'IntellectualPropertiesRecordsResponse';
   reports: Array<IntellectualProperty>;
-  stats: IntellectualPropertiesRecordsStats;
-};
-
-export type IntellectualPropertiesRecordsStats = {
-  __typename?: 'IntellectualPropertiesRecordsStats';
-  firstTimeRecord: Scalars['LocalDate'];
-  lastTimeRecord: Scalars['LocalDate'];
+  stats: TimeRecordsStats;
 };
 
 export type IntellectualProperty = {
@@ -178,8 +172,8 @@ export type Query = {
   allTimeRecordCategories: Array<TimeRecordCategory>;
   intellectualPropertiesRecords?: Maybe<IntellectualPropertiesRecordsResponse>;
   monthRevenueAndExpenseEntry?: Maybe<Array<RevenueAndExpenseEntry>>;
-  nonIPTimeRecords: Array<TimeRecord>;
   simulateLoan: Array<LoanCalculationInstallment>;
+  timeRecords: TimeRecordsResponse;
 };
 
 
@@ -196,6 +190,11 @@ export type QueryMonthRevenueAndExpenseEntryArgs = {
 
 export type QuerySimulateLoanArgs = {
   loanCalculationParams?: InputMaybe<LoanCalculationParams>;
+};
+
+
+export type QueryTimeRecordsArgs = {
+  input: TimeRecordsQueryInput;
 };
 
 export type RevenueAndExpenseEntry = {
@@ -277,6 +276,23 @@ export type TimeRecordData = {
   taskId?: InputMaybe<Scalars['Int']>;
 };
 
+export type TimeRecordsQueryInput = {
+  yearMonthFilter?: InputMaybe<Scalars['YearMonth']>;
+};
+
+export type TimeRecordsResponse = {
+  __typename?: 'TimeRecordsResponse';
+  nonIPTimeRecords: Array<TimeRecord>;
+  stats: TimeRecordsStats;
+  taskWithSelectedTimeRecords: Array<Task>;
+};
+
+export type TimeRecordsStats = {
+  __typename?: 'TimeRecordsStats';
+  firstTimeRecord: Scalars['LocalDate'];
+  lastTimeRecord: Scalars['LocalDate'];
+};
+
 export type SimulateLoanQueryVariables = Exact<{
   loanAmount: Scalars['BigDecimal'];
   numberOfInstallments: Scalars['Int'];
@@ -344,10 +360,12 @@ export type DeleteTaskMutationVariables = Exact<{
 
 export type DeleteTaskMutation = { __typename?: 'Mutation', deleteTask: string };
 
-export type GetAllDomainNonIpTimeRecordsQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetAllDomainNonIpTimeRecordsQueryVariables = Exact<{
+  yearMonthFilter?: InputMaybe<Scalars['YearMonth']>;
+}>;
 
 
-export type GetAllDomainNonIpTimeRecordsQuery = { __typename?: 'Query', nonIPTimeRecords: Array<{ __typename?: 'TimeRecord', id: number, date: any, numberOfHours: any, description?: string | null, timeRecordCategory?: { __typename?: 'TimeRecordCategory', id: number, name: string } | null, domain: { __typename?: 'DomainSimple', id: number, name: string } }> };
+export type GetAllDomainNonIpTimeRecordsQuery = { __typename?: 'Query', timeRecords: { __typename?: 'TimeRecordsResponse', nonIPTimeRecords: Array<{ __typename?: 'TimeRecord', id: number, date: any, numberOfHours: any, description?: string | null, timeRecordCategory?: { __typename?: 'TimeRecordCategory', id: number, name: string } | null, domain: { __typename?: 'DomainSimple', id: number, name: string } }> } };
 
 export type CreateTimeRecordMutationVariables = Exact<{
   taskId?: InputMaybe<Scalars['Int']>;
@@ -558,19 +576,21 @@ export const DeleteTask = gql`
 }
     `;
 export const GetAllDomainNonIpTimeRecords = gql`
-    query GetAllDomainNonIPTimeRecords {
-  nonIPTimeRecords {
-    id
-    date
-    numberOfHours
-    description
-    timeRecordCategory {
+    query GetAllDomainNonIPTimeRecords($yearMonthFilter: YearMonth) {
+  timeRecords(input: {yearMonthFilter: $yearMonthFilter}) {
+    nonIPTimeRecords {
       id
-      name
-    }
-    domain {
-      id
-      name
+      date
+      numberOfHours
+      description
+      timeRecordCategory {
+        id
+        name
+      }
+      domain {
+        id
+        name
+      }
     }
   }
 }

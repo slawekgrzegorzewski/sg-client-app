@@ -6,7 +6,7 @@ scalar Upload
 
 type Query {
   intellectualPropertiesRecords(input: IntellectualPropertiesRecordsQueryInput): IntellectualPropertiesRecordsResponse
-  nonIPTimeRecords: [TimeRecord!]!
+  timeRecords(input: TimeRecordsQueryInput!): TimeRecordsResponse!
   allTimeRecordCategories: [TimeRecordCategory!]!
   monthRevenueAndExpenseEntry(year: Int!, month: Int!): [RevenueAndExpenseEntry!]
   simulateLoan(loanCalculationParams: LoanCalculationParams): [LoanCalculationInstallment!]!
@@ -33,14 +33,24 @@ input IntellectualPropertiesRecordsQueryInput {
   yearMonthFilter: YearMonth
 }
 
-type IntellectualPropertiesRecordsResponse {
-  reports: [IntellectualProperty!]!
-  stats:  IntellectualPropertiesRecordsStats!
+input TimeRecordsQueryInput {
+  yearMonthFilter: YearMonth
 }
 
-type IntellectualPropertiesRecordsStats {
+type IntellectualPropertiesRecordsResponse {
+  reports: [IntellectualProperty!]!
+  stats:  TimeRecordsStats!
+}
+
+type TimeRecordsStats {
   firstTimeRecord: LocalDate!
   lastTimeRecord: LocalDate!
+}
+
+type TimeRecordsResponse {
+  taskWithSelectedTimeRecords: [Task!]!
+  nonIPTimeRecords: [TimeRecord!]!
+  stats: TimeRecordsStats!
 }
 
 input LoanCalculationParams {

@@ -109,19 +109,21 @@ mutation DeleteTask($taskId: Int!) {
   deleteTask(taskId: $taskId)
 }
 
-query GetAllDomainNonIPTimeRecords {
-  nonIPTimeRecords {
-    id
-    date
-    numberOfHours
-    description
-    timeRecordCategory {
+query GetAllDomainNonIPTimeRecords($yearMonthFilter: YearMonth) {
+  timeRecords(input: {yearMonthFilter: $yearMonthFilter}) {
+    nonIPTimeRecords {
       id
-      name
-    }
-    domain {
-      id
-      name
+      date
+      numberOfHours
+      description
+      timeRecordCategory {
+        id
+        name
+      }
+      domain {
+        id
+        name
+      }
     }
   }
 }
