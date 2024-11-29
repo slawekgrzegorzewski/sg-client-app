@@ -19,6 +19,7 @@ export class AuthInterceptor implements HttpInterceptor {
         setHeaders: {
           Authorization: `Bearer ${this.loginService.getToken()}`,
           DomainId: domainId ? domainId.toString() : '',
+          locale: navigator.language ? navigator.language : 'pl-PL',
           'X-Timezone-Id': Intl.DateTimeFormat().resolvedOptions().timeZone
         }
       });
