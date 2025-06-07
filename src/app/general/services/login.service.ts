@@ -14,7 +14,7 @@ import {AppLoginStatus} from '../utils/app-login-status';
 class TokenData {
   sub: string = '';
   roles: string[] = [];
-  defaultDomain: number = Number.NaN;
+  domain_id: number = Number.NaN;
   exp: Date = new Date(0);
 }
 
@@ -40,7 +40,7 @@ export class LoginService {
     private eventBus: NgEventBus
   ) {
     this.eventBus.on(APP_LOGIN_STATUS_REQUEST_EVENT).subscribe(() => {
-      this.eventBus.cast(APP_LOGIN_STATUS_EVENT, new AppLoginStatus(this.isLoggedIn(), this.getDefaultDomain()));
+      this.eventBus.cast(APP_LOGIN_STATUS_EVENT, new AppLoginStatus(this.isLoggedIn(), this.getDomainId()));
     });
   }
 
@@ -48,7 +48,7 @@ export class LoginService {
     const httpHeaders = new HttpHeaders({
       'x-tfa': userObj.authcode
     });
-    return this.http.post(`${environment.serviceUrl}/login`, {
+    return this.http.post(`${environment.serviceUrl}/auth/login`, {
       name: userObj.uname,
       pass: userObj.upass
     }, {observe: 'response', headers: httpHeaders, responseType: 'text'});
@@ -93,7 +93,7 @@ export class LoginService {
   login(token: string): void {
     localStorage.setItem('token', token);
     if (this.isLoggedIn()) {
-      this.eventBus.cast(APP_LOGIN_STATUS_EVENT, new AppLoginStatus(true, this.getDefaultDomain()));
+      this.eventBus.cast(APP_LOGIN_STATUS_EVENT, new AppLoginStatus(true, this.getDomainId()));
       setTimeout(() => this.router.navigate(['/']), 100);
     }
   }
@@ -165,10 +165,10 @@ export class LoginService {
     return false;
   }
 
-  public getDefaultDomain(): number | null {
+  public getDomainId(): number | null {
     const token = this.getToken();
     if (token) {
-      return jwt_decode<TokenData>(token).defaultDomain;
+      return jwt_decode<TokenData>(token).domain_id;
     }
     return null;
   }

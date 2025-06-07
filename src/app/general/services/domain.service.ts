@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {HttpClient, HttpResponse} from '@angular/common/http';
+import {forkJoin, Observable} from 'rxjs';
 import {environment} from '../../../environments/environment';
 import {DetailedDomain, Domain} from '../model/domain';
 import {filter, map, share, tap} from 'rxjs/operators';
@@ -58,12 +58,21 @@ export class DomainService {
     return Number(domainIdInLocalStorage);
   }
 
+  switchDomain(domainId: number): Observable<HttpResponse<string>> {
+    return this.http.post(`${environment.serviceUrl}/auth/switchDomain/${domainId}`,
+      {},
+      {observe: 'response', responseType: 'text'});
+  }
+
   set currentDomainId(domainId: number) {
-    this.findDomain(+domainId).subscribe(domain => {
-      if (domain && this.componentRegistration) {
-        this.router.navigate([this.componentRegistration.component, domain.id]);
-      }
-    });
+    forkJoin([
+      this.findDomain(+domainId),
+      this.switchDomain(domainId)])
+      .subscribe(([domain, response]) => {
+        if (domain && this.componentRegistration) {
+          this.router.navigate([this.componentRegistration.component, domain.id]);
+        }
+      });
   }
 
   constructor(
