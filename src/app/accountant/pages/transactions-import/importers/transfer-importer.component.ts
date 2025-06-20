@@ -123,7 +123,7 @@ export class TransferImporterComponent {
       sourceBankTransactionForTransfer.sourceAccount!,
       [destinationTransactionForTransfer.destinationAccount!],
       destinationTransactionForTransfer.destinationAccount!,
-      [sourceBankTransactionForTransfer.debitNodrigenTransactionId, destinationTransactionForTransfer.creditNodrigenTransactionId],
+      [sourceBankTransactionForTransfer.debitNodrigenTransactionPublicId, destinationTransactionForTransfer.creditNodrigenTransactionPublicId],
       TransactionType.TRANSFER_FROM_BANK_TRANSACTIONS,
       new Decimal(sourceBankTransactionForTransfer.debit),
       sourceBankTransactionForTransfer.description,

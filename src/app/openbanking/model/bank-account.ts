@@ -2,6 +2,7 @@ import {Domain} from '../../general/model/domain';
 
 export class BankAccount {
   id: number;
+  publicId: string;
   iban: string;
   currency: string;
   owner: string;
@@ -15,6 +16,7 @@ export class BankAccount {
       data = {};
     }
     this.id = data.id || 0;
+    this.publicId = data.publicId || '';
     this.iban = data.iban || '';
     this.currency = data.currency || '';
     this.owner = data.owner || '';

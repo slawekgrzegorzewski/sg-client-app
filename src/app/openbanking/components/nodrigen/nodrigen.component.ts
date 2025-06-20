@@ -67,7 +67,7 @@ export class NodrigenComponent implements OnInit {
     });
   }
 
-  updateDateFromProvider(externalId: string) {
-    this.nodrigenService.fetchBankAccountData(externalId).subscribe();
+  updateDateFromProvider(bankAccountPublicId: string) {
+    this.nodrigenService.fetchBankAccountData(bankAccountPublicId).subscribe();
   }
 }

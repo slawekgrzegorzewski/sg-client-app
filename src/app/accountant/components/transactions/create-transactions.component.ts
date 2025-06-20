@@ -116,7 +116,7 @@ export class CreateTransactionsComponent implements OnInit {
 
   @Input() description: string = '';
 
-  @Input() involvedBankTransactions: number[] = [];
+  @Input() involvedBankTransactions: string[] = [];
 
   rate$: number = 1;
 

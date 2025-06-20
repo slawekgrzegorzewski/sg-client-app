@@ -28,7 +28,7 @@ export class IgnoreImporterComponent {
 
   @Input() set transactions(value: BankTransactionToImport[]) {
     this._transactions = value;
-    this.canBeIgnored = this.transactions.find(t => !t.isEmpty()) === null;
+    this.canBeIgnored = this.transactions.find(t => !t.isEmpty()) === undefined;
   }
 
   @Output() onIgnore = new EventEmitter<BankTransactionToImport[]>();

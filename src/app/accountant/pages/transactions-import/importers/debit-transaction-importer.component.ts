@@ -112,8 +112,8 @@ export class DebitTransactionImporterComponent {
   createDebit() {
     const accountOfCreatingExpense = this.getAccountOfTransaction(this.transactions[0])!;
     const affectedBankTransactionsToImportInfo = AffectedBankTransactionsToImportInfo.debitCredit(
-      this.transactions.filter(t => t.isDebit()).map(t => t.debitNodrigenTransactionId),
-      this.transactions.filter(t => t.isCredit()).map(t => t.creditNodrigenTransactionId)
+      this.transactions.filter(t => t.isDebit()).map(t => t.debitNodrigenTransactionPublicId),
+      this.transactions.filter(t => t.isCredit()).map(t => t.creditNodrigenTransactionPublicId)
     );
     this.onExpensesCreation.emit([
       this.expensesToCreate!,
@@ -140,7 +140,7 @@ export class DebitTransactionImporterComponent {
       sourceAccount,
       cashAccounts,
       null,
-      [bankTransactionToImport.debitNodrigenTransactionId],
+      [bankTransactionToImport.debitNodrigenTransactionPublicId],
       TransactionType.TRANSFER_FROM_BANK_TRANSACTIONS,
       new Decimal(bankTransactionToImport.debit),
       bankTransactionToImport.description,

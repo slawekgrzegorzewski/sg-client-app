@@ -23,7 +23,7 @@ export class BanksService {
   }
 
   assignBankAccountToAnAccount(account: Account, bankAccount: BankAccount): Observable<void> {
-    return this.http.put<void>(`${this.endpoint}/${bankAccount.id}`, account.id);
+    return this.http.put<void>(`${this.endpoint}/${bankAccount.publicId}`, account.id);
   }
 
   fetchAllTransactions(): Observable<void> {

@@ -18,11 +18,11 @@ export class BankTransactionToImport {
   timeOfTransaction: Date;
   destinationAccount: Account | null;
   sourceAccount: Account | null;
-  creditBankAccountId: number;
-  debitBankAccountId: number;
-  creditNodrigenTransactionId: number;
-  debitNodrigenTransactionId: number;
-  nodrigenTransactionId: number;
+  creditBankAccountPublicId: string;
+  debitBankAccountPublicId: string;
+  creditNodrigenTransactionPublicId: string;
+  debitNodrigenTransactionPublicId: string;
+  nodrigenTransactionPublicId: string;
 
   constructor(data?: Partial<BankTransactionToImport>) {
     if (!data) {
@@ -37,11 +37,11 @@ export class BankTransactionToImport {
     this.timeOfTransaction = data.timeOfTransaction && new Date(data.timeOfTransaction) || new Date();
     this.destinationAccount = data.destinationAccount && new Account(data.destinationAccount) || null;
     this.sourceAccount = data.sourceAccount && new Account(data.sourceAccount) || null;
-    this.creditBankAccountId = data.creditBankAccountId || 0;
-    this.debitBankAccountId = data.debitBankAccountId || 0;
-    this.creditNodrigenTransactionId = data.creditNodrigenTransactionId || 0;
-    this.debitNodrigenTransactionId = data.debitNodrigenTransactionId || 0;
-    this.nodrigenTransactionId = data.nodrigenTransactionId || 0;
+    this.creditBankAccountPublicId = data.creditBankAccountPublicId || '';
+    this.debitBankAccountPublicId = data.debitBankAccountPublicId || '';
+    this.creditNodrigenTransactionPublicId = data.creditNodrigenTransactionPublicId || '';
+    this.debitNodrigenTransactionPublicId = data.debitNodrigenTransactionPublicId || '';
+    this.nodrigenTransactionPublicId = data.nodrigenTransactionPublicId	 || '';
   }
 
   public isCredit(): boolean {

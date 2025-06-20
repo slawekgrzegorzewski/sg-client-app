@@ -44,7 +44,6 @@
     (editEvent)="createBillingPeriodElement($event[0], $event[1], $event[2])"
     style="height: 100%">
   </app-create-billing-element>
-  <app-domain-accounts *ngIf="mobileEditMode==='display'"></app-domain-accounts>
   <ng-container *ngIf="mobileEditMode==='display'">
     <ng-container *ngTemplateOutlet="stats"></ng-container>
   </ng-container>

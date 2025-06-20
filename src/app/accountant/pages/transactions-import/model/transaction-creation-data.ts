@@ -8,7 +8,7 @@ export class TransactionCreationData {
     public sourceAccount: Account | null,
     public destinationAccounts: Account[],
     public destinationAccount: Account | null,
-    public involvedBankTransactions: number[],
+    public involvedBankTransactions: string[],
     public transactionType: TransactionType,
     public amount: Decimal,
     public description: string,

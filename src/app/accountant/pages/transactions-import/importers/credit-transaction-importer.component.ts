@@ -130,7 +130,7 @@ export class CreditTransactionImporterComponent {
         null,
         [accountOfFirstTransaction],
         accountOfFirstTransaction,
-        [firstTransaction.creditNodrigenTransactionId],
+        [firstTransaction.creditNodrigenTransactionPublicId],
         TransactionType.TRANSFER_FROM_BANK_TRANSACTIONS,
         new Decimal(firstTransaction.credit),
         firstTransaction.description,
@@ -186,8 +186,8 @@ export class CreditTransactionImporterComponent {
   private prepareCreateIncomeEvent() {
     const accountOfCreatingIncome = this.getAccountOfTransaction(this.transactions[0])!;
     const affectedBankTransactionsToImportInfo = AffectedBankTransactionsToImportInfo.debitCredit(
-      this.transactions.filter(t => t.isDebit()).map(t => t.debitNodrigenTransactionId),
-      this.transactions.filter(t => t.isCredit()).map(t => t.creditNodrigenTransactionId)
+      this.transactions.filter(t => t.isDebit()).map(t => t.debitNodrigenTransactionPublicId),
+      this.transactions.filter(t => t.isCredit()).map(t => t.creditNodrigenTransactionPublicId)
     );
 
     const event: [Income, Account, AffectedBankTransactionsToImportInfo] = [

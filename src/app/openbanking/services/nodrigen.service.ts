@@ -66,17 +66,17 @@ export class NodrigenService {
 
   mutuallyCancelTransactions(transactionToImport: BankTransactionToImport, otherTransactionForTransfer: BankTransactionToImport) {
     const firstId = transactionToImport.credit > 0
-      ? transactionToImport.creditNodrigenTransactionId
-      : transactionToImport.debitNodrigenTransactionId;
+      ? transactionToImport.creditNodrigenTransactionPublicId
+      : transactionToImport.debitNodrigenTransactionPublicId;
     const secondId = otherTransactionForTransfer.credit > 0
-      ? otherTransactionForTransfer.creditNodrigenTransactionId
-      : otherTransactionForTransfer.debitNodrigenTransactionId;
+      ? otherTransactionForTransfer.creditNodrigenTransactionPublicId
+      : otherTransactionForTransfer.debitNodrigenTransactionPublicId;
     return this.http.put<void>(`${this.endpoint}/nodrigen_transactions_to_mutually_cancel/${firstId}/${secondId}`, null)
       .pipe(tap(value => this.refreshTransactionsToImport()));
   }
 
   ignoreTransactions(transactionsToIgnore: BankTransactionToImport[]) {
-    return this.http.put<void>(`${this.endpoint}/nodrigen_ignore_transaction/${transactionsToIgnore.map(t => t.nodrigenTransactionId)}`, null)
+    return this.http.put<void>(`${this.endpoint}/nodrigen_ignore_transaction/${transactionsToIgnore.map(t => t.nodrigenTransactionPublicId)}`, null)
       .pipe(tap(value => this.refreshTransactionsToImport()));
   }
 
@@ -85,7 +85,7 @@ export class NodrigenService {
     this.eventBus.cast(TRANSACTIONS_TO_IMPORT_CHANGED);
   }
 
-  fetchBankAccountData(externalId: string) {
-    return this.http.post<void>(`${this.endpoint}/fetch/${externalId}`, {});
+  fetchBankAccountData(bankAccountPublicId: string) {
+    return this.http.post<void>(`${this.endpoint}/fetch/${bankAccountPublicId}`, {});
   }
 }

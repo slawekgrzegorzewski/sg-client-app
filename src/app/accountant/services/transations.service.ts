@@ -41,7 +41,7 @@ export class TransactionsService {
       .pipe(map(d => new Transaction(d)));
   }
 
-  transferWithBankTransactions(account: Account, targetAccount: Account, amount: number, description: string, involvedBankTransactions: number[]): Observable<Transaction> {
+  transferWithBankTransactions(account: Account, targetAccount: Account, amount: number, description: string, involvedBankTransactions: string[]): Observable<Transaction> {
     let url = `${this.endpoint}/transfer${involvedBankTransactions.length > 1 ? '' : '_cash'}/${account.id}/${targetAccount.id}/${amount}/${involvedBankTransactions[0]}`;
     if (involvedBankTransactions.length > 1) {
       url = `${url}/${involvedBankTransactions[1]}`;
@@ -67,7 +67,7 @@ export class TransactionsService {
   }
 
   transferWithConversionWithBankTransactions(account: Account, targetAccount: Account, amount: number, targetAmount: number, description: string,
-                                             rate: number, involvedBankTransactions: number[]): Observable<Transaction> {
+                                             rate: number, involvedBankTransactions: string[]): Observable<Transaction> {
     let url = `${this.endpoint}/transfer${involvedBankTransactions.length > 1 ? '' : '_cash'}_with_conversion/${account.id}/${targetAccount.id}/${amount}/${targetAmount}/${rate}/${involvedBankTransactions[0]}`;
     if (involvedBankTransactions.length > 1) {
       url = `${url}/${involvedBankTransactions[1]}`;
