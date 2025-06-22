@@ -5,7 +5,7 @@ import {Observable, tap} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {NodrigenInstitution} from '../model/nodrigen/nodrigen-institution';
 import {NodrigenPermission} from '../model/nodrigen/nodrigen-permission';
-import {MatchingMode, BankTransactionToImport} from '../model/nodrigen/bank-transaction-to-import';
+import {BankTransactionToImport} from '../model/nodrigen/bank-transaction-to-import';
 import {NgEventBus} from 'ng-event-bus';
 import {TRANSACTIONS_TO_IMPORT_CHANGED} from '../../general/utils/event-bus-events';
 
@@ -14,7 +14,7 @@ import {TRANSACTIONS_TO_IMPORT_CHANGED} from '../../general/utils/event-bus-even
 })
 export class NodrigenService {
 
-  private readonly endpoint = `${environment.serviceUrl}/nodrigen`;
+  private readonly endpoint = `${environment.serviceUrl}/go_cardless`;
   private transactionsToImport: Observable<any> | null = null;
 
 
