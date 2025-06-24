@@ -20,9 +20,9 @@ export class BankTransactionToImport {
   sourceAccount: Account | null;
   creditBankAccountPublicId: string;
   debitBankAccountPublicId: string;
-  creditNodrigenTransactionPublicId: string;
-  debitNodrigenTransactionPublicId: string;
-  nodrigenTransactionPublicId: string;
+  creditGoCardlessTransactionPublicId: string;
+  debitGoCardlessTransactionPublicId: string;
+  goCardlessTransactionPublicId: string;
 
   constructor(data?: Partial<BankTransactionToImport>) {
     if (!data) {
@@ -39,9 +39,9 @@ export class BankTransactionToImport {
     this.sourceAccount = data.sourceAccount && new Account(data.sourceAccount) || null;
     this.creditBankAccountPublicId = data.creditBankAccountPublicId || '';
     this.debitBankAccountPublicId = data.debitBankAccountPublicId || '';
-    this.creditNodrigenTransactionPublicId = data.creditNodrigenTransactionPublicId || '';
-    this.debitNodrigenTransactionPublicId = data.debitNodrigenTransactionPublicId || '';
-    this.nodrigenTransactionPublicId = data.nodrigenTransactionPublicId	 || '';
+    this.creditGoCardlessTransactionPublicId = data.creditGoCardlessTransactionPublicId || '';
+    this.debitGoCardlessTransactionPublicId = data.debitGoCardlessTransactionPublicId || '';
+    this.goCardlessTransactionPublicId = data.goCardlessTransactionPublicId	 || '';
   }
 
   public isCredit(): boolean {

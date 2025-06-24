@@ -1,4 +1,4 @@
-import {BankTransactionToImport} from '../../../../openbanking/model/nodrigen/bank-transaction-to-import';
+import {BankTransactionToImport} from '../../../../openbanking/model/go-cardless/bank-transaction-to-import';
 import {Account} from '../../../model/account';
 
 export class TransactionUtils {

@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {BankTransactionToImport} from '../../../../openbanking/model/nodrigen/bank-transaction-to-import';
+import {BankTransactionToImport} from '../../../../openbanking/model/go-cardless/bank-transaction-to-import';
 import Decimal from 'decimal.js';
 import {DatesUtils} from '../../../../general/utils/dates-utils';
-import {AffectedBankTransactionsToImportInfo} from '../../../../openbanking/model/nodrigen/affected-bank-transactions-to-import-info';
+import {AffectedBankTransactionsToImportInfo} from '../../../../openbanking/model/go-cardless/affected-bank-transactions-to-import-info';
 import {Account} from '../../../model/account';
 import {Income} from '../../../model/billings/income';
 import {TransactionCreationData} from '../model/transaction-creation-data';
@@ -130,7 +130,7 @@ export class CreditTransactionImporterComponent {
         null,
         [accountOfFirstTransaction],
         accountOfFirstTransaction,
-        [firstTransaction.creditNodrigenTransactionPublicId],
+        [firstTransaction.creditGoCardlessTransactionPublicId],
         TransactionType.TRANSFER_FROM_BANK_TRANSACTIONS,
         new Decimal(firstTransaction.credit),
         firstTransaction.description,
@@ -186,8 +186,8 @@ export class CreditTransactionImporterComponent {
   private prepareCreateIncomeEvent() {
     const accountOfCreatingIncome = this.getAccountOfTransaction(this.transactions[0])!;
     const affectedBankTransactionsToImportInfo = AffectedBankTransactionsToImportInfo.debitCredit(
-      this.transactions.filter(t => t.isDebit()).map(t => t.debitNodrigenTransactionPublicId),
-      this.transactions.filter(t => t.isCredit()).map(t => t.creditNodrigenTransactionPublicId)
+      this.transactions.filter(t => t.isDebit()).map(t => t.debitGoCardlessTransactionPublicId),
+      this.transactions.filter(t => t.isCredit()).map(t => t.creditGoCardlessTransactionPublicId)
     );
 
     const event: [Income, Account, AffectedBankTransactionsToImportInfo] = [

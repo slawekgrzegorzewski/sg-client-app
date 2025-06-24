@@ -1,9 +1,9 @@
 import {AfterViewInit, Component, OnInit} from '@angular/core';
-import {NodrigenService} from '../../services/nodrigen.service';
+import {GoCardlessService} from '../../services/go-cardless.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {DomainService} from '../../../general/services/domain.service';
-import {NodrigenInstitution} from '../../model/nodrigen/nodrigen-institution';
-import {NodrigenPermission} from '../../model/nodrigen/nodrigen-permission';
+import {NodrigenInstitution} from '../../model/go-cardless/nodrigen-institution';
+import {NodrigenPermission} from '../../model/go-cardless/nodrigen-permission';
 import {BanksService} from '../../services/banks.service';
 
 
@@ -20,7 +20,7 @@ export class NodrigenComponent implements OnInit {
   institutions: NodrigenInstitution[] = [];
 
   constructor(private banksService: BanksService,
-              private nodrigenService: NodrigenService,
+              private nodrigenService: GoCardlessService,
               private router: Router,
               private route: ActivatedRoute) {
   }

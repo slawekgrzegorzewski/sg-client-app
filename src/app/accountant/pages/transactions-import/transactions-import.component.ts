@@ -1,6 +1,6 @@
 import {Component, HostListener, OnInit} from '@angular/core';
-import {NodrigenService} from '../../../openbanking/services/nodrigen.service';
-import {BankTransactionToImport} from '../../../openbanking/model/nodrigen/bank-transaction-to-import';
+import {GoCardlessService} from '../../../openbanking/services/go-cardless.service';
+import {BankTransactionToImport} from '../../../openbanking/model/go-cardless/bank-transaction-to-import';
 import {ComparatorBuilder} from '../../../general/utils/comparator-builder';
 import {Expense} from '../../model/billings/expense';
 import {PiggyBank} from '../../model/piggy-bank';
@@ -12,7 +12,7 @@ import {NgEventBus} from 'ng-event-bus';
 import {TRANSACTIONS_TO_IMPORT_CHANGED} from '../../../general/utils/event-bus-events';
 import {AccountsService} from '../../services/accounts.service';
 import {forkJoin} from 'rxjs';
-import {AffectedBankTransactionsToImportInfo} from '../../../openbanking/model/nodrigen/affected-bank-transactions-to-import-info';
+import {AffectedBankTransactionsToImportInfo} from '../../../openbanking/model/go-cardless/affected-bank-transactions-to-import-info';
 import {BillingElementType} from '../../components/billing-periods/create-billing-element.component';
 import {TransactionCreationData} from './model/transaction-creation-data';
 
@@ -47,7 +47,7 @@ export class TransactionsImportComponent implements OnInit {
 
   constructor(private accountsService: AccountsService,
               private billingsService: BillingPeriodsService,
-              private nodrigenService: NodrigenService,
+              private nodrigenService: GoCardlessService,
               private piggyBanksService: PiggyBanksService,
               private eventBus: NgEventBus) {
     this.eventBus.on(TRANSACTIONS_TO_IMPORT_CHANGED).subscribe(md => {

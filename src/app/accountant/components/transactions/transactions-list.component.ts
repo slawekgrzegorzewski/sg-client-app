@@ -3,7 +3,7 @@ import {TransactionType} from '../../model/transaction-type';
 import {Account} from '../../model/account';
 import {Transaction} from '../../model/transaction';
 import {ComparatorBuilder} from '../../../general/utils/comparator-builder';
-import {MatchingMode, BankTransactionToImport} from '../../../openbanking/model/nodrigen/bank-transaction-to-import';
+import {MatchingMode, BankTransactionToImport} from '../../../openbanking/model/go-cardless/bank-transaction-to-import';
 import {DatesUtils} from '../../../general/utils/dates-utils';
 import {AccountsService} from '../../services/accounts.service';
 import {DomainService} from '../../../general/services/domain.service';

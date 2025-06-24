@@ -1,11 +1,11 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {BankTransactionToImport} from '../../../../openbanking/model/nodrigen/bank-transaction-to-import';
+import {BankTransactionToImport} from '../../../../openbanking/model/go-cardless/bank-transaction-to-import';
 import {Expense} from '../../../model/billings/expense';
 import Decimal from 'decimal.js';
 import {DatesUtils} from '../../../../general/utils/dates-utils';
 import {
   AffectedBankTransactionsToImportInfo
-} from '../../../../openbanking/model/nodrigen/affected-bank-transactions-to-import-info';
+} from '../../../../openbanking/model/go-cardless/affected-bank-transactions-to-import-info';
 import {Account} from '../../../model/account';
 import {TransactionCreationData} from '../model/transaction-creation-data';
 import {TransactionType} from '../../../model/transaction-type';
@@ -112,8 +112,8 @@ export class DebitTransactionImporterComponent {
   createDebit() {
     const accountOfCreatingExpense = this.getAccountOfTransaction(this.transactions[0])!;
     const affectedBankTransactionsToImportInfo = AffectedBankTransactionsToImportInfo.debitCredit(
-      this.transactions.filter(t => t.isDebit()).map(t => t.debitNodrigenTransactionPublicId),
-      this.transactions.filter(t => t.isCredit()).map(t => t.creditNodrigenTransactionPublicId)
+      this.transactions.filter(t => t.isDebit()).map(t => t.debitGoCardlessTransactionPublicId),
+      this.transactions.filter(t => t.isCredit()).map(t => t.creditGoCardlessTransactionPublicId)
     );
     this.onExpensesCreation.emit([
       this.expensesToCreate!,
@@ -140,7 +140,7 @@ export class DebitTransactionImporterComponent {
       sourceAccount,
       cashAccounts,
       null,
-      [bankTransactionToImport.debitNodrigenTransactionPublicId],
+      [bankTransactionToImport.debitGoCardlessTransactionPublicId],
       TransactionType.TRANSFER_FROM_BANK_TRANSACTIONS,
       new Decimal(bankTransactionToImport.debit),
       bankTransactionToImport.description,

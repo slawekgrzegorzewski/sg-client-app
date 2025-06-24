@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {BankTransactionToImport} from '../../../../openbanking/model/nodrigen/bank-transaction-to-import';
+import {BankTransactionToImport} from '../../../../openbanking/model/go-cardless/bank-transaction-to-import';
 import Decimal from 'decimal.js';
 import {TransactionCreationData} from '../model/transaction-creation-data';
 import {TransactionType} from '../../../model/transaction-type';
@@ -123,7 +123,7 @@ export class TransferImporterComponent {
       sourceBankTransactionForTransfer.sourceAccount!,
       [destinationTransactionForTransfer.destinationAccount!],
       destinationTransactionForTransfer.destinationAccount!,
-      [sourceBankTransactionForTransfer.debitNodrigenTransactionPublicId, destinationTransactionForTransfer.creditNodrigenTransactionPublicId],
+      [sourceBankTransactionForTransfer.debitGoCardlessTransactionPublicId, destinationTransactionForTransfer.creditGoCardlessTransactionPublicId],
       TransactionType.TRANSFER_FROM_BANK_TRANSACTIONS,
       new Decimal(sourceBankTransactionForTransfer.debit),
       sourceBankTransactionForTransfer.description,

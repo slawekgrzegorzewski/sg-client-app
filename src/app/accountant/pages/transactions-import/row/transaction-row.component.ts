@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {BankTransactionToImport} from '../../../../openbanking/model/nodrigen/bank-transaction-to-import';
+import {BankTransactionToImport} from '../../../../openbanking/model/go-cardless/bank-transaction-to-import';
 
 
 @Component({

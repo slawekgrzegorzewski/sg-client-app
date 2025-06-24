@@ -82,7 +82,7 @@ import {CubeComponent} from './speedcubing/components/cube/cube.component';
 import {CubeControlsComponent} from './speedcubing/components/cube-controls/cube-controls.component';
 import {CubeStatisticsComponent} from './speedcubing/pages/cube-statistics.component';
 import {CuberRecordTimeToDatePipe} from './speedcubing/pipes/cuber-record-time-to-date-pipe';
-import {NodrigenService} from './openbanking/services/nodrigen.service';
+import {GoCardlessService} from './openbanking/services/go-cardless.service';
 import {NodrigenComponent} from './openbanking/components/nodrigen/nodrigen.component';
 import {BanksService} from './openbanking/services/banks.service';
 import {TransactionsImportComponent} from './accountant/pages/transactions-import/transactions-import.component';
@@ -233,7 +233,7 @@ import {TimeRecordCategoryEditorComponent} from './ip/components/utils/time-reco
     },
     SizeService,
     ApplicationsService,
-    NodrigenService,
+    GoCardlessService,
     BanksService,
     AccountantSettingsService,
     LoanSimulatorService,

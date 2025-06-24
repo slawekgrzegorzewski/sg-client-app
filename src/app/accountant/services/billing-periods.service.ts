@@ -13,7 +13,7 @@ import {ACCOUNTS_CHANGED, BILLING_PERIOD_CHANGED} from '../../general/utils/even
 import {NgEventBus} from 'ng-event-bus';
 import {
   AffectedBankTransactionsToImportInfo
-} from '../../openbanking/model/nodrigen/affected-bank-transactions-to-import-info';
+} from '../../openbanking/model/go-cardless/affected-bank-transactions-to-import-info';
 
 @Injectable({
   providedIn: 'root'
